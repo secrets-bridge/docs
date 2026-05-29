@@ -1,12 +1,35 @@
 name: Deploy docs
 
+# Versioned docs via `mike`:
+#   - push to main          → deploys as `dev` (rolling alias)
+#   - release tag v*.*.*    → deploys as `vMAJOR.MINOR` + aliases `latest`
+#   - manual dispatch       → choose action
+#
+# Visitors land on `latest` by default (configured in mkdocs.yml's
+# extra.version.default). The version selector in the top-right of
+# every page lets them switch between `dev`, `latest`, and any
+# previously-released version.
+#
+# All versions live as subdirectories on the gh-pages branch; the
+# version selector reads `/versions.json` at runtime.
+
 on:
   push:
     branches: [main]
+    tags: ['v*.*.*']
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to deploy (e.g. v0.2 or dev)'
+        required: true
+        default: 'dev'
+      alias:
+        description: 'Alias to apply (typically `latest` for releases, blank for dev)'
+        required: false
+        default: ''
 
 permissions:
-  contents: write   # gh-deploy pushes to the gh-pages branch
+  contents: write   # mike pushes to the gh-pages branch
   pages: write
   id-token: write
 
@@ -18,10 +41,10 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout (with full history)
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # gh-deploy reads commit history
+          fetch-depth: 0   # mike reads the gh-pages branch history
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -36,20 +59,57 @@ jobs:
             ~/.cache/pip
             .venv
 
-      - name: Install mkdocs-material
+      - name: Install mkdocs-material + mike
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Build with strict
+      - name: Configure git for mike
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Strict build (smoke)
         run: mkdocs build --strict --verbose
 
-      - name: Deploy to gh-pages
-        if: github.event_name == 'push'
-        env:
-          GIT_AUTHOR_NAME: github-actions[bot]
-          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
-          GIT_COMMITTER_NAME: github-actions[bot]
-          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+      # Decide what to deploy based on the triggering ref.
+      - name: Resolve deploy version + alias
+        id: resolve
         run: |
-          mkdocs gh-deploy --force --clean --message "docs: deploy {sha} via gh-deploy"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ inputs.version }}"
+            ALIAS="${{ inputs.alias }}"
+          elif [[ "${{ github.ref_type }}" == "tag" ]]; then
+            # Tag like v0.2.0 → major.minor track (v0.2). Patch
+            # releases roll the same /v0.2/ URL. Adjust this if you
+            # want immutable /v0.2.0/ URLs instead.
+            FULL="${{ github.ref_name }}"
+            VERSION="${FULL%.*}"      # v0.2.0 → v0.2
+            ALIAS="latest"
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            VERSION="dev"
+            ALIAS=""
+          else
+            echo "::error::Unsupported trigger ref ${{ github.ref }}"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "alias=$ALIAS" >> "$GITHUB_OUTPUT"
+          echo "Deploying as version=$VERSION alias=$ALIAS"
+
+      - name: Mike deploy
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.resolve.outputs.version }}"
+          ALIAS="${{ steps.resolve.outputs.alias }}"
+          if [[ -n "$ALIAS" ]]; then
+            mike deploy --push --update-aliases "$VERSION" "$ALIAS"
+          else
+            mike deploy --push "$VERSION"
+          fi
+
+      # On the first run there's no default set; subsequent runs
+      # leave the default alone (idempotent).
+      - name: Ensure `latest` is the default landing version
+        if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
+        run: mike set-default --push latest

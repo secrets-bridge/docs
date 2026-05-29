@@ -69,6 +69,15 @@ theme:
 
 extra:
   generator: false
+  # Version selector — populated by `mike` from the gh-pages branch
+  # at runtime. CI uses:
+  #   - push to main         → `mike deploy --update-aliases dev`
+  #   - release tag `v*.*.*` → `mike deploy --update-aliases <ver> latest`
+  # The default version visitors land on is `latest`; the `dev`
+  # rolling alias serves the in-progress main branch.
+  version:
+    provider: mike
+    default: latest
   # Brand surface metadata — consumed by overrides/main.html for the
   # per-page Open Graph + Twitter card tags. Update here, not in the
   # template, when brand details change.
