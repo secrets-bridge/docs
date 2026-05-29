@@ -1,54 +1,88 @@
 ---
-title: Secrets Bridge
-description: The brain behind your secrets.
+title: Secrets Bridge — The brain behind your secrets.
+description: Unified secrets control plane for cloud-native teams. Approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS Secrets Manager, Azure Key Vault, GCP Secret Manager, and Kubernetes / GitOps.
 hide:
   - navigation
+  - toc
 ---
 
 # Secrets Bridge
 
-> **The brain behind your secrets.**
+<div class="sb-landing" markdown>
 
-A unified secrets **control plane** for cloud-native teams. Approvals, RBAC, audit, and least-privilege agent execution across HashiCorp Vault, AWS Secrets Manager, Azure Key Vault, GCP Secret Manager, and Kubernetes / GitOps — without your developers ever holding raw provider credentials.
+<div class="sb-hero" markdown>
 
-<div class="grid cards" markdown>
+<span class="sb-hero__eyebrow">Unified secrets control plane</span>
 
--   :material-shield-key: **Workflow-gated reads & writes**
+<div class="sb-hero__wordmark">SecretsBridge</div>
 
-    Developers request access through configurable workflows. Approvers vote. Agents fetch (or write) values. **Every value is single-shot, audited, and KMS-wrapped at rest.**
+<div class="sb-hero__tagline">The brain behind your secrets.</div>
 
--   :material-archive-eye: **Audit you can actually use in a SOC2 review**
+<p class="sb-hero__subhead">
+A distributed secrets control plane that connects and governs
+secrets across every provider — without replacing the tools your
+teams already use. One brain, every provider. Values stay home.
+</p>
 
-    The `audit_events` table is append-only at the schema layer
-    (`BEFORE UPDATE` / `BEFORE DELETE` triggers reject mutations).
-    The repository interface deliberately omits Update / Delete.
+<div class="sb-hero__ctas" markdown>
+[:material-rocket-launch: Try it locally](operations/docker-compose.md){ .md-button .md-button--primary }
+[:material-book-open-variant: Read the architecture](overview/architecture.md){ .md-button }
+[:material-github: Star on GitHub](https://github.com/secrets-bridge){ .md-button }
+</div>
 
--   :material-cloud-key-outline: **No KMS lock-in**
+</div>
 
-    Three backends ship today behind one `SB_KMS_BACKEND` knob:
-    `local` (dev), `vault-transit` (OSS production), `aws-kms`
-    (AWS production). Bring your own — no cloud lock-in.
+<div class="sb-section-heading">Why Secrets Bridge</div>
 
--   :material-shield-lock-open: **Plaintext never on the wire**
+<div class="grid cards sb-pillars" markdown>
+
+-   :material-shield-key:{ .lg .middle .sb-pillar-icon } &nbsp;**Workflow-gated reads & writes**
+
+    ---
+
+    Developers request access through configurable workflows.
+    Approvers vote. Agents fetch (or write) values. **Every
+    value is single-shot, audited, and KMS-wrapped at rest.**
+
+-   :material-archive-eye:{ .lg .middle .sb-pillar-icon } &nbsp;**SOC2-ready audit**
+
+    ---
+
+    The `audit_events` table is append-only at the schema
+    layer — `BEFORE UPDATE` / `BEFORE DELETE` triggers reject
+    mutations. Every action emits a correlation ID you can
+    drill into.
+
+-   :material-cloud-key-outline:{ .lg .middle .sb-pillar-icon } &nbsp;**No KMS lock-in**
+
+    ---
+
+    Three backends ship today behind one `SB_KMS_BACKEND`
+    knob: `local` (dev), `vault-transit` (OSS production),
+    `aws-kms` (AWS production). Bring your own. No cloud lock-in.
+
+-   :material-shield-lock-open:{ .lg .middle .sb-pillar-icon } &nbsp;**Plaintext never on the wire**
+
+    ---
 
     TLS + per-direction wire-envelope encryption (X25519 for
-    CP→Agent, KMS-DEK + AES-GCM for Agent→CP) means even a
+    CP→Agent, KMS-DEK + AES-GCM for Agent→CP). Even a
     TLS-terminating proxy in your mesh sees only ciphertext.
 
 </div>
 
-## Who this is for
+<div class="sb-section-heading">Who this is for</div>
 
-- **Regulated teams** (fintech, healthtech, defence-adjacent) where
-  "everyone has full Vault read access" is no longer an answer your
-  auditor will accept.
+- **Regulated teams** (fintech, healthtech, defence-adjacent)
+  where "everyone has full Vault read access" is no longer an
+  answer your auditor will accept.
 - **Platform teams** standing up multi-cluster / multi-account
   secrets governance from scratch.
 - **Compliance engineers** who need a real audit trail
   (correlation IDs, immutable rows, value-free metadata) without
   reaching for an SIEM bolt-on.
 
-## How it's different
+<div class="sb-section-heading">How it's different</div>
 
 | | Secrets Bridge | Direct Vault | AWS Secrets Manager + IAM | Most "secrets SaaS" |
 |---|---|---|---|---|
@@ -60,7 +94,7 @@ A unified secrets **control plane** for cloud-native teams. Approvals, RBAC, aud
 | KMS choice | ✅ Vault Transit / AWS KMS / local | n/a | AWS KMS only | Provider-controlled |
 | Agent uses **only** outbound traffic | ✅ Loopback probes; no inbound | n/a | n/a | Varies |
 
-## What it doesn't do (yet)
+<div class="sb-section-heading">What it doesn't do (yet)</div>
 
 - **OIDC SSO** lands as a follow-up — today the api ships with a
   local-admin email/password flow plus a JWT issued via HS256.
@@ -68,24 +102,27 @@ A unified secrets **control plane** for cloud-native teams. Approvals, RBAC, aud
   multi-tenant scoping is the next major slice.
 - **Slack / PagerDuty notifications** — webhook is in; native
   sinks are stubs.
-- **GCP Secret Manager + Azure Key Vault** discovery — works at the
-  metadata interface level; the agent's resolvers ship Vault +
-  AWS-SM today and the others land per design partner request.
+- **GCP Secret Manager + Azure Key Vault** discovery — the agent's
+  resolvers ship Vault + AWS-SM today; the others land per
+  design partner request.
 
-## Get started
+<div class="sb-status" markdown>
+<p class="sb-status__title">🚧 Pre-v1.0</p>
+<p>
+The architectural foundation is solid (BRD-aligned, polyrepo,
+infra-free <code>core</code>, type-safe Go), but several P0
+items from the
+<a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">SECURITY_REVIEW</a>
+are still open: real OIDC, agent workload identity, rate
+limiting, key-rotation runbook. We're tracking them on the
+<a href="https://github.com/orgs/secrets-bridge/projects/1">org project board</a>.
+</p>
+<p>
+If you'd like to be a <strong>design partner</strong> —
+particularly if you're in financial services, healthcare, or
+government-adjacent — please open an issue at
+<a href="https://github.com/secrets-bridge/.github">secrets-bridge/.github</a>.
+</p>
+</div>
 
-[:material-rocket-launch: **Try it locally with docker-compose**](operations/docker-compose.md){ .md-button .md-button--primary }
-[:material-book-open-variant: **Read the architecture**](overview/architecture.md){ .md-button }
-
-## Project status
-
-This is a **pre-v1.0** project. The architectural foundation is
-solid (BRD-aligned, polyrepo, infra-free `core`, type-safe Go), but
-several P0 items from the [SECURITY_REVIEW](https://github.com/secrets-bridge/.github/blob/main/SECURITY.md) are still open:
-real OIDC, agent workload identity, rate limiting, key-rotation
-runbook. We're tracking them on the
-[org project board](https://github.com/orgs/secrets-bridge/projects/1).
-
-If you'd like to be a design partner — particularly if you're in
-financial services, healthcare, or government-adjacent — please
-open an issue at [secrets-bridge/.github](https://github.com/secrets-bridge/.github).
+</div>

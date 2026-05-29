@@ -126,6 +126,9 @@ plugins:
   - search
   - tags
 
+extra_css:
+  - stylesheets/landing.css
+
 nav:
   - Home: index.md
   - Overview:
