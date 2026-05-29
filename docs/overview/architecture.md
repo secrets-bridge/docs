@@ -6,28 +6,28 @@ Plane decides; the Agent executes; the Providers own the values.
 
 ```mermaid
 flowchart LR
-    subgraph "User / Dev plane"
-        UI[UI SPA]
-        Dev[Developer]
-        Approver[Approver]
+    subgraph user_plane ["User / Dev plane"]
+        UI["UI SPA"]
+        Dev["Developer"]
+        Approver["Approver"]
         Dev --> UI
         Approver --> UI
     end
 
-    subgraph "Control Plane (Secrets Bridge)"
-        API[api - Fiber v3]
-        Postgres[(Postgres<br/>append-only audit)]
-        Redis[(Redis<br/>locks, cache,<br/>rate limit)]
-        Worker[worker<br/>sweepers + gitops]
-        KMS[KMS backend<br/>local / vault-transit / aws-kms]
+    subgraph control_plane ["Control Plane (Secrets Bridge)"]
+        API["api — Fiber v3"]
+        Postgres[("Postgres<br/>append-only audit")]
+        Redis[("Redis<br/>locks, cache,<br/>rate limit")]
+        Worker["worker<br/>sweepers + gitops"]
+        KMS["KMS backend<br/>local / vault-transit / aws-kms"]
     end
 
-    subgraph "Workload network (per cluster)"
-        Agent[agent<br/>outbound only]
-        Vault[(HashiCorp Vault)]
-        AWSSM[(AWS Secrets Manager)]
-        AzureKV[(Azure Key Vault)]
-        GCPSM[(GCP Secret Manager)]
+    subgraph workload ["Workload network (per cluster)"]
+        Agent["agent<br/>outbound only"]
+        Vault[("HashiCorp Vault")]
+        AWSSM[("AWS Secrets Manager")]
+        AzureKV[("Azure Key Vault")]
+        GCPSM[("GCP Secret Manager")]
     end
 
     UI <--> API
@@ -36,7 +36,7 @@ flowchart LR
     API <--> KMS
     Worker <--> Postgres
     Worker <--> Redis
-    Agent -->|outbound HTTPS| API
+    Agent -->|"outbound HTTPS"| API
     Agent --> Vault
     Agent --> AWSSM
     Agent --> AzureKV
@@ -78,8 +78,8 @@ flowchart LR
         API-->>UI: status: approved
         Agent->>API: POST /jobs/claim
         API-->>Agent: read job payload
-        Agent->>Vault: GetValue(prod/db/password)
-        Vault-->>Agent: { DB_PASSWORD: "..." }
+        Agent->>Vault: GetValue prod/db/password
+        Vault-->>Agent: bundle with DB_PASSWORD
         Agent->>API: POST /agents/:id/wraps<br/>(envelope-encrypted)
         Agent->>API: POST /jobs/:id/complete (succeeded)
         API-->>Agent: 204
@@ -101,7 +101,7 @@ flowchart LR
         participant Agent
         participant Vault
 
-        Dev->>UI: Submit patch request<br/>(prod/db/password = "new-value")
+        Dev->>UI: Submit patch request<br/>prod/db/password = new-value
         UI->>API: POST /requests with key_values
         API->>API: KMS-wrap each value;<br/>resolve policy → workflow
         API-->>UI: status: pending
@@ -131,13 +131,13 @@ flowchart LR
         participant Agent
         participant Vault
 
-        Admin->>API: POST /jobs (job_type=discover)
+        Admin->>API: POST /jobs job_type=discover
         Agent->>API: POST /jobs/claim
         API-->>Agent: discover job payload
         Agent->>Vault: ListMetadata(scope)
         Vault-->>Agent: 47 secrets with<br/>custom_metadata tags
-        Agent->>API: POST /agents/:id/secrets/bulk<br/>(cluster, provider, items[])
-        API->>API: Upsert on (cluster, provider, ref);<br/>preserve first_seen_at;<br/>refresh labels jsonb
+        Agent->>API: POST /agents/:id/secrets/bulk<br/>cluster + provider + items
+        API->>API: Upsert on cluster+provider+ref<br/>preserve first_seen_at<br/>refresh labels jsonb
         Agent->>API: POST /jobs/:id/complete (succeeded)
         Admin->>API: GET /secrets?label=Environment:prod<br/>&label=Team:billing
         API-->>Admin: filtered list (GIN index)
@@ -158,7 +158,7 @@ flowchart LR
         API->>API: Fan out observations for every<br/>app mapping bound to this secret
         loop Every 15s
             Worker->>API: Claim next observation
-            Worker->>ArgoCD: GET /api/v1/applications/:name/resource-tree<br/>(read-only transport — no POST)
+            Worker->>ArgoCD: GET /api/v1/applications/:name/resource-tree<br/>read-only transport, no POST
             ArgoCD-->>Worker: app status (filtered)
             Worker->>API: Update observed_state
             alt Healthy AND Synced
