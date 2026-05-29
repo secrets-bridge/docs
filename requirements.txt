@@ -1,3 +1,6 @@
 mkdocs-material==9.5.39
 mkdocs==1.6.1
 pymdown-extensions==10.11.2
+# `mike` versions the docs by deploying to subdirectories on the
+# gh-pages branch. CI runs `mike deploy` instead of `mkdocs gh-deploy`.
+mike==2.1.3
