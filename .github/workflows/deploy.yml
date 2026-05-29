@@ -1,0 +1,55 @@
+name: Deploy docs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write   # gh-deploy pushes to the gh-pages branch
+  pages: write
+  id-token: write
+
+concurrency:
+  group: docs-deploy
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # gh-deploy reads commit history
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache mkdocs deps
+        uses: actions/cache@v4
+        with:
+          key: mkdocs-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+          path: |
+            ~/.cache/pip
+            .venv
+
+      - name: Install mkdocs-material
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build with strict
+        run: mkdocs build --strict --verbose
+
+      - name: Deploy to gh-pages
+        if: github.event_name == 'push'
+        env:
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+        run: |
+          mkdocs gh-deploy --force --clean --message "docs: deploy {sha} via gh-deploy"
