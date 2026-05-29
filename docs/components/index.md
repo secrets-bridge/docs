@@ -33,18 +33,18 @@ flowchart LR
     ui["ui<br/>React SPA"]
     charts["charts<br/>Helm bundle"]
 
-    api -->|imports| core
-    worker -->|imports| api
-    worker -->|imports via pkg/| core
-    agent -->|imports| core
-    agent -.->|HTTPS only| api
-    controller -->|imports| core
-    ui -.->|HTTPS only| api
-    charts -.->|deploys| api
-    charts -.->|deploys| worker
-    charts -.->|deploys| agent
-    charts -.->|deploys| controller
-    charts -.->|deploys| ui
+    api -->|"imports"| core
+    worker -->|"imports"| api
+    worker -->|"imports via pkg"| core
+    agent -->|"imports"| core
+    agent -.->|"HTTPS only"| api
+    controller -->|"imports"| core
+    ui -.->|"HTTPS only"| api
+    charts -.->|"deploys"| api
+    charts -.->|"deploys"| worker
+    charts -.->|"deploys"| agent
+    charts -.->|"deploys"| controller
+    charts -.->|"deploys"| ui
 ```
 
 The forbidden edges:
