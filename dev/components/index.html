@@ -1394,18 +1394,18 @@ direction is one-way and reviewable.</p>
     ui["ui&lt;br/&gt;React SPA"]
     charts["charts&lt;br/&gt;Helm bundle"]
 
-    api --&gt;|imports| core
-    worker --&gt;|imports| api
-    worker --&gt;|imports via pkg/| core
-    agent --&gt;|imports| core
-    agent -.-&gt;|HTTPS only| api
-    controller --&gt;|imports| core
-    ui -.-&gt;|HTTPS only| api
-    charts -.-&gt;|deploys| api
-    charts -.-&gt;|deploys| worker
-    charts -.-&gt;|deploys| agent
-    charts -.-&gt;|deploys| controller
-    charts -.-&gt;|deploys| ui</code></pre>
+    api --&gt;|"imports"| core
+    worker --&gt;|"imports"| api
+    worker --&gt;|"imports via pkg"| core
+    agent --&gt;|"imports"| core
+    agent -.-&gt;|"HTTPS only"| api
+    controller --&gt;|"imports"| core
+    ui -.-&gt;|"HTTPS only"| api
+    charts -.-&gt;|"deploys"| api
+    charts -.-&gt;|"deploys"| worker
+    charts -.-&gt;|"deploys"| agent
+    charts -.-&gt;|"deploys"| controller
+    charts -.-&gt;|"deploys"| ui</code></pre>
 <p>The forbidden edges:</p>
 <ul>
 <li><code>agent</code> → <code>api/internal/storage</code> (would pull Postgres into the

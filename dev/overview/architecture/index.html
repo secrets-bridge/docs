@@ -1436,28 +1436,28 @@
 metadata index. Each tier holds one type of trust: the Control
 Plane decides; the Agent executes; the Providers own the values.</p>
 <pre class="mermaid"><code>flowchart LR
-    subgraph "User / Dev plane"
-        UI[UI SPA]
-        Dev[Developer]
-        Approver[Approver]
+    subgraph user_plane ["User / Dev plane"]
+        UI["UI SPA"]
+        Dev["Developer"]
+        Approver["Approver"]
         Dev --&gt; UI
         Approver --&gt; UI
     end
 
-    subgraph "Control Plane (Secrets Bridge)"
-        API[api - Fiber v3]
-        Postgres[(Postgres&lt;br/&gt;append-only audit)]
-        Redis[(Redis&lt;br/&gt;locks, cache,&lt;br/&gt;rate limit)]
-        Worker[worker&lt;br/&gt;sweepers + gitops]
-        KMS[KMS backend&lt;br/&gt;local / vault-transit / aws-kms]
+    subgraph control_plane ["Control Plane (Secrets Bridge)"]
+        API["api — Fiber v3"]
+        Postgres[("Postgres&lt;br/&gt;append-only audit")]
+        Redis[("Redis&lt;br/&gt;locks, cache,&lt;br/&gt;rate limit")]
+        Worker["worker&lt;br/&gt;sweepers + gitops"]
+        KMS["KMS backend&lt;br/&gt;local / vault-transit / aws-kms"]
     end
 
-    subgraph "Workload network (per cluster)"
-        Agent[agent&lt;br/&gt;outbound only]
-        Vault[(HashiCorp Vault)]
-        AWSSM[(AWS Secrets Manager)]
-        AzureKV[(Azure Key Vault)]
-        GCPSM[(GCP Secret Manager)]
+    subgraph workload ["Workload network (per cluster)"]
+        Agent["agent&lt;br/&gt;outbound only"]
+        Vault[("HashiCorp Vault")]
+        AWSSM[("AWS Secrets Manager")]
+        AzureKV[("Azure Key Vault")]
+        GCPSM[("GCP Secret Manager")]
     end
 
     UI &lt;--&gt; API
@@ -1466,7 +1466,7 @@ Plane decides; the Agent executes; the Providers own the values.</p>
     API &lt;--&gt; KMS
     Worker &lt;--&gt; Postgres
     Worker &lt;--&gt; Redis
-    Agent --&gt;|outbound HTTPS| API
+    Agent --&gt;|"outbound HTTPS"| API
     Agent --&gt; Vault
     Agent --&gt; AWSSM
     Agent --&gt; AzureKV
@@ -1540,8 +1540,8 @@ Plane decides; the Agent executes; the Providers own the values.</p>
     API--&gt;&gt;UI: status: approved
     Agent-&gt;&gt;API: POST /jobs/claim
     API--&gt;&gt;Agent: read job payload
-    Agent-&gt;&gt;Vault: GetValue(prod/db/password)
-    Vault--&gt;&gt;Agent: { DB_PASSWORD: "..." }
+    Agent-&gt;&gt;Vault: GetValue prod/db/password
+    Vault--&gt;&gt;Agent: bundle with DB_PASSWORD
     Agent-&gt;&gt;API: POST /agents/:id/wraps&lt;br/&gt;(envelope-encrypted)
     Agent-&gt;&gt;API: POST /jobs/:id/complete (succeeded)
     API--&gt;&gt;Agent: 204
@@ -1560,7 +1560,7 @@ Plane decides; the Agent executes; the Providers own the values.</p>
     participant Agent
     participant Vault
 
-    Dev-&gt;&gt;UI: Submit patch request&lt;br/&gt;(prod/db/password = "new-value")
+    Dev-&gt;&gt;UI: Submit patch request&lt;br/&gt;prod/db/password = new-value
     UI-&gt;&gt;API: POST /requests with key_values
     API-&gt;&gt;API: KMS-wrap each value;&lt;br/&gt;resolve policy → workflow
     API--&gt;&gt;UI: status: pending
@@ -1587,13 +1587,13 @@ Plane decides; the Agent executes; the Providers own the values.</p>
     participant Agent
     participant Vault
 
-    Admin-&gt;&gt;API: POST /jobs (job_type=discover)
+    Admin-&gt;&gt;API: POST /jobs job_type=discover
     Agent-&gt;&gt;API: POST /jobs/claim
     API--&gt;&gt;Agent: discover job payload
     Agent-&gt;&gt;Vault: ListMetadata(scope)
     Vault--&gt;&gt;Agent: 47 secrets with&lt;br/&gt;custom_metadata tags
-    Agent-&gt;&gt;API: POST /agents/:id/secrets/bulk&lt;br/&gt;(cluster, provider, items[])
-    API-&gt;&gt;API: Upsert on (cluster, provider, ref);&lt;br/&gt;preserve first_seen_at;&lt;br/&gt;refresh labels jsonb
+    Agent-&gt;&gt;API: POST /agents/:id/secrets/bulk&lt;br/&gt;cluster + provider + items
+    API-&gt;&gt;API: Upsert on cluster+provider+ref&lt;br/&gt;preserve first_seen_at&lt;br/&gt;refresh labels jsonb
     Agent-&gt;&gt;API: POST /jobs/:id/complete (succeeded)
     Admin-&gt;&gt;API: GET /secrets?label=Environment:prod&lt;br/&gt;&amp;label=Team:billing
     API--&gt;&gt;Admin: filtered list (GIN index)</code></pre>
@@ -1610,7 +1610,7 @@ AND <code>SB_WORKER_GITOPS_ENABLED=true</code> on the worker.</p>
     API-&gt;&gt;API: Fan out observations for every&lt;br/&gt;app mapping bound to this secret
     loop Every 15s
         Worker-&gt;&gt;API: Claim next observation
-        Worker-&gt;&gt;ArgoCD: GET /api/v1/applications/:name/resource-tree&lt;br/&gt;(read-only transport — no POST)
+        Worker-&gt;&gt;ArgoCD: GET /api/v1/applications/:name/resource-tree&lt;br/&gt;read-only transport, no POST
         ArgoCD--&gt;&gt;Worker: app status (filtered)
         Worker-&gt;&gt;API: Update observed_state
         alt Healthy AND Synced
