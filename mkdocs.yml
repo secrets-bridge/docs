@@ -1,0 +1,163 @@
+site_name: Secrets Bridge
+# Trailing slash matters: MkDocs uses site_url verbatim for the
+# <link rel="canonical"> tag and for absolute URLs in sitemap.xml.
+# Must point at the site root since we publish unversioned docs.
+site_url: https://secrets-bridge.io/
+site_description: >-
+  Unified secrets control plane for cloud-native teams. Approvals,
+  RBAC, audit, and least-privilege agent execution across Vault, AWS
+  Secrets Manager, Azure Key Vault, GCP Secret Manager, and
+  Kubernetes / GitOps.
+site_author: Secrets Bridge contributors
+repo_name: secrets-bridge
+repo_url: https://github.com/secrets-bridge
+edit_uri: edit/main/docs/
+
+copyright: >-
+  Copyright &copy; 2026 Secrets Bridge contributors.
+  <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
+
+theme:
+  name: material
+  language: en
+  custom_dir: overrides
+  favicon: assets/favicon.svg
+  logo: assets/icon.svg
+  palette:
+    # Match the SPA brand: cyan accent on Navy 900 / Dark Navy surfaces
+    # so the docs feel like the same product.
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/key-chain
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.indexes
+    - navigation.tracking
+    - navigation.instant
+    - navigation.instant.progress
+    - toc.follow
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.action.edit
+    - content.action.view
+    - search.suggest
+    - search.highlight
+    - search.share
+    - announce.dismiss
+
+extra:
+  generator: false
+  # Brand surface metadata — consumed by overrides/main.html for the
+  # per-page Open Graph + Twitter card tags. Update here, not in the
+  # template, when brand details change.
+  brand:
+    name: Secrets Bridge
+    tagline: The brain behind your secrets.
+    og_image: https://raw.githubusercontent.com/secrets-bridge/.github/main/profile/og-banner.png
+    twitter_handle: ""  # set when an org Twitter account exists
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/secrets-bridge
+      name: GitHub organisation
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/u/secretsbridge
+      name: Docker images
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+plugins:
+  - search
+  - tags
+
+extra_css:
+  - stylesheets/landing.css
+
+nav:
+  - Home: index.md
+  - Overview:
+      - overview/index.md
+      - Architecture: overview/architecture.md
+      - Threat model & hard rules: overview/threat-model.md
+      - Glossary: overview/glossary.md
+  - Components:
+      - components/index.md
+      - Control Plane API: components/api.md
+      - Agent: components/agent.md
+      - Worker: components/worker.md
+      - Controller (Kubernetes): components/controller.md
+      - UI (SPA): components/ui.md
+      - Core (shared library): components/core.md
+  - Design system:
+      - design/index.md
+      - Brand voice: design/brand-voice.md
+      - Tokens & theme: design/tokens.md
+      - Figma file & assets: design/figma.md
+  - Operations:
+      - operations/index.md
+      - Deploying with docker-compose: operations/docker-compose.md
+      - Bootstrap & first sign-in: operations/bootstrap.md
+      - Configuration reference: operations/config.md
+      - Troubleshooting: operations/troubleshooting.md
+  - Reference:
+      - reference/index.md
+      - HTTP API endpoints: reference/api-endpoints.md
+      - Providers supported: reference/providers.md
+      - KMS backends: reference/kms-backends.md
+      - Permissions catalog: reference/permissions.md

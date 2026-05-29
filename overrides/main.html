@@ -1,0 +1,96 @@
+{# Overrides Material's main template to inject SEO + social-card meta.
+   The brand values come from `extra.brand` in mkdocs.yml so updating
+   them is a one-line change instead of a template edit. #}
+{% extends "base.html" %}
+
+{% block extrahead %}
+  {{ super() }}
+
+  {# Page-specific values with fallbacks to site-wide defaults. #}
+  {% set page_title = page.meta.title if page and page.meta and page.meta.title else page.title if page and page.title else config.site_name %}
+  {% set page_description = page.meta.description if page and page.meta and page.meta.description else config.site_description %}
+  {% set page_url = page.canonical_url if page and page.canonical_url else config.site_url %}
+  {% set og_image = page.meta.image if page and page.meta and page.meta.image else config.extra.brand.og_image %}
+
+  {# Canonical URL — prevents duplicate-content penalties when the site
+     is mirrored or accessed through alternate hosts. #}
+  <link rel="canonical" href="{{ page_url }}" />
+
+  {# Open Graph. Twitter falls back to these when its own tags are
+     absent, so the Twitter set below is mostly belt-and-braces. #}
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="{{ config.extra.brand.name }}" />
+  <meta property="og:title" content="{{ page_title }}" />
+  <meta property="og:description" content="{{ page_description }}" />
+  <meta property="og:url" content="{{ page_url }}" />
+  <meta property="og:image" content="{{ og_image }}" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="{{ config.extra.brand.name }} — {{ config.extra.brand.tagline }}" />
+  <meta property="og:locale" content="en_US" />
+
+  {# Twitter card. Use summary_large_image so the OG banner renders at
+     full width in the timeline. #}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{{ page_title }}" />
+  <meta name="twitter:description" content="{{ page_description }}" />
+  <meta name="twitter:image" content="{{ og_image }}" />
+  <meta name="twitter:image:alt" content="{{ config.extra.brand.name }} — {{ config.extra.brand.tagline }}" />
+  {% if config.extra.brand.twitter_handle %}
+  <meta name="twitter:site" content="{{ config.extra.brand.twitter_handle }}" />
+  {% endif %}
+
+  {# Apple touch icon — used when a visitor adds the site to their home
+     screen on iOS / iPadOS. Falls through to the favicon for everyone
+     else. #}
+  <link rel="apple-touch-icon" href="{{ 'assets/icon.svg' | url }}" />
+
+  {# Theme color matches the brand Navy 900 so the iOS / Android browser
+     chrome doesn't render a default blue strip. #}
+  <meta name="theme-color" content="#0B1220" />
+
+  {# Robots — explicit allow for clarity. The robots.txt at the root
+     covers the same ground but per-page directives let us mark specific
+     pages noindex in the future (e.g. drafts) without touching the
+     site-wide config. #}
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+  {# Structured data — Organization schema for the homepage so search
+     engines can build a Knowledge Panel. Other pages get a
+     TechArticle schema with the page title. #}
+  {% if page and page.is_homepage %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "{{ config.extra.brand.name }}",
+    "alternateName": "SecretsBridge",
+    "url": "{{ config.site_url }}",
+    "logo": "{{ og_image }}",
+    "description": "{{ config.site_description }}",
+    "sameAs": [
+      "https://github.com/secrets-bridge"
+    ]
+  }
+  </script>
+  {% else %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "{{ page_title }}",
+    "description": "{{ page_description }}",
+    "url": "{{ page_url }}",
+    "image": "{{ og_image }}",
+    "publisher": {
+      "@type": "Organization",
+      "name": "{{ config.extra.brand.name }}",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "{{ og_image }}"
+      }
+    }
+  }
+  </script>
+  {% endif %}
+{% endblock %}
