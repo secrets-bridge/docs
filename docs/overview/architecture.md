@@ -103,7 +103,7 @@ flowchart LR
 
         Dev->>UI: Submit patch request<br/>prod/db/password = new-value
         UI->>API: POST /requests with key_values
-        API->>API: KMS-wrap each value;<br/>resolve policy → workflow
+        API->>API: KMS-wrap each value<br/>resolve policy → workflow
         API-->>UI: status: pending
         Approver->>UI: Approve
         UI->>API: POST /requests/:id/approve
