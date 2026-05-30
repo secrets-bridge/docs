@@ -1,0 +1,7 @@
+# MkDocs build output — never commit; CI builds afresh.
+/site/
+
+# Python venv from local mkdocs build
+/.venv/
+__pycache__/
+*.py[cod]

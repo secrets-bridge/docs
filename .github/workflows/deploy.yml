@@ -113,3 +113,15 @@ jobs:
       - name: Ensure `latest` is the default landing version
         if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
         run: mike set-default --push latest
+
+      # SEO P0-1 (2026-05-30): until we cut the first `latest` tag, the
+      # site root would otherwise serve the `dev` content without a
+      # redirect — Google indexes both `/` and `/dev/...` as duplicates
+      # AND the canonical inside each `dev` page conflicts with the
+      # sitemap's clean URLs. Setting `dev` as the default makes `/`
+      # → `/dev/` a real redirect so there's one canonical URL per
+      # page. The condition above (the `latest` step) takes precedence
+      # the moment we tag.
+      - name: Default to `dev` while no `latest` exists
+        if: github.ref == 'refs/heads/main'
+        run: mike set-default --push dev

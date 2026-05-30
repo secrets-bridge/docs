@@ -1,13 +1,16 @@
 site_name: Secrets Bridge
 # Trailing slash matters: MkDocs uses site_url verbatim for the
 # <link rel="canonical"> tag and for absolute URLs in sitemap.xml.
-# Must point at the site root since we publish unversioned docs.
+# Must point at the site root since we publish via `mike` and the
+# deploy step (set-default --push dev) makes `/` redirect to the
+# default version's URL.
 site_url: https://secrets-bridge.io/
+# Trimmed to <= 155 chars so Google's SERP snippet doesn't truncate
+# our key terms (audit 2026-05-30 P1-4).
 site_description: >-
-  Unified secrets control plane for cloud-native teams. Approvals,
-  RBAC, audit, and least-privilege agent execution across Vault, AWS
-  Secrets Manager, Azure Key Vault, GCP Secret Manager, and
-  Kubernetes / GitOps.
+  Unified secrets control plane: approvals, RBAC, audit, and
+  least-privilege agent execution across Vault, AWS, Azure, GCP, and
+  Kubernetes.
 site_author: Secrets Bridge contributors
 repo_name: secrets-bridge
 repo_url: https://github.com/secrets-bridge
@@ -84,7 +87,10 @@ extra:
   brand:
     name: Secrets Bridge
     tagline: The brain behind your secrets.
-    og_image: https://raw.githubusercontent.com/secrets-bridge/.github/main/profile/og-banner.png
+    # Self-hosted on the docs domain. raw.githubusercontent.com is
+    # rate-limited and not cache-friendly for social crawlers (SEO
+    # audit 2026-05-30 P2-7). 1200×630 PNG.
+    og_image: https://secrets-bridge.io/assets/og-banner.png
     twitter_handle: ""  # set when an org Twitter account exists
   social:
     - icon: fontawesome/brands/github
