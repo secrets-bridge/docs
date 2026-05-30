@@ -151,6 +151,7 @@ nav:
   - Overview:
       - overview/index.md
       - Architecture: overview/architecture.md
+      - Teams and section heads: overview/teams-and-section-heads.md
       - Threat model & hard rules: overview/threat-model.md
       - Glossary: overview/glossary.md
   - Components:
