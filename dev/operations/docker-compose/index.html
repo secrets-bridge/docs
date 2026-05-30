@@ -26,10 +26,10 @@
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
     
     
-      
-        <title>Deploying with docker-compose - Secrets Bridge</title>
-      
-    
+  
+    <title>Deploying with docker-compose - Secrets Bridge</title>
+  
+
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
       
@@ -63,6 +63,7 @@
     
     
   
+
 
   
   
@@ -1075,6 +1076,51 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#optional-profiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Optional profiles
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wiring-an-agent-end-to-end-vault-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Wiring an agent end-to-end (Vault example)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ports" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ports
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resetting-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resetting state
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-docker-compose-is-good-for-what-its-not" class="md-nav__link">
+    <span class="md-ellipsis">
+      What docker-compose is good for, what it's not
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1346,6 +1392,51 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#optional-profiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Optional profiles
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wiring-an-agent-end-to-end-vault-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Wiring an agent end-to-end (Vault example)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ports" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ports
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resetting-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resetting state
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-docker-compose-is-good-for-what-its-not" class="md-nav__link">
+    <span class="md-ellipsis">
+      What docker-compose is good for, what it's not
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1382,15 +1473,16 @@
 Postgres + Redis + api + ui + ingress in one command; optional
 profiles add <code>worker</code>, <code>vault</code>, <code>agent</code>, or <code>full</code> (all of them).</p>
 <h2 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
-<p>```bash
-git clone https://github.com/secrets-bridge/secrets-bridge.git
-cd secrets-bridge</p>
-<h1 id="default-profile-postgres-redis-api-ui-ingress">Default profile: postgres + redis + api + ui + ingress.<a class="headerlink" href="#default-profile-postgres-redis-api-ui-ingress" title="Permanent link">&para;</a></h1>
-<p>docker compose up -d --build</p>
-<h1 id="wait-a-few-seconds-then-check">Wait a few seconds, then check:<a class="headerlink" href="#wait-a-few-seconds-then-check" title="Permanent link">&para;</a></h1>
-<p>curl -fsS http://localhost:18080/readyz</p>
-<h1 _status_:_ready_="&quot;status&quot;:&quot;ready&quot;" id="_1">→<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>```</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/secrets-bridge/secrets-bridge.git
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>secrets-bridge
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Default profile: postgres + redis + api + ui + ingress.</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Wait a few seconds, then check:</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>http://localhost:18080/readyz
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># → {&quot;status&quot;:&quot;ready&quot;}</span>
+</span></code></pre></div>
 <p>Open <strong>http://localhost:18080/</strong> in your browser. The seed
 admin credentials are:</p>
 <table>
@@ -1416,57 +1508,64 @@ admin credentials are:</p>
 <p class="admonition-title">Rotate these immediately for any non-toy use</p>
 <p>The seed password lives in <code>docker-compose.yml</code> and is
 intended <strong>only</strong> for local development. Override via shell env:</p>
-<p><code>bash
-SB_BOOTSTRAP_ADMIN_EMAIL=alice@example.com \
-SB_BOOTSTRAP_ADMIN_PASSWORD="$(openssl rand -base64 24)" \
-docker compose up -d</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">SB_BOOTSTRAP_ADMIN_EMAIL</span><span class="o">=</span>alice@example.com<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nv">SB_BOOTSTRAP_ADMIN_PASSWORD</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>openssl<span class="w"> </span>rand<span class="w"> </span>-base64<span class="w"> </span><span class="m">24</span><span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
+</span></code></pre></div>
 <p>The bootstrap step is idempotent — once <code>local_users</code> has any
 row, the env vars are ignored. To re-seed, wipe the volume:</p>
-<p><code>bash
-docker compose down -v</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>down<span class="w"> </span>-v
+</span></code></pre></div>
 </div>
 <h2 id="optional-profiles">Optional profiles<a class="headerlink" href="#optional-profiles" title="Permanent link">&para;</a></h2>
-<p>```bash</p>
-<h1 id="worker-sweepers-gitops-observation-poller-stub">Worker (sweepers + GitOps observation poller stub)<a class="headerlink" href="#worker-sweepers-gitops-observation-poller-stub" title="Permanent link">&para;</a></h1>
-<p>docker compose --profile worker up -d</p>
-<h1 id="vault-dev-container-needed-for-the-agent-to-readwrite-real-values">Vault dev container (needed for the agent to read/write real values)<a class="headerlink" href="#vault-dev-container-needed-for-the-agent-to-readwrite-real-values" title="Permanent link">&para;</a></h1>
-<p>docker compose --profile vault up -d</p>
-<h1 id="agent-requires-a-manual-mint-step-first-see-below">Agent — REQUIRES a manual mint step first; see below<a class="headerlink" href="#agent-requires-a-manual-mint-step-first-see-below" title="Permanent link">&para;</a></h1>
-<p>docker compose --profile agent up -d</p>
-<h1 id="everything-at-once">Everything at once<a class="headerlink" href="#everything-at-once" title="Permanent link">&para;</a></h1>
-<p>docker compose --profile full up -d
-```</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Worker (sweepers + GitOps observation poller stub)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>--profile<span class="w"> </span>worker<span class="w"> </span>up<span class="w"> </span>-d
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Vault dev container (needed for the agent to read/write real values)</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>docker<span class="w"> </span>compose<span class="w"> </span>--profile<span class="w"> </span>vault<span class="w"> </span>up<span class="w"> </span>-d
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Agent — REQUIRES a manual mint step first; see below</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>docker<span class="w"> </span>compose<span class="w"> </span>--profile<span class="w"> </span>agent<span class="w"> </span>up<span class="w"> </span>-d
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># Everything at once</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>docker<span class="w"> </span>compose<span class="w"> </span>--profile<span class="w"> </span>full<span class="w"> </span>up<span class="w"> </span>-d
+</span></code></pre></div>
 <h2 id="wiring-an-agent-end-to-end-vault-example">Wiring an agent end-to-end (Vault example)<a class="headerlink" href="#wiring-an-agent-end-to-end-vault-example" title="Permanent link">&para;</a></h2>
-<p>```bash</p>
-<h1 id="1-mint-an-agent-from-the-ui-sidebar-agents-mint-agent">1. Mint an agent from the UI (Sidebar → Agents → + Mint agent)<a class="headerlink" href="#1-mint-an-agent-from-the-ui-sidebar-agents-mint-agent" title="Permanent link">&para;</a></h1>
-<h1 id="or-via-curl">OR via curl:<a class="headerlink" href="#or-via-curl" title="Permanent link">&para;</a></h1>
-<p>TOKEN=$(curl -fsS -X POST http://localhost:18080/api/v1/auth/login \
-  -H 'Content-Type: application/json' \
-  -d '{"email":"admin@example.com","password":"admin"}' \
-  | jq -r .token)</p>
-<p>MINT=$(curl -fsS -X POST http://localhost:18080/api/v1/agents \
-  -H "Authorization: Bearer $TOKEN" \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"local-vault","scope":{"cluster":"local"}}')
-AGENT_ID=$(echo "$MINT" | jq -r .id)
-AGENT_SECRET=$(echo "$MINT" | jq -r .agent_secret)</p>
-<h1 id="2-bring-up-vault-agent-with-those-creds">2. Bring up Vault + agent with those creds<a class="headerlink" href="#2-bring-up-vault-agent-with-those-creds" title="Permanent link">&para;</a></h1>
-<p>SB_AGENT_ID=$AGENT_ID SB_AGENT_SECRET=$AGENT_SECRET \
-  docker compose --profile vault --profile agent up -d</p>
-<h1 id="3-seed-a-secret-in-vault">3. Seed a secret in Vault<a class="headerlink" href="#3-seed-a-secret-in-vault" title="Permanent link">&para;</a></h1>
-<p>docker exec secrets-bridge-vault-1 sh -c \
-  'VAULT_ADDR=http://127.0.0.1:8200 VAULT_TOKEN=devroot \
-   vault kv put secret/prod/db/password \
-   DB_PASSWORD=hunter2-the-actual-prod-password'</p>
-<h1 id="4-from-the-ui-requests-new-request-read-flow-against">4. From the UI: Requests → + New request → Read flow against<a class="headerlink" href="#4-from-the-ui-requests-new-request-read-flow-against" title="Permanent link">&para;</a></h1>
-<h1 id="target_refproddbpassword-leave-provider-config-blank">target_ref=prod/db/password, leave provider config blank<a class="headerlink" href="#target_refproddbpassword-leave-provider-config-blank" title="Permanent link">&para;</a></h1>
-<h1 id="defaults-to-kvmountsecret-for-vault">(defaults to kvMount=secret for Vault).<a class="headerlink" href="#defaults-to-kvmountsecret-for-vault" title="Permanent link">&para;</a></h1>
-<h1 id="5-sign-in-as-a-second-user-or-from-another-browser-as-the">5. Sign in as a second user (or from another browser as the<a class="headerlink" href="#5-sign-in-as-a-second-user-or-from-another-browser-as-the" title="Permanent link">&para;</a></h1>
-<h1 id="same-user-with-allow_self_approval-enabled-on-the-workflow">same user with allow_self_approval enabled on the workflow)<a class="headerlink" href="#same-user-with-allow_self_approval-enabled-on-the-workflow" title="Permanent link">&para;</a></h1>
-<h1 id="and-approve">and approve.<a class="headerlink" href="#and-approve" title="Permanent link">&para;</a></h1>
-<h1 id="6-the-agent-claims-fetches-from-vault-posts-the-wrap-back-as">6. The agent claims, fetches from Vault, posts the wrap. Back as<a class="headerlink" href="#6-the-agent-claims-fetches-from-vault-posts-the-wrap-back-as" title="Permanent link">&para;</a></h1>
-<h1 id="the-requester-click-reveal-see-the-plaintext-exactly-once">the requester, click Reveal → see the plaintext exactly once.<a class="headerlink" href="#the-requester-click-reveal-see-the-plaintext-exactly-once" title="Permanent link">&para;</a></h1>
-<p>```</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># 1. Mint an agent from the UI (Sidebar → Agents → + Mint agent)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="c1">#    OR via curl:</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nv">TOKEN</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-fsS<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:18080/api/v1/auth/login<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;email&quot;:&quot;admin@example.com&quot;,&quot;password&quot;:&quot;admin&quot;}&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span>.token<span class="k">)</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="nv">MINT</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-fsS<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:18080/api/v1/agents<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;name&quot;:&quot;local-vault&quot;,&quot;scope&quot;:{&quot;cluster&quot;:&quot;local&quot;}}&#39;</span><span class="k">)</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="nv">AGENT_ID</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$MINT</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span>.id<span class="k">)</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="nv">AGENT_SECRET</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$MINT</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span>.agent_secret<span class="k">)</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="c1"># 2. Bring up Vault + agent with those creds</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="nv">SB_AGENT_ID</span><span class="o">=</span><span class="nv">$AGENT_ID</span><span class="w"> </span><span class="nv">SB_AGENT_SECRET</span><span class="o">=</span><span class="nv">$AGENT_SECRET</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">  </span>docker<span class="w"> </span>compose<span class="w"> </span>--profile<span class="w"> </span>vault<span class="w"> </span>--profile<span class="w"> </span>agent<span class="w"> </span>up<span class="w"> </span>-d
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="c1"># 3. Seed a secret in Vault</span>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>secrets-bridge-vault-1<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">  </span><span class="s1">&#39;VAULT_ADDR=http://127.0.0.1:8200 VAULT_TOKEN=devroot \</span>
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="s1">   vault kv put secret/prod/db/password \</span>
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="s1">   DB_PASSWORD=hunter2-the-actual-prod-password&#39;</span>
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="c1"># 4. From the UI: Requests → + New request → Read flow against</span>
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="c1">#    target_ref=prod/db/password, leave provider config blank</span>
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="c1">#    (defaults to kvMount=secret for Vault).</span>
+</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>
+</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="c1"># 5. Sign in as a second user (or from another browser as the</span>
+</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="c1">#    same user with allow_self_approval enabled on the workflow)</span>
+</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="c1">#    and approve.</span>
+</span><span id="__span-4-32"><a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>
+</span><span id="__span-4-33"><a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="c1"># 6. The agent claims, fetches from Vault, posts the wrap. Back as</span>
+</span><span id="__span-4-34"><a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a><span class="c1">#    the requester, click Reveal → see the plaintext exactly once.</span>
+</span></code></pre></div>
 <h2 id="ports">Ports<a class="headerlink" href="#ports" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1500,14 +1599,13 @@ AGENT_SECRET=$(echo "$MINT" | jq -r .agent_secret)</p>
 </tbody>
 </table>
 <p>Override the host port via <code>INGRESS_HOST_PORT</code>:</p>
-<p><code>bash
-INGRESS_HOST_PORT=19090 docker compose up -d</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">INGRESS_HOST_PORT</span><span class="o">=</span><span class="m">19090</span><span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
+</span></code></pre></div>
 <h2 id="resetting-state">Resetting state<a class="headerlink" href="#resetting-state" title="Permanent link">&para;</a></h2>
-<p>```bash</p>
-<h1 id="stop-everything-and-drop-the-postgres-volume-wipes-all-data">Stop everything and drop the Postgres volume (wipes all data,<a class="headerlink" href="#stop-everything-and-drop-the-postgres-volume-wipes-all-data" title="Permanent link">&para;</a></h1>
-<h1 id="including-the-bootstrapped-admin">including the bootstrapped admin)<a class="headerlink" href="#including-the-bootstrapped-admin" title="Permanent link">&para;</a></h1>
-<p>docker compose down -v
-```</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Stop everything and drop the Postgres volume (wipes all data,</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1"># including the bootstrapped admin)</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>docker<span class="w"> </span>compose<span class="w"> </span>down<span class="w"> </span>-v
+</span></code></pre></div>
 <h2 id="what-docker-compose-is-good-for-what-its-not">What docker-compose is good for, what it's not<a class="headerlink" href="#what-docker-compose-is-good-for-what-its-not" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1575,7 +1673,7 @@ KMS backend.</p>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Secrets Bridge contributors. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
+      Copyright &copy; 2026 Secrets Bridge contributors. Built by <a href="https://www.linkedin.com/in/haydercyber1/" rel="author" target="_blank">Haider Raed</a>. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
     </div>
   
   

@@ -26,10 +26,10 @@
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
     
     
-      
-        <title>Control Plane API - Secrets Bridge</title>
-      
-    
+  
+    <title>Control Plane API - Secrets Bridge</title>
+  
+
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
       
@@ -63,6 +63,7 @@
     
     
   
+
 
   
   
@@ -1441,20 +1442,21 @@
 domain, mediates between users (via the SPA) and agents (via
 outbound HTTPS).</p>
 <h2 id="layout">Layout<a class="headerlink" href="#layout" title="Permanent link">&para;</a></h2>
-<p><code>api/
-├── cmd/api/                # main, config, server bootstrap
-├── internal/
-│   ├── auth/               # JWT signer + permission catalog + auth.Require
-│   ├── handlers/           # HTTP layer (one file per aggregate)
-│   ├── middleware/         # Auth (Bearer→X-User-Id→anon), RequestID, Logger, Recover
-│   ├── observability/      # slog JSON logger
-│   └── services/           # business logic (one file per aggregate)
-└── pkg/
-    ├── storage/            # Postgres repositories + migrations (embed.FS)
-    ├── runtime/            # Redis primitives (locks, idempotency, rate limit, pub/sub)
-    ├── keymgmt/            # KMS backends (local / vault-transit / aws-kms)
-    ├── sealing/            # X25519 + HKDF + AES-GCM for wire envelope
-    └── argocd/             # read-only ArgoCD client (BRD §26)</code></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>api/
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── cmd/api/                # main, config, server bootstrap
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├── internal/
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   ├── auth/               # JWT signer + permission catalog + auth.Require
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   ├── handlers/           # HTTP layer (one file per aggregate)
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── middleware/         # Auth (Bearer→X-User-Id→anon), RequestID, Logger, Recover
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   ├── observability/      # slog JSON logger
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   └── services/           # business logic (one file per aggregate)
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>└── pkg/
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    ├── storage/            # Postgres repositories + migrations (embed.FS)
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    ├── runtime/            # Redis primitives (locks, idempotency, rate limit, pub/sub)
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    ├── keymgmt/            # KMS backends (local / vault-transit / aws-kms)
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    ├── sealing/            # X25519 + HKDF + AES-GCM for wire envelope
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    └── argocd/             # read-only ArgoCD client (BRD §26)
+</span></code></pre></div>
 <p>The <code>internal/</code> boundary is closed; the <code>pkg/</code> boundary is
 deliberately open because <code>worker</code> imports <code>pkg/storage</code> and
 <code>pkg/keymgmt</code>.</p>
@@ -1648,7 +1650,7 @@ exhaustive list.</p>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Secrets Bridge contributors. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
+      Copyright &copy; 2026 Secrets Bridge contributors. Built by <a href="https://www.linkedin.com/in/haydercyber1/" rel="author" target="_blank">Haider Raed</a>. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
     </div>
   
   

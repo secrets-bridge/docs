@@ -26,10 +26,10 @@
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
     
     
-      
-        <title>Architecture - Secrets Bridge</title>
-      
-    
+  
+    <title>Architecture - Secrets Bridge</title>
+  
+
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
       
@@ -63,6 +63,7 @@
     
     
   
+
 
   
   
@@ -1626,11 +1627,12 @@ AND <code>SB_WORKER_GITOPS_ENABLED=true</code> on the worker.</p>
 </div>
 <h2 id="defense-in-depth-on-the-wire">Defense-in-depth on the wire<a class="headerlink" href="#defense-in-depth-on-the-wire" title="Permanent link">&para;</a></h2>
 <p>Three layers of encryption protect every value-bearing flow:</p>
-<p><code>TLS (mandatory)              — passive sniffers, compromised system CA
-  ↓
-Wire envelope (Piece 8b)     — TLS-terminating proxies, CP-side log leaks
-  ↓
-Storage envelope (Piece 8a)  — DB exfiltration, offline backup theft</code></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>TLS (mandatory)              — passive sniffers, compromised system CA
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  ↓
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Wire envelope (Piece 8b)     — TLS-terminating proxies, CP-side log leaks
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  ↓
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Storage envelope (Piece 8a)  — DB exfiltration, offline backup theft
+</span></code></pre></div>
 <table>
 <thead>
 <tr>
@@ -1701,7 +1703,7 @@ example the agent's CI fails the build if it ever picks up
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Secrets Bridge contributors. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
+      Copyright &copy; 2026 Secrets Bridge contributors. Built by <a href="https://www.linkedin.com/in/haydercyber1/" rel="author" target="_blank">Haider Raed</a>. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
     </div>
   
   

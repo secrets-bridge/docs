@@ -26,10 +26,10 @@
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
     
     
-      
-        <title>Troubleshooting - Secrets Bridge</title>
-      
-    
+  
+    <title>Troubleshooting - Secrets Bridge</title>
+  
+
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
       
@@ -63,6 +63,7 @@
     
     
   
+
 
   
   
@@ -1184,8 +1185,86 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#agent-stays-stale-forever" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agent stays "stale" forever
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vault-read-returns-permission-denied" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vault read returns "permission denied"
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#useful-queries-against-the-audit-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      Useful queries against the audit log
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Useful queries against the audit log">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#find-every-action-for-one-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      Find every action for one request
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#find-every-login-failure-in-the-last-hour" class="md-nav__link">
+    <span class="md-ellipsis">
+      Find every login failure in the last hour
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#find-every-wrap-retrieval-who-saw-which-value-when" class="md-nav__link">
+    <span class="md-ellipsis">
+      Find every wrap retrieval (who saw which value when)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-the-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reading the metrics
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-in-doubt" class="md-nav__link">
+    <span class="md-ellipsis">
+      When in doubt
+    </span>
+  </a>
   
 </li>
       
@@ -1443,8 +1522,86 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#agent-stays-stale-forever" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agent stays "stale" forever
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vault-read-returns-permission-denied" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vault read returns "permission denied"
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#useful-queries-against-the-audit-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      Useful queries against the audit log
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Useful queries against the audit log">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#find-every-action-for-one-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      Find every action for one request
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#find-every-login-failure-in-the-last-hour" class="md-nav__link">
+    <span class="md-ellipsis">
+      Find every login failure in the last hour
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#find-every-wrap-retrieval-who-saw-which-value-when" class="md-nav__link">
+    <span class="md-ellipsis">
+      Find every wrap retrieval (who saw which value when)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-the-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reading the metrics
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-in-doubt" class="md-nav__link">
+    <span class="md-ellipsis">
+      When in doubt
+    </span>
+  </a>
   
 </li>
       
@@ -1483,19 +1640,19 @@
 <h2 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h2>
 <h3 id="failed-to-load-on-every-page">"Failed to load …" on every page<a class="headerlink" href="#failed-to-load-on-every-page" title="Permanent link">&para;</a></h3>
 <p>Likely the api isn't reachable. Check:</p>
-<p><code>bash
-curl -fsS http://localhost:18080/readyz</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>http://localhost:18080/readyz
+</span></code></pre></div>
 <p>If 503, the api can see Postgres or Redis but one of them isn't
 ready — the response body lists which:</p>
-<p><code>json
-{"status":"unready","checks":{"postgres":"ping failed: dial tcp ..."}}</code></p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="s2">&quot;unready&quot;</span><span class="p">,</span><span class="nt">&quot;checks&quot;</span><span class="p">:{</span><span class="nt">&quot;postgres&quot;</span><span class="p">:</span><span class="s2">&quot;ping failed: dial tcp ...&quot;</span><span class="p">}}</span>
+</span></code></pre></div>
 <h3 id="login-returns-401-with-a-valid-password">Login returns 401 with a valid password<a class="headerlink" href="#login-returns-401-with-a-valid-password" title="Permanent link">&para;</a></h3>
 <p>Check the audit log:</p>
-<p><code>bash
-TOKEN=...  # need an admin token from another session
-curl -fsS "http://localhost:18080/api/v1/audit-events?action=auth.login" \
-  -H "Authorization: Bearer $TOKEN" \
-  | jq '.[] | select(.status=="denied")'</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">TOKEN</span><span class="o">=</span>...<span class="w">  </span><span class="c1"># need an admin token from another session</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">&quot;http://localhost:18080/api/v1/audit-events?action=auth.login&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.[] | select(.status==&quot;denied&quot;)&#39;</span>
+</span></code></pre></div>
 <p>The <code>metadata.error_kind</code> tells you what's wrong:</p>
 <table>
 <thead>
@@ -1525,15 +1682,15 @@ curl -fsS "http://localhost:18080/api/v1/audit-events?action=auth.login" \
 </table>
 <h3 id="agent-job-fails-immediately-agent-reported-failure">Agent job fails immediately ("agent reported failure")<a class="headerlink" href="#agent-job-fails-immediately-agent-reported-failure" title="Permanent link">&para;</a></h3>
 <p>Read the agent's log:</p>
-<p><code>bash
-docker logs secrets-bridge-agent-1 | grep -iE "job|error|fail" | tail</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>docker<span class="w"> </span>logs<span class="w"> </span>secrets-bridge-agent-1<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-iE<span class="w"> </span><span class="s2">&quot;job|error|fail&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tail
+</span></code></pre></div>
 <p>The most common cause is <strong>provider config missing</strong>. For Vault:
 leave the Provider config field blank in the Submit drawer (the UI
 defaults to <code>kvMount=secret</code>). For AWS Secrets Manager: the
 <code>region</code> is required.</p>
 <p>For a deeper trace, set the agent's log level to debug:</p>
-<p><code>bash
-SB_LOG_LEVEL=debug docker compose up -d agent</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">SB_LOG_LEVEL</span><span class="o">=</span>debug<span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>agent
+</span></code></pre></div>
 <h3 id="wraps-card-shows-no-wraps-issued-yet-after-the-agent-ran">"Wraps card shows 'No wraps issued yet'" after the agent ran<a class="headerlink" href="#wraps-card-shows-no-wraps-issued-yet-after-the-agent-ran" title="Permanent link">&para;</a></h3>
 <p>Two possibilities:</p>
 <ol>
@@ -1548,11 +1705,10 @@ SB_LOG_LEVEL=debug docker compose up -d agent</code></p>
 <p>Likely <code>audit.read</code> permission missing. The seed admin role has
 it; if you're a different user, an admin needs to grant you the
 <code>audit.read</code> permission via a role.</p>
-<p>```bash</p>
-<h1 id="as-admin">As admin:<a class="headerlink" href="#as-admin" title="Permanent link">&para;</a></h1>
-<p>curl -fsS http://localhost:18080/api/v1/audit-events \
-  -H "Authorization: Bearer $TOKEN"
-```</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># As admin:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>http://localhost:18080/api/v1/audit-events<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span>
+</span></code></pre></div>
 <p>Expected: 200 with an array. If 403, your role doesn't carry
 <code>audit.read</code>.</p>
 <h3 id="agent-stays-stale-forever">Agent stays "stale" forever<a class="headerlink" href="#agent-stays-stale-forever" title="Permanent link">&para;</a></h3>
@@ -1560,8 +1716,8 @@ it; if you're a different user, an admin needs to grant you the
 <ol>
 <li><strong>The agent's heartbeat is reaching the CP.</strong> From the agent's
    network, run:
-   <code>bash
-   docker exec secrets-bridge-agent-1 wget -qO- http://api:8080/healthz</code></li>
+   <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>secrets-bridge-agent-1<span class="w"> </span>wget<span class="w"> </span>-qO-<span class="w"> </span>http://api:8080/healthz
+</span></code></pre></div></li>
 <li><strong>The agent secret is correct.</strong> A wrong secret returns 401 on
    heartbeat (generic message; the audit log records
    <code>error_kind=unauthorized</code>).</li>
@@ -1570,28 +1726,28 @@ it; if you're a different user, an admin needs to grant you the
 <p>The agent uses the credentials in <code>SB_VAULT_TOKEN</code> or via the
 configured Kubernetes auth role. Check that they have read access
 to the secret path:</p>
-<p><code>bash
-docker exec secrets-bridge-vault-1 sh -c \
-  'VAULT_ADDR=http://127.0.0.1:8200 VAULT_TOKEN=devroot \
-   vault kv get secret/&lt;path&gt;'</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>secrets-bridge-vault-1<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="s1">&#39;VAULT_ADDR=http://127.0.0.1:8200 VAULT_TOKEN=devroot \</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="s1">   vault kv get secret/&lt;path&gt;&#39;</span>
+</span></code></pre></div>
 <p>If that works but the agent gets denied, the agent token has less
 scope than the dev token. Adjust the policy in Vault.</p>
 <h2 id="useful-queries-against-the-audit-log">Useful queries against the audit log<a class="headerlink" href="#useful-queries-against-the-audit-log" title="Permanent link">&para;</a></h2>
 <h3 id="find-every-action-for-one-request">Find every action for one request<a class="headerlink" href="#find-every-action-for-one-request" title="Permanent link">&para;</a></h3>
-<p><code>bash
-curl -fsS "http://localhost:18080/api/v1/audit-events?correlation_id=&lt;uuid&gt;" \
-  -H "Authorization: Bearer $TOKEN" | jq '.[] | {time:.occurred_at, actor, action, resource}'</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">&quot;http://localhost:18080/api/v1/audit-events?correlation_id=&lt;uuid&gt;&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.[] | {time:.occurred_at, actor, action, resource}&#39;</span>
+</span></code></pre></div>
 <h3 id="find-every-login-failure-in-the-last-hour">Find every login failure in the last hour<a class="headerlink" href="#find-every-login-failure-in-the-last-hour" title="Permanent link">&para;</a></h3>
-<p><code>bash
-SINCE=$(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%SZ)
-curl -fsS "http://localhost:18080/api/v1/audit-events?action=auth.login&amp;since=$SINCE" \
-  -H "Authorization: Bearer $TOKEN" \
-  | jq '.[] | select(.status=="denied")'</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nv">SINCE</span><span class="o">=</span><span class="k">$(</span>date<span class="w"> </span>-u<span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;1 hour ago&#39;</span><span class="w"> </span>+%Y-%m-%dT%H:%M:%SZ<span class="k">)</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">&quot;http://localhost:18080/api/v1/audit-events?action=auth.login&amp;since=</span><span class="nv">$SINCE</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.[] | select(.status==&quot;denied&quot;)&#39;</span>
+</span></code></pre></div>
 <h3 id="find-every-wrap-retrieval-who-saw-which-value-when">Find every wrap retrieval (who saw which value when)<a class="headerlink" href="#find-every-wrap-retrieval-who-saw-which-value-when" title="Permanent link">&para;</a></h3>
-<p><code>bash
-curl -fsS "http://localhost:18080/api/v1/audit-events?action=wrap.retrieve" \
-  -H "Authorization: Bearer $TOKEN" \
-  | jq '.[] | {time:.occurred_at, actor, resource, status}'</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">&quot;http://localhost:18080/api/v1/audit-events?action=wrap.retrieve&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.[] | {time:.occurred_at, actor, resource, status}&#39;</span>
+</span></code></pre></div>
 <p>This is the SOC2-friendly query — every plaintext reveal across
 the platform, append-only, with the actor and timestamp.</p>
 <h2 id="reading-the-metrics">Reading the metrics<a class="headerlink" href="#reading-the-metrics" title="Permanent link">&para;</a></h2>
@@ -1668,7 +1824,7 @@ a future PR adds explicit histograms.</p>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Secrets Bridge contributors. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
+      Copyright &copy; 2026 Secrets Bridge contributors. Built by <a href="https://www.linkedin.com/in/haydercyber1/" rel="author" target="_blank">Haider Raed</a>. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
     </div>
   
   

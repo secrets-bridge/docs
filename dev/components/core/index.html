@@ -26,10 +26,10 @@
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
     
     
-      
-        <title>Core (shared library) - Secrets Bridge</title>
-      
-    
+  
+    <title>Core (shared library) - Secrets Bridge</title>
+  
+
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
       
@@ -63,6 +63,7 @@
     
     
   
+
 
   
   
@@ -1443,13 +1444,13 @@ Redis-shaped here is a CI failure on the dependent repos.</p>
 </tbody>
 </table>
 <h2 id="the-metadata-value-split">The metadata / value split<a class="headerlink" href="#the-metadata-value-split" title="Permanent link">&para;</a></h2>
-<p><code>go
-type Provider interface {
-    GetMetadata(ctx, ref) (SecretMetadata, error)        // CP, discovery, controller
-    ListMetadata(ctx, scope) ([]SecretMetadata, error)
-    GetValue(ctx, ref) (SecretValue, error)              // agent only
-    PutValue(ctx, ref, value, opts) (SecretVersion, error) // agent only
-}</code></p>
+<div class="language-go highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">type</span><span class="w"> </span><span class="nx">Provider</span><span class="w"> </span><span class="kd">interface</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nx">GetMetadata</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">ref</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nx">SecretMetadata</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w">        </span><span class="c1">// CP, discovery, controller</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="nx">ListMetadata</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">scope</span><span class="p">)</span><span class="w"> </span><span class="p">([]</span><span class="nx">SecretMetadata</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="nx">GetValue</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">ref</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nx">SecretValue</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w">              </span><span class="c1">// agent only</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="nx">PutValue</span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">ref</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">,</span><span class="w"> </span><span class="nx">opts</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nx">SecretVersion</span><span class="p">,</span><span class="w"> </span><span class="kt">error</span><span class="p">)</span><span class="w"> </span><span class="c1">// agent only</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">}</span>
+</span></code></pre></div>
 <p>The interface is the load-bearing architectural decision in the
 whole project. The CP only ever needs metadata; the agent only
 ever needs values. Different processes hold different trust.</p>
@@ -1502,7 +1503,7 @@ belongs in <code>api</code> or <code>agent</code> instead.</p>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Secrets Bridge contributors. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
+      Copyright &copy; 2026 Secrets Bridge contributors. Built by <a href="https://www.linkedin.com/in/haydercyber1/" rel="author" target="_blank">Haider Raed</a>. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
     </div>
   
   

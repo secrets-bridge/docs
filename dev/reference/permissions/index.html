@@ -24,10 +24,10 @@
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
     
     
-      
-        <title>Permissions catalog - Secrets Bridge</title>
-      
-    
+  
+    <title>Permissions catalog - Secrets Bridge</title>
+  
+
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
       
@@ -61,6 +61,7 @@
     
     
   
+
 
   
   
@@ -1735,17 +1736,18 @@ about (e.g. a legacy custom permission from before
 the catalog), the UI renders it in a separate <strong>Custom / unknown</strong>
 group at the bottom — so old roles stay editable.</p>
 <h2 id="how-to-add-a-permission">How to add a permission<a class="headerlink" href="#how-to-add-a-permission" title="Permanent link">&para;</a></h2>
-<p>```go
-// In api/internal/auth/permissions.go:</p>
-<p>const (
-    // ...existing
-    PermSomethingNew Permission = "something.new"
-)</p>
-<p>var Catalog = []Descriptor{
-    // ...existing
-    {PermSomethingNew, "Group Name", "What this permission gates."},
-}
-```</p>
+<div class="language-go highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// In api/internal/auth/permissions.go:</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kd">const</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="c1">// ...existing</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="nx">PermSomethingNew</span><span class="w"> </span><span class="nx">Permission</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;something.new&quot;</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="kd">var</span><span class="w"> </span><span class="nx">Catalog</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[]</span><span class="nx">Descriptor</span><span class="p">{</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="c1">// ...existing</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="p">{</span><span class="nx">PermSomethingNew</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Group Name&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;What this permission gates.&quot;</span><span class="p">},</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">}</span>
+</span></code></pre></div>
 <p>That's it — <code>Catalog</code> is the source of truth; the <code>Keys()</code> /
 <code>IsKnown()</code> helpers + the HTTP endpoint + the drift-guard test all
 pick it up automatically.</p>
@@ -1790,7 +1792,7 @@ first boot.</p>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Secrets Bridge contributors. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
+      Copyright &copy; 2026 Secrets Bridge contributors. Built by <a href="https://www.linkedin.com/in/haydercyber1/" rel="author" target="_blank">Haider Raed</a>. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
     </div>
   
   

@@ -26,10 +26,10 @@
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
     
     
-      
-        <title>Overview - Secrets Bridge</title>
-      
-    
+  
+    <title>Overview - Secrets Bridge</title>
+  
+
     
       <link rel="stylesheet" href="../assets/stylesheets/main.8c3ca2c6.min.css">
       
@@ -63,6 +63,7 @@
     
     
   
+
 
   
   
@@ -1359,9 +1360,10 @@
 <p>Secrets Bridge is a <strong>secrets control plane</strong> — the thing that sits
 between developers / operators and the actual secret stores. The
 mental model the project never violates:</p>
-<p><code>Control Plane = decisions, workflow, metadata, audit, RBAC, jobs, status
-Agent         = execution inside the target account/cluster, least privilege
-Providers     = the actual secret values (source of truth)</code></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Control Plane = decisions, workflow, metadata, audit, RBAC, jobs, status
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Agent         = execution inside the target account/cluster, least privilege
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Providers     = the actual secret values (source of truth)
+</span></code></pre></div>
 <p>The Control Plane never holds raw secret values. The Agent holds
 them for the duration of one request and then drops them. The
 Providers are unchanged — Secrets Bridge augments them, it doesn't
@@ -1510,7 +1512,7 @@ replace them.</p>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Secrets Bridge contributors. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
+      Copyright &copy; 2026 Secrets Bridge contributors. Built by <a href="https://www.linkedin.com/in/haydercyber1/" rel="author" target="_blank">Haider Raed</a>. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
     </div>
   
   

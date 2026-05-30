@@ -26,10 +26,10 @@
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
     
     
-      
-        <title>Worker - Secrets Bridge</title>
-      
-    
+  
+    <title>Worker - Secrets Bridge</title>
+  
+
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
       
@@ -63,6 +63,7 @@
     
     
   
+
 
   
   
@@ -1505,10 +1506,10 @@ read-only ArgoCD observation poller (BRD §26).</p>
 </table>
 <h2 id="multi-replica-safety">Multi-replica safety<a class="headerlink" href="#multi-replica-safety" title="Permanent link">&para;</a></h2>
 <p>Every sweeper acquires a Redis lock before running:</p>
-<p><code>go
-lock := scheduler.AcquireLock("worker:sweeper:" + name)
-if errors.Is(err, runtime.ErrLockHeld) { /* metric, return */ }
-// run + StartRenewal + Release on tick end</code></p>
+<div class="language-go highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nx">lock</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">scheduler</span><span class="p">.</span><span class="nx">AcquireLock</span><span class="p">(</span><span class="s">&quot;worker:sweeper:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">name</span><span class="p">)</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">if</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">Is</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span><span class="w"> </span><span class="nx">runtime</span><span class="p">.</span><span class="nx">ErrLockHeld</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* metric, return */</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1">// run + StartRenewal + Release on tick end</span>
+</span></code></pre></div>
 <p>So you can scale the worker deployment to N replicas; exactly one
 runs each sweeper per tick, the others record <code>worker_scheduler_lock_skipped_total</code>
 (a metric, not a warn-level log — N-1 of N replicas always skip).</p>
@@ -1645,7 +1646,7 @@ runs each sweeper per tick, the others record <code>worker_scheduler_lock_skippe
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Secrets Bridge contributors. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
+      Copyright &copy; 2026 Secrets Bridge contributors. Built by <a href="https://www.linkedin.com/in/haydercyber1/" rel="author" target="_blank">Haider Raed</a>. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
     </div>
   
   

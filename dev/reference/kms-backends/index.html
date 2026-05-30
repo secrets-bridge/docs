@@ -26,10 +26,10 @@
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
     
     
-      
-        <title>KMS backends - Secrets Bridge</title>
-      
-    
+  
+    <title>KMS backends - Secrets Bridge</title>
+  
+
     
       <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
       
@@ -63,6 +63,7 @@
     
     
   
+
 
   
   
@@ -1302,8 +1303,86 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#key-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key rotation
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aws-kms" class="md-nav__link">
+    <span class="md-ellipsis">
+      aws-kms
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="aws-kms">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key resolution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setup_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setup
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-rotation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key rotation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choosing-between-vault-transit-and-aws-kms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Choosing between vault-transit and aws-kms
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#per-tenant-kms-scoping" class="md-nav__link">
+    <span class="md-ellipsis">
+      Per-tenant KMS scoping
+    </span>
+  </a>
   
 </li>
       
@@ -1407,8 +1486,86 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#key-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key rotation
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aws-kms" class="md-nav__link">
+    <span class="md-ellipsis">
+      aws-kms
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="aws-kms">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key resolution
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setup_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setup
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-rotation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key rotation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choosing-between-vault-transit-and-aws-kms" class="md-nav__link">
+    <span class="md-ellipsis">
+      Choosing between vault-transit and aws-kms
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#per-tenant-kms-scoping" class="md-nav__link">
+    <span class="md-ellipsis">
+      Per-tenant KMS scoping
+    </span>
+  </a>
   
 </li>
       
@@ -1485,10 +1642,10 @@ key. The KMS backend is pluggable behind one env var.</p>
 </tbody>
 </table>
 <p>Selected via:</p>
-<p><code>bash
-SB_KMS_BACKEND=local         # default — dev only
-SB_KMS_BACKEND=vault-transit
-SB_KMS_BACKEND=aws-kms</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">SB_KMS_BACKEND</span><span class="o">=</span><span class="nb">local</span><span class="w">         </span><span class="c1"># default — dev only</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">SB_KMS_BACKEND</span><span class="o">=</span>vault-transit
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">SB_KMS_BACKEND</span><span class="o">=</span>aws-kms
+</span></code></pre></div>
 <h2 id="local"><code>local</code><a class="headerlink" href="#local" title="Permanent link">&para;</a></h2>
 <p>The dev backend. Master key in an env var.</p>
 <table>
@@ -1562,22 +1719,23 @@ envelope as <code>data_key_ciphertext</code>.</p>
 </tbody>
 </table>
 <h3 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h3>
-<p>```bash</p>
-<h1 id="in-vault">In Vault:<a class="headerlink" href="#in-vault" title="Permanent link">&para;</a></h1>
-<p>vault secrets enable transit
-vault write -f transit/keys/sb-wrap</p>
-<h1 id="in-the-api-env">In the api env:<a class="headerlink" href="#in-the-api-env" title="Permanent link">&para;</a></h1>
-<p>export SB_KMS_BACKEND=vault-transit
-export SB_KMS_VAULT_ADDR=https://vault.example.com
-export SB_KMS_VAULT_TOKEN=hvs.CAESI...
-export SB_KMS_VAULT_KEY=sb-wrap
-```</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># In Vault:</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>vault<span class="w"> </span>secrets<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>transit
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>vault<span class="w"> </span>write<span class="w"> </span>-f<span class="w"> </span>transit/keys/sb-wrap
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># In the api env:</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_BACKEND</span><span class="o">=</span>vault-transit
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_VAULT_ADDR</span><span class="o">=</span>https://vault.example.com
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_VAULT_TOKEN</span><span class="o">=</span>hvs.CAESI...
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_VAULT_KEY</span><span class="o">=</span>sb-wrap
+</span></code></pre></div>
 <p>The api logs the resolved backend at boot:</p>
-<p><code>{"msg":"keymgmt backend ready","key_id":"vault-transit:transit/sb-wrap"}</code></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>{&quot;msg&quot;:&quot;keymgmt backend ready&quot;,&quot;key_id&quot;:&quot;vault-transit:transit/sb-wrap&quot;}
+</span></code></pre></div>
 <h3 id="key-rotation">Key rotation<a class="headerlink" href="#key-rotation" title="Permanent link">&para;</a></h3>
 <p>Use Vault's native rotation:</p>
-<p><code>bash
-vault write -f transit/keys/sb-wrap/rotate</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>vault<span class="w"> </span>write<span class="w"> </span>-f<span class="w"> </span>transit/keys/sb-wrap/rotate
+</span></code></pre></div>
 <p>New rows wrap with the new key version automatically; old rows
 decrypt with the original version (Vault retains all versions until
 explicitly trimmed). A <strong>tested rotation runbook</strong> (covering both
@@ -1622,18 +1780,18 @@ you pass an alias. So if you rotate <code>alias/sb-wrap</code> to point at a
 new CMK, the old rows still tell you which exact key wrapped them.
 Critical for forensic audit.</p>
 <h3 id="setup_1">Setup<a class="headerlink" href="#setup_1" title="Permanent link">&para;</a></h3>
-<p>```bash
-aws kms create-key --description "Secrets Bridge wrap key"
-aws kms create-alias --alias-name alias/sb-wrap --target-key-id <key-id></p>
-<p>export SB_KMS_BACKEND=aws-kms
-export SB_KMS_AWS_REGION=us-east-1
-export SB_KMS_AWS_KEY_ID=alias/sb-wrap
-```</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>aws<span class="w"> </span>kms<span class="w"> </span>create-key<span class="w"> </span>--description<span class="w"> </span><span class="s2">&quot;Secrets Bridge wrap key&quot;</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>aws<span class="w"> </span>kms<span class="w"> </span>create-alias<span class="w"> </span>--alias-name<span class="w"> </span>alias/sb-wrap<span class="w"> </span>--target-key-id<span class="w"> </span>&lt;key-id&gt;
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_BACKEND</span><span class="o">=</span>aws-kms
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_AWS_REGION</span><span class="o">=</span>us-east-1
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_AWS_KEY_ID</span><span class="o">=</span>alias/sb-wrap
+</span></code></pre></div>
 <h3 id="key-rotation_1">Key rotation<a class="headerlink" href="#key-rotation_1" title="Permanent link">&para;</a></h3>
 <p>AWS KMS handles rotation automatically (enable annual rotation on
 the CMK):</p>
-<p><code>bash
-aws kms enable-key-rotation --key-id alias/sb-wrap</code></p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>aws<span class="w"> </span>kms<span class="w"> </span>enable-key-rotation<span class="w"> </span>--key-id<span class="w"> </span>alias/sb-wrap
+</span></code></pre></div>
 <p>The CMK retains a backing-key version per rotation; AWS picks the
 right one on decrypt. Rows wrapped with the old version still
 decrypt; new rows use the new version. No app change needed.</p>
@@ -1718,7 +1876,7 @@ Existing single-backend deployments keep working unchanged.</p>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Secrets Bridge contributors. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
+      Copyright &copy; 2026 Secrets Bridge contributors. Built by <a href="https://www.linkedin.com/in/haydercyber1/" rel="author" target="_blank">Haider Raed</a>. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
     </div>
   
   
