@@ -1,10 +1,16 @@
 ---
-title: Secrets Bridge — Unified Secrets Control Plane
-description: Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes.
+title: Secrets Bridge
+# Quoted because the value contains a `:` (after "plane") which YAML
+# would otherwise interpret as a second mapping. An unquoted colon
+# silently kills the whole frontmatter — page.meta becomes empty, the
+# nav config wins page.title, and SEO tags fall back to site defaults.
+seo_title: "Secrets Bridge — Unified Secrets Control Plane"
+description: "Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes."
 hide:
   - navigation
   - toc
 ---
+
 
 # Secrets Bridge
 

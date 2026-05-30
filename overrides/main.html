@@ -3,11 +3,33 @@
    them is a one-line change instead of a template edit. #}
 {% extends "base.html" %}
 
+{# Material's default htmltitle uses only `config.site_name` on the
+   homepage and `page.title - site_name` everywhere else. But MkDocs'
+   nav config wins over frontmatter `title:` — so the homepage's
+   `<title>` always reads "Home" no matter what frontmatter says.
+   Honour an explicit `seo_title:` frontmatter key first (so each
+   page can set its <title> independently of the nav label) and fall
+   back to Material's "Page Title - Site Name" / site_name pattern.
+   (SEO audit 2026-05-30 P1-5 follow-up.) #}
+{% block htmltitle %}
+  {% if page and page.meta and page.meta.seo_title %}
+    <title>{{ page.meta.seo_title }}</title>
+  {% elif page and page.title and not page.is_homepage %}
+    <title>{{ page.title | striptags }} - {{ config.site_name }}</title>
+  {% else %}
+    <title>{{ config.site_name }}</title>
+  {% endif %}
+{% endblock %}
+
 {% block extrahead %}
   {{ super() }}
 
-  {# Page-specific values with fallbacks to site-wide defaults. #}
-  {% set page_title = page.meta.title if page and page.meta and page.meta.title else page.title if page and page.title else config.site_name %}
+
+  {# Page-specific values with fallbacks to site-wide defaults. The
+     `seo_title` frontmatter key is preferred so the OG / Twitter card
+     title matches the <title> tag (which the htmltitle block above
+     also uses). #}
+  {% set page_title = page.meta.seo_title if page and page.meta and page.meta.seo_title else page.meta.title if page and page.meta and page.meta.title else page.title if page and page.title else config.site_name %}
   {% set page_description = page.meta.description if page and page.meta and page.meta.description else config.site_description %}
   {% set page_url = page.canonical_url if page and page.canonical_url else config.site_url %}
   {% set og_image = page.meta.image if page and page.meta and page.meta.image else config.extra.brand.og_image %}
