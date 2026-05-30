@@ -1,6 +1,10 @@
 mkdocs-material==9.5.39
 mkdocs==1.6.1
-pymdown-extensions==10.11.2
+# >=10.14 fixes a parser regression where unlabeled fenced code blocks
+# (```...``` without a language) were rendered as inline <code> spans
+# inside <p>. SEO audit 2026-05-30 follow-up: lots of bash/json snippets
+# across the docs were affected.
+pymdown-extensions>=10.14
 # `mike` versions the docs by deploying to subdirectories on the
 # gh-pages branch. CI runs `mike deploy` instead of `mkdocs gh-deploy`.
 mike==2.1.3
