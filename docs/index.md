@@ -1,6 +1,6 @@
 ---
-title: Secrets Bridge — The brain behind your secrets.
-description: Unified secrets control plane for cloud-native teams. Approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS Secrets Manager, Azure Key Vault, GCP Secret Manager, and Kubernetes / GitOps.
+title: Secrets Bridge — Unified Secrets Control Plane
+description: Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes.
 hide:
   - navigation
   - toc
@@ -16,7 +16,7 @@ hide:
 
 <div class="sb-hero__wordmark">SecretsBridge</div>
 
-<div class="sb-hero__tagline">The brain behind your secrets.</div>
+<h2 class="sb-hero__tagline">The brain behind your secrets.</h2>
 
 <p class="sb-hero__subhead">
 A distributed secrets control plane that connects and governs
@@ -32,7 +32,7 @@ teams already use. One brain, every provider. Values stay home.
 
 </div>
 
-<div class="sb-section-heading">Why Secrets Bridge</div>
+<h2 class="sb-section-heading">Why Secrets Bridge</h2>
 
 <div class="grid cards sb-pillars" markdown>
 
@@ -71,7 +71,7 @@ teams already use. One brain, every provider. Values stay home.
 
 </div>
 
-<div class="sb-section-heading">Who this is for</div>
+<h2 class="sb-section-heading">Who this is for</h2>
 
 - **Regulated teams** (fintech, healthtech, defence-adjacent)
   where "everyone has full Vault read access" is no longer an
@@ -82,7 +82,7 @@ teams already use. One brain, every provider. Values stay home.
   (correlation IDs, immutable rows, value-free metadata) without
   reaching for an SIEM bolt-on.
 
-<div class="sb-section-heading">How it's different</div>
+<h2 class="sb-section-heading">How it's different</h2>
 
 | | Secrets Bridge | Direct Vault | AWS Secrets Manager + IAM | Most "secrets SaaS" |
 |---|---|---|---|---|
@@ -94,7 +94,7 @@ teams already use. One brain, every provider. Values stay home.
 | KMS choice | ✅ Vault Transit / AWS KMS / local | n/a | AWS KMS only | Provider-controlled |
 | Agent uses **only** outbound traffic | ✅ Loopback probes; no inbound | n/a | n/a | Varies |
 
-<div class="sb-section-heading">What it doesn't do (yet)</div>
+<h2 class="sb-section-heading">What it doesn't do (yet)</h2>
 
 - **OIDC SSO** lands as a follow-up — today the api ships with a
   local-admin email/password flow plus a JWT issued via HS256.
