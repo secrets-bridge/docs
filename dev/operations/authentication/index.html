@@ -7,19 +7,19 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes.">
+        <meta name="description" content="Cookie-only session model, account lockout, OIDC + MFA step-up, and the break-glass posture.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
       
       
-        <link rel="canonical" href="https://secrets-bridge.io/dev/design/tokens/">
+        <link rel="canonical" href="https://secrets-bridge.io/dev/operations/authentication/">
       
       
-        <link rel="prev" href="../brand-voice/">
+        <link rel="prev" href="../bootstrap/">
       
       
-        <link rel="next" href="../figma/">
+        <link rel="next" href="../oidc-authentik/">
       
       
       <link rel="icon" href="../../assets/favicon.svg">
@@ -27,7 +27,7 @@
     
     
   
-    <title>Tokens & theme - Secrets Bridge</title>
+    <title>Authentication - Secrets Bridge</title>
   
 
     
@@ -72,14 +72,14 @@
   
 
   
-  <link rel="canonical" href="https://secrets-bridge.io/dev/design/tokens/" />
+  <link rel="canonical" href="https://secrets-bridge.io/dev/operations/authentication/" />
 
   
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Secrets Bridge" />
-  <meta property="og:title" content="Tokens & theme" />
-  <meta property="og:description" content="Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes." />
-  <meta property="og:url" content="https://secrets-bridge.io/dev/design/tokens/" />
+  <meta property="og:title" content="Authentication" />
+  <meta property="og:description" content="Cookie-only session model, account lockout, OIDC + MFA step-up, and the break-glass posture." />
+  <meta property="og:url" content="https://secrets-bridge.io/dev/operations/authentication/" />
   <meta property="og:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -88,8 +88,8 @@
 
   
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Tokens & theme" />
-  <meta name="twitter:description" content="Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes." />
+  <meta name="twitter:title" content="Authentication" />
+  <meta name="twitter:description" content="Cookie-only session model, account lockout, OIDC + MFA step-up, and the break-glass posture." />
   <meta name="twitter:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge — The brain behind your secrets." />
   
@@ -109,9 +109,9 @@
   {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    "headline": "Tokens & theme",
-    "description": "Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes.",
-    "url": "https://secrets-bridge.io/dev/design/tokens/",
+    "headline": "Authentication",
+    "description": "Cookie-only session model, account lockout, OIDC + MFA step-up, and the break-glass posture.",
+    "url": "https://secrets-bridge.io/dev/operations/authentication/",
     "image": "https://secrets-bridge.io/assets/og-banner.png",
     "publisher": {
       "@type": "Organization",
@@ -144,7 +144,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#tokens-theme" class="md-skip">
+        <a href="#authentication" class="md-skip">
           Skip to content
         </a>
       
@@ -183,7 +183,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Tokens & theme
+              Authentication
             
           </span>
         </div>
@@ -346,13 +346,11 @@
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../design/" class="md-tabs__link">
           
   
     
@@ -368,11 +366,13 @@
         
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../operations/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
           
   
     
@@ -839,6 +839,140 @@
       
   
   
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../design/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Design system
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Design system
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/brand-voice/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Brand voice
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/tokens/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tokens & theme
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/figma/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Figma file & assets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -848,6 +982,12 @@
       
         
           
+        
+      
+        
+      
+        
+      
         
       
         
@@ -871,7 +1011,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
           
@@ -880,23 +1020,23 @@
               
   
   <span class="md-ellipsis">
-    Design system
+    Operations
   </span>
   
 
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
-            Design system
+            Operations
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -909,11 +1049,32 @@
   
   
     <li class="md-nav__item">
-      <a href="../brand-voice/" class="md-nav__link">
+      <a href="../docker-compose/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Brand voice
+    Deploying with docker-compose
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bootstrap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bootstrap & first sign-in
   </span>
   
 
@@ -943,7 +1104,7 @@
           
   
   <span class="md-ellipsis">
-    Tokens & theme
+    Authentication
   </span>
   
 
@@ -954,7 +1115,7 @@
         
   
   <span class="md-ellipsis">
-    Tokens & theme
+    Authentication
   </span>
   
 
@@ -976,19 +1137,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#color-tokens" class="md-nav__link">
+  <a href="#the-session-model-slices-a2-c" class="md-nav__link">
     <span class="md-ellipsis">
-      Color tokens
+      The session model (Slices A2 + C)
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Color tokens">
+    <nav class="md-nav" aria-label="The session model (Slices A2 + C)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#status-colors-statuspill-variants" class="md-nav__link">
+  <a href="#ttls-architect-q3" class="md-nav__link">
     <span class="md-ellipsis">
-      Status colors (StatusPill variants)
+      TTLs (architect Q3)
     </span>
   </a>
   
@@ -1000,19 +1161,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-tokens" class="md-nav__link">
+  <a href="#account-lockout-slice-a1" class="md-nav__link">
     <span class="md-ellipsis">
-      Type tokens
+      Account lockout (Slice A1)
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Type tokens">
+    <nav class="md-nav" aria-label="Account lockout (Slice A1)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#type-scale" class="md-nav__link">
+  <a href="#rate-limit-per-ip-anti-scan" class="md-nav__link">
     <span class="md-ellipsis">
-      Type scale
+      Rate limit (per-IP, anti-scan)
     </span>
   </a>
   
@@ -1024,36 +1185,108 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#spacing-layout" class="md-nav__link">
+  <a href="#oidc-sign-in-slices-b-c-e" class="md-nav__link">
     <span class="md-ellipsis">
-      Spacing &amp; layout
+      OIDC sign-in (Slices B + C + E)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OIDC sign-in (Slices B + C + E)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#group-claim-role-mapping-slice-e" class="md-nav__link">
+    <span class="md-ellipsis">
+      Group-claim → role mapping (Slice E)
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#gradients" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#the-reconciler-invariant-dont-break-this" class="md-nav__link">
     <span class="md-ellipsis">
-      Gradients
+      The reconciler invariant (don't break this)
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#where-these-live-in-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      Where these live in code
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-to-update-a-token" class="md-nav__link">
+  <a href="#mfa-step-up-slice-d" class="md-nav__link">
     <span class="md-ellipsis">
-      How to update a token
+      MFA + step-up (Slice D)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MFA + step-up (Slice D)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#strong-factor-recognition-amr" class="md-nav__link">
+    <span class="md-ellipsis">
+      Strong-factor recognition (amr)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-factor-priority" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recommended factor priority
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#break-glass-local-admin-policy-architect-q1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Break-glass (local-admin) policy (architect Q1)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Break-glass (local-admin) policy (architect Q1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#local-admin-sessions-are-never-mfa-fresh" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local-admin sessions are NEVER MFA-fresh
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disabling-break-glass-entirely" class="md-nav__link">
+    <span class="md-ellipsis">
+      Disabling break-glass entirely
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-page-does-not-cover" class="md-nav__link">
+    <span class="md-ellipsis">
+      What this page does NOT cover
     </span>
   </a>
   
@@ -1075,168 +1308,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../figma/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Figma file & assets
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-      
-        
-          
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../../operations/" class="md-nav__link ">
-              
-  
-  <span class="md-ellipsis">
-    Operations
-  </span>
-  
-
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
-            Operations
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/docker-compose/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Deploying with docker-compose
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/bootstrap/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Bootstrap & first sign-in
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/authentication/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Authentication
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/oidc-authentik/" class="md-nav__link">
+      <a href="../oidc-authentik/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1257,7 +1329,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/config/" class="md-nav__link">
+      <a href="../config/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1278,7 +1350,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/troubleshooting/" class="md-nav__link">
+      <a href="../troubleshooting/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1483,19 +1555,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#color-tokens" class="md-nav__link">
+  <a href="#the-session-model-slices-a2-c" class="md-nav__link">
     <span class="md-ellipsis">
-      Color tokens
+      The session model (Slices A2 + C)
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Color tokens">
+    <nav class="md-nav" aria-label="The session model (Slices A2 + C)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#status-colors-statuspill-variants" class="md-nav__link">
+  <a href="#ttls-architect-q3" class="md-nav__link">
     <span class="md-ellipsis">
-      Status colors (StatusPill variants)
+      TTLs (architect Q3)
     </span>
   </a>
   
@@ -1507,19 +1579,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-tokens" class="md-nav__link">
+  <a href="#account-lockout-slice-a1" class="md-nav__link">
     <span class="md-ellipsis">
-      Type tokens
+      Account lockout (Slice A1)
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Type tokens">
+    <nav class="md-nav" aria-label="Account lockout (Slice A1)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#type-scale" class="md-nav__link">
+  <a href="#rate-limit-per-ip-anti-scan" class="md-nav__link">
     <span class="md-ellipsis">
-      Type scale
+      Rate limit (per-IP, anti-scan)
     </span>
   </a>
   
@@ -1531,36 +1603,108 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#spacing-layout" class="md-nav__link">
+  <a href="#oidc-sign-in-slices-b-c-e" class="md-nav__link">
     <span class="md-ellipsis">
-      Spacing &amp; layout
+      OIDC sign-in (Slices B + C + E)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OIDC sign-in (Slices B + C + E)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#group-claim-role-mapping-slice-e" class="md-nav__link">
+    <span class="md-ellipsis">
+      Group-claim → role mapping (Slice E)
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#gradients" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#the-reconciler-invariant-dont-break-this" class="md-nav__link">
     <span class="md-ellipsis">
-      Gradients
+      The reconciler invariant (don't break this)
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#where-these-live-in-code" class="md-nav__link">
-    <span class="md-ellipsis">
-      Where these live in code
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-to-update-a-token" class="md-nav__link">
+  <a href="#mfa-step-up-slice-d" class="md-nav__link">
     <span class="md-ellipsis">
-      How to update a token
+      MFA + step-up (Slice D)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MFA + step-up (Slice D)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#strong-factor-recognition-amr" class="md-nav__link">
+    <span class="md-ellipsis">
+      Strong-factor recognition (amr)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-factor-priority" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recommended factor priority
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#break-glass-local-admin-policy-architect-q1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Break-glass (local-admin) policy (architect Q1)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Break-glass (local-admin) policy (architect Q1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#local-admin-sessions-are-never-mfa-fresh" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local-admin sessions are NEVER MFA-fresh
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disabling-break-glass-entirely" class="md-nav__link">
+    <span class="md-ellipsis">
+      Disabling break-glass entirely
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-page-does-not-cover" class="md-nav__link">
+    <span class="md-ellipsis">
+      What this page does NOT cover
     </span>
   </a>
   
@@ -1581,7 +1725,7 @@
                   
 
   
-    <a href="https://github.com/secrets-bridge/edit/main/docs/design/tokens.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/secrets-bridge/edit/main/docs/operations/authentication.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1590,263 +1734,276 @@
     
       
     
-    <a href="https://github.com/secrets-bridge/raw/main/docs/design/tokens.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/secrets-bridge/raw/main/docs/operations/authentication.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="tokens-theme">Tokens &amp; theme<a class="headerlink" href="#tokens-theme" title="Permanent link">&para;</a></h1>
-<p>The SPA's Tailwind theme, this docs site, the GitHub social
-banners, and every brand surface use the same set of design
-tokens. The Figma file is the source; the SPA's
-<code>tailwind.config.js</code> is the consumer.</p>
-<h2 id="color-tokens">Color tokens<a class="headerlink" href="#color-tokens" title="Permanent link">&para;</a></h2>
+<h1 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h1>
+<p>Secrets Bridge ships <strong>two ways to sign in</strong> — OIDC for everyone, local-admin as break-glass — and gates Tier 2 operations (approve, reject, reveal) behind <strong>fresh MFA</strong>. This page explains the model end-to-end so an operator knows what's enforced where.</p>
+<h2 id="the-session-model-slices-a2-c">The session model (Slices A2 + C)<a class="headerlink" href="#the-session-model-slices-a2-c" title="Permanent link">&para;</a></h2>
+<p>Sessions are <strong>server-side</strong>, not stateless tokens.</p>
 <table>
 <thead>
 <tr>
-<th>Tailwind name</th>
-<th>Hex</th>
-<th>Role</th>
+<th>Concept</th>
+<th>Where it lives</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>bg</code></td>
-<td><code>#0B1220</code></td>
-<td>Base page background (Navy 900)</td>
+<td>Identity proof</td>
+<td><code>sb_session</code> cookie — HttpOnly, Secure (prod), SameSite=Strict</td>
 </tr>
 <tr>
-<td><code>surface</code></td>
-<td><code>#0F172A</code></td>
-<td>Card / panel surface (Dark Navy)</td>
+<td>Source of truth</td>
+<td><code>sessions</code> table in Postgres — <code>revoked_at</code>, <code>expires_at</code>, <code>idle_expires_at</code>, <code>last_mfa_at</code>, <code>ip</code>, <code>user_agent</code></td>
 </tr>
 <tr>
-<td><code>text</code></td>
-<td><code>#CBD5E1</code></td>
-<td>Body copy (Slate 300)</td>
+<td>Cookie content</td>
+<td>32 random bytes, base64url; <strong>SHA-256 stored</strong>, plaintext returned ONCE in Set-Cookie</td>
 </tr>
 <tr>
-<td><code>muted</code></td>
-<td><code>#64748B</code></td>
-<td>Secondary text / labels (Slate 500)</td>
-</tr>
-<tr>
-<td><code>accent</code></td>
-<td><code>#06B6D4</code></td>
-<td><strong>Primary accent</strong> — Cyan</td>
-</tr>
-<tr>
-<td><code>accent-bright</code></td>
-<td><code>#22D3EE</code></td>
-<td>Highlight / hover</td>
-</tr>
-<tr>
-<td><code>border</code></td>
-<td><code>#1E293B</code></td>
-<td>Card edges, separators</td>
-</tr>
-<tr>
-<td><code>teal</code></td>
-<td><code>#14B8A6</code></td>
-<td>Secondary accent</td>
-</tr>
-<tr>
-<td><code>blue</code></td>
-<td><code>#3B82F6</code></td>
-<td>Tertiary / brand-gradient end</td>
-</tr>
-<tr>
-<td><code>purple</code></td>
-<td><code>#A855F7</code></td>
-<td>Tertiary (sparingly)</td>
-</tr>
-<tr>
-<td><code>success</code></td>
-<td><code>#10B981</code></td>
-<td>StatusPill success (Vault healthy, request approved)</td>
+<td>Revocation</td>
+<td>Immediate — <code>UPDATE sessions SET revoked_at = NOW()</code>; next request fails validation</td>
 </tr>
 </tbody>
 </table>
-<h3 id="status-colors-statuspill-variants">Status colors (StatusPill variants)<a class="headerlink" href="#status-colors-statuspill-variants" title="Permanent link">&para;</a></h3>
+<p><strong>The SPA never holds a token.</strong> Closing the tab + reopening it re-uses the same cookie. Reload, navigate, refresh — all hit the server. There is no <code>localStorage</code> / <code>sessionStorage</code> keypair to steal.</p>
+<h3 id="ttls-architect-q3">TTLs (architect Q3)<a class="headerlink" href="#ttls-architect-q3" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>Variant</th>
-<th>When</th>
+<th>TTL</th>
+<th>Default</th>
+<th>Behaviour</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>success</code></td>
-<td>Green outline / fill — agent active, request approved, audit success, secret present</td>
+<td>Absolute</td>
+<td>8 hours</td>
+<td>Hard ceiling from session create; the browser drops the cookie at this point</td>
 </tr>
 <tr>
-<td><code>warning</code></td>
-<td>Yellow outline / fill — agent stale, audit denied, env uat, archived project, applied_unverified</td>
+<td>Idle</td>
+<td>30 minutes</td>
+<td>Slides forward on every authenticated request; clamped to the absolute TTL</td>
 </tr>
 <tr>
-<td><code>error</code></td>
-<td>Red outline / fill — request rejected/failed, env prod, audit failure</td>
-</tr>
-<tr>
-<td><code>pending</code></td>
-<td>Yellow — request pending</td>
-</tr>
-<tr>
-<td><code>accent</code></td>
-<td>Cyan — role badges, env staging</td>
-</tr>
-<tr>
-<td><code>system</code></td>
-<td>Cyan outline — system-seed row marker</td>
-</tr>
-<tr>
-<td><code>neutral</code></td>
-<td>Muted — env other, preview chips</td>
-</tr>
-<tr>
-<td><code>cancelled</code></td>
-<td>Muted strikethrough — consumed wraps</td>
+<td>Step-up</td>
+<td>15 minutes</td>
+<td><code>last_mfa_at</code> must be within this window for Tier 2 ops</td>
 </tr>
 </tbody>
 </table>
-<h2 id="type-tokens">Type tokens<a class="headerlink" href="#type-tokens" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Family</th>
-<th>Font</th>
-<th>When</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Sans</td>
-<td><a href="https://fonts.google.com/specimen/Inter">Inter</a></td>
-<td>Body copy, headings, UI labels</td>
-</tr>
-<tr>
-<td>Mono</td>
-<td><a href="https://fonts.google.com/specimen/JetBrains+Mono">JetBrains Mono</a></td>
-<td>Code, CLI snippets, identifiers, UUIDs, secret refs</td>
-</tr>
-</tbody>
-</table>
-<p>Loaded via Google Fonts with <code>preconnect</code> to keep CLS low. The
-SPA's CSP allows <code>fonts.googleapis.com</code> + <code>fonts.gstatic.com</code> for
-this reason.</p>
-<h3 id="type-scale">Type scale<a class="headerlink" href="#type-scale" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Token</th>
-<th>Tailwind class</th>
-<th>Use</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>display</code></td>
-<td><code>text-5xl font-bold</code></td>
-<td>Hero headings (Figma frames only)</td>
-</tr>
-<tr>
-<td><code>h1</code></td>
-<td><code>text-2xl font-bold tracking-tight</code></td>
-<td>Page title (PageHeader)</td>
-</tr>
-<tr>
-<td><code>h2</code></td>
-<td><code>text-base font-semibold</code></td>
-<td>Card / section headers</td>
-</tr>
-<tr>
-<td><code>eyebrow</code></td>
-<td><code>text-[11px] uppercase tracking-wider text-muted font-medium</code></td>
-<td>Field labels, table headers</td>
-</tr>
-<tr>
-<td><code>body</code></td>
-<td><code>text-sm</code></td>
-<td>Default body copy</td>
-</tr>
-<tr>
-<td><code>caption</code></td>
-<td><code>text-[11px] text-muted</code></td>
-<td>Footer notes, helper text</td>
-</tr>
-</tbody>
-</table>
-<h2 id="spacing-layout">Spacing &amp; layout<a class="headerlink" href="#spacing-layout" title="Permanent link">&para;</a></h2>
-<p>The SPA uses Tailwind's default 4px-grid spacing scale. Cards have:</p>
+<p>A user who hasn't acted in 30 minutes is logged out idle-side; a user who's been active for 8 straight hours is logged out absolute-side. Both require a fresh login.</p>
+<h2 id="account-lockout-slice-a1">Account lockout (Slice A1)<a class="headerlink" href="#account-lockout-slice-a1" title="Permanent link">&para;</a></h2>
+<p>Five consecutive wrong-password attempts pin the account out for 15 minutes. State lives in Postgres (<code>local_users.failed_login_count</code> + <code>locked_until</code>), not Redis — a cache flush must <strong>not</strong> silently re-enable a locked account.</p>
+<p>Even a <em>correct</em> password is rejected during the lock window. The 6<sup>th</sup> attempt with the right password fails just like the wrong ones — operators must wait out the timer or have a sibling admin clear the lock via psql.</p>
+<p>The audit trail captures every state change:</p>
 <ul>
-<li><code>rounded-2xl</code> corners (16px)</li>
-<li><code>border border-border</code> outline</li>
-<li><code>bg-surface</code> background</li>
-<li><code>shadow-2xl</code> on modals only</li>
+<li><code>auth.login</code> with <code>status=denied</code> + <code>error_kind=wrong_password</code> + <code>failed_login_count=N</code> — every wrong attempt</li>
+<li><code>auth.lockout.applied</code> — written exactly once, when the threshold is crossed</li>
+<li><code>auth.login</code> with <code>status=denied</code> + <code>error_kind=account_locked</code> — every attempt against a locked account</li>
+<li><code>auth.login</code> with <code>status=success</code> + <code>BREAK_GLASS_LOGIN</code> (severity=CRITICAL) — successful sign-in, see below</li>
 </ul>
-<p>PageHeader carries a 6-unit (24px) bottom margin; Card → Card
-spacing is 16px (<code>gap-4</code>) on grids and 24px (<code>space-y-6</code>) on
-vertical stacks.</p>
-<h2 id="gradients">Gradients<a class="headerlink" href="#gradients" title="Permanent link">&para;</a></h2>
-<p><code>bg-brand-gradient</code> is the <strong>only</strong> gradient that ships in the SPA.
-It's the cyan→blue gradient used on every primary CTA pill (<code>+ New
-…</code>, <code>Reveal (one-time)</code>, <code>Mint</code>, <code>Submit</code>, <code>Sign in</code>):</p>
-<div class="language-css highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">background-image</span><span class="o">:</span><span class="w"> </span><span class="nt">linear-gradient</span><span class="o">(</span><span class="nt">135deg</span><span class="o">,</span><span class="w"> </span><span class="p">#</span><span class="nn">06B6D4</span><span class="w"> </span><span class="nt">0</span><span class="o">%,</span><span class="w"> </span><span class="p">#</span><span class="nn">3B82F6</span><span class="w"> </span><span class="nt">100</span><span class="o">%);</span>
-</span></code></pre></div>
-<p>Do not invent new gradients. If you need to highlight something
-that isn't a primary CTA, use a solid color (<code>bg-accent/10</code>) or a
-border-l-4 callout, not a new gradient.</p>
-<h2 id="where-these-live-in-code">Where these live in code<a class="headerlink" href="#where-these-live-in-code" title="Permanent link">&para;</a></h2>
+<h3 id="rate-limit-per-ip-anti-scan">Rate limit (per-IP, anti-scan)<a class="headerlink" href="#rate-limit-per-ip-anti-scan" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>File</th>
-<th>What</th>
+<th>Endpoint</th>
+<th>Limit</th>
+<th>Window</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><a href="https://github.com/secrets-bridge/ui/blob/main/tailwind.config.js"><code>ui/tailwind.config.js</code></a></td>
-<td>The canonical Tailwind config — every token above</td>
+<td><code>POST /auth/login</code></td>
+<td>30</td>
+<td>60s</td>
 </tr>
 <tr>
-<td><a href="https://github.com/secrets-bridge/ui/tree/main/src/ui"><code>ui/src/ui/</code></a></td>
-<td>The shared primitives that consume the tokens: <code>Button</code>, <code>Card</code>, <code>StatusPill</code>, <code>Drawer</code>, <code>ConfirmModal</code>, <code>PageHeader</code>, <code>LogoMark</code></td>
+<td><code>GET /auth/oidc/callback</code></td>
+<td>60</td>
+<td>60s</td>
 </tr>
 <tr>
-<td><a href="https://github.com/secrets-bridge/skills/tree/main/ui/design/tokens"><code>skills/ui/design/tokens/</code></a></td>
-<td>The Figma → JSON sync output; the <code>sync.sh</code> script + <code>design-tokens.json</code> + <code>mapping.md</code></td>
+<td><code>POST /auth/oidc/{logout,backchannel}</code></td>
+<td>60</td>
+<td>60s</td>
 </tr>
 <tr>
-<td><a href="https://github.com/secrets-bridge/skills/blob/main/ui/design/BRAND_VOICE.md"><code>skills/ui/design/BRAND_VOICE.md</code></a></td>
-<td>The canonical brand voice doc</td>
+<td><code>POST /agents/:id/heartbeat</code></td>
+<td>6 per-agent</td>
+<td>60s</td>
+</tr>
+<tr>
+<td><code>GET /requests/:id/wraps/:wrap_id</code></td>
+<td>20 per-user</td>
+<td>60s</td>
 </tr>
 </tbody>
 </table>
-<h2 id="how-to-update-a-token">How to update a token<a class="headerlink" href="#how-to-update-a-token" title="Permanent link">&para;</a></h2>
-<p>The flow is <strong>Figma → skills/ui/design → tailwind.config.js</strong>:</p>
+<p>The login / callback caps are <strong>deliberately permissive</strong> so users behind shared CGNAT (an entire ISP or VPC behind one egress IP) aren't locked out by their neighbours. <strong>Brute-force defence lives in the per-account lockout above</strong>, not the per-IP rate limit — the lockout is IP-independent so rotating source IPs doesn't dodge it. Designed against Iraqi CGNAT and similar shared-egress environments.</p>
+<h2 id="oidc-sign-in-slices-b-c-e">OIDC sign-in (Slices B + C + E)<a class="headerlink" href="#oidc-sign-in-slices-b-c-e" title="Permanent link">&para;</a></h2>
+<p>Single Identity Provider (architect Q4). The api refuses to mount the OIDC routes unless <code>SB_OIDC_ISSUER</code> is set; until then, only <code>/auth/login</code> (local admin) accepts sign-ins.</p>
+<p>The flow:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>SPA → GET /api/v1/auth/oidc/start
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>api → 302 to IdP with PKCE state/nonce/code_challenge
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>IdP → user authenticates + consents
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>IdP → 302 back to /api/v1/auth/oidc/callback?code=...&amp;state=...
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>api → verify state, exchange code, verify ID token (signature + audience + nonce)
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>api → JIT upsert local_users row keyed on email-or-sub
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>api → reconcile user_roles against the configured group claim (see below)
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>api → stamp last_mfa_at if amr ⊇ {strong-factor}
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>api → Set-Cookie + 302 to return_to
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>SPA → /users/me → render
+</span></code></pre></div>
+<h3 id="group-claim-role-mapping-slice-e">Group-claim → role mapping (Slice E)<a class="headerlink" href="#group-claim-role-mapping-slice-e" title="Permanent link">&para;</a></h3>
+<p><code>SB_OIDC_GROUP_MAP</code> is a JSON object mapping IdP group names to Secrets Bridge role names:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;sb-admins&quot;</span><span class="p">:</span><span class="w">    </span><span class="s2">&quot;admin&quot;</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;sb-approvers&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;approver&quot;</span><span class="p">,</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">&quot;sb-devs&quot;</span><span class="p">:</span><span class="w">      </span><span class="s2">&quot;developer&quot;</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>The reconciler runs on <strong>every</strong> OIDC sign-in:</p>
+<ul>
+<li>User has a mapped group → grant added (if absent), <code>granted_by='system:oidc'</code></li>
+<li>User no longer has a mapped group → grant revoked</li>
+<li>Mapped role doesn't exist in the catalog → silent skip + audit (typo doesn't 5xx the login)</li>
+<li>Reconcile failure → audited as <code>auth.oidc.reconcile_failed</code>; user still signs in</li>
+</ul>
+<h3 id="the-reconciler-invariant-dont-break-this">The reconciler invariant (don't break this)<a class="headerlink" href="#the-reconciler-invariant-dont-break-this" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>The reconciler <strong>only</strong> touches <code>user_roles</code> rows with <code>granted_by = 'system:oidc'</code>.</p>
+</blockquote>
+<p>Admin-assigned grants — the <code>SB_BOOTSTRAP_ADMIN_USER_ID</code> grant, every manually-curated team-scoped grant, every grant created via <code>POST /api/v1/user-roles</code> — carry a different <code>granted_by</code> value and are <strong>invisible</strong> to the reconciler. They survive every reconcile pass, including the "user belongs to no mapped groups" case.</p>
+<p>This protects:</p>
 <ol>
-<li>Make the change in the Figma file (versions 02 Foundations).</li>
-<li>Re-run <code>skills/ui/design/tokens/sync.sh</code> to pull the latest
-   token definitions into <code>design-tokens.json</code>.</li>
-<li>Update <code>ui/tailwind.config.js</code> to match — same Tailwind names,
-   new hex values.</li>
-<li>Rebuild the SPA; visual diff against the Figma frames in
-   <code>skills/ui/design/frames/</code> (six PNG renders cached at last
-   sync).</li>
-<li>Open a PR against both <code>ui</code> and <code>skills</code> — they ship together.</li>
+<li>The break-glass admin from getting locked out when the IdP returns no groups during an outage.</li>
+<li>Manually-curated team-scoped grants (which OIDC has no way to express in v1).</li>
+<li>Operator overrides during incident response.</li>
 </ol>
-<p>The reverse direction (code → Figma) is not supported. Figma is
-upstream; the SPA is downstream.</p>
+<p>If you ever find yourself "cleaning up" this filter, <strong>stop</strong>. It is the security boundary, not an accident.</p>
+<h2 id="mfa-step-up-slice-d">MFA + step-up (Slice D)<a class="headerlink" href="#mfa-step-up-slice-d" title="Permanent link">&para;</a></h2>
+<p>Tier 2 operations (approve / reject / reveal-wrap; future: rotate, role-edit, provider-edit) require a session whose <code>last_mfa_at</code> is within the step-up TTL. A stale or unstamped session gets:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>401 Unauthorized
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>WWW-Authenticate: step-up max_age=900 acr_values=mfa
+</span></code></pre></div>
+<p>The SPA's global step-up interceptor catches this and redirects to:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>GET /api/v1/auth/oidc/start?step_up=mfa&amp;return_to=&lt;current page&gt;
+</span></code></pre></div>
+<p>which forwards to the IdP with <code>prompt=login&amp;max_age=0&amp;acr_values=mfa</code>. The IdP re-prompts for the second factor even with an alive SSO session. The api callback stamps <code>last_mfa_at</code> on the <strong>same session row</strong> — the cookie value does not change. The user returns to the original page; the cookie they had before is the cookie they have after. Audit chains, revocation semantics, and idle-TTL slides are all preserved.</p>
+<h3 id="strong-factor-recognition-amr">Strong-factor recognition (<code>amr</code>)<a class="headerlink" href="#strong-factor-recognition-amr" title="Permanent link">&para;</a></h3>
+<p>The <code>last_mfa_at</code> stamp only fires when the IdP's ID-token <code>amr</code> claim includes one of the RFC 8176 strong-factor identifiers:</p>
+<table>
+<thead>
+<tr>
+<th>Factor</th>
+<th>Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Multi-factor (explicit)</td>
+<td><code>mfa</code></td>
+</tr>
+<tr>
+<td>One-time password</td>
+<td><code>otp</code></td>
+</tr>
+<tr>
+<td>Hardware key</td>
+<td><code>hwk</code></td>
+</tr>
+<tr>
+<td>FIDO2 / WebAuthn</td>
+<td><code>fido</code></td>
+</tr>
+<tr>
+<td>Software-secured key</td>
+<td><code>swk</code></td>
+</tr>
+<tr>
+<td>Smart card</td>
+<td><code>sc</code></td>
+</tr>
+<tr>
+<td>Proof-of-possession</td>
+<td><code>pop</code></td>
+</tr>
+<tr>
+<td>Biometric — iris</td>
+<td><code>eye</code></td>
+</tr>
+<tr>
+<td>Biometric — fingerprint</td>
+<td><code>fpt</code></td>
+</tr>
+<tr>
+<td>Biometric — retina</td>
+<td><code>retina</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>pwd</code> (password alone) and <code>kba</code> (knowledge-based answer) are explicitly <strong>not</strong> strong. A password-only IdP cannot accidentally stamp MFA.</p>
+<h3 id="recommended-factor-priority">Recommended factor priority<a class="headerlink" href="#recommended-factor-priority" title="Permanent link">&para;</a></h3>
+<p>When you configure MFA on your IdP, use this priority order:</p>
+<ol>
+<li><strong>FIDO2 / WebAuthn (hardware keys)</strong> — phishing-resistant, no shared secret on the device, no battery. YubiKey, Solo, built-in TouchID/Windows-Hello.</li>
+<li><strong>Hardware OTP token</strong> — Yubico, RSA SecurID. Better than software OTP because the device can't be cloned to a malware-controlled phone.</li>
+<li><strong>Software TOTP</strong> — Aegis, 1Password, Authy. Fine for most users; vulnerable to phishing kits that proxy the TOTP code.</li>
+<li><strong>SMS / email OTP</strong> — <strong>avoid</strong>. SIM swap and email-account takeover are well-documented bypasses.</li>
+</ol>
+<p>If your IdP supports it, prefer <strong>WebAuthn first</strong> in the user enrolment flow so new users register a hardware key before they fall back to software TOTP.</p>
+<h2 id="break-glass-local-admin-policy-architect-q1">Break-glass (local-admin) policy (architect Q1)<a class="headerlink" href="#break-glass-local-admin-policy-architect-q1" title="Permanent link">&para;</a></h2>
+<p>Local-admin sign-in via <code>/auth/login</code> is the <strong>break-glass surface</strong> — the way operators sign in when the IdP is down, the OIDC client is misconfigured, or the network is partitioned. It is <strong>not</strong> the day-to-day sign-in path once OIDC is configured.</p>
+<p>Every successful local-admin sign-in emits a high-severity audit event:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>action:   BREAK_GLASS_LOGIN
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>status:   success
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>severity: CRITICAL    (in metadata)
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>actor:    user:&lt;uuid&gt;
+</span></code></pre></div>
+<p><strong>Route this audit action into your alert pipeline.</strong> Splunk / Datadog / Grafana Alertmanager — whichever you use, page the on-call when a <code>BREAK_GLASS_LOGIN</code> shows up outside of an open incident bridge. The Slack notification recipe:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Example: worker notification sink (when configured) or external SIEM rule</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nt">when</span><span class="p">:</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BREAK_GLASS_LOGIN</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">severity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CRITICAL</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="nt">then</span><span class="p">:</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nt">notify</span><span class="p">:</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nt">channel</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;#security-incidents&quot;</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">      </span><span class="no">Break-glass local-admin login by ${actor}.</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">      </span><span class="no">Expected? If not, open an incident.</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">      </span><span class="no">Session ID: ${metadata.session_id}</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">      </span><span class="no">IP: ${metadata.ip}</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">      </span><span class="no">User-agent: ${metadata.user_agent}</span>
+</span></code></pre></div>
+<h3 id="local-admin-sessions-are-never-mfa-fresh">Local-admin sessions are NEVER MFA-fresh<a class="headerlink" href="#local-admin-sessions-are-never-mfa-fresh" title="Permanent link">&para;</a></h3>
+<p><code>last_mfa_at</code> is only stamped via OIDC callback when <code>amr</code> carries a strong factor. Local-admin sessions never go through OIDC, so they never get a stamp. Every Tier 2 operation <strong>forces a step-up to OIDC</strong> — even when the user is a local-admin. This is intentional. Break-glass proves <em>who you are</em>; it does not prove <em>fresh MFA</em>.</p>
+<p>Concretely: a local-admin user can sign in during an IdP outage and see the dashboard, but they <strong>cannot</strong> approve a request or reveal a secret until OIDC is back up and they step up. If you're routinely approving as the break-glass user, your operating model is wrong — that account should be reserved for "the IdP is broken and I need to fix it."</p>
+<h3 id="disabling-break-glass-entirely">Disabling break-glass entirely<a class="headerlink" href="#disabling-break-glass-entirely" title="Permanent link">&para;</a></h3>
+<p>For deployments that want to refuse local-admin sign-in once OIDC is configured, the chart will gain a <code>SB_LOCAL_ADMIN_ENABLED=false</code> flag in a follow-up. Today the flag is implicit — leave <code>SB_BOOTSTRAP_ADMIN_EMAIL</code> unset and no local-admin account exists, so <code>/auth/login</code> always fails with <code>invalid credentials</code>.</p>
+<h2 id="what-this-page-does-not-cover">What this page does NOT cover<a class="headerlink" href="#what-this-page-does-not-cover" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>RBAC enforcement</strong> at the route level. Sidebar nav already hides admin pages without <code>team.edit</code> / <code>role.edit</code>; route-level enforcement on the api lands in a follow-up.</li>
+<li><strong>Audit log forwarding</strong> to SIEM. The api emits structured slog JSON; pick that up with Fluent Bit / Vector and route to wherever.</li>
+<li><strong>mTLS for agent ↔ api</strong>. Slice B of the workload-identity track replaces the static agent secret with a SPIFFE / IRSA-backed identity. Tracked separately from the user-auth series.</li>
+</ul>
+<p>For the chart-side knobs (<code>api.config.oidc.*</code>, <code>api.config.bootstrap.userId</code>), see <a href="../config/">Configuration reference</a>. For the underlying threat model + hard rules, see <a href="../../overview/threat-model/">Threat model</a>.</p>
 
 
 
 
 
 
+
+  
+  
 
 
 

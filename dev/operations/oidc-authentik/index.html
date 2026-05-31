@@ -7,19 +7,19 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes.">
+        <meta name="description" content="Step-by-step Authentik setup for Secrets Bridge — application, scopes, group claim, WebAuthn enrolment.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
       
       
-        <link rel="canonical" href="https://secrets-bridge.io/dev/design/tokens/">
+        <link rel="canonical" href="https://secrets-bridge.io/dev/operations/oidc-authentik/">
       
       
-        <link rel="prev" href="../brand-voice/">
+        <link rel="prev" href="../authentication/">
       
       
-        <link rel="next" href="../figma/">
+        <link rel="next" href="../config/">
       
       
       <link rel="icon" href="../../assets/favicon.svg">
@@ -27,7 +27,7 @@
     
     
   
-    <title>Tokens & theme - Secrets Bridge</title>
+    <title>OIDC with Authentik - Secrets Bridge</title>
   
 
     
@@ -72,14 +72,14 @@
   
 
   
-  <link rel="canonical" href="https://secrets-bridge.io/dev/design/tokens/" />
+  <link rel="canonical" href="https://secrets-bridge.io/dev/operations/oidc-authentik/" />
 
   
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Secrets Bridge" />
-  <meta property="og:title" content="Tokens & theme" />
-  <meta property="og:description" content="Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes." />
-  <meta property="og:url" content="https://secrets-bridge.io/dev/design/tokens/" />
+  <meta property="og:title" content="OIDC with Authentik" />
+  <meta property="og:description" content="Step-by-step Authentik setup for Secrets Bridge — application, scopes, group claim, WebAuthn enrolment." />
+  <meta property="og:url" content="https://secrets-bridge.io/dev/operations/oidc-authentik/" />
   <meta property="og:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -88,8 +88,8 @@
 
   
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Tokens & theme" />
-  <meta name="twitter:description" content="Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes." />
+  <meta name="twitter:title" content="OIDC with Authentik" />
+  <meta name="twitter:description" content="Step-by-step Authentik setup for Secrets Bridge — application, scopes, group claim, WebAuthn enrolment." />
   <meta name="twitter:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge — The brain behind your secrets." />
   
@@ -109,9 +109,9 @@
   {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    "headline": "Tokens & theme",
-    "description": "Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes.",
-    "url": "https://secrets-bridge.io/dev/design/tokens/",
+    "headline": "OIDC with Authentik",
+    "description": "Step-by-step Authentik setup for Secrets Bridge — application, scopes, group claim, WebAuthn enrolment.",
+    "url": "https://secrets-bridge.io/dev/operations/oidc-authentik/",
     "image": "https://secrets-bridge.io/assets/og-banner.png",
     "publisher": {
       "@type": "Organization",
@@ -144,7 +144,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#tokens-theme" class="md-skip">
+        <a href="#oidc-with-authentik" class="md-skip">
           Skip to content
         </a>
       
@@ -183,7 +183,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Tokens & theme
+              OIDC with Authentik
             
           </span>
         </div>
@@ -346,13 +346,11 @@
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../design/" class="md-tabs__link">
           
   
     
@@ -368,11 +366,13 @@
         
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../operations/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
           
   
     
@@ -839,6 +839,140 @@
       
   
   
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../design/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Design system
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Design system
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/brand-voice/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Brand voice
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/tokens/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Tokens & theme
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/figma/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Figma file & assets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -848,6 +982,12 @@
       
         
           
+        
+      
+        
+      
+        
+      
         
       
         
@@ -871,7 +1011,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
           
@@ -880,23 +1020,23 @@
               
   
   <span class="md-ellipsis">
-    Design system
+    Operations
   </span>
   
 
             </a>
             
               
-              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
-            Design system
+            Operations
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -909,11 +1049,53 @@
   
   
     <li class="md-nav__item">
-      <a href="../brand-voice/" class="md-nav__link">
+      <a href="../docker-compose/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Brand voice
+    Deploying with docker-compose
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bootstrap/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bootstrap & first sign-in
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Authentication
   </span>
   
 
@@ -943,7 +1125,7 @@
           
   
   <span class="md-ellipsis">
-    Tokens & theme
+    OIDC with Authentik
   </span>
   
 
@@ -954,7 +1136,7 @@
         
   
   <span class="md-ellipsis">
-    Tokens & theme
+    OIDC with Authentik
   </span>
   
 
@@ -976,19 +1158,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#color-tokens" class="md-nav__link">
+  <a href="#1-create-the-application-in-authentik" class="md-nav__link">
     <span class="md-ellipsis">
-      Color tokens
+      1. Create the application in Authentik
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Color tokens">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-configure-the-group-claim" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Configure the group claim
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Configure the group claim">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#status-colors-statuspill-variants" class="md-nav__link">
+  <a href="#the-reconciler-invariant-you-cannot-disable-this" class="md-nav__link">
     <span class="md-ellipsis">
-      Status colors (StatusPill variants)
+      The reconciler invariant (you cannot disable this)
     </span>
   </a>
   
@@ -1000,19 +1191,46 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-tokens" class="md-nav__link">
+  <a href="#3-configure-secrets-bridge" class="md-nav__link">
     <span class="md-ellipsis">
-      Type tokens
+      3. Configure Secrets Bridge
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Type tokens">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-sign-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Sign in
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-configure-mfa-in-authentik" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Configure MFA in Authentik
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Configure MFA in Authentik">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#type-scale" class="md-nav__link">
+  <a href="#enabling-webauthn-enrolment" class="md-nav__link">
     <span class="md-ellipsis">
-      Type scale
+      Enabling WebAuthn enrolment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verifying-amr-is-correct" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verifying amr is correct
     </span>
   </a>
   
@@ -1024,36 +1242,36 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#spacing-layout" class="md-nav__link">
+  <a href="#6-step-up-flow-in-action" class="md-nav__link">
     <span class="md-ellipsis">
-      Spacing &amp; layout
+      6. Step-up flow in action
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#gradients" class="md-nav__link">
+  <a href="#7-back-channel-logout" class="md-nav__link">
     <span class="md-ellipsis">
-      Gradients
+      7. Back-channel logout
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#where-these-live-in-code" class="md-nav__link">
+  <a href="#8-troubleshooting" class="md-nav__link">
     <span class="md-ellipsis">
-      Where these live in code
+      8. Troubleshooting
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-to-update-a-token" class="md-nav__link">
+  <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
-      How to update a token
+      See also
     </span>
   </a>
   
@@ -1075,189 +1293,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../figma/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Figma file & assets
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-      
-        
-          
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../../operations/" class="md-nav__link ">
-              
-  
-  <span class="md-ellipsis">
-    Operations
-  </span>
-  
-
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
-            Operations
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/docker-compose/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Deploying with docker-compose
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/bootstrap/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Bootstrap & first sign-in
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/authentication/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Authentication
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/oidc-authentik/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    OIDC with Authentik
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/config/" class="md-nav__link">
+      <a href="../config/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1278,7 +1314,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/troubleshooting/" class="md-nav__link">
+      <a href="../troubleshooting/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1483,19 +1519,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#color-tokens" class="md-nav__link">
+  <a href="#1-create-the-application-in-authentik" class="md-nav__link">
     <span class="md-ellipsis">
-      Color tokens
+      1. Create the application in Authentik
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Color tokens">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-configure-the-group-claim" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Configure the group claim
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Configure the group claim">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#status-colors-statuspill-variants" class="md-nav__link">
+  <a href="#the-reconciler-invariant-you-cannot-disable-this" class="md-nav__link">
     <span class="md-ellipsis">
-      Status colors (StatusPill variants)
+      The reconciler invariant (you cannot disable this)
     </span>
   </a>
   
@@ -1507,19 +1552,46 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#type-tokens" class="md-nav__link">
+  <a href="#3-configure-secrets-bridge" class="md-nav__link">
     <span class="md-ellipsis">
-      Type tokens
+      3. Configure Secrets Bridge
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Type tokens">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-sign-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Sign in
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-configure-mfa-in-authentik" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Configure MFA in Authentik
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Configure MFA in Authentik">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#type-scale" class="md-nav__link">
+  <a href="#enabling-webauthn-enrolment" class="md-nav__link">
     <span class="md-ellipsis">
-      Type scale
+      Enabling WebAuthn enrolment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verifying-amr-is-correct" class="md-nav__link">
+    <span class="md-ellipsis">
+      Verifying amr is correct
     </span>
   </a>
   
@@ -1531,36 +1603,36 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#spacing-layout" class="md-nav__link">
+  <a href="#6-step-up-flow-in-action" class="md-nav__link">
     <span class="md-ellipsis">
-      Spacing &amp; layout
+      6. Step-up flow in action
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#gradients" class="md-nav__link">
+  <a href="#7-back-channel-logout" class="md-nav__link">
     <span class="md-ellipsis">
-      Gradients
+      7. Back-channel logout
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#where-these-live-in-code" class="md-nav__link">
+  <a href="#8-troubleshooting" class="md-nav__link">
     <span class="md-ellipsis">
-      Where these live in code
+      8. Troubleshooting
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-to-update-a-token" class="md-nav__link">
+  <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
-      How to update a token
+      See also
     </span>
   </a>
   
@@ -1581,7 +1653,7 @@
                   
 
   
-    <a href="https://github.com/secrets-bridge/edit/main/docs/design/tokens.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/secrets-bridge/edit/main/docs/operations/oidc-authentik.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1590,263 +1662,187 @@
     
       
     
-    <a href="https://github.com/secrets-bridge/raw/main/docs/design/tokens.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/secrets-bridge/raw/main/docs/operations/oidc-authentik.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="tokens-theme">Tokens &amp; theme<a class="headerlink" href="#tokens-theme" title="Permanent link">&para;</a></h1>
-<p>The SPA's Tailwind theme, this docs site, the GitHub social
-banners, and every brand surface use the same set of design
-tokens. The Figma file is the source; the SPA's
-<code>tailwind.config.js</code> is the consumer.</p>
-<h2 id="color-tokens">Color tokens<a class="headerlink" href="#color-tokens" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Tailwind name</th>
-<th>Hex</th>
-<th>Role</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>bg</code></td>
-<td><code>#0B1220</code></td>
-<td>Base page background (Navy 900)</td>
-</tr>
-<tr>
-<td><code>surface</code></td>
-<td><code>#0F172A</code></td>
-<td>Card / panel surface (Dark Navy)</td>
-</tr>
-<tr>
-<td><code>text</code></td>
-<td><code>#CBD5E1</code></td>
-<td>Body copy (Slate 300)</td>
-</tr>
-<tr>
-<td><code>muted</code></td>
-<td><code>#64748B</code></td>
-<td>Secondary text / labels (Slate 500)</td>
-</tr>
-<tr>
-<td><code>accent</code></td>
-<td><code>#06B6D4</code></td>
-<td><strong>Primary accent</strong> — Cyan</td>
-</tr>
-<tr>
-<td><code>accent-bright</code></td>
-<td><code>#22D3EE</code></td>
-<td>Highlight / hover</td>
-</tr>
-<tr>
-<td><code>border</code></td>
-<td><code>#1E293B</code></td>
-<td>Card edges, separators</td>
-</tr>
-<tr>
-<td><code>teal</code></td>
-<td><code>#14B8A6</code></td>
-<td>Secondary accent</td>
-</tr>
-<tr>
-<td><code>blue</code></td>
-<td><code>#3B82F6</code></td>
-<td>Tertiary / brand-gradient end</td>
-</tr>
-<tr>
-<td><code>purple</code></td>
-<td><code>#A855F7</code></td>
-<td>Tertiary (sparingly)</td>
-</tr>
-<tr>
-<td><code>success</code></td>
-<td><code>#10B981</code></td>
-<td>StatusPill success (Vault healthy, request approved)</td>
-</tr>
-</tbody>
-</table>
-<h3 id="status-colors-statuspill-variants">Status colors (StatusPill variants)<a class="headerlink" href="#status-colors-statuspill-variants" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Variant</th>
-<th>When</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>success</code></td>
-<td>Green outline / fill — agent active, request approved, audit success, secret present</td>
-</tr>
-<tr>
-<td><code>warning</code></td>
-<td>Yellow outline / fill — agent stale, audit denied, env uat, archived project, applied_unverified</td>
-</tr>
-<tr>
-<td><code>error</code></td>
-<td>Red outline / fill — request rejected/failed, env prod, audit failure</td>
-</tr>
-<tr>
-<td><code>pending</code></td>
-<td>Yellow — request pending</td>
-</tr>
-<tr>
-<td><code>accent</code></td>
-<td>Cyan — role badges, env staging</td>
-</tr>
-<tr>
-<td><code>system</code></td>
-<td>Cyan outline — system-seed row marker</td>
-</tr>
-<tr>
-<td><code>neutral</code></td>
-<td>Muted — env other, preview chips</td>
-</tr>
-<tr>
-<td><code>cancelled</code></td>
-<td>Muted strikethrough — consumed wraps</td>
-</tr>
-</tbody>
-</table>
-<h2 id="type-tokens">Type tokens<a class="headerlink" href="#type-tokens" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Family</th>
-<th>Font</th>
-<th>When</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Sans</td>
-<td><a href="https://fonts.google.com/specimen/Inter">Inter</a></td>
-<td>Body copy, headings, UI labels</td>
-</tr>
-<tr>
-<td>Mono</td>
-<td><a href="https://fonts.google.com/specimen/JetBrains+Mono">JetBrains Mono</a></td>
-<td>Code, CLI snippets, identifiers, UUIDs, secret refs</td>
-</tr>
-</tbody>
-</table>
-<p>Loaded via Google Fonts with <code>preconnect</code> to keep CLS low. The
-SPA's CSP allows <code>fonts.googleapis.com</code> + <code>fonts.gstatic.com</code> for
-this reason.</p>
-<h3 id="type-scale">Type scale<a class="headerlink" href="#type-scale" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Token</th>
-<th>Tailwind class</th>
-<th>Use</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>display</code></td>
-<td><code>text-5xl font-bold</code></td>
-<td>Hero headings (Figma frames only)</td>
-</tr>
-<tr>
-<td><code>h1</code></td>
-<td><code>text-2xl font-bold tracking-tight</code></td>
-<td>Page title (PageHeader)</td>
-</tr>
-<tr>
-<td><code>h2</code></td>
-<td><code>text-base font-semibold</code></td>
-<td>Card / section headers</td>
-</tr>
-<tr>
-<td><code>eyebrow</code></td>
-<td><code>text-[11px] uppercase tracking-wider text-muted font-medium</code></td>
-<td>Field labels, table headers</td>
-</tr>
-<tr>
-<td><code>body</code></td>
-<td><code>text-sm</code></td>
-<td>Default body copy</td>
-</tr>
-<tr>
-<td><code>caption</code></td>
-<td><code>text-[11px] text-muted</code></td>
-<td>Footer notes, helper text</td>
-</tr>
-</tbody>
-</table>
-<h2 id="spacing-layout">Spacing &amp; layout<a class="headerlink" href="#spacing-layout" title="Permanent link">&para;</a></h2>
-<p>The SPA uses Tailwind's default 4px-grid spacing scale. Cards have:</p>
+<h1 id="oidc-with-authentik">OIDC with Authentik<a class="headerlink" href="#oidc-with-authentik" title="Permanent link">&para;</a></h1>
+<p>This guide configures <a href="https://goauthentik.io/">Authentik</a> as the IdP for Secrets Bridge. Authentik is the <strong>worked example</strong> — Keycloak, Okta, Auth0, and Entra ID work the same way; the screens are different but the contract (issuer URL, client id / secret, redirect URL, scopes, group claim) is identical.</p>
+<p>Prerequisites:</p>
 <ul>
-<li><code>rounded-2xl</code> corners (16px)</li>
-<li><code>border border-border</code> outline</li>
-<li><code>bg-surface</code> background</li>
-<li><code>shadow-2xl</code> on modals only</li>
+<li>A running Authentik instance with admin access.</li>
+<li>A running Secrets Bridge installation. See <a href="../bootstrap/">Bootstrap &amp; first sign-in</a>.</li>
+<li>A public hostname for the SPA + api, e.g. <code>https://secrets-bridge.example.com</code>.</li>
 </ul>
-<p>PageHeader carries a 6-unit (24px) bottom margin; Card → Card
-spacing is 16px (<code>gap-4</code>) on grids and 24px (<code>space-y-6</code>) on
-vertical stacks.</p>
-<h2 id="gradients">Gradients<a class="headerlink" href="#gradients" title="Permanent link">&para;</a></h2>
-<p><code>bg-brand-gradient</code> is the <strong>only</strong> gradient that ships in the SPA.
-It's the cyan→blue gradient used on every primary CTA pill (<code>+ New
-…</code>, <code>Reveal (one-time)</code>, <code>Mint</code>, <code>Submit</code>, <code>Sign in</code>):</p>
-<div class="language-css highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">background-image</span><span class="o">:</span><span class="w"> </span><span class="nt">linear-gradient</span><span class="o">(</span><span class="nt">135deg</span><span class="o">,</span><span class="w"> </span><span class="p">#</span><span class="nn">06B6D4</span><span class="w"> </span><span class="nt">0</span><span class="o">%,</span><span class="w"> </span><span class="p">#</span><span class="nn">3B82F6</span><span class="w"> </span><span class="nt">100</span><span class="o">%);</span>
+<h2 id="1-create-the-application-in-authentik">1. Create the application in Authentik<a class="headerlink" href="#1-create-the-application-in-authentik" title="Permanent link">&para;</a></h2>
+<p>In the Authentik admin:</p>
+<ol>
+<li><strong>Applications → Applications → Create</strong></li>
+<li>Name: <code>Secrets Bridge</code></li>
+<li>Slug: <code>secrets-bridge</code></li>
+<li>Group: (your choice — controls who can see it in the user library)</li>
+<li><strong>Applications → Providers → Create → OAuth2/OpenID Provider</strong></li>
+<li>Name: <code>secrets-bridge</code></li>
+<li>Authorization flow: <code>default-provider-authorization-explicit-consent</code> (or implicit, your call)</li>
+<li>Client type: <strong>Confidential</strong></li>
+<li>Client ID: <code>secrets-bridge</code> (or whatever — note it down)</li>
+<li>Client Secret: Authentik generates one — note it down, store it in the env Secret</li>
+<li>Redirect URIs: <code>https://secrets-bridge.example.com/api/v1/auth/oidc/callback</code></li>
+<li>Signing key: the same key your other apps use, or <code>authentik Self-signed Certificate</code></li>
+<li>Scopes: leave the default OpenID + profile + email scopes selected; <strong>also enable the <code>groups</code> scope</strong> (Authentik exposes group memberships via this scope)</li>
+<li>Back in the Application, bind the provider you just created.</li>
+</ol>
+<p>The <strong>issuer URL</strong> you'll need for Secrets Bridge is:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>https://authentik.example.com/application/o/secrets-bridge/
 </span></code></pre></div>
-<p>Do not invent new gradients. If you need to highlight something
-that isn't a primary CTA, use a solid color (<code>bg-accent/10</code>) or a
-border-l-4 callout, not a new gradient.</p>
-<h2 id="where-these-live-in-code">Where these live in code<a class="headerlink" href="#where-these-live-in-code" title="Permanent link">&para;</a></h2>
+<p>(Note the <strong>trailing slash</strong> — Authentik's discovery endpoint is <code>&lt;issuer&gt;/.well-known/openid-configuration</code> and that resolves only with the slash present.)</p>
+<h2 id="2-configure-the-group-claim">2. Configure the group claim<a class="headerlink" href="#2-configure-the-group-claim" title="Permanent link">&para;</a></h2>
+<p>Group-claim → role mapping is the architect Q5 deferral that Slice E delivered. The reconciler reads the <code>groups</code> claim by default and maps each IdP group to a Secrets Bridge role.</p>
+<p>Authentik emits the <code>groups</code> claim automatically when the <code>groups</code> scope is granted on the provider — no scope mapper to configure.</p>
+<p>If your Authentik install has groups named differently from your Secrets Bridge roles, set the map in <code>values.yaml</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">api</span><span class="p">:</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">config</span><span class="p">:</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nt">oidc</span><span class="p">:</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">      </span><span class="nt">groupClaim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">groups</span><span class="w">   </span><span class="c1"># the default; matches Authentik</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">      </span><span class="nt">groupMap</span><span class="p">:</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">        </span><span class="nt">sb-admins</span><span class="p">:</span><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">        </span><span class="nt">sb-approvers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">approver</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">        </span><span class="nt">sb-devs</span><span class="p">:</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">developer</span>
+</span></code></pre></div>
+<p>The chart serializes this map to JSON and exposes it as <code>SB_OIDC_GROUP_MAP</code>. The api binary's <code>ValidateOIDCGroupMap</code> fails the boot if the JSON is malformed or has empty keys/values — operators get the signal up front, not as a 401 in production.</p>
+<h3 id="the-reconciler-invariant-you-cannot-disable-this">The reconciler invariant (you cannot disable this)<a class="headerlink" href="#the-reconciler-invariant-you-cannot-disable-this" title="Permanent link">&para;</a></h3>
+<p>The reconciler <strong>only</strong> touches <code>user_roles</code> rows with <code>granted_by = 'system:oidc'</code>. Admin-assigned grants are invisible to it. See <a href="../authentication/#the-reconciler-invariant-dont-break-this">Authentication → The reconciler invariant</a> for what this protects. Repeat in your runbook so the next on-call doesn't relax the filter as "cleanup."</p>
+<h2 id="3-configure-secrets-bridge">3. Configure Secrets Bridge<a class="headerlink" href="#3-configure-secrets-bridge" title="Permanent link">&para;</a></h2>
+<p>In your chart values:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">api</span><span class="p">:</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">config</span><span class="p">:</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">oidc</span><span class="p">:</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">      </span><span class="nt">issuer</span><span class="p">:</span><span class="w">             </span><span class="s">&quot;https://authentik.example.com/application/o/secrets-bridge/&quot;</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">      </span><span class="nt">clientId</span><span class="p">:</span><span class="w">           </span><span class="s">&quot;secrets-bridge&quot;</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">      </span><span class="nt">redirectUrl</span><span class="p">:</span><span class="w">        </span><span class="s">&quot;https://secrets-bridge.example.com/api/v1/auth/oidc/callback&quot;</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">      </span><span class="nt">scopes</span><span class="p">:</span><span class="w">             </span><span class="s">&quot;openid</span><span class="nv"> </span><span class="s">profile</span><span class="nv"> </span><span class="s">email</span><span class="nv"> </span><span class="s">groups&quot;</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">      </span><span class="nt">postLogoutRedirect</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;https://secrets-bridge.example.com/&quot;</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">      </span><span class="nt">groupClaim</span><span class="p">:</span><span class="w">         </span><span class="l l-Scalar l-Scalar-Plain">groups</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">      </span><span class="nt">groupMap</span><span class="p">:</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">        </span><span class="nt">sb-admins</span><span class="p">:</span><span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">admin</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">        </span><span class="nt">sb-approvers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">approver</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">        </span><span class="nt">sb-devs</span><span class="p">:</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">developer</span>
+</span></code></pre></div>
+<p>And in the env Secret (<code>secrets.existingSecret</code>, typically <code>secrets-bridge-env</code>):</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>SB_OIDC_CLIENT_SECRET=&lt;the secret Authentik generated above&gt;
+</span></code></pre></div>
+<p>Apply the chart upgrade:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>helm<span class="w"> </span>upgrade<span class="w"> </span>secrets-bridge<span class="w"> </span>./charts/secrets-bridge<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>-n<span class="w"> </span>secrets-bridge<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span>-f<span class="w"> </span>my-values.yaml
+</span></code></pre></div>
+<p>The api pod rolls automatically — the chart's <code>checksum/config</code> annotation includes the OIDC issuer + groupMap, so a Helm upgrade that flips OIDC on/off or rewrites the mapping triggers a fresh pod.</p>
+<h2 id="4-sign-in">4. Sign in<a class="headerlink" href="#4-sign-in" title="Permanent link">&para;</a></h2>
+<p>Browse to <code>https://secrets-bridge.example.com/login</code>. The SPA probes the api for OIDC availability via <code>/api/v1/auth/oidc/start</code> and renders the <strong>"Sign in with SSO"</strong> button above the local-admin form when OIDC is mounted.</p>
+<p>Click it. The redirect chain runs:</p>
+<ol>
+<li>SPA → api <code>/auth/oidc/start</code> → Authentik authorize endpoint</li>
+<li>Authentik prompts for credentials (and MFA — see below)</li>
+<li>Authentik → api <code>/auth/oidc/callback?code=...&amp;state=...</code></li>
+<li>api verifies + JIT-creates the user + reconciles roles + Set-Cookie</li>
+<li>api → 302 to the SPA's original page</li>
+</ol>
+<p>If your user's <code>groups</code> claim contained <code>sb-admins</code>, the reconciler grants the <code>admin</code> role on the way through. Your first sign-in lands you on the Dashboard with full permissions.</p>
+<p>If your <code>groups</code> claim contained none of the mapped groups, the user is provisioned with <strong>no role grants</strong>. An admin must assign one from <code>/admin/assignments</code> before the user can do anything beyond <code>/users/me</code>.</p>
+<h2 id="5-configure-mfa-in-authentik">5. Configure MFA in Authentik<a class="headerlink" href="#5-configure-mfa-in-authentik" title="Permanent link">&para;</a></h2>
+<p>Secrets Bridge gates Tier 2 operations (approve / reject / reveal-wrap) behind <strong>fresh MFA</strong>. The api stamps <code>last_mfa_at</code> on the session when the IdP's <code>amr</code> claim carries a strong factor — see <a href="../authentication/#strong-factor-recognition-amr">Authentication → Strong-factor recognition</a>.</p>
+<p>Authentik supports WebAuthn (FIDO2 / passkeys), TOTP, SMS, and email. The <strong>recommended priority</strong> is:</p>
+<ol>
+<li><strong>WebAuthn (hardware key or platform authenticator)</strong> — phishing-resistant, no shared secret. Authentik treats WebAuthn as <code>mfa</code> in the <code>amr</code> claim, which the api recognises as strong.</li>
+<li><strong>TOTP</strong> — falls back to <code>otp</code> in the <code>amr</code> claim, still strong.</li>
+<li><strong>SMS</strong> — avoid. Authentik exposes <code>sms</code> in <code>amr</code>, which the api treats as NOT strong (it's not in the RFC 8176 strong-factor set). Tier 2 ops will continue to step-up.</li>
+</ol>
+<h3 id="enabling-webauthn-enrolment">Enabling WebAuthn enrolment<a class="headerlink" href="#enabling-webauthn-enrolment" title="Permanent link">&para;</a></h3>
+<p>In Authentik:</p>
+<ol>
+<li><strong>Flows &amp; Stages → Stages → Create → WebAuthn Authenticator Setup</strong></li>
+<li>Add the stage to your default authentication flow (or your user-self-enrolment flow if you have one).</li>
+<li>Mark the stage as <strong>required</strong> for users with any of your <code>sb-admins</code> / <code>sb-approvers</code> groups — those are the people who'll need step-up MFA on every approve, so they should have a hardware key enrolled before they ever sign in.</li>
+</ol>
+<p>You can require WebAuthn for everyone or only for privileged groups — Authentik's stage-binding lets you scope by group, user, or any other expression.</p>
+<h3 id="verifying-amr-is-correct">Verifying <code>amr</code> is correct<a class="headerlink" href="#verifying-amr-is-correct" title="Permanent link">&para;</a></h3>
+<p>After a user signs in with WebAuthn, check the audit row on the Secrets Bridge side:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;amr&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;session_id&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">occurred_at</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">audit_events</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;auth.oidc.callback&#39;</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="k">DESC</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+</span></code></pre></div>
+<p>You should see <code>amr</code> as <code>["mfa"]</code> (or <code>["pwd","mfa"]</code> for a password-then-WebAuthn flow). If you only see <code>["pwd"]</code>, the IdP did not assert MFA and the api will demand step-up on every Tier 2 op. That's a sign your flow isn't enforcing the WebAuthn stage.</p>
+<h2 id="6-step-up-flow-in-action">6. Step-up flow in action<a class="headerlink" href="#6-step-up-flow-in-action" title="Permanent link">&para;</a></h2>
+<p>The first time the user tries to approve a request, they'll see:</p>
+<ol>
+<li>SPA opens the request detail → clicks <strong>Approve</strong></li>
+<li>SPA <code>POST /requests/:id/approve</code> → api returns <code>401 step_up_required</code></li>
+<li>SPA detects the <code>WWW-Authenticate: step-up</code> header → redirects through the OIDC step-up start URL</li>
+<li>Authentik re-prompts MFA (it honours <code>prompt=login</code> + <code>max_age=0</code> + <code>acr_values=mfa</code> in the authorize call)</li>
+<li>api callback stamps <code>last_mfa_at</code> on the <strong>same session row</strong> (cookie unchanged)</li>
+<li>SPA returns to the request detail → clicks Approve again → 200</li>
+</ol>
+<p>The "cookie unchanged" invariant is critical — see <a href="../authentication/#mfa-step-up-slice-d">Authentication → MFA + step-up</a>. Your audit chain stays continuous; the session ID never changes.</p>
+<h2 id="7-back-channel-logout">7. Back-channel logout<a class="headerlink" href="#7-back-channel-logout" title="Permanent link">&para;</a></h2>
+<p>Authentik supports RFC 8417 back-channel logout. To wire it:</p>
+<ol>
+<li>In the provider settings: enable <strong>Back-channel logout</strong> and set the URL to:
+   <div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>https://secrets-bridge.example.com/api/v1/auth/oidc/backchannel
+</span></code></pre></div></li>
+<li>Authentik will POST a <code>logout_token</code> to this URL when the user signs out of Authentik (single sign-out across applications).</li>
+<li>The Secrets Bridge api verifies the token signature + audience + the <code>events</code> claim, then revokes <strong>every</strong> server-side session for the user's <code>sub</code>. The user is signed out of Secrets Bridge immediately.</li>
+</ol>
+<h2 id="8-troubleshooting">8. Troubleshooting<a class="headerlink" href="#8-troubleshooting" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>File</th>
-<th>What</th>
+<th>Symptom</th>
+<th>Likely cause</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><a href="https://github.com/secrets-bridge/ui/blob/main/tailwind.config.js"><code>ui/tailwind.config.js</code></a></td>
-<td>The canonical Tailwind config — every token above</td>
+<td>"OIDC routes don't appear on /login"</td>
+<td><code>SB_OIDC_ISSUER</code> is empty; SPA probes 404 and hides the button. Check the api logs for the <code>oidc disabled</code> line at boot.</td>
 </tr>
 <tr>
-<td><a href="https://github.com/secrets-bridge/ui/tree/main/src/ui"><code>ui/src/ui/</code></a></td>
-<td>The shared primitives that consume the tokens: <code>Button</code>, <code>Card</code>, <code>StatusPill</code>, <code>Drawer</code>, <code>ConfirmModal</code>, <code>PageHeader</code>, <code>LogoMark</code></td>
+<td>"Login succeeds but I have no permissions"</td>
+<td>The user's <code>groups</code> claim doesn't include any mapped group, OR the role name in <code>groupMap</code> doesn't exist in the role catalog. Check the <code>auth.oidc.role_reconcile</code> audit row — <code>metadata.added</code> will be empty.</td>
 </tr>
 <tr>
-<td><a href="https://github.com/secrets-bridge/skills/tree/main/ui/design/tokens"><code>skills/ui/design/tokens/</code></a></td>
-<td>The Figma → JSON sync output; the <code>sync.sh</code> script + <code>design-tokens.json</code> + <code>mapping.md</code></td>
+<td>"User has admin BUT shouldn't"</td>
+<td>An admin-assigned grant exists for them (<code>granted_by != 'system:oidc'</code>). The reconciler can't see it. Revoke via <code>/admin/assignments</code> or <code>DELETE /api/v1/user-roles/:id</code>.</td>
 </tr>
 <tr>
-<td><a href="https://github.com/secrets-bridge/skills/blob/main/ui/design/BRAND_VOICE.md"><code>skills/ui/design/BRAND_VOICE.md</code></a></td>
-<td>The canonical brand voice doc</td>
+<td>"Tier 2 ops still step up after I enabled WebAuthn"</td>
+<td>The <code>amr</code> claim doesn't contain a strong factor. Run the SQL in §5 to verify. Usually the WebAuthn stage isn't bound to the authentication flow, or it's optional and the user skipped it.</td>
+</tr>
+<tr>
+<td>"Boot fails with 'SB_OIDC_GROUP_MAP must be a JSON object…'"</td>
+<td>The chart was given a non-object groupMap (e.g. a list) OR an entry has an empty role name. Fix the values and <code>helm upgrade</code> again.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="how-to-update-a-token">How to update a token<a class="headerlink" href="#how-to-update-a-token" title="Permanent link">&para;</a></h2>
-<p>The flow is <strong>Figma → skills/ui/design → tailwind.config.js</strong>:</p>
-<ol>
-<li>Make the change in the Figma file (versions 02 Foundations).</li>
-<li>Re-run <code>skills/ui/design/tokens/sync.sh</code> to pull the latest
-   token definitions into <code>design-tokens.json</code>.</li>
-<li>Update <code>ui/tailwind.config.js</code> to match — same Tailwind names,
-   new hex values.</li>
-<li>Rebuild the SPA; visual diff against the Figma frames in
-   <code>skills/ui/design/frames/</code> (six PNG renders cached at last
-   sync).</li>
-<li>Open a PR against both <code>ui</code> and <code>skills</code> — they ship together.</li>
-</ol>
-<p>The reverse direction (code → Figma) is not supported. Figma is
-upstream; the SPA is downstream.</p>
+<h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../authentication/">Authentication overview</a> — full auth model</li>
+<li><a href="../bootstrap/">Bootstrap &amp; first sign-in</a> — local-admin setup before OIDC lands</li>
+<li><a href="../config/">Configuration reference</a> — every env var, including the <code>SB_OIDC_*</code> set</li>
+</ul>
 
 
 
 
 
 
+
+  
+  
 
 
 
