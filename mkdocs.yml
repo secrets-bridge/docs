@@ -171,6 +171,8 @@ nav:
       - operations/index.md
       - Deploying with docker-compose: operations/docker-compose.md
       - Bootstrap & first sign-in: operations/bootstrap.md
+      - Authentication: operations/authentication.md
+      - OIDC with Authentik: operations/oidc-authentik.md
       - Configuration reference: operations/config.md
       - Troubleshooting: operations/troubleshooting.md
   - Reference:
