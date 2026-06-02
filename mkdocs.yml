@@ -173,6 +173,8 @@ nav:
       - Bootstrap & first sign-in: operations/bootstrap.md
       - Authentication: operations/authentication.md
       - OIDC with Authentik: operations/oidc-authentik.md
+      - Project environments: operations/project-environments.md
+      - Policy templates: operations/policy-templates.md
       - Configuration reference: operations/config.md
       - Troubleshooting: operations/troubleshooting.md
   - Reference:

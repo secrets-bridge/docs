@@ -17,7 +17,7 @@ edit their permission lists but can't delete the rows.
 |---|---|
 | `admin` | `role.edit`, `user_role.edit`, `workflow.edit`, `policy.edit`, `agent.mint`, `agent.revoke`, `secret.request`, `secret.approve`, `audit.read` |
 | `approver` | `secret.approve`, `audit.read` |
-| `developer` | `secret.request`, `audit.read` |
+| `developer` | `secret.request`, `secret.reveal.direct`, `audit.read` |
 
 ## Catalog by group
 
@@ -49,6 +49,7 @@ edit their permission lists but can't delete the rows.
 |---|---|
 | `secret.request` | Submit a read or patch request. |
 | `secret.approve` | Vote on a pending request (approve or reject). |
+| `secret.reveal.direct` | (Slice L4) Eligibility for the auto-executed direct-reveal path. The matched `policy_rules` row MUST ALSO have `direct_reveal_allowed=true` AND the environment's `kind` must be `non_prod`. Without all three, the user is routed through the standard request flow. PROD direct-reveal is impossible by construction. |
 
 ### Observability
 
