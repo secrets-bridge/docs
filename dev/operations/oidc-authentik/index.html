@@ -1209,28 +1209,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-configure-mfa-in-authentik" class="md-nav__link">
+  <a href="#5-mfa-authentik-vs-the-control-plane" class="md-nav__link">
     <span class="md-ellipsis">
-      5. Configure MFA in Authentik
+      5. MFA — Authentik vs the Control Plane
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Configure MFA in Authentik">
+    <nav class="md-nav" aria-label="5. MFA — Authentik vs the Control Plane">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#enabling-webauthn-enrolment" class="md-nav__link">
+  <a href="#enabling-mfa-in-authentik-only-if-you-flip-trustamrformfa-true" class="md-nav__link">
     <span class="md-ellipsis">
-      Enabling WebAuthn enrolment
+      Enabling MFA in Authentik (only if you flip trustAmrForMFA: true)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#verifying-amr-is-correct" class="md-nav__link">
+  <a href="#verifying-amr-is-correct-idp-trust-path-only" class="md-nav__link">
     <span class="md-ellipsis">
-      Verifying amr is correct
+      Verifying amr is correct (IdP-trust path only)
     </span>
   </a>
   
@@ -1570,28 +1570,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-configure-mfa-in-authentik" class="md-nav__link">
+  <a href="#5-mfa-authentik-vs-the-control-plane" class="md-nav__link">
     <span class="md-ellipsis">
-      5. Configure MFA in Authentik
+      5. MFA — Authentik vs the Control Plane
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. Configure MFA in Authentik">
+    <nav class="md-nav" aria-label="5. MFA — Authentik vs the Control Plane">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#enabling-webauthn-enrolment" class="md-nav__link">
+  <a href="#enabling-mfa-in-authentik-only-if-you-flip-trustamrformfa-true" class="md-nav__link">
     <span class="md-ellipsis">
-      Enabling WebAuthn enrolment
+      Enabling MFA in Authentik (only if you flip trustAmrForMFA: true)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#verifying-amr-is-correct" class="md-nav__link">
+  <a href="#verifying-amr-is-correct-idp-trust-path-only" class="md-nav__link">
     <span class="md-ellipsis">
-      Verifying amr is correct
+      Verifying amr is correct (IdP-trust path only)
     </span>
   </a>
   
@@ -1752,42 +1752,36 @@
 </ol>
 <p>If your user's <code>groups</code> claim contained <code>sb-admins</code>, the reconciler grants the <code>admin</code> role on the way through. Your first sign-in lands you on the Dashboard with full permissions.</p>
 <p>If your <code>groups</code> claim contained none of the mapped groups, the user is provisioned with <strong>no role grants</strong>. An admin must assign one from <code>/admin/assignments</code> before the user can do anything beyond <code>/users/me</code>.</p>
-<h2 id="5-configure-mfa-in-authentik">5. Configure MFA in Authentik<a class="headerlink" href="#5-configure-mfa-in-authentik" title="Permanent link">&para;</a></h2>
-<p>Secrets Bridge gates Tier 2 operations (approve / reject / reveal-wrap) behind <strong>fresh MFA</strong>. The api stamps <code>last_mfa_at</code> on the session when the IdP's <code>amr</code> claim carries a strong factor — see <a href="../authentication/#strong-factor-recognition-amr">Authentication → Strong-factor recognition</a>.</p>
-<p>Authentik supports WebAuthn (FIDO2 / passkeys), TOTP, SMS, and email. The <strong>recommended priority</strong> is:</p>
-<ol>
-<li><strong>WebAuthn (hardware key or platform authenticator)</strong> — phishing-resistant, no shared secret. Authentik treats WebAuthn as <code>mfa</code> in the <code>amr</code> claim, which the api recognises as strong.</li>
-<li><strong>TOTP</strong> — falls back to <code>otp</code> in the <code>amr</code> claim, still strong.</li>
-<li><strong>SMS</strong> — avoid. Authentik exposes <code>sms</code> in <code>amr</code>, which the api treats as NOT strong (it's not in the RFC 8176 strong-factor set). Tier 2 ops will continue to step-up.</li>
-</ol>
-<h3 id="enabling-webauthn-enrolment">Enabling WebAuthn enrolment<a class="headerlink" href="#enabling-webauthn-enrolment" title="Permanent link">&para;</a></h3>
-<p>In Authentik:</p>
+<h2 id="5-mfa-authentik-vs-the-control-plane">5. MFA — Authentik vs the Control Plane<a class="headerlink" href="#5-mfa-authentik-vs-the-control-plane" title="Permanent link">&para;</a></h2>
+<p><strong>The current model has the Control Plane own MFA enrollment + step-up directly.</strong> Identity stays with Authentik; users enrol a TOTP factor or a WebAuthn credential in the Secrets Bridge SPA at <code>/me/mfa</code>; step-up runs through the api's <code>/auth/mfa/{challenge,verify}</code> endpoints. See <a href="../authentication/#mfa-step-up-slices-h-i-current-model">Authentication → MFA + step-up</a> for the full model. You do <strong>not</strong> need to configure MFA inside Authentik for Secrets Bridge to enforce it.</p>
+<p>If you want Authentik to handle MFA on the IdP side instead (so the same MFA stage protects every app behind Authentik, not just Secrets Bridge), set <code>api.config.oidc.trustAmrForMFA: true</code> in the chart. The api will then stamp <code>last_mfa_at</code> when the ID-token <code>amr</code> claim carries an RFC 8176 strong factor — see <a href="../authentication/#oidc-trust-mfa-slice-d-legacy-opt-in">Authentication → OIDC-trust MFA (Slice D — legacy)</a>. The two paths run in parallel; users on a <code>trustAmrForMFA: true</code> deployment can still satisfy step-up via the app-MFA path if they prefer.</p>
+<p>The IdP-trust path remains useful when you have a uniform MFA policy across many apps (Entra / Okta with org-wide WebAuthn enforcement). Most Secrets Bridge deployments are simpler with the app-MFA default.</p>
+<h3 id="enabling-mfa-in-authentik-only-if-you-flip-trustamrformfa-true">Enabling MFA in Authentik (only if you flip <code>trustAmrForMFA: true</code>)<a class="headerlink" href="#enabling-mfa-in-authentik-only-if-you-flip-trustamrformfa-true" title="Permanent link">&para;</a></h3>
 <ol>
 <li><strong>Flows &amp; Stages → Stages → Create → WebAuthn Authenticator Setup</strong></li>
-<li>Add the stage to your default authentication flow (or your user-self-enrolment flow if you have one).</li>
-<li>Mark the stage as <strong>required</strong> for users with any of your <code>sb-admins</code> / <code>sb-approvers</code> groups — those are the people who'll need step-up MFA on every approve, so they should have a hardware key enrolled before they ever sign in.</li>
+<li>Add the stage to your default authentication flow (or a user-self-enrolment flow).</li>
+<li>Mark the stage as <strong>required</strong> for users with any of your <code>sb-admins</code> / <code>sb-approvers</code> groups — those are the people who'll need step-up MFA on every approve.</li>
 </ol>
-<p>You can require WebAuthn for everyone or only for privileged groups — Authentik's stage-binding lets you scope by group, user, or any other expression.</p>
-<h3 id="verifying-amr-is-correct">Verifying <code>amr</code> is correct<a class="headerlink" href="#verifying-amr-is-correct" title="Permanent link">&para;</a></h3>
-<p>After a user signs in with WebAuthn, check the audit row on the Secrets Bridge side:</p>
+<h3 id="verifying-amr-is-correct-idp-trust-path-only">Verifying <code>amr</code> is correct (IdP-trust path only)<a class="headerlink" href="#verifying-amr-is-correct-idp-trust-path-only" title="Permanent link">&para;</a></h3>
+<p>After a user signs in with WebAuthn through Authentik, check the audit row on the Secrets Bridge side:</p>
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;amr&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;session_id&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">occurred_at</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">audit_events</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;auth.oidc.callback&#39;</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="k">DESC</span>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
 </span></code></pre></div>
-<p>You should see <code>amr</code> as <code>["mfa"]</code> (or <code>["pwd","mfa"]</code> for a password-then-WebAuthn flow). If you only see <code>["pwd"]</code>, the IdP did not assert MFA and the api will demand step-up on every Tier 2 op. That's a sign your flow isn't enforcing the WebAuthn stage.</p>
+<p>You should see <code>amr</code> as <code>["mfa"]</code> (or <code>["pwd","mfa"]</code> for a password-then-WebAuthn flow). If you only see <code>["pwd"]</code>, the IdP did not assert MFA — Tier 2 ops will demand step-up via the app-MFA path (a fine outcome if you've enrolled the factor there) OR fail closed (if you haven't). That's a sign your Authentik flow isn't enforcing the WebAuthn stage; users with an app-MFA factor stay unaffected.</p>
 <h2 id="6-step-up-flow-in-action">6. Step-up flow in action<a class="headerlink" href="#6-step-up-flow-in-action" title="Permanent link">&para;</a></h2>
 <p>The first time the user tries to approve a request, they'll see:</p>
 <ol>
 <li>SPA opens the request detail → clicks <strong>Approve</strong></li>
-<li>SPA <code>POST /requests/:id/approve</code> → api returns <code>401 step_up_required</code></li>
-<li>SPA detects the <code>WWW-Authenticate: step-up</code> header → redirects through the OIDC step-up start URL</li>
-<li>Authentik re-prompts MFA (it honours <code>prompt=login</code> + <code>max_age=0</code> + <code>acr_values=mfa</code> in the authorize call)</li>
-<li>api callback stamps <code>last_mfa_at</code> on the <strong>same session row</strong> (cookie unchanged)</li>
-<li>SPA returns to the request detail → clicks Approve again → 200</li>
+<li>SPA <code>POST /requests/:id/approve</code> → api returns <code>401 step_up_required</code> (session is MFA-stale)</li>
+<li>SPA's global step-up interceptor opens the step-up modal</li>
+<li>User picks their factor — TOTP code or tap their security key</li>
+<li>SPA <code>POST /auth/mfa/verify</code> → api stamps <code>last_mfa_at</code> on the <strong>same session row</strong> (cookie unchanged) → <code>204 No Content</code></li>
+<li>Modal closes → user re-clicks <strong>Approve</strong> → 200</li>
 </ol>
-<p>The "cookie unchanged" invariant is critical — see <a href="../authentication/#mfa-step-up-slice-d">Authentication → MFA + step-up</a>. Your audit chain stays continuous; the session ID never changes.</p>
+<p>The "cookie unchanged" invariant is critical — see <a href="../authentication/#step-up-ceremony">Authentication → Step-up ceremony</a>. Your audit chain stays continuous; the session ID never changes.</p>
 <h2 id="7-back-channel-logout">7. Back-channel logout<a class="headerlink" href="#7-back-channel-logout" title="Permanent link">&para;</a></h2>
 <p>Authentik supports RFC 8417 back-channel logout. To wire it:</p>
 <ol>

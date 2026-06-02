@@ -7,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Cookie-only session model, account lockout, OIDC + MFA step-up, and the break-glass posture.">
+        <meta name="description" content="Cookie-only session model, account lockout, OIDC sign-in, app-MFA enrollment + step-up, and the break-glass posture.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
@@ -78,7 +78,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Secrets Bridge" />
   <meta property="og:title" content="Authentication" />
-  <meta property="og:description" content="Cookie-only session model, account lockout, OIDC + MFA step-up, and the break-glass posture." />
+  <meta property="og:description" content="Cookie-only session model, account lockout, OIDC sign-in, app-MFA enrollment + step-up, and the break-glass posture." />
   <meta property="og:url" content="https://secrets-bridge.io/dev/operations/authentication/" />
   <meta property="og:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
@@ -89,7 +89,7 @@
   
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Authentication" />
-  <meta name="twitter:description" content="Cookie-only session model, account lockout, OIDC + MFA step-up, and the break-glass posture." />
+  <meta name="twitter:description" content="Cookie-only session model, account lockout, OIDC sign-in, app-MFA enrollment + step-up, and the break-glass posture." />
   <meta name="twitter:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge — The brain behind your secrets." />
   
@@ -110,7 +110,7 @@
     "@context": "https://schema.org",
     "@type": "TechArticle",
     "headline": "Authentication",
-    "description": "Cookie-only session model, account lockout, OIDC + MFA step-up, and the break-glass posture.",
+    "description": "Cookie-only session model, account lockout, OIDC sign-in, app-MFA enrollment + step-up, and the break-glass posture.",
     "url": "https://secrets-bridge.io/dev/operations/authentication/",
     "image": "https://secrets-bridge.io/assets/og-banner.png",
     "publisher": {
@@ -1218,19 +1218,46 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mfa-step-up-slice-d" class="md-nav__link">
+  <a href="#mfa-step-up-slices-h-i-current-model" class="md-nav__link">
     <span class="md-ellipsis">
-      MFA + step-up (Slice D)
+      MFA + step-up (Slices H + I — current model)
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="MFA + step-up (Slice D)">
+    <nav class="md-nav" aria-label="MFA + step-up (Slices H + I — current model)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#strong-factor-recognition-amr" class="md-nav__link">
+  <a href="#factor-types" class="md-nav__link">
     <span class="md-ellipsis">
-      Strong-factor recognition (amr)
+      Factor types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enrollment-ceremony" class="md-nav__link">
+    <span class="md-ellipsis">
+      Enrollment ceremony
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-up-ceremony" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step-up ceremony
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#two-related-responses-the-interceptor-routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Two related responses the interceptor routes
     </span>
   </a>
   
@@ -1251,6 +1278,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#oidc-trust-mfa-slice-d-legacy-opt-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      OIDC-trust MFA (Slice D — legacy, opt-in)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#break-glass-local-admin-policy-architect-q1" class="md-nav__link">
     <span class="md-ellipsis">
       Break-glass (local-admin) policy (architect Q1)
@@ -1261,9 +1297,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#local-admin-sessions-are-never-mfa-fresh" class="md-nav__link">
+  <a href="#local-admin-sessions-step-up" class="md-nav__link">
     <span class="md-ellipsis">
-      Local-admin sessions are NEVER MFA-fresh
+      Local-admin sessions + step-up
     </span>
   </a>
   
@@ -1636,19 +1672,46 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mfa-step-up-slice-d" class="md-nav__link">
+  <a href="#mfa-step-up-slices-h-i-current-model" class="md-nav__link">
     <span class="md-ellipsis">
-      MFA + step-up (Slice D)
+      MFA + step-up (Slices H + I — current model)
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="MFA + step-up (Slice D)">
+    <nav class="md-nav" aria-label="MFA + step-up (Slices H + I — current model)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#strong-factor-recognition-amr" class="md-nav__link">
+  <a href="#factor-types" class="md-nav__link">
     <span class="md-ellipsis">
-      Strong-factor recognition (amr)
+      Factor types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enrollment-ceremony" class="md-nav__link">
+    <span class="md-ellipsis">
+      Enrollment ceremony
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-up-ceremony" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step-up ceremony
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#two-related-responses-the-interceptor-routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Two related responses the interceptor routes
     </span>
   </a>
   
@@ -1669,6 +1732,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#oidc-trust-mfa-slice-d-legacy-opt-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      OIDC-trust MFA (Slice D — legacy, opt-in)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#break-glass-local-admin-policy-architect-q1" class="md-nav__link">
     <span class="md-ellipsis">
       Break-glass (local-admin) policy (architect Q1)
@@ -1679,9 +1751,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#local-admin-sessions-are-never-mfa-fresh" class="md-nav__link">
+  <a href="#local-admin-sessions-step-up" class="md-nav__link">
     <span class="md-ellipsis">
-      Local-admin sessions are NEVER MFA-fresh
+      Local-admin sessions + step-up
     </span>
   </a>
   
@@ -1889,17 +1961,87 @@
 <li>Operator overrides during incident response.</li>
 </ol>
 <p>If you ever find yourself "cleaning up" this filter, <strong>stop</strong>. It is the security boundary, not an accident.</p>
-<h2 id="mfa-step-up-slice-d">MFA + step-up (Slice D)<a class="headerlink" href="#mfa-step-up-slice-d" title="Permanent link">&para;</a></h2>
-<p>Tier 2 operations (approve / reject / reveal-wrap; future: rotate, role-edit, provider-edit) require a session whose <code>last_mfa_at</code> is within the step-up TTL. A stale or unstamped session gets:</p>
+<h2 id="mfa-step-up-slices-h-i-current-model">MFA + step-up (Slices H + I — current model)<a class="headerlink" href="#mfa-step-up-slices-h-i-current-model" title="Permanent link">&para;</a></h2>
+<p>Tier 2 operations (approve / reject / reveal-wrap; future: rotate, role-edit, provider-edit) require a session whose <code>last_mfa_at</code> is within the step-up TTL.</p>
+<p><strong>The Control Plane owns MFA enrollment + step-up directly.</strong> Identity stays with the IdP; MFA is an app-level concern. This is an architectural inversion of the original Slice D design (described as the legacy path further down). Every user enrolls one or more factors in the SPA at <code>/me/mfa</code>; step-up runs through the api's <code>/auth/mfa/{challenge,verify}</code> endpoints. Local-admin and OIDC users follow the same enrollment surface and the same step-up flow.</p>
+<h3 id="factor-types">Factor types<a class="headerlink" href="#factor-types" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Library on the api side</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>totp</code></td>
+<td>stdlib (RFC 6238, HMAC-SHA1, 6 digits, 30 s step, ±1 step skew)</td>
+<td>Compatible with every authenticator app (Google Authenticator, Authy, 1Password, Bitwarden, YubiKey Authenticator).</td>
+</tr>
+<tr>
+<td><code>webauthn</code></td>
+<td><code>github.com/go-webauthn/webauthn</code> (FIDO2 / WebAuthn)</td>
+<td>Hardware-backed: YubiKey, Solo, Titan, platform authenticators (Touch ID / Face ID / Windows Hello). Phishing-resistant by design.</td>
+</tr>
+</tbody>
+</table>
+<p>WebAuthn requires the chart's <code>api.config.mfa.webauthn.rpId</code> + <code>api.config.mfa.webauthn.rpOrigins</code> to be set. When either is empty the api mounts only the TOTP routes (and the SPA's <code>/me/mfa</code> page hides the "Add security key" button). See <a href="../config/">Configuration reference</a> for the values.</p>
+<h3 id="enrollment-ceremony">Enrollment ceremony<a class="headerlink" href="#enrollment-ceremony" title="Permanent link">&para;</a></h3>
+<p>Both kinds follow the same two-step shape (Stripe / GitHub / AWS Console model):</p>
+<ol>
+<li><strong><code>POST /users/me/mfa/&lt;kind&gt;/.../start</code></strong> mints the challenge + envelope-encrypts the factor secret + parks the encrypted blob in Redis under a 10-minute challenge id. Nothing lands in Postgres yet.</li>
+<li><strong><code>POST /users/me/mfa/&lt;kind&gt;/.../confirm</code> (or <code>…/finish</code>)</strong> consumes the Redis blob (GETDEL — single-shot), verifies the user's response, and only then persists the factor row.</li>
+</ol>
+<p>A wrong TOTP code or a failed WebAuthn attestation <strong>burns the challenge</strong> — the user restarts from step 1. This blocks an attacker from brute-forcing the 6-digit space against a single secret.</p>
+<p>The SPA exposes the enrollment surfaces at <code>/me/mfa</code>. A user with zero factors sees an accent-coloured "Add MFA factor →" nudge in the sidebar; an enrolled user sees a quieter "Security" link.</p>
+<h3 id="step-up-ceremony">Step-up ceremony<a class="headerlink" href="#step-up-ceremony" title="Permanent link">&para;</a></h3>
+<p>When a Tier 2 op hits the api's <code>RequireFreshMFA</code> gate on a stale session:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>401 Unauthorized
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>WWW-Authenticate: step-up max_age=900 acr_values=mfa
 </span></code></pre></div>
-<p>The SPA's global step-up interceptor catches this and redirects to:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>GET /api/v1/auth/oidc/start?step_up=mfa&amp;return_to=&lt;current page&gt;
-</span></code></pre></div>
-<p>which forwards to the IdP with <code>prompt=login&amp;max_age=0&amp;acr_values=mfa</code>. The IdP re-prompts for the second factor even with an alive SSO session. The api callback stamps <code>last_mfa_at</code> on the <strong>same session row</strong> — the cookie value does not change. The user returns to the original page; the cookie they had before is the cookie they have after. Audit chains, revocation semantics, and idle-TTL slides are all preserved.</p>
-<h3 id="strong-factor-recognition-amr">Strong-factor recognition (<code>amr</code>)<a class="headerlink" href="#strong-factor-recognition-amr" title="Permanent link">&para;</a></h3>
-<p>The <code>last_mfa_at</code> stamp only fires when the IdP's ID-token <code>amr</code> claim includes one of the RFC 8176 strong-factor identifiers:</p>
+<p>The SPA's global onError interceptor opens the step-up modal:</p>
+<ol>
+<li>Modal asks the user to pick a factor — filtered by what they have enrolled.</li>
+<li>SPA calls <code>POST /auth/mfa/challenge { kind }</code> for the chosen kind.</li>
+<li><strong>TOTP path</strong> — user types the 6-digit code; SPA calls <code>POST /auth/mfa/verify { challenge_id, factor_id, code }</code>.</li>
+<li><strong>WebAuthn path</strong> — SPA calls <code>navigator.credentials.get(...)</code> with the api-issued options; ships the assertion back via <code>POST /auth/mfa/verify { challenge_id, response }</code>.</li>
+<li>On <code>204 No Content</code> the session is MFA-fresh — the api stamped <code>last_mfa_at</code> on the <strong>same session row</strong> (no new cookie). The user re-clicks the original button.</li>
+</ol>
+<h3 id="two-related-responses-the-interceptor-routes">Two related responses the interceptor routes<a class="headerlink" href="#two-related-responses-the-interceptor-routes" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Response</th>
+<th>What it means</th>
+<th>SPA action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>412 mfa_enrollment_required</code></td>
+<td>User has zero factors enrolled.</td>
+<td>Navigate to <code>/me/mfa</code>. The step-up modal would be a dead-end.</td>
+</tr>
+<tr>
+<td><code>401 factor_compromised</code></td>
+<td>WebAuthn sign-count regression — the api detected a possible cloned authenticator and revoked every session for the user.</td>
+<td>Hard-navigate to <code>/login</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="recommended-factor-priority">Recommended factor priority<a class="headerlink" href="#recommended-factor-priority" title="Permanent link">&para;</a></h3>
+<p>When you onboard users, encourage this enrollment order:</p>
+<ol>
+<li><strong>WebAuthn (hardware key — YubiKey, Solo, Titan)</strong> — phishing-resistant, no shared secret on the device, no battery.</li>
+<li><strong>WebAuthn (platform — Touch ID / Face ID / Windows Hello)</strong> — phishing-resistant, no extra device to carry, but tied to one machine.</li>
+<li><strong>TOTP via authenticator app (Aegis, 1Password, Authy)</strong> — universal fallback; vulnerable to phishing kits that proxy the code.</li>
+<li><strong>SMS / email OTP</strong> — Secrets Bridge does NOT support this. SIM swap and email-account takeover are well-documented bypasses.</li>
+</ol>
+<p>Operators should enrol <strong>at least two factors</strong> per privileged user — one hardware key plus one TOTP backup — so a lost YubiKey doesn't lock them out of Tier 2 ops.</p>
+<h2 id="oidc-trust-mfa-slice-d-legacy-opt-in">OIDC-trust MFA (Slice D — legacy, opt-in)<a class="headerlink" href="#oidc-trust-mfa-slice-d-legacy-opt-in" title="Permanent link">&para;</a></h2>
+<p>The api retains the original Slice D path for deployments whose IdP genuinely owns MFA (Microsoft Entra / Okta with strong-factor policy bound), so an operator can keep that posture during a transition window.</p>
+<p>Set <code>api.config.oidc.trustAmrForMFA: true</code> (renders <code>SB_OIDC_TRUSTED_AMR_MFA=true</code>) to opt in. When enabled, the OIDC callback stamps <code>last_mfa_at</code> on the session whenever the ID-token <code>amr</code> claim includes one of the RFC 8176 strong-factor identifiers:</p>
 <table>
 <thead>
 <tr>
@@ -1950,42 +2092,41 @@
 </tr>
 </tbody>
 </table>
-<p><code>pwd</code> (password alone) and <code>kba</code> (knowledge-based answer) are explicitly <strong>not</strong> strong. A password-only IdP cannot accidentally stamp MFA.</p>
-<h3 id="recommended-factor-priority">Recommended factor priority<a class="headerlink" href="#recommended-factor-priority" title="Permanent link">&para;</a></h3>
-<p>When you configure MFA on your IdP, use this priority order:</p>
-<ol>
-<li><strong>FIDO2 / WebAuthn (hardware keys)</strong> — phishing-resistant, no shared secret on the device, no battery. YubiKey, Solo, built-in TouchID/Windows-Hello.</li>
-<li><strong>Hardware OTP token</strong> — Yubico, RSA SecurID. Better than software OTP because the device can't be cloned to a malware-controlled phone.</li>
-<li><strong>Software TOTP</strong> — Aegis, 1Password, Authy. Fine for most users; vulnerable to phishing kits that proxy the TOTP code.</li>
-<li><strong>SMS / email OTP</strong> — <strong>avoid</strong>. SIM swap and email-account takeover are well-documented bypasses.</li>
-</ol>
-<p>If your IdP supports it, prefer <strong>WebAuthn first</strong> in the user enrolment flow so new users register a hardware key before they fall back to software TOTP.</p>
+<p><code>pwd</code> and <code>kba</code> are not strong. <strong>The app-MFA path (above) runs in parallel</strong> — a user can still satisfy step-up via <code>/auth/mfa/verify</code> even when the OIDC-trust knob is on. Operators flip this knob OFF (the default) once every user has enrolled an app-MFA factor; <code>amr</code> continues to be recorded in audit either way.</p>
+<p><strong>Hard rule:</strong> <code>SessionService.MarkMFA</code> only fires from <code>MFAVerifyService.Verify</code> (the app path) OR from the OIDC callback when <code>TrustAMRForMFA=true</code>. The architectural invariant is that exactly one path writes <code>last_mfa_at</code>. New callers in the api codebase need explicit justification or the step-up gate's contract collapses.</p>
 <h2 id="break-glass-local-admin-policy-architect-q1">Break-glass (local-admin) policy (architect Q1)<a class="headerlink" href="#break-glass-local-admin-policy-architect-q1" title="Permanent link">&para;</a></h2>
 <p>Local-admin sign-in via <code>/auth/login</code> is the <strong>break-glass surface</strong> — the way operators sign in when the IdP is down, the OIDC client is misconfigured, or the network is partitioned. It is <strong>not</strong> the day-to-day sign-in path once OIDC is configured.</p>
 <p>Every successful local-admin sign-in emits a high-severity audit event:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>action:   BREAK_GLASS_LOGIN
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>status:   success
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>severity: CRITICAL    (in metadata)
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>actor:    user:&lt;uuid&gt;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>action:   BREAK_GLASS_LOGIN
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>status:   success
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>severity: CRITICAL    (in metadata)
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>actor:    user:&lt;uuid&gt;
 </span></code></pre></div>
 <p><strong>Route this audit action into your alert pipeline.</strong> Splunk / Datadog / Grafana Alertmanager — whichever you use, page the on-call when a <code>BREAK_GLASS_LOGIN</code> shows up outside of an open incident bridge. The Slack notification recipe:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Example: worker notification sink (when configured) or external SIEM rule</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nt">when</span><span class="p">:</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BREAK_GLASS_LOGIN</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">severity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CRITICAL</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="nt">then</span><span class="p">:</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nt">notify</span><span class="p">:</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nt">channel</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;#security-incidents&quot;</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">      </span><span class="no">Break-glass local-admin login by ${actor}.</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">      </span><span class="no">Expected? If not, open an incident.</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">      </span><span class="no">Session ID: ${metadata.session_id}</span>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">      </span><span class="no">IP: ${metadata.ip}</span>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">      </span><span class="no">User-agent: ${metadata.user_agent}</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Example: worker notification sink (when configured) or external SIEM rule</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nt">when</span><span class="p">:</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BREAK_GLASS_LOGIN</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">severity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CRITICAL</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nt">then</span><span class="p">:</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="nt">notify</span><span class="p">:</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="nt">channel</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;#security-incidents&quot;</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">      </span><span class="no">Break-glass local-admin login by ${actor}.</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">      </span><span class="no">Expected? If not, open an incident.</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">      </span><span class="no">Session ID: ${metadata.session_id}</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">      </span><span class="no">IP: ${metadata.ip}</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">      </span><span class="no">User-agent: ${metadata.user_agent}</span>
 </span></code></pre></div>
-<h3 id="local-admin-sessions-are-never-mfa-fresh">Local-admin sessions are NEVER MFA-fresh<a class="headerlink" href="#local-admin-sessions-are-never-mfa-fresh" title="Permanent link">&para;</a></h3>
-<p><code>last_mfa_at</code> is only stamped via OIDC callback when <code>amr</code> carries a strong factor. Local-admin sessions never go through OIDC, so they never get a stamp. Every Tier 2 operation <strong>forces a step-up to OIDC</strong> — even when the user is a local-admin. This is intentional. Break-glass proves <em>who you are</em>; it does not prove <em>fresh MFA</em>.</p>
-<p>Concretely: a local-admin user can sign in during an IdP outage and see the dashboard, but they <strong>cannot</strong> approve a request or reveal a secret until OIDC is back up and they step up. If you're routinely approving as the break-glass user, your operating model is wrong — that account should be reserved for "the IdP is broken and I need to fix it."</p>
+<h3 id="local-admin-sessions-step-up">Local-admin sessions + step-up<a class="headerlink" href="#local-admin-sessions-step-up" title="Permanent link">&para;</a></h3>
+<p>Local-admin users go through the <strong>same app-MFA enrollment + step-up surfaces as OIDC users</strong>. The local-admin sign-in path does not stamp <code>last_mfa_at</code> directly — every Tier 2 op the operator runs is gated by a fresh <code>/auth/mfa/verify</code> against an enrolled factor.</p>
+<p>Operationally this means:</p>
+<ul>
+<li>A local-admin user with no factor enrolled hits <code>412 mfa_enrollment_required</code> on the first Tier 2 op and is routed to <code>/me/mfa</code> to enrol.</li>
+<li>After enrolling, every Tier 2 op runs through the step-up modal — same flow as OIDC users.</li>
+<li>If the operator is in the middle of an IdP outage and <em>also</em> hasn't enrolled an MFA factor, they should enrol one immediately — the IdP outage doesn't block factor enrollment, and once enrolled they can satisfy step-up without the IdP.</li>
+</ul>
+<p>This is a tighter posture than the pre-H4 architecture, where local-admin users were forced through <code>/auth/oidc/start?step_up=mfa</code> for every Tier 2 op and effectively couldn't approve anything during an IdP outage. App-MFA closes that gap.</p>
+<p>If you're routinely approving as the break-glass user, your operating model is still wrong — that account should be reserved for "the IdP is broken and I need to fix it." But during a real IdP outage the break-glass user can now approve cleanly without an additional dependency.</p>
 <h3 id="disabling-break-glass-entirely">Disabling break-glass entirely<a class="headerlink" href="#disabling-break-glass-entirely" title="Permanent link">&para;</a></h3>
 <p>For deployments that want to refuse local-admin sign-in once OIDC is configured, the chart will gain a <code>SB_LOCAL_ADMIN_ENABLED=false</code> flag in a follow-up. Today the flag is implicit — leave <code>SB_BOOTSTRAP_ADMIN_EMAIL</code> unset and no local-admin account exists, so <code>/auth/login</code> always fails with <code>invalid credentials</code>.</p>
 <h2 id="what-this-page-does-not-cover">What this page does NOT cover<a class="headerlink" href="#what-this-page-does-not-cover" title="Permanent link">&para;</a></h2>
