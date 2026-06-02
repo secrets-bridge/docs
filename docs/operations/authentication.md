@@ -1,6 +1,6 @@
 ---
 title: "Authentication"
-description: "Cookie-only session model, account lockout, OIDC + MFA step-up, and the break-glass posture."
+description: "Cookie-only session model, account lockout, OIDC sign-in, app-MFA enrollment + step-up, and the break-glass posture."
 ---
 
 # Authentication
@@ -107,26 +107,72 @@ This protects:
 
 If you ever find yourself "cleaning up" this filter, **stop**. It is the security boundary, not an accident.
 
-## MFA + step-up (Slice D)
+## MFA + step-up (Slices H + I — current model)
 
-Tier 2 operations (approve / reject / reveal-wrap; future: rotate, role-edit, provider-edit) require a session whose `last_mfa_at` is within the step-up TTL. A stale or unstamped session gets:
+Tier 2 operations (approve / reject / reveal-wrap; future: rotate, role-edit, provider-edit) require a session whose `last_mfa_at` is within the step-up TTL.
+
+**The Control Plane owns MFA enrollment + step-up directly.** Identity stays with the IdP; MFA is an app-level concern. This is an architectural inversion of the original Slice D design (described as the legacy path further down). Every user enrolls one or more factors in the SPA at `/me/mfa`; step-up runs through the api's `/auth/mfa/{challenge,verify}` endpoints. Local-admin and OIDC users follow the same enrollment surface and the same step-up flow.
+
+### Factor types
+
+| Kind | Library on the api side | Description |
+|---|---|---|
+| `totp` | stdlib (RFC 6238, HMAC-SHA1, 6 digits, 30 s step, ±1 step skew) | Compatible with every authenticator app (Google Authenticator, Authy, 1Password, Bitwarden, YubiKey Authenticator). |
+| `webauthn` | `github.com/go-webauthn/webauthn` (FIDO2 / WebAuthn) | Hardware-backed: YubiKey, Solo, Titan, platform authenticators (Touch ID / Face ID / Windows Hello). Phishing-resistant by design. |
+
+WebAuthn requires the chart's `api.config.mfa.webauthn.rpId` + `api.config.mfa.webauthn.rpOrigins` to be set. When either is empty the api mounts only the TOTP routes (and the SPA's `/me/mfa` page hides the "Add security key" button). See [Configuration reference](config.md) for the values.
+
+### Enrollment ceremony
+
+Both kinds follow the same two-step shape (Stripe / GitHub / AWS Console model):
+
+1. **`POST /users/me/mfa/<kind>/.../start`** mints the challenge + envelope-encrypts the factor secret + parks the encrypted blob in Redis under a 10-minute challenge id. Nothing lands in Postgres yet.
+2. **`POST /users/me/mfa/<kind>/.../confirm` (or `…/finish`)** consumes the Redis blob (GETDEL — single-shot), verifies the user's response, and only then persists the factor row.
+
+A wrong TOTP code or a failed WebAuthn attestation **burns the challenge** — the user restarts from step 1. This blocks an attacker from brute-forcing the 6-digit space against a single secret.
+
+The SPA exposes the enrollment surfaces at `/me/mfa`. A user with zero factors sees an accent-coloured "Add MFA factor →" nudge in the sidebar; an enrolled user sees a quieter "Security" link.
+
+### Step-up ceremony
+
+When a Tier 2 op hits the api's `RequireFreshMFA` gate on a stale session:
 
 ```
 401 Unauthorized
 WWW-Authenticate: step-up max_age=900 acr_values=mfa
 ```
 
-The SPA's global step-up interceptor catches this and redirects to:
+The SPA's global onError interceptor opens the step-up modal:
 
-```
-GET /api/v1/auth/oidc/start?step_up=mfa&return_to=<current page>
-```
+1. Modal asks the user to pick a factor — filtered by what they have enrolled.
+2. SPA calls `POST /auth/mfa/challenge { kind }` for the chosen kind.
+3. **TOTP path** — user types the 6-digit code; SPA calls `POST /auth/mfa/verify { challenge_id, factor_id, code }`.
+4. **WebAuthn path** — SPA calls `navigator.credentials.get(...)` with the api-issued options; ships the assertion back via `POST /auth/mfa/verify { challenge_id, response }`.
+5. On `204 No Content` the session is MFA-fresh — the api stamped `last_mfa_at` on the **same session row** (no new cookie). The user re-clicks the original button.
 
-which forwards to the IdP with `prompt=login&max_age=0&acr_values=mfa`. The IdP re-prompts for the second factor even with an alive SSO session. The api callback stamps `last_mfa_at` on the **same session row** — the cookie value does not change. The user returns to the original page; the cookie they had before is the cookie they have after. Audit chains, revocation semantics, and idle-TTL slides are all preserved.
+### Two related responses the interceptor routes
 
-### Strong-factor recognition (`amr`)
+| Response | What it means | SPA action |
+|---|---|---|
+| `412 mfa_enrollment_required` | User has zero factors enrolled. | Navigate to `/me/mfa`. The step-up modal would be a dead-end. |
+| `401 factor_compromised` | WebAuthn sign-count regression — the api detected a possible cloned authenticator and revoked every session for the user. | Hard-navigate to `/login`. |
 
-The `last_mfa_at` stamp only fires when the IdP's ID-token `amr` claim includes one of the RFC 8176 strong-factor identifiers:
+### Recommended factor priority
+
+When you onboard users, encourage this enrollment order:
+
+1. **WebAuthn (hardware key — YubiKey, Solo, Titan)** — phishing-resistant, no shared secret on the device, no battery.
+2. **WebAuthn (platform — Touch ID / Face ID / Windows Hello)** — phishing-resistant, no extra device to carry, but tied to one machine.
+3. **TOTP via authenticator app (Aegis, 1Password, Authy)** — universal fallback; vulnerable to phishing kits that proxy the code.
+4. **SMS / email OTP** — Secrets Bridge does NOT support this. SIM swap and email-account takeover are well-documented bypasses.
+
+Operators should enrol **at least two factors** per privileged user — one hardware key plus one TOTP backup — so a lost YubiKey doesn't lock them out of Tier 2 ops.
+
+## OIDC-trust MFA (Slice D — legacy, opt-in)
+
+The api retains the original Slice D path for deployments whose IdP genuinely owns MFA (Microsoft Entra / Okta with strong-factor policy bound), so an operator can keep that posture during a transition window.
+
+Set `api.config.oidc.trustAmrForMFA: true` (renders `SB_OIDC_TRUSTED_AMR_MFA=true`) to opt in. When enabled, the OIDC callback stamps `last_mfa_at` on the session whenever the ID-token `amr` claim includes one of the RFC 8176 strong-factor identifiers:
 
 | Factor | Code |
 |---|---|
@@ -141,18 +187,9 @@ The `last_mfa_at` stamp only fires when the IdP's ID-token `amr` claim includes 
 | Biometric — fingerprint | `fpt` |
 | Biometric — retina | `retina` |
 
-`pwd` (password alone) and `kba` (knowledge-based answer) are explicitly **not** strong. A password-only IdP cannot accidentally stamp MFA.
+`pwd` and `kba` are not strong. **The app-MFA path (above) runs in parallel** — a user can still satisfy step-up via `/auth/mfa/verify` even when the OIDC-trust knob is on. Operators flip this knob OFF (the default) once every user has enrolled an app-MFA factor; `amr` continues to be recorded in audit either way.
 
-### Recommended factor priority
-
-When you configure MFA on your IdP, use this priority order:
-
-1. **FIDO2 / WebAuthn (hardware keys)** — phishing-resistant, no shared secret on the device, no battery. YubiKey, Solo, built-in TouchID/Windows-Hello.
-2. **Hardware OTP token** — Yubico, RSA SecurID. Better than software OTP because the device can't be cloned to a malware-controlled phone.
-3. **Software TOTP** — Aegis, 1Password, Authy. Fine for most users; vulnerable to phishing kits that proxy the TOTP code.
-4. **SMS / email OTP** — **avoid**. SIM swap and email-account takeover are well-documented bypasses.
-
-If your IdP supports it, prefer **WebAuthn first** in the user enrolment flow so new users register a hardware key before they fall back to software TOTP.
+**Hard rule:** `SessionService.MarkMFA` only fires from `MFAVerifyService.Verify` (the app path) OR from the OIDC callback when `TrustAMRForMFA=true`. The architectural invariant is that exactly one path writes `last_mfa_at`. New callers in the api codebase need explicit justification or the step-up gate's contract collapses.
 
 ## Break-glass (local-admin) policy (architect Q1)
 
@@ -185,11 +222,19 @@ then:
       User-agent: ${metadata.user_agent}
 ```
 
-### Local-admin sessions are NEVER MFA-fresh
+### Local-admin sessions + step-up
 
-`last_mfa_at` is only stamped via OIDC callback when `amr` carries a strong factor. Local-admin sessions never go through OIDC, so they never get a stamp. Every Tier 2 operation **forces a step-up to OIDC** — even when the user is a local-admin. This is intentional. Break-glass proves *who you are*; it does not prove *fresh MFA*.
+Local-admin users go through the **same app-MFA enrollment + step-up surfaces as OIDC users**. The local-admin sign-in path does not stamp `last_mfa_at` directly — every Tier 2 op the operator runs is gated by a fresh `/auth/mfa/verify` against an enrolled factor.
 
-Concretely: a local-admin user can sign in during an IdP outage and see the dashboard, but they **cannot** approve a request or reveal a secret until OIDC is back up and they step up. If you're routinely approving as the break-glass user, your operating model is wrong — that account should be reserved for "the IdP is broken and I need to fix it."
+Operationally this means:
+
+- A local-admin user with no factor enrolled hits `412 mfa_enrollment_required` on the first Tier 2 op and is routed to `/me/mfa` to enrol.
+- After enrolling, every Tier 2 op runs through the step-up modal — same flow as OIDC users.
+- If the operator is in the middle of an IdP outage and *also* hasn't enrolled an MFA factor, they should enrol one immediately — the IdP outage doesn't block factor enrollment, and once enrolled they can satisfy step-up without the IdP.
+
+This is a tighter posture than the pre-H4 architecture, where local-admin users were forced through `/auth/oidc/start?step_up=mfa` for every Tier 2 op and effectively couldn't approve anything during an IdP outage. App-MFA closes that gap.
+
+If you're routinely approving as the break-glass user, your operating model is still wrong — that account should be reserved for "the IdP is broken and I need to fix it." But during a real IdP outage the break-glass user can now approve cleanly without an additional dependency.
 
 ### Disabling break-glass entirely
 

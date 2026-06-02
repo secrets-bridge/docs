@@ -117,29 +117,23 @@ If your user's `groups` claim contained `sb-admins`, the reconciler grants the `
 
 If your `groups` claim contained none of the mapped groups, the user is provisioned with **no role grants**. An admin must assign one from `/admin/assignments` before the user can do anything beyond `/users/me`.
 
-## 5. Configure MFA in Authentik
+## 5. MFA — Authentik vs the Control Plane
 
-Secrets Bridge gates Tier 2 operations (approve / reject / reveal-wrap) behind **fresh MFA**. The api stamps `last_mfa_at` on the session when the IdP's `amr` claim carries a strong factor — see [Authentication → Strong-factor recognition](authentication.md#strong-factor-recognition-amr).
+**The current model has the Control Plane own MFA enrollment + step-up directly.** Identity stays with Authentik; users enrol a TOTP factor or a WebAuthn credential in the Secrets Bridge SPA at `/me/mfa`; step-up runs through the api's `/auth/mfa/{challenge,verify}` endpoints. See [Authentication → MFA + step-up](authentication.md#mfa-step-up-slices-h-i-current-model) for the full model. You do **not** need to configure MFA inside Authentik for Secrets Bridge to enforce it.
 
-Authentik supports WebAuthn (FIDO2 / passkeys), TOTP, SMS, and email. The **recommended priority** is:
+If you want Authentik to handle MFA on the IdP side instead (so the same MFA stage protects every app behind Authentik, not just Secrets Bridge), set `api.config.oidc.trustAmrForMFA: true` in the chart. The api will then stamp `last_mfa_at` when the ID-token `amr` claim carries an RFC 8176 strong factor — see [Authentication → OIDC-trust MFA (Slice D — legacy)](authentication.md#oidc-trust-mfa-slice-d-legacy-opt-in). The two paths run in parallel; users on a `trustAmrForMFA: true` deployment can still satisfy step-up via the app-MFA path if they prefer.
 
-1. **WebAuthn (hardware key or platform authenticator)** — phishing-resistant, no shared secret. Authentik treats WebAuthn as `mfa` in the `amr` claim, which the api recognises as strong.
-2. **TOTP** — falls back to `otp` in the `amr` claim, still strong.
-3. **SMS** — avoid. Authentik exposes `sms` in `amr`, which the api treats as NOT strong (it's not in the RFC 8176 strong-factor set). Tier 2 ops will continue to step-up.
+The IdP-trust path remains useful when you have a uniform MFA policy across many apps (Entra / Okta with org-wide WebAuthn enforcement). Most Secrets Bridge deployments are simpler with the app-MFA default.
 
-### Enabling WebAuthn enrolment
-
-In Authentik:
+### Enabling MFA in Authentik (only if you flip `trustAmrForMFA: true`)
 
 1. **Flows & Stages → Stages → Create → WebAuthn Authenticator Setup**
-2. Add the stage to your default authentication flow (or your user-self-enrolment flow if you have one).
-3. Mark the stage as **required** for users with any of your `sb-admins` / `sb-approvers` groups — those are the people who'll need step-up MFA on every approve, so they should have a hardware key enrolled before they ever sign in.
+2. Add the stage to your default authentication flow (or a user-self-enrolment flow).
+3. Mark the stage as **required** for users with any of your `sb-admins` / `sb-approvers` groups — those are the people who'll need step-up MFA on every approve.
 
-You can require WebAuthn for everyone or only for privileged groups — Authentik's stage-binding lets you scope by group, user, or any other expression.
+### Verifying `amr` is correct (IdP-trust path only)
 
-### Verifying `amr` is correct
-
-After a user signs in with WebAuthn, check the audit row on the Secrets Bridge side:
+After a user signs in with WebAuthn through Authentik, check the audit row on the Secrets Bridge side:
 
 ```sql
 SELECT metadata->>'amr', metadata->>'session_id', occurred_at
@@ -149,20 +143,20 @@ ORDER BY occurred_at DESC
 LIMIT 5;
 ```
 
-You should see `amr` as `["mfa"]` (or `["pwd","mfa"]` for a password-then-WebAuthn flow). If you only see `["pwd"]`, the IdP did not assert MFA and the api will demand step-up on every Tier 2 op. That's a sign your flow isn't enforcing the WebAuthn stage.
+You should see `amr` as `["mfa"]` (or `["pwd","mfa"]` for a password-then-WebAuthn flow). If you only see `["pwd"]`, the IdP did not assert MFA — Tier 2 ops will demand step-up via the app-MFA path (a fine outcome if you've enrolled the factor there) OR fail closed (if you haven't). That's a sign your Authentik flow isn't enforcing the WebAuthn stage; users with an app-MFA factor stay unaffected.
 
 ## 6. Step-up flow in action
 
 The first time the user tries to approve a request, they'll see:
 
 1. SPA opens the request detail → clicks **Approve**
-2. SPA `POST /requests/:id/approve` → api returns `401 step_up_required`
-3. SPA detects the `WWW-Authenticate: step-up` header → redirects through the OIDC step-up start URL
-4. Authentik re-prompts MFA (it honours `prompt=login` + `max_age=0` + `acr_values=mfa` in the authorize call)
-5. api callback stamps `last_mfa_at` on the **same session row** (cookie unchanged)
-6. SPA returns to the request detail → clicks Approve again → 200
+2. SPA `POST /requests/:id/approve` → api returns `401 step_up_required` (session is MFA-stale)
+3. SPA's global step-up interceptor opens the step-up modal
+4. User picks their factor — TOTP code or tap their security key
+5. SPA `POST /auth/mfa/verify` → api stamps `last_mfa_at` on the **same session row** (cookie unchanged) → `204 No Content`
+6. Modal closes → user re-clicks **Approve** → 200
 
-The "cookie unchanged" invariant is critical — see [Authentication → MFA + step-up](authentication.md#mfa-step-up-slice-d). Your audit chain stays continuous; the session ID never changes.
+The "cookie unchanged" invariant is critical — see [Authentication → Step-up ceremony](authentication.md#step-up-ceremony). Your audit chain stays continuous; the session ID never changes.
 
 ## 7. Back-channel logout
 
