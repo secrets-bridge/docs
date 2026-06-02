@@ -2,6 +2,14 @@
 
 Documentation site for [Secrets Bridge](https://github.com/secrets-bridge) — `mkdocs-material` + `mike` → [secrets-bridge.io](https://secrets-bridge.io).
 
+## Recent additions
+
+- [Project environments](https://secrets-bridge.io/operations/project-environments/) — the `kind=non_prod/prod` model + why kind/name are immutable (Slice L6)
+- [Policy templates](https://secrets-bridge.io/operations/policy-templates/) — three copy-pasteable policy shapes for non-prod direct reveal + prod single/multi approver (Slice L6)
+- [Authentication](https://secrets-bridge.io/operations/authentication/) — extended with the Slice K login-time MFA gate + the Slice L4 `secret.reveal.direct` permission section
+
+See [`secrets-bridge/skills/PROGRESS.md`](https://github.com/secrets-bridge/skills/blob/main/PROGRESS.md) for the slice-by-slice log.
+
 ## Versioning
 
 The site is **versioned by `mike`**. Each GitHub release tag (`vMAJOR.MINOR.PATCH`) deploys to its own URL on the `gh-pages` branch:
