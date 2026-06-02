@@ -1272,6 +1272,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#step-up-vs-login-time-mfa" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step-up vs login-time MFA
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1726,6 +1735,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#step-up-vs-login-time-mfa" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step-up vs login-time MFA
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2039,6 +2057,47 @@
 <li><strong>SMS / email OTP</strong> — Secrets Bridge does NOT support this. SIM swap and email-account takeover are well-documented bypasses.</li>
 </ol>
 <p>Operators should enrol <strong>at least two factors</strong> per privileged user — one hardware key plus one TOTP backup — so a lost YubiKey doesn't lock them out of Tier 2 ops.</p>
+<h3 id="step-up-vs-login-time-mfa">Step-up vs login-time MFA<a class="headerlink" href="#step-up-vs-login-time-mfa" title="Permanent link">&para;</a></h3>
+<p>The default posture (Slices H + I) gates <strong>only Tier-2 ops</strong> (approve / reject / reveal-wrap). Sign-in itself + Tier-1 browsing (lists, dashboards) only need a session cookie. The argument: the session cookie is the high-value loot — step-up makes "I have your cookie" insufficient at the moment of a sensitive action without paying the ergonomic cost of a modal on every page load.</p>
+<p>The alternative posture — <strong>login-time MFA on every authenticated route</strong> — is available via the Slice K opt-in knob.</p>
+<p>Set <code>api.config.mfa.requireMFAAtLogin: true</code> (renders <code>SB_REQUIRE_MFA_AT_LOGIN=true</code>) to enable. When the knob is on:</p>
+<ul>
+<li>A fresh session with no MFA stamp returns <code>401 step_up_required</code> on every Tier-1 route (lists, dashboards, project pages).</li>
+<li>The SPA's global onError interceptor opens the step-up modal <strong>immediately after sign-in</strong> before the user reaches any value-bearing surface.</li>
+<li>A user with no factor enrolled is bounced to <code>/me/mfa</code> via the <code>412 mfa_enrollment_required</code> shape (the same response the existing 412 path uses).</li>
+<li>Tier-2 routes still enforce the 15-min freshness window via the per-route <code>RequireFreshMFA</code>.</li>
+</ul>
+<p>Carve-outs the gate ALWAYS allows through (so it isn't self-locking):</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>GET    /api/v1/users/me                 SPA identity hydration
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>GET    /api/v1/users/me/projects        identity-adjacent
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>GET    /api/v1/users/me/mfa/factors     SPA factor-kind picker
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>POST   /api/v1/users/me/mfa/totp/*      enrollment must reach
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>POST   /api/v1/users/me/mfa/webauthn/*  the user pre-stamp
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>DELETE /api/v1/users/me/mfa/factors/:id factor removal
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>POST   /api/v1/auth/logout              always allow sign-out
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>POST   /api/v1/auth/mfa/challenge       the gate&#39;s own ceremony
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>POST   /api/v1/auth/mfa/verify          ditto
+</span></code></pre></div>
+<p>Pick the posture by environment, not by user:</p>
+<table>
+<thead>
+<tr>
+<th>Posture</th>
+<th>When it fits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Step-up only</strong> (default)</td>
+<td>Dev clusters, single-tenant deployments, deployments where users browse infrequently and verifying on every access would be friction without benefit.</td>
+</tr>
+<tr>
+<td><strong>Login-time MFA</strong> (<code>requireMFAAtLogin: true</code>)</td>
+<td>Production multi-tenant deployments, regulated environments (SOC2 / ISO 27001 audit), AWS-Console / GitHub-org-with-2FA-required parity.</td>
+</tr>
+</tbody>
+</table>
+<p>The two postures share the same factor enrollment surface (<code>/me/mfa</code>) and the same verify endpoint (<code>/auth/mfa/verify</code>) — the gate position is the only difference. Switching between them is a single env-var change + pod roll; users keep their enrolled factors.</p>
 <h2 id="oidc-trust-mfa-slice-d-legacy-opt-in">OIDC-trust MFA (Slice D — legacy, opt-in)<a class="headerlink" href="#oidc-trust-mfa-slice-d-legacy-opt-in" title="Permanent link">&para;</a></h2>
 <p>The api retains the original Slice D path for deployments whose IdP genuinely owns MFA (Microsoft Entra / Okta with strong-factor policy bound), so an operator can keep that posture during a transition window.</p>
 <p>Set <code>api.config.oidc.trustAmrForMFA: true</code> (renders <code>SB_OIDC_TRUSTED_AMR_MFA=true</code>) to opt in. When enabled, the OIDC callback stamps <code>last_mfa_at</code> on the session whenever the ID-token <code>amr</code> claim includes one of the RFC 8176 strong-factor identifiers:</p>
@@ -2097,25 +2156,25 @@
 <h2 id="break-glass-local-admin-policy-architect-q1">Break-glass (local-admin) policy (architect Q1)<a class="headerlink" href="#break-glass-local-admin-policy-architect-q1" title="Permanent link">&para;</a></h2>
 <p>Local-admin sign-in via <code>/auth/login</code> is the <strong>break-glass surface</strong> — the way operators sign in when the IdP is down, the OIDC client is misconfigured, or the network is partitioned. It is <strong>not</strong> the day-to-day sign-in path once OIDC is configured.</p>
 <p>Every successful local-admin sign-in emits a high-severity audit event:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>action:   BREAK_GLASS_LOGIN
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>status:   success
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>severity: CRITICAL    (in metadata)
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>actor:    user:&lt;uuid&gt;
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>action:   BREAK_GLASS_LOGIN
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>status:   success
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>severity: CRITICAL    (in metadata)
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>actor:    user:&lt;uuid&gt;
 </span></code></pre></div>
 <p><strong>Route this audit action into your alert pipeline.</strong> Splunk / Datadog / Grafana Alertmanager — whichever you use, page the on-call when a <code>BREAK_GLASS_LOGIN</code> shows up outside of an open incident bridge. The Slack notification recipe:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Example: worker notification sink (when configured) or external SIEM rule</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nt">when</span><span class="p">:</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BREAK_GLASS_LOGIN</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">severity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CRITICAL</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nt">then</span><span class="p">:</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="nt">notify</span><span class="p">:</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="nt">channel</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;#security-incidents&quot;</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">      </span><span class="no">Break-glass local-admin login by ${actor}.</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">      </span><span class="no">Expected? If not, open an incident.</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">      </span><span class="no">Session ID: ${metadata.session_id}</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">      </span><span class="no">IP: ${metadata.ip}</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">      </span><span class="no">User-agent: ${metadata.user_agent}</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Example: worker notification sink (when configured) or external SIEM rule</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nt">when</span><span class="p">:</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BREAK_GLASS_LOGIN</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">severity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CRITICAL</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="nt">then</span><span class="p">:</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nt">notify</span><span class="p">:</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nt">channel</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;#security-incidents&quot;</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="nt">message</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">      </span><span class="no">Break-glass local-admin login by ${actor}.</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">      </span><span class="no">Expected? If not, open an incident.</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">      </span><span class="no">Session ID: ${metadata.session_id}</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">      </span><span class="no">IP: ${metadata.ip}</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">      </span><span class="no">User-agent: ${metadata.user_agent}</span>
 </span></code></pre></div>
 <h3 id="local-admin-sessions-step-up">Local-admin sessions + step-up<a class="headerlink" href="#local-admin-sessions-step-up" title="Permanent link">&para;</a></h3>
 <p>Local-admin users go through the <strong>same app-MFA enrollment + step-up surfaces as OIDC users</strong>. The local-admin sign-in path does not stamp <code>last_mfa_at</code> directly — every Tier 2 op the operator runs is gated by a fresh <code>/auth/mfa/verify</code> against an enrolled factor.</p>
