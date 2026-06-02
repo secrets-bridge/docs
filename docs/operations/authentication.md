@@ -168,6 +168,42 @@ When you onboard users, encourage this enrollment order:
 
 Operators should enrol **at least two factors** per privileged user — one hardware key plus one TOTP backup — so a lost YubiKey doesn't lock them out of Tier 2 ops.
 
+### Step-up vs login-time MFA
+
+The default posture (Slices H + I) gates **only Tier-2 ops** (approve / reject / reveal-wrap). Sign-in itself + Tier-1 browsing (lists, dashboards) only need a session cookie. The argument: the session cookie is the high-value loot — step-up makes "I have your cookie" insufficient at the moment of a sensitive action without paying the ergonomic cost of a modal on every page load.
+
+The alternative posture — **login-time MFA on every authenticated route** — is available via the Slice K opt-in knob.
+
+Set `api.config.mfa.requireMFAAtLogin: true` (renders `SB_REQUIRE_MFA_AT_LOGIN=true`) to enable. When the knob is on:
+
+- A fresh session with no MFA stamp returns `401 step_up_required` on every Tier-1 route (lists, dashboards, project pages).
+- The SPA's global onError interceptor opens the step-up modal **immediately after sign-in** before the user reaches any value-bearing surface.
+- A user with no factor enrolled is bounced to `/me/mfa` via the `412 mfa_enrollment_required` shape (the same response the existing 412 path uses).
+- Tier-2 routes still enforce the 15-min freshness window via the per-route `RequireFreshMFA`.
+
+Carve-outs the gate ALWAYS allows through (so it isn't self-locking):
+
+```
+GET    /api/v1/users/me                 SPA identity hydration
+GET    /api/v1/users/me/projects        identity-adjacent
+GET    /api/v1/users/me/mfa/factors     SPA factor-kind picker
+POST   /api/v1/users/me/mfa/totp/*      enrollment must reach
+POST   /api/v1/users/me/mfa/webauthn/*  the user pre-stamp
+DELETE /api/v1/users/me/mfa/factors/:id factor removal
+POST   /api/v1/auth/logout              always allow sign-out
+POST   /api/v1/auth/mfa/challenge       the gate's own ceremony
+POST   /api/v1/auth/mfa/verify          ditto
+```
+
+Pick the posture by environment, not by user:
+
+| Posture | When it fits |
+|---|---|
+| **Step-up only** (default) | Dev clusters, single-tenant deployments, deployments where users browse infrequently and verifying on every access would be friction without benefit. |
+| **Login-time MFA** (`requireMFAAtLogin: true`) | Production multi-tenant deployments, regulated environments (SOC2 / ISO 27001 audit), AWS-Console / GitHub-org-with-2FA-required parity. |
+
+The two postures share the same factor enrollment surface (`/me/mfa`) and the same verify endpoint (`/auth/mfa/verify`) — the gate position is the only difference. Switching between them is a single env-var change + pod roll; users keep their enrolled factors.
+
 ## OIDC-trust MFA (Slice D — legacy, opt-in)
 
 The api retains the original Slice D path for deployments whose IdP genuinely owns MFA (Microsoft Entra / Okta with strong-factor policy bound), so an operator can keep that posture during a transition window.
