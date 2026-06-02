@@ -276,6 +276,20 @@ If you're routinely approving as the break-glass user, your operating model is s
 
 For deployments that want to refuse local-admin sign-in once OIDC is configured, the chart will gain a `SB_LOCAL_ADMIN_ENABLED=false` flag in a follow-up. Today the flag is implicit — leave `SB_BOOTSTRAP_ADMIN_EMAIL` unset and no local-admin account exists, so `/auth/login` always fails with `invalid credentials`.
 
+## Direct reveal permission (Slice L4)
+
+Slice L4 added `secret.reveal.direct` to the permission catalog and seeded it onto the bootstrap `developer` role.
+
+The permission is a NECESSARY but NOT SUFFICIENT gate. Three conditions must all hold for a direct-reveal request to auto-execute:
+
+1. The caller holds `secret.reveal.direct` (route-level `auth.Require`).
+2. The matched `policy_rules` row has `direct_reveal_allowed=true`.
+3. The matched environment's `kind` is `non_prod`.
+
+If any one of these fails, the API returns 403 and the SPA shows an inline error. The dev endpoint never bypasses approval against a `prod`-classified env — the PolicyEngine zeroes `direct_reveal_allowed=true` server-side regardless of operator misconfig. See [Project environments](project-environments.md#kind-vs-type-why-both) for the `kind` model and [Policy templates](policy-templates.md#template-1-non-prod-direct-reveal) for ready-to-paste rules.
+
+Operators who want a stricter baseline can strip `secret.reveal.direct` from the developer role via the existing Roles admin endpoint — the rest of the developer surface (`secret.request`, `audit.read`) is unaffected.
+
 ## What this page does NOT cover
 
 - **RBAC enforcement** at the route level. Sidebar nav already hides admin pages without `team.edit` / `role.edit`; route-level enforcement on the api lands in a follow-up.
