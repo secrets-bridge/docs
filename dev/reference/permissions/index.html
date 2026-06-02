@@ -992,6 +992,10 @@
       
         
       
+        
+      
+        
+      
     
     
       
@@ -1112,6 +1116,48 @@
   
   <span class="md-ellipsis">
     OIDC with Authentik
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/project-environments/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Project environments
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/policy-templates/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Policy templates
   </span>
   
 
@@ -1665,7 +1711,7 @@ edit their permission lists but can't delete the rows.</p>
 </tr>
 <tr>
 <td><code>developer</code></td>
-<td><code>secret.request</code>, <code>audit.read</code></td>
+<td><code>secret.request</code>, <code>secret.reveal.direct</code>, <code>audit.read</code></td>
 </tr>
 </tbody>
 </table>
@@ -1747,6 +1793,10 @@ edit their permission lists but can't delete the rows.</p>
 <tr>
 <td><code>secret.approve</code></td>
 <td>Vote on a pending request (approve or reject).</td>
+</tr>
+<tr>
+<td><code>secret.reveal.direct</code></td>
+<td>(Slice L4) Eligibility for the auto-executed direct-reveal path. The matched <code>policy_rules</code> row MUST ALSO have <code>direct_reveal_allowed=true</code> AND the environment's <code>kind</code> must be <code>non_prod</code>. Without all three, the user is routed through the standard request flow. PROD direct-reveal is impossible by construction.</td>
 </tr>
 </tbody>
 </table>

@@ -996,6 +996,10 @@
       
         
       
+        
+      
+        
+      
     
     
       
@@ -1329,6 +1333,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#direct-reveal-permission-slice-l4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Direct reveal permission (Slice L4)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-this-page-does-not-cover" class="md-nav__link">
     <span class="md-ellipsis">
       What this page does NOT cover
@@ -1358,6 +1371,48 @@
   
   <span class="md-ellipsis">
     OIDC with Authentik
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../project-environments/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Project environments
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../policy-templates/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Policy templates
   </span>
   
 
@@ -1792,6 +1847,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#direct-reveal-permission-slice-l4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Direct reveal permission (Slice L4)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-this-page-does-not-cover" class="md-nav__link">
     <span class="md-ellipsis">
       What this page does NOT cover
@@ -2188,6 +2252,16 @@
 <p>If you're routinely approving as the break-glass user, your operating model is still wrong — that account should be reserved for "the IdP is broken and I need to fix it." But during a real IdP outage the break-glass user can now approve cleanly without an additional dependency.</p>
 <h3 id="disabling-break-glass-entirely">Disabling break-glass entirely<a class="headerlink" href="#disabling-break-glass-entirely" title="Permanent link">&para;</a></h3>
 <p>For deployments that want to refuse local-admin sign-in once OIDC is configured, the chart will gain a <code>SB_LOCAL_ADMIN_ENABLED=false</code> flag in a follow-up. Today the flag is implicit — leave <code>SB_BOOTSTRAP_ADMIN_EMAIL</code> unset and no local-admin account exists, so <code>/auth/login</code> always fails with <code>invalid credentials</code>.</p>
+<h2 id="direct-reveal-permission-slice-l4">Direct reveal permission (Slice L4)<a class="headerlink" href="#direct-reveal-permission-slice-l4" title="Permanent link">&para;</a></h2>
+<p>Slice L4 added <code>secret.reveal.direct</code> to the permission catalog and seeded it onto the bootstrap <code>developer</code> role.</p>
+<p>The permission is a NECESSARY but NOT SUFFICIENT gate. Three conditions must all hold for a direct-reveal request to auto-execute:</p>
+<ol>
+<li>The caller holds <code>secret.reveal.direct</code> (route-level <code>auth.Require</code>).</li>
+<li>The matched <code>policy_rules</code> row has <code>direct_reveal_allowed=true</code>.</li>
+<li>The matched environment's <code>kind</code> is <code>non_prod</code>.</li>
+</ol>
+<p>If any one of these fails, the API returns 403 and the SPA shows an inline error. The dev endpoint never bypasses approval against a <code>prod</code>-classified env — the PolicyEngine zeroes <code>direct_reveal_allowed=true</code> server-side regardless of operator misconfig. See <a href="../project-environments/#kind-vs-type-why-both">Project environments</a> for the <code>kind</code> model and <a href="../policy-templates/#template-1-non-prod-direct-reveal">Policy templates</a> for ready-to-paste rules.</p>
+<p>Operators who want a stricter baseline can strip <code>secret.reveal.direct</code> from the developer role via the existing Roles admin endpoint — the rest of the developer surface (<code>secret.request</code>, <code>audit.read</code>) is unaffected.</p>
 <h2 id="what-this-page-does-not-cover">What this page does NOT cover<a class="headerlink" href="#what-this-page-does-not-cover" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>RBAC enforcement</strong> at the route level. Sidebar nav already hides admin pages without <code>team.edit</code> / <code>role.edit</code>; route-level enforcement on the api lands in a follow-up.</li>
