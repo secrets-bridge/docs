@@ -56,6 +56,20 @@ required to call it.
 | `GET` | `/api/v1/requests/:id/wraps/:wrap_id` | user_id | Single-shot retrieve (consumes) |
 | `GET` | `/api/v1/requests/:id/gitops` | user_id | BRD §26 observation list (404 when feature is off) |
 
+## Reveal sessions
+
+Slice M — bulk reveal page surface. Open returns wrap_id + key_name
+handles; the SPA loops over them calling the single-shot
+`/requests/:id/wraps/:wrap_id` retrieve for each plaintext. See
+[Reveal sessions](../operations/reveal-sessions.md) for the operator
+guide.
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| `POST` | `/api/v1/reveal-sessions` | bearer + step-up MFA | `{access_request_id}` → `{session_id, expires_at, ttl_seconds, wraps[]}`. 20/60s per identity rate limit. |
+| `GET` | `/api/v1/reveal-sessions/me/active` | bearer | Caller's active sessions; value-free summaries (no envelopes) |
+| `POST` | `/api/v1/reveal-sessions/:id/expire` | bearer | `{reason: 'user_hide' \| 'unmount'}` → 204; owner-bound; idempotent server-side |
+
 ## Workflows / Policies / Roles / Assignments / Tenancy (admin)
 
 | Method | Path | Auth |
