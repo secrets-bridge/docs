@@ -13,13 +13,13 @@
         <meta name="author" content="Secrets Bridge contributors">
       
       
-        <link rel="canonical" href="https://secrets-bridge.io/dev/components/worker/">
+        <link rel="canonical" href="https://secrets-bridge.io/dev/operations/reveal-sessions/">
       
       
-        <link rel="prev" href="../agent/">
+        <link rel="prev" href="../policy-templates/">
       
       
-        <link rel="next" href="../controller/">
+        <link rel="next" href="../config/">
       
       
       <link rel="icon" href="../../assets/favicon.svg">
@@ -27,7 +27,7 @@
     
     
   
-    <title>Worker - Secrets Bridge</title>
+    <title>Reveal sessions - Secrets Bridge</title>
   
 
     
@@ -72,14 +72,14 @@
   
 
   
-  <link rel="canonical" href="https://secrets-bridge.io/dev/components/worker/" />
+  <link rel="canonical" href="https://secrets-bridge.io/dev/operations/reveal-sessions/" />
 
   
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Secrets Bridge" />
-  <meta property="og:title" content="Worker" />
+  <meta property="og:title" content="Reveal sessions" />
   <meta property="og:description" content="Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes." />
-  <meta property="og:url" content="https://secrets-bridge.io/dev/components/worker/" />
+  <meta property="og:url" content="https://secrets-bridge.io/dev/operations/reveal-sessions/" />
   <meta property="og:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -88,7 +88,7 @@
 
   
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Worker" />
+  <meta name="twitter:title" content="Reveal sessions" />
   <meta name="twitter:description" content="Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes." />
   <meta name="twitter:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge — The brain behind your secrets." />
@@ -109,9 +109,9 @@
   {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    "headline": "Worker",
+    "headline": "Reveal sessions",
     "description": "Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes.",
-    "url": "https://secrets-bridge.io/dev/components/worker/",
+    "url": "https://secrets-bridge.io/dev/operations/reveal-sessions/",
     "image": "https://secrets-bridge.io/assets/og-banner.png",
     "publisher": {
       "@type": "Organization",
@@ -144,7 +144,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#worker" class="md-skip">
+        <a href="#reveal-sessions" class="md-skip">
           Skip to content
         </a>
       
@@ -183,7 +183,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Worker
+              Reveal sessions
             
           </span>
         </div>
@@ -326,13 +326,11 @@
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../components/" class="md-tabs__link">
           
   
     
@@ -368,11 +366,13 @@
         
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../operations/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
           
   
     
@@ -636,8 +636,6 @@
       
   
   
-    
-  
   
   
     
@@ -662,24 +660,23 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
+            <a href="../../components/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -690,13 +687,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             Components
@@ -712,7 +709,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/" class="md-nav__link">
+      <a href="../../components/api/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -733,7 +730,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../agent/" class="md-nav__link">
+      <a href="../../components/agent/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -751,30 +748,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Worker
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../components/worker/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -783,71 +760,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#sweepers-shipped-today" class="md-nav__link">
-    <span class="md-ellipsis">
-      Sweepers shipped today
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#multi-replica-safety" class="md-nav__link">
-    <span class="md-ellipsis">
-      Multi-replica safety
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#notification-sinks" class="md-nav__link">
-    <span class="md-ellipsis">
-      Notification sinks
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#hard-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      Hard rules
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      Configuration
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -860,7 +772,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../controller/" class="md-nav__link">
+      <a href="../../components/controller/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -881,7 +793,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../ui/" class="md-nav__link">
+      <a href="../../components/ui/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -902,7 +814,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../core/" class="md-nav__link">
+      <a href="../../components/core/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1061,6 +973,8 @@
       
   
   
+    
+  
   
   
     
@@ -1091,23 +1005,24 @@
     
     
       
+        
+        
+      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../operations/" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -1118,13 +1033,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             Operations
@@ -1140,7 +1055,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/docker-compose/" class="md-nav__link">
+      <a href="../docker-compose/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1161,7 +1076,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/bootstrap/" class="md-nav__link">
+      <a href="../bootstrap/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1182,7 +1097,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/authentication/" class="md-nav__link">
+      <a href="../authentication/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1203,7 +1118,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/oidc-authentik/" class="md-nav__link">
+      <a href="../oidc-authentik/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1224,7 +1139,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/project-environments/" class="md-nav__link">
+      <a href="../project-environments/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1245,7 +1160,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/policy-templates/" class="md-nav__link">
+      <a href="../policy-templates/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1263,10 +1178,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../operations/reveal-sessions/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Reveal sessions
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -1275,6 +1210,140 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-a-reveal-session-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      What a reveal session is
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-differs-from-the-request-flow-single-shot-retrieval" class="md-nav__link">
+    <span class="md-ellipsis">
+      How it differs from the request-flow single-shot retrieval
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      Lifecycle
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ttl-reveal_ttl_seconds" class="md-nav__link">
+    <span class="md-ellipsis">
+      TTL — reveal_ttl_seconds
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hard-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hard rules
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-server-side-guarantee" class="md-nav__link">
+    <span class="md-ellipsis">
+      The server-side guarantee
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#copy-all-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Copy All policy
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#operator-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Operator queries
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Operator queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-reveal-sessions-are-open-right-now" class="md-nav__link">
+    <span class="md-ellipsis">
+      "What reveal sessions are open right now?"
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#did-the-worker-sweeper-close-every-past-ttl-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      "Did the worker sweeper close every past-TTL session?"
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trace-one-users-reveal-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      "Trace one user's reveal history"
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      Related
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1287,7 +1356,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/config/" class="md-nav__link">
+      <a href="../config/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1308,7 +1377,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/troubleshooting/" class="md-nav__link">
+      <a href="../troubleshooting/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1513,27 +1582,36 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#sweepers-shipped-today" class="md-nav__link">
+  <a href="#what-a-reveal-session-is" class="md-nav__link">
     <span class="md-ellipsis">
-      Sweepers shipped today
+      What a reveal session is
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#multi-replica-safety" class="md-nav__link">
+  <a href="#how-it-differs-from-the-request-flow-single-shot-retrieval" class="md-nav__link">
     <span class="md-ellipsis">
-      Multi-replica safety
+      How it differs from the request-flow single-shot retrieval
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#notification-sinks" class="md-nav__link">
+  <a href="#lifecycle" class="md-nav__link">
     <span class="md-ellipsis">
-      Notification sinks
+      Lifecycle
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ttl-reveal_ttl_seconds" class="md-nav__link">
+    <span class="md-ellipsis">
+      TTL — reveal_ttl_seconds
     </span>
   </a>
   
@@ -1549,9 +1627,69 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#the-server-side-guarantee" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration
+      The server-side guarantee
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#copy-all-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Copy All policy
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#operator-queries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Operator queries
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Operator queries">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-reveal-sessions-are-open-right-now" class="md-nav__link">
+    <span class="md-ellipsis">
+      "What reveal sessions are open right now?"
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#did-the-worker-sweeper-close-every-past-ttl-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      "Did the worker sweeper close every past-TTL session?"
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#trace-one-users-reveal-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      "Trace one user's reveal history"
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      Related
     </span>
   </a>
   
@@ -1572,7 +1710,7 @@
                   
 
   
-    <a href="https://github.com/secrets-bridge/edit/main/docs/components/worker.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/secrets-bridge/edit/main/docs/operations/reveal-sessions.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1581,172 +1719,305 @@
     
       
     
-    <a href="https://github.com/secrets-bridge/raw/main/docs/components/worker.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/secrets-bridge/raw/main/docs/operations/reveal-sessions.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="worker">Worker<a class="headerlink" href="#worker" title="Permanent link">&para;</a></h1>
-<p>Repo: <a href="https://github.com/secrets-bridge/worker"><code>secrets-bridge/worker</code></a>
-· Stack: Go 1.25 + <code>api/pkg/storage</code> + <code>api/pkg/runtime</code> (via local
-<code>replace</code> directive) + Prometheus client
-· Container: <code>golang:1.25-alpine</code> → <code>distroless/static:nonroot</code></p>
-<p>Background workhorse for the platform's lifecycle hygiene + the
-read-only ArgoCD observation poller (BRD §26).</p>
-<h2 id="sweepers-shipped-today">Sweepers shipped today<a class="headerlink" href="#sweepers-shipped-today" title="Permanent link">&para;</a></h2>
+<h1 id="reveal-sessions">Reveal sessions<a class="headerlink" href="#reveal-sessions" title="Permanent link">&para;</a></h1>
+<p>Slice M introduced <strong>reveal sessions</strong> — the time-limited bulk-reveal
+surface that replaces the per-row "click, see one secret, modal
+closes" flow from earlier slices. This page is the operator-facing
+reference: what a session is, what knobs control it, what
+invariants the system holds during the open window, and what
+happens when the window closes.</p>
+<p>If you came here from
+<a href="../policy-templates/#anatomy-of-a-policy-rule">Policy templates</a>
+looking for <code>reveal_ttl_seconds</code>, the section
+<a href="#ttl-reveal_ttl_seconds"><strong>TTL — <code>reveal_ttl_seconds</code></strong></a> is the
+short answer.</p>
+<h2 id="what-a-reveal-session-is">What a reveal session is<a class="headerlink" href="#what-a-reveal-session-is" title="Permanent link">&para;</a></h2>
+<p>A reveal session is a <strong>server-side breadcrumb</strong> that pairs the
+SPA's visible-plaintext window with a TTL anchor. It is created when
+the developer clicks "Reveal" on an approved (or auto-executed via
+<a href="../policy-templates/#template-1-non-prod-direct-reveal">direct reveal</a>)
+read request. The row lives in <code>reveal_sessions</code> and carries:</p>
 <table>
 <thead>
 <tr>
-<th>Name</th>
-<th>Cadence</th>
-<th>Job</th>
+<th>Column</th>
+<th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>wraps-expired</code></td>
-<td>60s</td>
-<td>Delete <code>secret_wraps</code> past <code>expires_at</code></td>
+<td><code>user_id</code></td>
+<td>Caller identity. Only this user can expire or list the session.</td>
 </tr>
 <tr>
-<td><code>secrets-stale</code></td>
-<td>5m</td>
-<td>Flip discovered <code>secrets</code> rows whose <code>last_seen_at &lt; cutoff</code> to <code>status='missing'</code></td>
+<td><code>project_id</code> / <code>environment_id</code></td>
+<td>Scope binding so the audit trail tells operators which surface a reveal opened on.</td>
 </tr>
 <tr>
-<td><code>agents-stale</code></td>
-<td>60s</td>
-<td>Flip agents whose <code>last_seen_at &lt; cutoff</code> to <code>status='stale'</code></td>
+<td><code>access_request_id</code></td>
+<td>The read request whose wraps this session bundles.</td>
 </tr>
 <tr>
-<td><code>jobs-recovery</code></td>
-<td>30s</td>
-<td>Mark <code>sync_jobs</code> rows whose claim lease expired without a complete as <code>status='expired'</code></td>
+<td><code>wrap_ids</code></td>
+<td>The <code>secret_wraps</code> rows the session has authority to reveal.</td>
 </tr>
 <tr>
-<td><code>discover-scheduler</code></td>
-<td>5m</td>
-<td>Enqueue one discover job per configured target (env var today; admin API tracked)</td>
+<td><code>ttl_seconds</code></td>
+<td>Server-enforced TTL (see below).</td>
 </tr>
 <tr>
-<td><code>gitops-poller</code></td>
-<td>15s</td>
-<td>Claim a queued observation → call ArgoCD → record <code>observed_state</code> → transition</td>
+<td><code>opened_at</code> / <code>expires_at</code></td>
+<td>The window.</td>
 </tr>
 <tr>
-<td><code>gitops-timeout</code></td>
-<td>60s</td>
-<td>Flip observations past their <code>timeout_at</code> to <code>applied_unverified</code></td>
+<td><code>expired_at</code> + <code>expired_reason</code></td>
+<td>Set when the session ends — <code>ttl</code> (sweeper), <code>user_hide</code> (Hide Now), or <code>unmount</code> (SPA navigated away).</td>
 </tr>
 </tbody>
 </table>
-<h2 id="multi-replica-safety">Multi-replica safety<a class="headerlink" href="#multi-replica-safety" title="Permanent link">&para;</a></h2>
-<p>Every sweeper acquires a Redis lock before running:</p>
-<div class="language-go highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nx">lock</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nx">scheduler</span><span class="p">.</span><span class="nx">AcquireLock</span><span class="p">(</span><span class="s">&quot;worker:sweeper:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">name</span><span class="p">)</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">if</span><span class="w"> </span><span class="nx">errors</span><span class="p">.</span><span class="nx">Is</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span><span class="w"> </span><span class="nx">runtime</span><span class="p">.</span><span class="nx">ErrLockHeld</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* metric, return */</span><span class="w"> </span><span class="p">}</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1">// run + StartRenewal + Release on tick end</span>
+<p>The row <strong>never</strong> carries a plaintext value. The plaintexts live in
+the SPA's React state during the open window and are wiped at TTL=0
+or earlier on Hide Now / unmount.</p>
+<h2 id="how-it-differs-from-the-request-flow-single-shot-retrieval">How it differs from the request-flow single-shot retrieval<a class="headerlink" href="#how-it-differs-from-the-request-flow-single-shot-retrieval" title="Permanent link">&para;</a></h2>
+<p>Before Slice M, the only way to retrieve a value was the per-wrap
+single-shot endpoint
+(<a href="../../reference/api-endpoints/"><code>GET /api/v1/requests/:id/wraps/:wrap_id</code></a>).
+Each click consumed exactly one wrap; the user typed in the SPA's
+modal, copied, closed — and to view another key they clicked again
+on another wrap.</p>
+<p>The reveal session is <strong>bulk + time-bound</strong> instead:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Single-shot (pre-M)</th>
+<th>Reveal session (M)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Plaintexts shown</td>
+<td>One per click</td>
+<td>All at once, in a table</td>
+</tr>
+<tr>
+<td>Server-side surface</td>
+<td>One endpoint per click</td>
+<td>One Open + N existing single-shot fetches</td>
+</tr>
+<tr>
+<td>TTL anchor</td>
+<td>Per-wrap <code>expires_at</code> only</td>
+<td>Session <code>expires_at</code> AND per-wrap <code>expires_at</code> (advanced in lockstep on expiry)</td>
+</tr>
+<tr>
+<td>Operator audit row</td>
+<td><code>wrap.retrieve</code> per click</td>
+<td><code>reveal.session.opened</code> once + <code>wrap.retrieve</code> per fetch + <code>reveal.session.expired</code></td>
+</tr>
+<tr>
+<td>UX</td>
+<td>Modal per key</td>
+<td>Page with a countdown</td>
+</tr>
+</tbody>
+</table>
+<p>The single-shot flow still exists — <code>RevealModal</code> in the request
+detail page uses it for legacy flows. The reveal session is the new
+default for the direct-reveal path; approval-flow reads still pass
+through the modal until Slice N migrates them.</p>
+<h2 id="lifecycle">Lifecycle<a class="headerlink" href="#lifecycle" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>SPA opens session   →   POST /api/v1/reveal-sessions { access_request_id }
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                        ←  { session_id, expires_at, ttl_seconds, wraps: [...] }
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>SPA fetches each    →   GET  /api/v1/requests/:id/wraps/:wrap_id  (× N)
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>plaintext (existing
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>single-shot path)
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>SPA renders table + countdown over expires_at - now
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>       │
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>       ├── countdown hits 0  ──→ React state cleared; copy buttons disabled
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>       │                        worker sweeper marks session expired (reason=&#39;ttl&#39;)
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>       │                        worker sweeper advances wrap.expires_at = now
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>       │                        any further GET on a wrap_id → 410
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>       │
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>       ├── user clicks Hide Now ─→ POST /api/v1/reveal-sessions/:id/expire { reason: &#39;user_hide&#39; }
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>       │                          api advances wrap.expires_at = now
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>       │                          state cleared client-side
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>       │
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>       └── tab navigates away  ─→ POST /api/v1/reveal-sessions/:id/expire { reason: &#39;unmount&#39; }
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>                                  (fire-and-forget; sweeper is the safety net)
 </span></code></pre></div>
-<p>So you can scale the worker deployment to N replicas; exactly one
-runs each sweeper per tick, the others record <code>worker_scheduler_lock_skipped_total</code>
-(a metric, not a warn-level log — N-1 of N replicas always skip).</p>
-<h2 id="notification-sinks">Notification sinks<a class="headerlink" href="#notification-sinks" title="Permanent link">&para;</a></h2>
+<h2 id="ttl-reveal_ttl_seconds">TTL — <code>reveal_ttl_seconds</code><a class="headerlink" href="#ttl-reveal_ttl_seconds" title="Permanent link">&para;</a></h2>
+<p>TTL is <strong>policy-driven</strong>, not caller-driven. The matched
+<a href="../policy-templates/#anatomy-of-a-policy-rule">policy rule's</a>
+<code>reveal_ttl_seconds</code> column anchors how long the session lives.</p>
 <table>
 <thead>
 <tr>
-<th>Sink</th>
-<th>Status</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>NoOp</code></td>
-<td>default</td>
-<td>Logs at the event's severity</td>
-</tr>
-<tr>
-<td><code>Webhook</code></td>
-<td>ships</td>
-<td>JSON POST; <code>FormatSlack=true</code> switches to <code>{text: ...}</code> envelope. 4xx is permanent (no retry); 5xx is transient (with backoff).</td>
-</tr>
-<tr>
-<td><code>Fanout</code></td>
-<td>ships</td>
-<td><code>errors.Join</code> across N sinks; one bad sink doesn't block siblings</td>
-</tr>
-<tr>
-<td>Native Slack</td>
-<td>placeholder</td>
-<td>Tracked as a follow-up</td>
-</tr>
-<tr>
-<td>Email / SMTP</td>
-<td>placeholder</td>
-<td></td>
-</tr>
-<tr>
-<td>PagerDuty</td>
-<td>placeholder</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-<h2 id="hard-rules">Hard rules<a class="headerlink" href="#hard-rules" title="Permanent link">&para;</a></h2>
-<ul>
-<li>Stateless (NFR-08) — all state in Postgres + Redis</li>
-<li>No secret values logged or notified — sweeper errors carry
-  counts + cutoffs + sweeper names, never row contents</li>
-<li>No provider SDKs imported (worker doesn't fetch values; the
-  agent does)</li>
-<li>Multi-replica safe by construction</li>
-<li>Fails loud on misconfig at boot (e.g. <code>SB_DISCOVER_TARGETS_JSON</code>
-  parse error → exit 1)</li>
-</ul>
-<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Env var</th>
-<th>Required</th>
+<th>Knob</th>
+<th>Where</th>
+<th>Range</th>
 <th>Default</th>
-<th>Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>DATABASE_URL</code></td>
-<td>yes</td>
-<td>—</td>
-<td>Same Postgres as the api</td>
-</tr>
-<tr>
-<td><code>REDIS_URL</code></td>
-<td>yes</td>
-<td>—</td>
-<td>Same Redis as the api</td>
-</tr>
-<tr>
-<td><code>SB_WORKER_GITOPS_ENABLED</code></td>
-<td>no</td>
-<td><code>false</code></td>
-<td>Must match the api's <code>SB_GITOPS_ENABLED</code> for §26 to be active</td>
-</tr>
-<tr>
-<td><code>SB_DISCOVER_TARGETS_JSON</code></td>
-<td>no</td>
-<td>—</td>
-<td>Array of <code>{agent_id, provider, config, scope}</code>; admin API replaces this</td>
-</tr>
-<tr>
-<td>Sweeper interval overrides</td>
-<td>no</td>
-<td>per-sweeper defaults</td>
-<td><code>SB_SWEEP_WRAPS_INTERVAL</code>, etc.</td>
+<td><code>reveal_ttl_seconds</code></td>
+<td><code>policy_rules</code> row</td>
+<td>10..300</td>
+<td>60 (seed rule)</td>
 </tr>
 </tbody>
 </table>
+<p>PRD-recommended values:</p>
+<table>
+<thead>
+<tr>
+<th>Environment kind</th>
+<th>Suggested TTL</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>non_prod</code></td>
+<td>120 s</td>
+<td>Comfortable read-and-copy window</td>
+</tr>
+<tr>
+<td><code>prod</code></td>
+<td>60 s</td>
+<td>Tighter on real-data surfaces</td>
+</tr>
+</tbody>
+</table>
+<p>The api <strong>clamps</strong> out-of-range values defensively (the schema CHECK
+also rejects them, but the service-layer clamp guards legacy /
+imported rules); a value of 0 falls back to 60.</p>
+<p>The TTL is <strong>not</strong> the wrap's TTL — that comes from the workflow's
+<code>wrap_ttl_*</code> columns. <code>reveal_ttl_seconds</code> only bounds the session
+window. When the window expires (or on Hide Now), the underlying
+wraps' <code>expires_at</code> is advanced to "now" so a leaked wrap_id is
+unusable after the window — see
+<a href="#the-server-side-guarantee">The server-side guarantee</a> below.</p>
+<h2 id="hard-rules">Hard rules<a class="headerlink" href="#hard-rules" title="Permanent link">&para;</a></h2>
+<p>The platform holds these invariants by construction (schema, code,
+and the worker sweeper). Operators do not need to wire them.</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>How enforced</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>No secret values in PostgreSQL</strong> (outside the KMS-wrapped <code>secret_wraps.encrypted_value</code> column)</td>
+<td>The <code>reveal_sessions</code> table has no value column; only <code>wrap_ids</code> (UUIDs). Canary tests scan <code>reveal_sessions::text</code> after every Open.</td>
+</tr>
+<tr>
+<td><strong>No secret values in Redis</strong></td>
+<td>The api never writes plaintext to Redis; sessions are Postgres-only.</td>
+</tr>
+<tr>
+<td><strong>No secret values in logs</strong></td>
+<td>The <code>reveal.session.opened</code> audit metadata carries <code>key_names[]</code> only, never values. The api's structured logger never receives plaintext.</td>
+</tr>
+<tr>
+<td><strong>No secret values in API errors</strong></td>
+<td>All error paths return generic messages; the canary scan asserts the same against <code>audit_events.metadata</code>.</td>
+</tr>
+<tr>
+<td><strong>No secret values in browser state after expiry</strong></td>
+<td>The SPA holds plaintext in React refs only; the TTL=0 effect rewrites every row's value to the empty string. No <code>localStorage</code> / <code>sessionStorage</code> / cookie writes anywhere in the page.</td>
+</tr>
+<tr>
+<td><strong>No re-reveal after expiry</strong></td>
+<td>Wraps are single-shot AND <code>expires_at</code>-bounded; once the sweeper advances them, the user-bound retrieve endpoint returns 410.</td>
+</tr>
+<tr>
+<td><strong>Caller owns the session</strong></td>
+<td>Open binds <code>user_id</code>; the expire endpoint refuses non-owners with 403; ListActive filters by caller.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-server-side-guarantee">The server-side guarantee<a class="headerlink" href="#the-server-side-guarantee" title="Permanent link">&para;</a></h2>
+<p>The promise this slice makes: <strong>when a session expires, the wraps it
+issued become unreachable</strong>. The worker sweeper
+(<code>reveal-sessions-expired</code>) closes the window in two steps:</p>
+<ol>
+<li>Atomic <code>UPDATE … RETURNING</code> against <code>reveal_sessions</code>: every row
+   whose <code>expires_at &lt;= now() AND expired_at IS NULL</code> is marked
+   expired with <code>reason='ttl'</code>. The query returns the
+   <code>(session_id, wrap_ids)</code> pairs so the sweeper can advance each
+   wrap in lockstep.</li>
+<li>For each wrap_id from the returned set: <code>UPDATE secret_wraps SET
+   expires_at = now()</code>. Any further user-bound retrieve returns 410
+   (the storage layer's <code>expires_at</code> filter does the rejection).</li>
+</ol>
+<p>This holds even when the SPA has already cleared its plaintext: a
+leaked wrap_id is <strong>server-side unusable</strong> after the session ends.</p>
+<p>The sweeper runs at <code>SB_WORKER_REVEAL_SESSIONS_EXPIRED_INTERVAL</code>
+(default <code>5s</code>) — fast enough that a leaked wrap_id stays unusable
+within a few seconds of TTL elapse. See
+<a href="../config/">Configuration reference</a> for the full env var.</p>
+<h2 id="copy-all-policy">Copy All policy<a class="headerlink" href="#copy-all-policy" title="Permanent link">&para;</a></h2>
+<p>PRD §15 calls out a Copy-All button on the bulk reveal page. Today
+the UI ships a per-row Copy CTA only — Copy-All is a future PRD §15
+follow-up that will be <strong>disabled by default in PROD</strong> via a policy
+knob (the exact column is TBD; the contract is: PROD environments
+must opt in explicitly, non-PROD environments default opt-out unless
+the policy rule turns it on).</p>
+<p>When Copy-All ships, the policy_rules surface will likely grow a
+<code>copy_all_allowed bool</code> column. Operators planning Slice N work
+should anticipate this and avoid scripting against <code>policy_rules</code>
+columns as if the set is stable.</p>
+<h2 id="operator-queries">Operator queries<a class="headerlink" href="#operator-queries" title="Permanent link">&para;</a></h2>
+<h3 id="what-reveal-sessions-are-open-right-now">"What reveal sessions are open right now?"<a class="headerlink" href="#what-reveal-sessions-are-open-right-now" title="Permanent link">&para;</a></h3>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">project_id</span><span class="p">,</span><span class="w"> </span><span class="n">environment_id</span><span class="p">,</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">       </span><span class="n">opened_at</span><span class="p">,</span><span class="w"> </span><span class="n">expires_at</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">       </span><span class="n">array_length</span><span class="p">(</span><span class="n">wrap_ids</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">wrap_count</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="k">FROM</span><span class="w"> </span><span class="n">reveal_sessions</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">expired_at</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">opened_at</span><span class="w"> </span><span class="k">DESC</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">50</span><span class="p">;</span>
+</span></code></pre></div>
+<h3 id="did-the-worker-sweeper-close-every-past-ttl-session">"Did the worker sweeper close every past-TTL session?"<a class="headerlink" href="#did-the-worker-sweeper-close-every-past-ttl-session" title="Permanent link">&para;</a></h3>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">overdue</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">reveal_sessions</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">expired_at</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">expires_at</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">now</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">INTERVAL</span><span class="w"> </span><span class="s1">&#39;30 seconds&#39;</span><span class="p">;</span>
+</span></code></pre></div>
+<p>A non-zero count means the sweeper has not run since the row aged
+past TTL — investigate the worker. The <code>worker_scheduler_runs_total
+{task="reveal-sessions-expired"}</code> Prometheus counter is the
+authoritative liveness signal.</p>
+<h3 id="trace-one-users-reveal-history">"Trace one user's reveal history"<a class="headerlink" href="#trace-one-users-reveal-history" title="Permanent link">&para;</a></h3>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">created_at</span><span class="p">,</span><span class="w"> </span><span class="n">action</span><span class="p">,</span><span class="w"> </span><span class="n">resource</span><span class="p">,</span><span class="w"> </span><span class="n">metadata</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">audit_events</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">actor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;user:alice&#39;</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">action</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">&#39;reveal.session.%&#39;</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">created_at</span><span class="w"> </span><span class="k">DESC</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+</span></code></pre></div>
+<p>The <code>reveal.session.opened</code> row carries <code>key_names[]</code> so you can
+see <strong>which keys</strong> were exposed without ever holding the values.</p>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../policy-templates/">Policy templates</a> — how to wire
+  <code>reveal_ttl_seconds</code> per (project, env) scope</li>
+<li><a href="../project-environments/">Project environments</a> — the <code>kind=prod</code>
+  hard boundary the PolicyEngine enforces alongside reveal sessions</li>
+<li><a href="../../reference/api-endpoints/#reveal-sessions">API endpoints</a> — the
+  three HTTP routes this surface exposes</li>
+<li><a href="../config/">Configuration reference</a> — the worker sweeper interval</li>
+</ul>
 
 
 

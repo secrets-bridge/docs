@@ -998,6 +998,8 @@
       
         
       
+        
+      
     
     
       
@@ -1160,6 +1162,27 @@
   
   <span class="md-ellipsis">
     Policy templates
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/reveal-sessions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Reveal sessions
   </span>
   
 
@@ -1376,6 +1399,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#reveal-sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reveal sessions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#workflows-policies-roles-assignments-tenancy-admin" class="md-nav__link">
     <span class="md-ellipsis">
       Workflows / Policies / Roles / Assignments / Tenancy (admin)
@@ -1565,6 +1597,15 @@
   <a href="#requests-access-requests" class="md-nav__link">
     <span class="md-ellipsis">
       Requests (access requests)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reveal-sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reveal sessions
     </span>
   </a>
   
@@ -1887,6 +1928,42 @@ required to call it.</p>
 <td><code>/api/v1/requests/:id/gitops</code></td>
 <td>user_id</td>
 <td>BRD §26 observation list (404 when feature is off)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reveal-sessions">Reveal sessions<a class="headerlink" href="#reveal-sessions" title="Permanent link">&para;</a></h2>
+<p>Slice M — bulk reveal page surface. Open returns wrap_id + key_name
+handles; the SPA loops over them calling the single-shot
+<code>/requests/:id/wraps/:wrap_id</code> retrieve for each plaintext. See
+<a href="../../operations/reveal-sessions/">Reveal sessions</a> for the operator
+guide.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/reveal-sessions</code></td>
+<td>bearer + step-up MFA</td>
+<td><code>{access_request_id}</code> → <code>{session_id, expires_at, ttl_seconds, wraps[]}</code>. 20/60s per identity rate limit.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/reveal-sessions/me/active</code></td>
+<td>bearer</td>
+<td>Caller's active sessions; value-free summaries (no envelopes)</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/reveal-sessions/:id/expire</code></td>
+<td>bearer</td>
+<td><code>{reason: 'user_hide' \| 'unmount'}</code> → 204; owner-bound; idempotent server-side</td>
 </tr>
 </tbody>
 </table>
