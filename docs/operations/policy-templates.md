@@ -33,7 +33,7 @@ shapes.
 | `priority` | Higher wins on overlap. The seed `match-all` rule lives at priority `0`. |
 | `direct_reveal_allowed` | **Access decision** — when true AND the env is `non_prod`, the dev endpoint can bypass `access_requests` and auto-execute. The PolicyEngine zeroes this against `prod` envs regardless. |
 | `requires_mfa` | When true, the matched route attaches `RequireFreshMFA` (Slice K/H5) so the user must have a recent MFA stamp. |
-| `reveal_ttl_seconds` | Server-enforced reveal-session / wrap TTL. `[10, 300]` range. |
+| `reveal_ttl_seconds` | Server-enforced reveal-session / wrap TTL. `[10, 300]` range. See [Reveal sessions](reveal-sessions.md#ttl-reveal_ttl_seconds) for the full lifecycle this knob anchors. |
 
 ## Template 1 — Non-prod direct reveal
 
