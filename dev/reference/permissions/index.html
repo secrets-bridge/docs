@@ -1796,6 +1796,11 @@ edit their permission lists but can't delete the rows.</p>
 <td><code>secret.security.approve</code></td>
 <td>Slice N seed — holder can cast the security vote on cross-team requests where the bound workflow has <code>requires_security_approval=true</code>.</td>
 </tr>
+<tr>
+<td><code>provider_connection_binder</code></td>
+<td><code>integration.bind</code></td>
+<td>EPIC Q seed — section-head capability for <a href="../../operations/provider-connections/#scoped-bindings-integrationbind">self-service provider connection binding</a>. Assignment carries a <code>team_id</code> (covers descendant project subtree) or <code>project_id</code> (one project) scope. <strong>Not</strong> auto-granted to <code>integration.edit</code> holders — operators grant explicitly.</td>
+</tr>
 </tbody>
 </table>
 <h2 id="catalog-by-group">Catalog by group<a class="headerlink" href="#catalog-by-group" title="Permanent link">&para;</a></h2>
@@ -1917,7 +1922,11 @@ edit their permission lists but can't delete the rows.</p>
 <tbody>
 <tr>
 <td><code>integration.edit</code></td>
-<td>Create / update / delete ArgoCD endpoints + GitOps app mappings + Provider connections (EPIC P, api#92). One permission, two surfaces.</td>
+<td>Create / update / delete ArgoCD endpoints + GitOps app mappings + Provider connections (EPIC P, api#92). One permission, three surfaces — does <strong>not</strong> auto-cover <code>integration.bind</code> server-side; the SPA's capability helper unifies them in the UI but the api treats each endpoint family strictly.</td>
+</tr>
+<tr>
+<td><code>integration.bind</code></td>
+<td>Bind / unbind self-service-bindable provider connections on projects + environments you cover (EPIC Q, api#99). Scoped via the existing team-aware resolver. Never auto-covered by <code>integration.edit</code> — grant explicitly via the <code>provider_connection_binder</code> system role (or any custom role carrying this permission). Refuses prod envs, disabled connections, and connections without <code>self_service_bindable=true</code>.</td>
 </tr>
 </tbody>
 </table>

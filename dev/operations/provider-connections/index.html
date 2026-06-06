@@ -1417,6 +1417,93 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#scoped-bindings-integrationbind" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scoped bindings (integration.bind)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scoped bindings (integration.bind)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#self_service_bindable-the-platform-opt-in-flag" class="md-nav__link">
+    <span class="md-ellipsis">
+      self_service_bindable — the platform opt-in flag
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hard-rules-for-scoped-binders" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hard rules for scoped binders
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integrationedit-does-not-auto-cover-integrationbind-server-side" class="md-nav__link">
+    <span class="md-ellipsis">
+      integration.edit does NOT auto-cover integration.bind server-side
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-provider_connection_binder-seed-role" class="md-nav__link">
+    <span class="md-ellipsis">
+      The provider_connection_binder seed role
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#capability-helper-pattern-in-the-spa" class="md-nav__link">
+    <span class="md-ellipsis">
+      Capability helper pattern in the SPA
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#triage-sql-scoped-bindings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Triage SQL — scoped bindings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operator-playbook" class="md-nav__link">
+    <span class="md-ellipsis">
+      Operator playbook
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observability-prometheus-counters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Observability — Prometheus counters
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#triage-sql" class="md-nav__link">
     <span class="md-ellipsis">
       Triage SQL
@@ -1861,6 +1948,93 @@
       Disable semantics
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scoped-bindings-integrationbind" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scoped bindings (integration.bind)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scoped bindings (integration.bind)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#self_service_bindable-the-platform-opt-in-flag" class="md-nav__link">
+    <span class="md-ellipsis">
+      self_service_bindable — the platform opt-in flag
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hard-rules-for-scoped-binders" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hard rules for scoped binders
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integrationedit-does-not-auto-cover-integrationbind-server-side" class="md-nav__link">
+    <span class="md-ellipsis">
+      integration.edit does NOT auto-cover integration.bind server-side
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-provider_connection_binder-seed-role" class="md-nav__link">
+    <span class="md-ellipsis">
+      The provider_connection_binder seed role
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#capability-helper-pattern-in-the-spa" class="md-nav__link">
+    <span class="md-ellipsis">
+      Capability helper pattern in the SPA
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#triage-sql-scoped-bindings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Triage SQL — scoped bindings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#operator-playbook" class="md-nav__link">
+    <span class="md-ellipsis">
+      Operator playbook
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observability-prometheus-counters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Observability — Prometheus counters
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2361,65 +2535,268 @@ doesn't blow up in-flight requests, but it stops every new dependency:</p>
 into queued sync jobs to invalidate them, so the agent's executor is the
 last line of defense for a destination that disappeared between enqueue
 and claim.</p>
+<h2 id="scoped-bindings-integrationbind">Scoped bindings (<code>integration.bind</code>)<a class="headerlink" href="#scoped-bindings-integrationbind" title="Permanent link">&para;</a></h2>
+<p>EPIC Q (api#99) added a project-scoped permission so section heads can
+self-serve binds on their own projects without holding the global
+<code>integration.edit</code>. Platform retains full control over connection
+lifecycle (create, update, delete, discover-now); scoped users can only
+bind / unbind, and only on connections platform has explicitly enabled
+for self-service.</p>
+<h3 id="self_service_bindable-the-platform-opt-in-flag"><code>self_service_bindable</code> — the platform opt-in flag<a class="headerlink" href="#self_service_bindable-the-platform-opt-in-flag" title="Permanent link">&para;</a></h3>
+<p>Migration 0031 added a <code>BOOLEAN NOT NULL DEFAULT false</code> flag on
+<code>provider_connections</code>. Default-deny: every existing row stays
+invisible to <code>integration.bind</code> callers until platform flips the flag
+via the admin SPA's connection edit drawer.</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">provider_connections</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">self_service_bindable</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">false</span><span class="p">;</span>
+</span></code></pre></div>
+<p>A connection that is <code>self_service_bindable=false</code> behaves exactly as
+before EPIC Q — only <code>integration.edit</code> callers see and bind it.</p>
+<h3 id="hard-rules-for-scoped-binders">Hard rules for scoped binders<a class="headerlink" href="#hard-rules-for-scoped-binders" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bind</td>
+<td>Requires <code>environment_id</code> in the body. Project-wide bindings (<code>environment_id IS NULL</code>) are platform-only.</td>
+</tr>
+<tr>
+<td>Bind</td>
+<td>Refused on <code>env.kind='prod'</code> — production bindings are platform-team territory.</td>
+</tr>
+<tr>
+<td>Bind</td>
+<td>Refused on <code>status='disabled'</code> connections (409 <code>connection_disabled</code>).</td>
+</tr>
+<tr>
+<td>Bind</td>
+<td>Refused on <code>self_service_bindable=false</code> connections (403 <code>connection_not_self_service_bindable</code>).</td>
+</tr>
+<tr>
+<td>Unbind</td>
+<td>Allowed regardless of current <code>self_service_bindable</code> — cleanup is always allowed for bindings the user could have created.</td>
+</tr>
+<tr>
+<td>Unbind</td>
+<td>Refused on <code>env.kind='prod'</code> — admin path required.</td>
+</tr>
+<tr>
+<td>Unbind</td>
+<td>Refused on project-wide bindings (<code>environment_id IS NULL</code>) — platform-only.</td>
+</tr>
+<tr>
+<td>Both</td>
+<td>Requires actor coverage of <code>(project_id, environment_id)</code> via the existing team-aware resolver.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="integrationedit-does-not-auto-cover-integrationbind-server-side"><code>integration.edit</code> does NOT auto-cover <code>integration.bind</code> server-side<a class="headerlink" href="#integrationedit-does-not-auto-cover-integrationbind-server-side" title="Permanent link">&para;</a></h3>
+<p>This is a deliberate decision per the §2 Q6 sign-off. Granting an
+operator <code>integration.edit</code> does <strong>not</strong> automatically grant them
+<code>integration.bind</code> at the API layer — the api treats the two
+permissions as distinct. The SPA's capability helper unifies them in
+the UI (admins get the binder CTA on every env page for ergonomics),
+but the api still gates each endpoint strictly.</p>
+<p><strong>Operator implication:</strong> if you want a section head to self-serve
+binds, grant them the <code>provider_connection_binder</code> role (or any role
+carrying <code>integration.bind</code>) scoped to their team or project. Granting
+<code>integration.edit</code> alone won't enable the project-anchored URLs.</p>
+<h3 id="the-provider_connection_binder-seed-role">The <code>provider_connection_binder</code> seed role<a class="headerlink" href="#the-provider_connection_binder-seed-role" title="Permanent link">&para;</a></h3>
+<p>Migration 0032 seeds a system role scoped to one capability:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Role:         provider_connection_binder
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>Permission:   integration.bind
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>Scope at:     user_roles.scope = {project_id: &quot;...&quot;} OR {team_id: &quot;...&quot;}
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>is_system:    true (editable, not deletable)
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>Auto-granted: no — operators grant explicitly
+</span></code></pre></div>
+<p>Team-scoped grants automatically cover the team's descendant project
+subtree via the team-aware resolver (the same expansion EPIC L Slice 2
+set up for <code>secret.approve</code>).</p>
+<h3 id="capability-helper-pattern-in-the-spa">Capability helper pattern in the SPA<a class="headerlink" href="#capability-helper-pattern-in-the-spa" title="Permanent link">&para;</a></h3>
+<p>The SPA decides which endpoint family to hit by reading two capability
+helpers (<code>canBindProviderConnectionOnEnv</code> + <code>canUnbindBinding</code>), each
+returning <code>{allowed, via}</code> where <code>via</code> is the permission that carried
+the action:</p>
+<table>
+<thead>
+<tr>
+<th><code>via</code></th>
+<th>URL family used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>integration.edit</code></td>
+<td><code>POST /provider-connections/:id/bindings</code> + <code>DELETE /provider-connection-bindings/:id</code> (admin)</td>
+</tr>
+<tr>
+<td><code>integration.bind</code></td>
+<td><code>POST /projects/:id/provider-connection-bindings</code> + <code>DELETE /projects/:id/provider-connection-bindings/:bid</code> (scoped)</td>
+</tr>
+<tr>
+<td><code>null</code></td>
+<td>UI hides the action — server still enforces a stable 403 if anyone tries</td>
+</tr>
+</tbody>
+</table>
+<p>The generic <code>hasPermission('integration.bind')</code> keeps its strict
+semantic everywhere else in the SPA — it returns <code>true</code> only for
+explicit <code>integration.bind</code> grants. The capability helpers are the
+ONLY place that knows "admin can act on every env including prod via
+the admin URLs."</p>
+<h3 id="triage-sql-scoped-bindings">Triage SQL — scoped bindings<a class="headerlink" href="#triage-sql-scoped-bindings" title="Permanent link">&para;</a></h3>
+<p><strong>What connections are currently bindable for self-service:</strong></p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="n">cluster_name</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">provider_connections</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">self_service_bindable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">true</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+</span></code></pre></div>
+<p><strong>Recent out-of-scope binding probes (security signal — operators
+should know when section heads are reaching outside their subtree):</strong></p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">occurred_at</span><span class="p">,</span><span class="w"> </span><span class="n">actor</span><span class="p">,</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;attempted_project_id&#39;</span><span class="w">      </span><span class="k">AS</span><span class="w"> </span><span class="n">attempted_project</span><span class="p">,</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;attempted_environment_id&#39;</span><span class="w">  </span><span class="k">AS</span><span class="w"> </span><span class="n">attempted_env</span><span class="p">,</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;actor_permission_attempted&#39;</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">perm</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">FROM</span><span class="w"> </span><span class="n">audit_events</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;binding.denied_out_of_scope&#39;</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="k">DESC</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+</span></code></pre></div>
+<p>Note: this audit event deliberately omits <code>provider_connection_id</code> —
+the gate-order protection means the actor failed coverage BEFORE the
+connection was loaded, and including it would defeat the whole
+enumeration-leak protection.</p>
+<p><strong>Bind-path breakdown (last 7 days — who's using scoped vs admin?):</strong></p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">SELECT</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">FILTER</span><span class="w"> </span><span class="p">(</span><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;actor_permission_used&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;integration.bind&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">scoped_binds</span><span class="p">,</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">FILTER</span><span class="w"> </span><span class="p">(</span><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;actor_permission_used&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;integration.edit&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">admin_binds</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">FROM</span><span class="w"> </span><span class="n">audit_events</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;binding.create&#39;</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">INTERVAL</span><span class="w"> </span><span class="s1">&#39;7 days&#39;</span><span class="p">;</span>
+</span></code></pre></div>
+<p><strong>Bindings owned by a specific actor (incident response — when a
+section head's account is compromised):</strong></p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">occurred_at</span><span class="p">,</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;provider_connection_id&#39;</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">connection_id</span><span class="p">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;project_id&#39;</span><span class="w">             </span><span class="k">AS</span><span class="w"> </span><span class="n">project_id</span><span class="p">,</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;environment_id&#39;</span><span class="w">         </span><span class="k">AS</span><span class="w"> </span><span class="n">environment_id</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="k">FROM</span><span class="w"> </span><span class="n">audit_events</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">action</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;binding.create&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;binding.delete&#39;</span><span class="p">)</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">actor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+</span></code></pre></div>
+<h3 id="operator-playbook">Operator playbook<a class="headerlink" href="#operator-playbook" title="Permanent link">&para;</a></h3>
+<p><strong>To enable a connection for self-service:</strong></p>
+<ol>
+<li>Sign in as platform admin (holds <code>integration.edit</code>).</li>
+<li>Navigate to <code>/admin/provider-connections</code> → edit the connection.</li>
+<li>Flip the <code>Self-service bindable</code> toggle on. Save.</li>
+<li>The connection now appears in scoped binders' picker drawer for
+   any project/env they cover (non-prod only).</li>
+</ol>
+<p><strong>To grant a section head bind capability:</strong></p>
+<ol>
+<li>Identify the team or project subtree the section head should cover.</li>
+<li>Assign the <code>provider_connection_binder</code> system role scoped to that
+   team_id (preferred — covers the descendant project subtree
+   automatically) or project_id (one project only).</li>
+<li>The section head can now bind any <code>self_service_bindable=true</code>
+   connection to non-prod envs in their subtree via the per-env card
+   on <code>/projects/:id/env/:env_id</code>.</li>
+</ol>
+<p><strong>To audit recent self-service activity:</strong></p>
+<p>Run the three SQL queries above. Combine with the existing
+<code>audit_events</code> correlation_id chain to reconstruct the full lifecycle
+of a binding from creation through eventual cross-team request use.</p>
+<p><strong>To revoke a section head's bind capability without touching their
+existing bindings:</strong></p>
+<ol>
+<li>Revoke the <code>provider_connection_binder</code> role assignment (via
+   <code>/admin/assignments</code> or <code>DELETE /user-roles/:id</code>).</li>
+<li>Their existing bindings remain in place — revoking the role does
+   NOT cascade-unbind. If you need to remove specific bindings, the
+   platform admin uses the admin URL family.</li>
+</ol>
+<h3 id="observability-prometheus-counters">Observability — Prometheus counters<a class="headerlink" href="#observability-prometheus-counters" title="Permanent link">&para;</a></h3>
+<p>EPIC Q added three counters scraped from <code>/metrics</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>provider_connection_bindings_created_total{permission_used, env_kind}
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>provider_connection_bindings_deleted_total{permission_used, env_kind}
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>provider_connection_bindings_denied_total{reason}
+</span></code></pre></div>
+<p><code>reason</code> is a fixed low-cardinality set:
+<code>out_of_scope</code>, <code>prod_blocked</code>, <code>not_self_service_bindable</code>,
+<code>connection_disabled</code>, <code>connection_not_found</code>, <code>env_not_in_project</code>,
+<code>binding_exists</code>, <code>binding_not_found</code>.</p>
+<p><strong>LOW-CARDINALITY LOCK:</strong> the counters never carry <code>actor_id</code>,
+<code>project_id</code>, <code>connection_id</code>, or <code>environment_id</code> as labels — those
+go to the audit trail, not Prometheus. A <code>denied_total{reason="prod_blocked"}</code>
+spike on the dashboard means "scoped binders are running into the
+prod wall a lot," not "any specific row is misconfigured." Pair with
+the audit triage SQL above to find the actor + project + env.</p>
 <h2 id="triage-sql">Triage SQL<a class="headerlink" href="#triage-sql" title="Permanent link">&para;</a></h2>
 <p><strong>Active connections per cluster:</strong></p>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">cluster_name</span><span class="p">,</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">       </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">FILTER</span><span class="w"> </span><span class="p">(</span><span class="k">WHERE</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">discover_enabled</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">discovering</span><span class="p">,</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">       </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">FILTER</span><span class="w"> </span><span class="p">(</span><span class="k">WHERE</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">active_total</span><span class="p">,</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">       </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">FILTER</span><span class="w"> </span><span class="p">(</span><span class="k">WHERE</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;disabled&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">disabled</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="k">FROM</span><span class="w"> </span><span class="n">provider_connections</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">cluster_name</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">cluster_name</span><span class="p">;</span>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">cluster_name</span><span class="p">,</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">       </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">FILTER</span><span class="w"> </span><span class="p">(</span><span class="k">WHERE</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">discover_enabled</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">discovering</span><span class="p">,</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">       </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">FILTER</span><span class="w"> </span><span class="p">(</span><span class="k">WHERE</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">active_total</span><span class="p">,</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">       </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">FILTER</span><span class="w"> </span><span class="p">(</span><span class="k">WHERE</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;disabled&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">disabled</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="k">FROM</span><span class="w"> </span><span class="n">provider_connections</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">cluster_name</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">cluster_name</span><span class="p">;</span>
 </span></code></pre></div>
 <p><strong>Rows stuck running past 2× interval (the worker sweeper's targets):</strong></p>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="n">cluster_name</span><span class="p">,</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">       </span><span class="n">last_discover_started_at</span><span class="p">,</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">       </span><span class="n">discover_interval_seconds</span><span class="p">,</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">       </span><span class="n">NOW</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">last_discover_started_at</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">elapsed</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="k">FROM</span><span class="w"> </span><span class="n">provider_connections</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">last_discover_status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;running&#39;</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">last_discover_started_at</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">discover_interval_seconds</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">INTERVAL</span><span class="w"> </span><span class="s1">&#39;1 second&#39;</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">last_discover_started_at</span><span class="p">;</span>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="n">cluster_name</span><span class="p">,</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">       </span><span class="n">last_discover_started_at</span><span class="p">,</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">       </span><span class="n">discover_interval_seconds</span><span class="p">,</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">       </span><span class="n">NOW</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">last_discover_started_at</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">elapsed</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="k">FROM</span><span class="w"> </span><span class="n">provider_connections</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">last_discover_status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;running&#39;</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">last_discover_started_at</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">discover_interval_seconds</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">INTERVAL</span><span class="w"> </span><span class="s1">&#39;1 second&#39;</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">last_discover_started_at</span><span class="p">;</span>
 </span></code></pre></div>
 <p><strong>Connections that never successfully discovered:</strong></p>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="n">cluster_name</span><span class="p">,</span><span class="w"> </span><span class="n">discover_enabled</span><span class="p">,</span><span class="w"> </span><span class="n">last_discover_status</span><span class="p">,</span><span class="w"> </span><span class="n">last_discover_at</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">provider_connections</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">discover_enabled</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="p">(</span><span class="n">last_discover_at</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">last_discover_status</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="s1">&#39;success&#39;</span><span class="p">)</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">created_at</span><span class="p">;</span>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="n">cluster_name</span><span class="p">,</span><span class="w"> </span><span class="n">discover_enabled</span><span class="p">,</span><span class="w"> </span><span class="n">last_discover_status</span><span class="p">,</span><span class="w"> </span><span class="n">last_discover_at</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">provider_connections</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">discover_enabled</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="p">(</span><span class="n">last_discover_at</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">last_discover_status</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="s1">&#39;success&#39;</span><span class="p">)</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">created_at</span><span class="p">;</span>
 </span></code></pre></div>
 <p><strong>Audit replay for one connection:</strong></p>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">created_at</span><span class="p">,</span><span class="w"> </span><span class="n">action</span><span class="p">,</span><span class="w"> </span><span class="n">actor</span><span class="p">,</span><span class="w"> </span><span class="n">metadata</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">audit_events</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;provider_connection&#39;</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="w"> </span><span class="o">-&gt;&gt;</span><span class="w"> </span><span class="s1">&#39;provider_connection_id&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">created_at</span><span class="p">;</span>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">created_at</span><span class="p">,</span><span class="w"> </span><span class="n">action</span><span class="p">,</span><span class="w"> </span><span class="n">actor</span><span class="p">,</span><span class="w"> </span><span class="n">metadata</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">audit_events</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;provider_connection&#39;</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="w"> </span><span class="o">-&gt;&gt;</span><span class="w"> </span><span class="s1">&#39;provider_connection_id&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">created_at</span><span class="p">;</span>
 </span></code></pre></div>
 <p><strong>Bindings + open requests against one connection (matches the 409
 <code>connection_in_use</code> body):</strong></p>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">SELECT</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">project_provider_connections</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">   </span><span class="k">WHERE</span><span class="w"> </span><span class="n">provider_connection_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span><span class="p">)</span><span class="w">                     </span><span class="k">AS</span><span class="w"> </span><span class="n">bindings_count</span><span class="p">,</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">access_requests</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">   </span><span class="k">WHERE</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;pending&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;pending_values&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;pending_verification&#39;</span><span class="p">)</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">     </span><span class="k">AND</span><span class="w"> </span><span class="n">destination_provider_connection_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span><span class="p">)</span><span class="w">         </span><span class="k">AS</span><span class="w"> </span><span class="n">open_requests_count</span><span class="p">;</span>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">SELECT</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">project_provider_connections</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">   </span><span class="k">WHERE</span><span class="w"> </span><span class="n">provider_connection_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span><span class="p">)</span><span class="w">                     </span><span class="k">AS</span><span class="w"> </span><span class="n">bindings_count</span><span class="p">,</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">access_requests</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">   </span><span class="k">WHERE</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;pending&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;pending_values&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;pending_verification&#39;</span><span class="p">)</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">     </span><span class="k">AND</span><span class="w"> </span><span class="n">destination_provider_connection_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span><span class="p">)</span><span class="w">         </span><span class="k">AS</span><span class="w"> </span><span class="n">open_requests_count</span><span class="p">;</span>
 </span></code></pre></div>
 <h2 id="api-scope-hard-rules">API + scope hard rules<a class="headerlink" href="#api-scope-hard-rules" title="Permanent link">&para;</a></h2>
 <p>The 9 endpoints are documented at
 <a href="../../reference/api-endpoints/#provider-connections">HTTP API endpoints — Provider connections</a>.</p>
 <p>Every endpoint returns errors in the <strong>EPIC P envelope</strong> — distinct from
 the legacy <code>{code, error}</code> shape some older endpoints still use:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&quot;error_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;credential_in_scope&quot;</span><span class="p">,</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w">    </span><span class="s2">&quot;scope contains a credential-shaped key&quot;</span><span class="p">,</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">&quot;banned_key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;awsAccessKeyID&quot;</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="p">{</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nt">&quot;error_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;credential_in_scope&quot;</span><span class="p">,</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w">    </span><span class="s2">&quot;scope contains a credential-shaped key&quot;</span><span class="p">,</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="nt">&quot;banned_key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;awsAccessKeyID&quot;</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>19 stable error codes — see the
 <a href="#error-code-reference">Error code reference</a> below.</p>
 <p>The sanitizer pipeline ordering for <code>last_discover_error</code> is
 <strong>load-bearing</strong>:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>credential redaction (AKIA…, hvs.…, JWT, OAuth) → JSON blob strip → truncate to 280 chars
+<div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>credential redaction (AKIA…, hvs.…, JWT, OAuth) → JSON blob strip → truncate to 280 chars
 </span></code></pre></div>
 <p>Truncating first would lose credentials that span the cut point — a
 provider error like <code>"failed: token=hvs.AAAA…"</code> truncated to 280 chars
@@ -2492,7 +2869,7 @@ worker#13 (P-follow-up) tracks the final removal.</p>
    inbox; agent eventually writes values to <code>secret/data/&lt;ref&gt;</code>.</li>
 <li><strong>Admin tries to delete <code>vault-prod</code></strong> — returns 409
    <code>connection_in_use</code> with the count envelope:
-   <div class="language-json highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span><span class="nt">&quot;error_code&quot;</span><span class="p">:</span><span class="s2">&quot;connection_in_use&quot;</span><span class="p">,</span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="s2">&quot;…&quot;</span><span class="p">,</span><span class="nt">&quot;bindings_count&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="nt">&quot;open_requests_count&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">}</span>
+   <div class="language-json highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="p">{</span><span class="nt">&quot;error_code&quot;</span><span class="p">:</span><span class="s2">&quot;connection_in_use&quot;</span><span class="p">,</span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="s2">&quot;…&quot;</span><span class="p">,</span><span class="nt">&quot;bindings_count&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="nt">&quot;open_requests_count&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">}</span>
 </span></code></pre></div>
    SPA's "Delete anyway" button stays disabled while either count is<blockquote>
 <p>0.</p>
@@ -2507,25 +2884,26 @@ worker#13 (P-follow-up) tracks the final removal.</p>
     AND with a DB row due for discovery. The WARN log fires; only the
     DB target is enqueued. Then a canary scan confirms no plaintext
     leaks anywhere:</p>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">provider_connections</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">last_discover_error</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="s1">&#39;AKIA[A-Z0-9]{16}&#39;</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">   </span><span class="k">OR</span><span class="w"> </span><span class="n">last_discover_error</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="s1">&#39;hvs\.[A-Za-z0-9_-]{20,}&#39;</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">   </span><span class="k">OR</span><span class="w"> </span><span class="n">last_discover_error</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="s1">&#39;eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+&#39;</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">   </span><span class="k">OR</span><span class="w"> </span><span class="n">last_discover_error</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="s1">&#39;ya29\.[A-Za-z0-9_-]+&#39;</span><span class="p">;</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">audit_events</span>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">::</span><span class="nb">text</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="s1">&#39;AKIA[A-Z0-9]{16}&#39;</span>
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">   </span><span class="k">OR</span><span class="w"> </span><span class="n">metadata</span><span class="p">::</span><span class="nb">text</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="s1">&#39;hvs\.[A-Za-z0-9_-]{20,}&#39;</span><span class="p">;</span>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">provider_connections</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">last_discover_error</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="s1">&#39;AKIA[A-Z0-9]{16}&#39;</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">   </span><span class="k">OR</span><span class="w"> </span><span class="n">last_discover_error</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="s1">&#39;hvs\.[A-Za-z0-9_-]{20,}&#39;</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">   </span><span class="k">OR</span><span class="w"> </span><span class="n">last_discover_error</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="s1">&#39;eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+&#39;</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">   </span><span class="k">OR</span><span class="w"> </span><span class="n">last_discover_error</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="s1">&#39;ya29\.[A-Za-z0-9_-]+&#39;</span><span class="p">;</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">audit_events</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">::</span><span class="nb">text</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="s1">&#39;AKIA[A-Z0-9]{16}&#39;</span>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">   </span><span class="k">OR</span><span class="w"> </span><span class="n">metadata</span><span class="p">::</span><span class="nb">text</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="s1">&#39;hvs\.[A-Za-z0-9_-]{20,}&#39;</span><span class="p">;</span>
 </span></code></pre></div>
 <p>Both counts must be <code>0</code>. They are, because the sanitizer pipeline
 redacts before persistence.</p>
 </li>
 </ol>
 <h2 id="error-code-reference">Error code reference<a class="headerlink" href="#error-code-reference" title="Permanent link">&para;</a></h2>
-<p>All 19 stable codes from the EPIC P §6.A locked spec. Returned in the
-<code>{error_code, message, …}</code> envelope. The SPA maps every code to a
-friendly toast string via <code>providerConnectionErrorMessage</code>; operators
-running raw <code>curl</code> see the code in the body.</p>
+<p>23 stable codes — 19 from the EPIC P §6.A locked spec, plus 4 added
+by EPIC Q (api#99). Returned in the <code>{error_code, message, …}</code>
+envelope. The SPA maps every code to a friendly toast string via
+<code>providerConnectionErrorMessage</code>; operators running raw <code>curl</code> see
+the code in the body.</p>
 <table>
 <thead>
 <tr>
@@ -2598,7 +2976,7 @@ running raw <code>curl</code> see the code in the body.</p>
 <tr>
 <td><code>connection_disabled</code></td>
 <td>409</td>
-<td>Action requires <code>status=active</code> (Discover now / cross-team destination)</td>
+<td>Action requires <code>status=active</code> (Discover now / cross-team destination / scoped bind)</td>
 </tr>
 <tr>
 <td><code>binding_exists</code></td>
@@ -2608,7 +2986,7 @@ running raw <code>curl</code> see the code in the body.</p>
 <tr>
 <td><code>binding_not_found</code></td>
 <td>404</td>
-<td>Unbind on a missing binding id</td>
+<td>Unbind on a missing binding id, OR scoped DELETE where the URL <code>projectID</code> doesn't match the binding's stored <code>project_id</code> (§4 correction — NEVER <code>out_of_scope_binding</code> on mismatch, which would leak existence)</td>
 </tr>
 <tr>
 <td><code>environment_not_in_project</code></td>
@@ -2618,7 +2996,7 @@ running raw <code>curl</code> see the code in the body.</p>
 <tr>
 <td><code>project_id_required</code></td>
 <td>400</td>
-<td><code>environment_id</code> passed without <code>project_id</code> to the shared GET</td>
+<td><code>environment_id</code> or <code>for_binding=true</code> passed without <code>project_id</code> to the shared GET</td>
 </tr>
 <tr>
 <td><code>discovery_already_running</code></td>
@@ -2629,6 +3007,26 @@ running raw <code>curl</code> see the code in the body.</p>
 <td><code>out_of_scope_project</code></td>
 <td>403</td>
 <td>Dropdown caller lacks <code>secret.request</code> scoped to (project, env)</td>
+</tr>
+<tr>
+<td><code>connection_not_self_service_bindable</code></td>
+<td>403</td>
+<td>EPIC Q — scoped caller tried to bind a connection where <code>self_service_bindable=false</code>. Platform must opt the connection in via the admin SPA.</td>
+</tr>
+<tr>
+<td><code>prod_binding_not_allowed_for_scope</code></td>
+<td>403</td>
+<td>EPIC Q — scoped caller tried to bind / unbind on <code>env.kind='prod'</code>. Envelope includes <code>{"env_kind": "prod"}</code>. Admin path (<code>integration.edit</code>) required for prod bindings.</td>
+</tr>
+<tr>
+<td><code>out_of_scope_binding</code></td>
+<td>403</td>
+<td>EPIC Q — caller's <code>integration.bind</code> grant doesn't cover the target (project, env) per the team-aware resolver. Audit emits <code>binding.denied_out_of_scope</code> (security signal).</td>
+</tr>
+<tr>
+<td><code>environment_id_required</code></td>
+<td>400</td>
+<td>EPIC Q — the binder picker (<code>for_binding=true</code>) or scoped bind body lacks <code>environment_id</code>. Scoped binders never create project-wide bindings.</td>
 </tr>
 </tbody>
 </table>

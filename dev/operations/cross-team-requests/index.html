@@ -1849,6 +1849,32 @@ CTA on <code>hasPermission('integration.edit')</code> — admins see a "Manage
 provider connections" link, non-admins see "Ask your platform team to
 bind a provider connection." Cross-team submits against a
 <strong>disabled</strong> destination return 409 <code>connection_disabled</code>.</p>
+<p><strong>Two kinds of binding</strong> affect what shows up in the destination
+dropdown:</p>
+<table>
+<thead>
+<tr>
+<th>Binding shape</th>
+<th>Created by</th>
+<th>When it appears in the dropdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Env-specific (<code>environment_id IS NOT NULL</code>)</td>
+<td>Platform admins (<code>integration.edit</code>) OR scoped binders (<code>integration.bind</code>, EPIC Q) via the per-env <a href="../provider-connections/#scoped-bindings-integrationbind">Provider Connections card</a> on <code>/projects/:id/env/:env_id</code></td>
+<td>When the cross-team source project + env match</td>
+</tr>
+<tr>
+<td>Project-wide (<code>environment_id IS NULL</code>)</td>
+<td>Platform admins ONLY — scoped binders cannot create or delete project-wide bindings</td>
+<td>When the cross-team source project matches, regardless of env</td>
+</tr>
+</tbody>
+</table>
+<p>A project-wide binding implicitly covers every environment, including
+production, which is why the §2 lock keeps project-wide bindings as
+platform-only.</p>
 <h2 id="state-machine">State machine<a class="headerlink" href="#state-machine" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>                       ┌─ refused (Team B refused)
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                       │

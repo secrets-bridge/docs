@@ -1529,6 +1529,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Provider connections">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#project-anchored-scoped-binding-epic-q-api99" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project-anchored scoped binding (EPIC Q, api#99)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1765,6 +1780,21 @@
       Provider connections
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Provider connections">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#project-anchored-scoped-binding-epic-q-api99" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project-anchored scoped binding (EPIC Q, api#99)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2463,7 +2493,7 @@ for the full branching matrix. All errors land in the EPIC P envelope:
 <td><code>GET</code></td>
 <td><code>/api/v1/provider-connections</code></td>
 <td>branched</td>
-<td>No <code>project_id</code> → admin list (<code>integration.edit</code>, full projection). <code>project_id</code> (+ optional <code>environment_id</code>) → sanitized dropdown (<code>{id, name, type}</code> per row, <code>secret.request</code> scoped). <code>environment_id</code> without <code>project_id</code> → 400 <code>project_id_required</code> BEFORE auth.</td>
+<td>4-way branch (EPIC P + EPIC Q): No <code>project_id</code> → admin list (<code>integration.edit</code>, full projection). <code>project_id</code> (+ optional <code>environment_id</code>) without <code>for_binding</code> → sanitized dropdown (<code>{id, name, type}</code> per row, <code>secret.request</code> scoped). <code>project_id</code> + <code>environment_id</code> + <code>for_binding=true</code> → binder picker (<code>integration.bind</code> scoped; returns active + <code>self_service_bindable=true</code> + NOT-already-bound; refuses <code>env.kind=prod</code> with 403 <code>prod_binding_not_allowed_for_scope</code>). <code>environment_id</code> without <code>project_id</code> → 400 <code>project_id_required</code> BEFORE auth. <code>for_binding=true</code> without <code>project_id</code> → 400 <code>project_id_required</code>. <code>for_binding=true</code> with <code>project_id</code> but no <code>environment_id</code> → 400 <code>environment_id_required</code>.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
@@ -2509,7 +2539,85 @@ for the full branching matrix. All errors land in the EPIC P envelope:
 </tr>
 </tbody>
 </table>
-<p><strong>Error codes</strong> — the full 19-code reference lives in
+<h3 id="project-anchored-scoped-binding-epic-q-api99">Project-anchored scoped binding (EPIC Q, api#99)<a class="headerlink" href="#project-anchored-scoped-binding-epic-q-api99" title="Permanent link">&para;</a></h3>
+<p><code>integration.bind</code> callers (typically section heads granted the
+<code>provider_connection_binder</code> seed role) use a separate URL family
+that's gated on the binding's project + env. The URL hierarchy
+expresses the §3 mental model split — scoped binding is
+project-ownership work, not platform registry administration. The
+<code>integration.edit</code> URLs above are unchanged; admins keep using them.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/projects/:projectID/provider-connection-bindings</code></td>
+<td><code>bearer + integration.bind</code> scoped to (project, env)</td>
+<td>Bind a self-service-bindable connection to a (project, env). Body: <code>{provider_connection_id, environment_id}</code>. <code>environment_id</code> is REQUIRED — scoped binders never create project-wide bindings. 403 <code>connection_not_self_service_bindable</code> if the platform admin hasn't flipped the flag. 403 <code>prod_binding_not_allowed_for_scope</code> for prod envs. 409 <code>binding_exists</code>/<code>connection_disabled</code> per the locked chain.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/projects/:projectID/provider-connection-bindings[?environment_id=:id]</code></td>
+<td><code>bearer</code></td>
+<td>Joined project bindings — server-side join adds <code>environment_name</code>, <code>environment_kind</code>, <code>connection_name</code>, <code>connection_type</code>. Optional <code>environment_id</code> narrows to env-specific + project-wide for that env. Sanitized projection (no scope / auth_method / discovery fields).</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/projects/:projectID/provider-connection-bindings/:bindingID</code></td>
+<td><code>bearer + integration.bind</code> scoped to (project, binding env)</td>
+<td>Unbind. 204 on success. <strong>§4 correction pinned</strong>: if <code>bindingID</code> exists under a DIFFERENT project, returns 404 <code>binding_not_found</code> — never 403 <code>out_of_scope_binding</code> (which would leak existence under another project). 403 <code>prod_binding_not_allowed_for_scope</code> for prod env bindings (admin path required).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>New stable error codes</strong> (EPIC Q):</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>connection_not_self_service_bindable</code></td>
+<td>403</td>
+<td>Scoped caller tried to bind a connection where <code>self_service_bindable=false</code>.</td>
+</tr>
+<tr>
+<td><code>prod_binding_not_allowed_for_scope</code></td>
+<td>403</td>
+<td>Scoped caller tried to bind / unbind on <code>env.kind='prod'</code>. Envelope includes <code>{"env_kind": "prod"}</code>.</td>
+</tr>
+<tr>
+<td><code>out_of_scope_binding</code></td>
+<td>403</td>
+<td>Caller's <code>integration.bind</code> grant doesn't cover the target (project, env) per the team-aware resolver.</td>
+</tr>
+<tr>
+<td><code>environment_id_required</code></td>
+<td>400</td>
+<td>The binder picker branch (<code>for_binding=true</code>) or scoped bind body lacks <code>environment_id</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Prometheus counters</strong> (EPIC Q):</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>provider_connection_bindings_created_total{permission_used, env_kind}
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>provider_connection_bindings_deleted_total{permission_used, env_kind}
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>provider_connection_bindings_denied_total{reason}
+</span></code></pre></div>
+<p><code>reason</code> is a fixed low-cardinality set; the counters NEVER carry
+<code>actor_id</code>, <code>project_id</code>, <code>connection_id</code>, or <code>environment_id</code> as
+labels. See <a href="../../operations/provider-connections/#observability-prometheus-counters">Provider connections — Observability</a> for the operator-facing
+discussion + the audit-event triage SQL that pairs with these.</p>
+<p><strong>Error codes</strong> — the full reference lives in
 <a href="../../operations/provider-connections/#error-code-reference">Provider connections — Error code reference</a>.</p>
 <h2 id="permissions-catalog">Permissions catalog<a class="headerlink" href="#permissions-catalog" title="Permanent link">&para;</a></h2>
 <table>
