@@ -219,6 +219,204 @@ into queued sync jobs to invalidate them, so the agent's executor is the
 last line of defense for a destination that disappeared between enqueue
 and claim.
 
+## Scoped bindings (`integration.bind`)
+
+EPIC Q (api#99) added a project-scoped permission so section heads can
+self-serve binds on their own projects without holding the global
+`integration.edit`. Platform retains full control over connection
+lifecycle (create, update, delete, discover-now); scoped users can only
+bind / unbind, and only on connections platform has explicitly enabled
+for self-service.
+
+### `self_service_bindable` — the platform opt-in flag
+
+Migration 0031 added a `BOOLEAN NOT NULL DEFAULT false` flag on
+`provider_connections`. Default-deny: every existing row stays
+invisible to `integration.bind` callers until platform flips the flag
+via the admin SPA's connection edit drawer.
+
+```sql
+ALTER TABLE provider_connections
+    ADD COLUMN self_service_bindable BOOLEAN NOT NULL DEFAULT false;
+```
+
+A connection that is `self_service_bindable=false` behaves exactly as
+before EPIC Q — only `integration.edit` callers see and bind it.
+
+### Hard rules for scoped binders
+
+| Action | Rule |
+|---|---|
+| Bind | Requires `environment_id` in the body. Project-wide bindings (`environment_id IS NULL`) are platform-only. |
+| Bind | Refused on `env.kind='prod'` — production bindings are platform-team territory. |
+| Bind | Refused on `status='disabled'` connections (409 `connection_disabled`). |
+| Bind | Refused on `self_service_bindable=false` connections (403 `connection_not_self_service_bindable`). |
+| Unbind | Allowed regardless of current `self_service_bindable` — cleanup is always allowed for bindings the user could have created. |
+| Unbind | Refused on `env.kind='prod'` — admin path required. |
+| Unbind | Refused on project-wide bindings (`environment_id IS NULL`) — platform-only. |
+| Both | Requires actor coverage of `(project_id, environment_id)` via the existing team-aware resolver. |
+
+### `integration.edit` does NOT auto-cover `integration.bind` server-side
+
+This is a deliberate decision per the §2 Q6 sign-off. Granting an
+operator `integration.edit` does **not** automatically grant them
+`integration.bind` at the API layer — the api treats the two
+permissions as distinct. The SPA's capability helper unifies them in
+the UI (admins get the binder CTA on every env page for ergonomics),
+but the api still gates each endpoint strictly.
+
+**Operator implication:** if you want a section head to self-serve
+binds, grant them the `provider_connection_binder` role (or any role
+carrying `integration.bind`) scoped to their team or project. Granting
+`integration.edit` alone won't enable the project-anchored URLs.
+
+### The `provider_connection_binder` seed role
+
+Migration 0032 seeds a system role scoped to one capability:
+
+```
+Role:         provider_connection_binder
+Permission:   integration.bind
+Scope at:     user_roles.scope = {project_id: "..."} OR {team_id: "..."}
+is_system:    true (editable, not deletable)
+Auto-granted: no — operators grant explicitly
+```
+
+Team-scoped grants automatically cover the team's descendant project
+subtree via the team-aware resolver (the same expansion EPIC L Slice 2
+set up for `secret.approve`).
+
+### Capability helper pattern in the SPA
+
+The SPA decides which endpoint family to hit by reading two capability
+helpers (`canBindProviderConnectionOnEnv` + `canUnbindBinding`), each
+returning `{allowed, via}` where `via` is the permission that carried
+the action:
+
+| `via` | URL family used |
+|---|---|
+| `integration.edit` | `POST /provider-connections/:id/bindings` + `DELETE /provider-connection-bindings/:id` (admin) |
+| `integration.bind` | `POST /projects/:id/provider-connection-bindings` + `DELETE /projects/:id/provider-connection-bindings/:bid` (scoped) |
+| `null` | UI hides the action — server still enforces a stable 403 if anyone tries |
+
+The generic `hasPermission('integration.bind')` keeps its strict
+semantic everywhere else in the SPA — it returns `true` only for
+explicit `integration.bind` grants. The capability helpers are the
+ONLY place that knows "admin can act on every env including prod via
+the admin URLs."
+
+### Triage SQL — scoped bindings
+
+**What connections are currently bindable for self-service:**
+
+```sql
+SELECT id, name, type, cluster_name
+FROM provider_connections
+WHERE status = 'active' AND self_service_bindable = true
+ORDER BY name;
+```
+
+**Recent out-of-scope binding probes (security signal — operators
+should know when section heads are reaching outside their subtree):**
+
+```sql
+SELECT occurred_at, actor,
+       metadata->>'attempted_project_id'      AS attempted_project,
+       metadata->>'attempted_environment_id'  AS attempted_env,
+       metadata->>'actor_permission_attempted' AS perm
+FROM audit_events
+WHERE action = 'binding.denied_out_of_scope'
+ORDER BY occurred_at DESC
+LIMIT 20;
+```
+
+Note: this audit event deliberately omits `provider_connection_id` —
+the gate-order protection means the actor failed coverage BEFORE the
+connection was loaded, and including it would defeat the whole
+enumeration-leak protection.
+
+**Bind-path breakdown (last 7 days — who's using scoped vs admin?):**
+
+```sql
+SELECT
+  count(*) FILTER (WHERE metadata->>'actor_permission_used' = 'integration.bind') AS scoped_binds,
+  count(*) FILTER (WHERE metadata->>'actor_permission_used' = 'integration.edit') AS admin_binds
+FROM audit_events
+WHERE action = 'binding.create'
+  AND occurred_at > NOW() - INTERVAL '7 days';
+```
+
+**Bindings owned by a specific actor (incident response — when a
+section head's account is compromised):**
+
+```sql
+SELECT occurred_at,
+       metadata->>'provider_connection_id' AS connection_id,
+       metadata->>'project_id'             AS project_id,
+       metadata->>'environment_id'         AS environment_id
+FROM audit_events
+WHERE action IN ('binding.create', 'binding.delete')
+  AND actor = $1
+ORDER BY occurred_at DESC;
+```
+
+### Operator playbook
+
+**To enable a connection for self-service:**
+
+1. Sign in as platform admin (holds `integration.edit`).
+2. Navigate to `/admin/provider-connections` → edit the connection.
+3. Flip the `Self-service bindable` toggle on. Save.
+4. The connection now appears in scoped binders' picker drawer for
+   any project/env they cover (non-prod only).
+
+**To grant a section head bind capability:**
+
+1. Identify the team or project subtree the section head should cover.
+2. Assign the `provider_connection_binder` system role scoped to that
+   team_id (preferred — covers the descendant project subtree
+   automatically) or project_id (one project only).
+3. The section head can now bind any `self_service_bindable=true`
+   connection to non-prod envs in their subtree via the per-env card
+   on `/projects/:id/env/:env_id`.
+
+**To audit recent self-service activity:**
+
+Run the three SQL queries above. Combine with the existing
+`audit_events` correlation_id chain to reconstruct the full lifecycle
+of a binding from creation through eventual cross-team request use.
+
+**To revoke a section head's bind capability without touching their
+existing bindings:**
+
+1. Revoke the `provider_connection_binder` role assignment (via
+   `/admin/assignments` or `DELETE /user-roles/:id`).
+2. Their existing bindings remain in place — revoking the role does
+   NOT cascade-unbind. If you need to remove specific bindings, the
+   platform admin uses the admin URL family.
+
+### Observability — Prometheus counters
+
+EPIC Q added three counters scraped from `/metrics`:
+
+```
+provider_connection_bindings_created_total{permission_used, env_kind}
+provider_connection_bindings_deleted_total{permission_used, env_kind}
+provider_connection_bindings_denied_total{reason}
+```
+
+`reason` is a fixed low-cardinality set:
+`out_of_scope`, `prod_blocked`, `not_self_service_bindable`,
+`connection_disabled`, `connection_not_found`, `env_not_in_project`,
+`binding_exists`, `binding_not_found`.
+
+**LOW-CARDINALITY LOCK:** the counters never carry `actor_id`,
+`project_id`, `connection_id`, or `environment_id` as labels — those
+go to the audit trail, not Prometheus. A `denied_total{reason="prod_blocked"}`
+spike on the dashboard means "scoped binders are running into the
+prod wall a lot," not "any specific row is misconfigured." Pair with
+the audit triage SQL above to find the actor + project + env.
+
 ## Triage SQL
 
 **Active connections per cluster:**
@@ -409,10 +607,11 @@ The full P loop against the docker-compose stack from
 
 ## Error code reference
 
-All 19 stable codes from the EPIC P §6.A locked spec. Returned in the
-`{error_code, message, …}` envelope. The SPA maps every code to a
-friendly toast string via `providerConnectionErrorMessage`; operators
-running raw `curl` see the code in the body.
+23 stable codes — 19 from the EPIC P §6.A locked spec, plus 4 added
+by EPIC Q (api#99). Returned in the `{error_code, message, …}`
+envelope. The SPA maps every code to a friendly toast string via
+`providerConnectionErrorMessage`; operators running raw `curl` see
+the code in the body.
 
 | Code | Status | Meaning |
 |---|---|---|
@@ -428,13 +627,17 @@ running raw `curl` see the code in the body.
 | `invalid_discover_interval` | 400 | Interval outside 60..86400 |
 | `invalid_discover_status` | 400 | Transitioning to a non-terminal status (e.g. `MarkDiscoverFinished('running')`) |
 | `connection_in_use` | 409 | DELETE blocked; envelope adds `bindings_count` + `open_requests_count` |
-| `connection_disabled` | 409 | Action requires `status=active` (Discover now / cross-team destination) |
+| `connection_disabled` | 409 | Action requires `status=active` (Discover now / cross-team destination / scoped bind) |
 | `binding_exists` | 409 | (project, env) already bound |
-| `binding_not_found` | 404 | Unbind on a missing binding id |
+| `binding_not_found` | 404 | Unbind on a missing binding id, OR scoped DELETE where the URL `projectID` doesn't match the binding's stored `project_id` (§4 correction — NEVER `out_of_scope_binding` on mismatch, which would leak existence) |
 | `environment_not_in_project` | 400 | Binding references an env that doesn't belong to the project |
-| `project_id_required` | 400 | `environment_id` passed without `project_id` to the shared GET |
+| `project_id_required` | 400 | `environment_id` or `for_binding=true` passed without `project_id` to the shared GET |
 | `discovery_already_running` | 409 | Per-target Redis lock held — another Discover now is in flight |
 | `out_of_scope_project` | 403 | Dropdown caller lacks `secret.request` scoped to (project, env) |
+| `connection_not_self_service_bindable` | 403 | EPIC Q — scoped caller tried to bind a connection where `self_service_bindable=false`. Platform must opt the connection in via the admin SPA. |
+| `prod_binding_not_allowed_for_scope` | 403 | EPIC Q — scoped caller tried to bind / unbind on `env.kind='prod'`. Envelope includes `{"env_kind": "prod"}`. Admin path (`integration.edit`) required for prod bindings. |
+| `out_of_scope_binding` | 403 | EPIC Q — caller's `integration.bind` grant doesn't cover the target (project, env) per the team-aware resolver. Audit emits `binding.denied_out_of_scope` (security signal). |
+| `environment_id_required` | 400 | EPIC Q — the binder picker (`for_binding=true`) or scoped bind body lacks `environment_id`. Scoped binders never create project-wide bindings. |
 
 ## Related
 

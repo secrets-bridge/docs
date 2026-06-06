@@ -20,6 +20,7 @@ edit their permission lists but can't delete the rows.
 | `developer` | `secret.request`, `secret.reveal.direct`, `audit.read` | |
 | `value_provider` | `secret.value.provide` | Slice N seed — used for the [cross-team flow](../operations/cross-team-requests.md). Assignment **must** carry a `team_id` scope; the Assignments form gates global grants behind a type-to-confirm. |
 | `security_approver` | `secret.security.approve` | Slice N seed — holder can cast the security vote on cross-team requests where the bound workflow has `requires_security_approval=true`. |
+| `provider_connection_binder` | `integration.bind` | EPIC Q seed — section-head capability for [self-service provider connection binding](../operations/provider-connections.md#scoped-bindings-integrationbind). Assignment carries a `team_id` (covers descendant project subtree) or `project_id` (one project) scope. **Not** auto-granted to `integration.edit` holders — operators grant explicitly. |
 
 ## Catalog by group
 
@@ -65,7 +66,8 @@ edit their permission lists but can't delete the rows.
 
 | Permission | Description |
 |---|---|
-| `integration.edit` | Create / update / delete ArgoCD endpoints + GitOps app mappings + Provider connections (EPIC P, api#92). One permission, two surfaces. |
+| `integration.edit` | Create / update / delete ArgoCD endpoints + GitOps app mappings + Provider connections (EPIC P, api#92). One permission, three surfaces — does **not** auto-cover `integration.bind` server-side; the SPA's capability helper unifies them in the UI but the api treats each endpoint family strictly. |
+| `integration.bind` | Bind / unbind self-service-bindable provider connections on projects + environments you cover (EPIC Q, api#99). Scoped via the existing team-aware resolver. Never auto-covered by `integration.edit` — grant explicitly via the `provider_connection_binder` system role (or any custom role carrying this permission). Refuses prod envs, disabled connections, and connections without `self_service_bindable=true`. |
 
 ## Scoped permissions (today)
 
