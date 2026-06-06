@@ -65,7 +65,7 @@ edit their permission lists but can't delete the rows.
 
 | Permission | Description |
 |---|---|
-| `integration.edit` | Create / update / delete ArgoCD endpoints + GitOps app mappings. |
+| `integration.edit` | Create / update / delete ArgoCD endpoints + GitOps app mappings + Provider connections (EPIC P, api#92). One permission, two surfaces. |
 
 ## Scoped permissions (today)
 
