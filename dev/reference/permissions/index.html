@@ -998,6 +998,8 @@
       
         
       
+        
+      
     
     
       
@@ -1181,6 +1183,27 @@
   
   <span class="md-ellipsis">
     Reveal sessions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/cross-team-requests/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cross-team requests
   </span>
   
 
@@ -1721,20 +1744,34 @@ edit their permission lists but can't delete the rows.</p>
 <tr>
 <th>Role</th>
 <th>Permissions</th>
+<th>Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>admin</code></td>
 <td><code>role.edit</code>, <code>user_role.edit</code>, <code>workflow.edit</code>, <code>policy.edit</code>, <code>agent.mint</code>, <code>agent.revoke</code>, <code>secret.request</code>, <code>secret.approve</code>, <code>audit.read</code></td>
+<td></td>
 </tr>
 <tr>
 <td><code>approver</code></td>
 <td><code>secret.approve</code>, <code>audit.read</code></td>
+<td></td>
 </tr>
 <tr>
 <td><code>developer</code></td>
 <td><code>secret.request</code>, <code>secret.reveal.direct</code>, <code>audit.read</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>value_provider</code></td>
+<td><code>secret.value.provide</code></td>
+<td>Slice N seed — used for the <a href="../../operations/cross-team-requests/">cross-team flow</a>. Assignment <strong>must</strong> carry a <code>team_id</code> scope; the Assignments form gates global grants behind a type-to-confirm.</td>
+</tr>
+<tr>
+<td><code>security_approver</code></td>
+<td><code>secret.security.approve</code></td>
+<td>Slice N seed — holder can cast the security vote on cross-team requests where the bound workflow has <code>requires_security_approval=true</code>.</td>
 </tr>
 </tbody>
 </table>
@@ -1821,6 +1858,14 @@ edit their permission lists but can't delete the rows.</p>
 <td><code>secret.reveal.direct</code></td>
 <td>(Slice L4) Eligibility for the auto-executed direct-reveal path. The matched <code>policy_rules</code> row MUST ALSO have <code>direct_reveal_allowed=true</code> AND the environment's <code>kind</code> must be <code>non_prod</code>. Without all three, the user is routed through the standard request flow. PROD direct-reveal is impossible by construction.</td>
 </tr>
+<tr>
+<td><code>secret.value.provide</code></td>
+<td>(Slice N) Holder appears in the <a href="../../operations/cross-team-requests/">cross-team inbox</a> for the team scoped on the grant and can fill cross-team requests targeting it. <strong>Team-scoped</strong>: the grant carries <code>team_id</code> in <code>user_roles.scope</code>. The SPA sidebar's Inbox entry is fail-closed on this permission.</td>
+</tr>
+<tr>
+<td><code>secret.security.approve</code></td>
+<td>(Slice N) Holder can cast the security vote on cross-team requests where the bound workflow has <code>requires_security_approval=true</code>. <strong>Global in v1</strong>; per-project / per-environment scoping is deferred. Adding this permission to a role triggers a type-to-confirm gate in the SPA Roles editor.</td>
+</tr>
 </tbody>
 </table>
 <h3 id="observability">Observability<a class="headerlink" href="#observability" title="Permanent link">&para;</a></h3>
@@ -1861,6 +1906,7 @@ to a single project / environment / secret-ref prefix / provider:</p>
 <ul>
 <li><code>secret.request</code> (typical scope: <code>{project_id, environment}</code>)</li>
 <li><code>secret.approve</code> (typical scope: <code>{secret_ref_prefix, environment}</code>)</li>
+<li><code>secret.value.provide</code> (typical scope: <code>{team_id}</code> — required for the seed <code>value_provider</code> role)</li>
 <li><code>agent.mint</code> (typical scope: <code>{cluster}</code>)</li>
 <li><code>agent.revoke</code> (typical scope: <code>{cluster}</code>)</li>
 </ul>

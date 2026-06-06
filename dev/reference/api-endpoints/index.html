@@ -1000,6 +1000,8 @@
       
         
       
+        
+      
     
     
       
@@ -1183,6 +1185,27 @@
   
   <span class="md-ellipsis">
     Reveal sessions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/cross-team-requests/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cross-team requests
   </span>
   
 
@@ -1399,6 +1422,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#cross-team-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cross-team requests
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cross-team requests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#verifyresponse-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      VerifyResponse routing
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#reveal-sessions" class="md-nav__link">
     <span class="md-ellipsis">
       Reveal sessions
@@ -1599,6 +1646,30 @@
       Requests (access requests)
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cross-team-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cross-team requests
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cross-team requests">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#verifyresponse-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      VerifyResponse routing
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1931,6 +2002,104 @@ required to call it.</p>
 </tr>
 </tbody>
 </table>
+<h2 id="cross-team-requests">Cross-team requests<a class="headerlink" href="#cross-team-requests" title="Permanent link">&para;</a></h2>
+<p>Slice N — Team A → Team B value handoff. See
+<a href="../../operations/cross-team-requests/">Cross-team requests</a> for the
+operator model, state machine, and SoD matrix.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/requests/cross-team</code></td>
+<td><code>bearer + secret.request</code></td>
+<td><code>{target_team_id, target_project_id, target_environment_id, destination_provider_connection_id, destination_secret_ref, destination_keys[], justification}</code> → <code>AccessRequest</code>. Refuses <code>min_approvers ≥ 2</code> with <code>cross_team_min_approvers_unsupported</code>. NO values in body — destination_keys is the NAME list.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/requests/:id/fill</code></td>
+<td><code>bearer + secret.value.provide</code></td>
+<td><code>{key_values: {&lt;key&gt;: base64}, fill_comment?}</code>. Late writers get <code>fill_window_expired</code> (410). Same-actor-as-requester returns <code>separation_of_duties_violated</code> (403).</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/requests/:id/refuse</code></td>
+<td><code>bearer + secret.value.provide</code></td>
+<td><code>{reason}</code> (≥ 10 chars). Transitions to <code>refused</code>.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/requests/:id/verify</code></td>
+<td><code>bearer + secret.approve</code> or <code>secret.security.approve</code></td>
+<td><code>{decision, voted_as, comment?}</code> → <strong>200 OK</strong> with structured <code>VerifyResponse</code> (NOT 412 on partial votes). Body: <code>{vote_recorded, voted_as, source_votes, security_approval_required, security_vote_present, next_required[]}</code>.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/requests/inbox</code></td>
+<td><code>bearer + secret.value.provide</code></td>
+<td><code>?team_id=</code> narrows to one team's inbox. Returns <code>AccessRequest[]</code> with <code>pending_values</code> status. Fail-closed: empty array when caller covers no teams.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/requests/inbox/count</code></td>
+<td><code>bearer + secret.value.provide</code></td>
+<td><code>{total, per_team: [{team_id, team_name?, count}]}</code> — drives the sidebar badge.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/provider-connections?project_id=:id</code></td>
+<td>bearer</td>
+<td>Returns the connections bound to that project; the SPA's cross-team submit drawer hits this for the source project's destination dropdown.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="verifyresponse-routing">VerifyResponse routing<a class="headerlink" href="#verifyresponse-routing" title="Permanent link">&para;</a></h3>
+<p>The structured response means the SPA can render the right next-step
+toast without a second round trip:</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th><code>voted_as</code></th>
+<th><code>security_approval_required</code></th>
+<th><code>security_vote_present</code></th>
+<th><code>next_required[]</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source vote, no security required</td>
+<td><code>source</code></td>
+<td><code>false</code></td>
+<td><code>false</code></td>
+<td><code>[]</code> — transitions to <code>approved</code></td>
+</tr>
+<tr>
+<td>Source vote, security required, not yet voted</td>
+<td><code>source</code></td>
+<td><code>true</code></td>
+<td><code>false</code></td>
+<td><code>["security_approval"]</code> — SPA toast "your source vote was recorded; security approval still pending"</td>
+</tr>
+<tr>
+<td>Security vote, source already voted</td>
+<td><code>security</code></td>
+<td><code>true</code></td>
+<td><code>true</code></td>
+<td><code>[]</code> — transitions to <code>approved</code></td>
+</tr>
+</tbody>
+</table>
+<p>The SPA's <code>crossTeamErrorMessage(code)</code> maps the stable 403 codes to
+friendly strings; see the table at the bottom of
+<a href="../../operations/cross-team-requests/#error-code-reference">Cross-team requests</a>.</p>
 <h2 id="reveal-sessions">Reveal sessions<a class="headerlink" href="#reveal-sessions" title="Permanent link">&para;</a></h2>
 <p>Slice M — bulk reveal page surface. Open returns wrap_id + key_name
 handles; the SPA loops over them calling the single-shot

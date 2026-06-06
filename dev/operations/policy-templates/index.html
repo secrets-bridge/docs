@@ -1002,6 +1002,8 @@
       
         
       
+        
+      
     
     
       
@@ -1242,6 +1244,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#template-4-cross-team-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Template 4 — Cross-team workflows
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Template 4 — Cross-team workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#non-prod-cross-team-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      Non-prod cross-team template
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prod-cross-team-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      PROD cross-team template
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#hard-rules" class="md-nav__link">
     <span class="md-ellipsis">
       Hard rules
@@ -1280,6 +1315,27 @@
   
   <span class="md-ellipsis">
     Reveal sessions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cross-team-requests/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cross-team requests
   </span>
   
 
@@ -1558,6 +1614,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#template-4-cross-team-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      Template 4 — Cross-team workflows
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Template 4 — Cross-team workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#non-prod-cross-team-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      Non-prod cross-team template
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prod-cross-team-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      PROD cross-team template
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#hard-rules" class="md-nav__link">
     <span class="md-ellipsis">
       Hard rules
@@ -1772,9 +1861,65 @@ shapes.</p>
 <p>The <code>secret_ref_prefix</code> selector key is a <strong>prefix match</strong> — every
 ref starting with <code>billing/</code> falls into this rule. Combine with
 <code>environment: "prod"</code> to scope it tightly.</p>
-<p>Slice N (cross-team integration workflow) will add an explicit
-"Security approval" step as the third approver in this chain via a
-new <code>workflow_definitions</code> knob.</p>
+<p>Slice N (cross-team integration workflow) adds an explicit
+"Security approval" step as the third approver in this chain via the
+new <code>workflow_definitions.requires_security_approval</code> knob — see
+<a href="#template-4-cross-team-workflows">Cross-team workflows</a> below.</p>
+<h2 id="template-4-cross-team-workflows">Template 4 — Cross-team workflows<a class="headerlink" href="#template-4-cross-team-workflows" title="Permanent link">&para;</a></h2>
+<p>Cross-team requests carry their own workflow shape: Team B fills, an
+optional security approver verifies, then the agent writes. Two new
+<code>workflow_definitions</code> knobs configure this:</p>
+<table>
+<thead>
+<tr>
+<th>Knob</th>
+<th>Default</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fill_ttl_seconds</code></td>
+<td><code>86400</code> (24h)</td>
+<td>How long Team B has to fill before the request expires.</td>
+</tr>
+<tr>
+<td><code>requires_security_approval</code></td>
+<td><code>false</code></td>
+<td>When <code>true</code>, a <code>secret.security.approve</code> vote is needed in addition to source approval.</td>
+</tr>
+</tbody>
+</table>
+<p><code>min_approvers</code> for cross-team workflows is constrained to <code>{0, 1}</code>
+in v1; the submit endpoint refuses <code>≥ 2</code> with
+<code>cross_team_min_approvers_unsupported</code>.</p>
+<h3 id="non-prod-cross-team-template">Non-prod cross-team template<a class="headerlink" href="#non-prod-cross-team-template" title="Permanent link">&para;</a></h3>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">workflow_definitions</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">min_approvers</span><span class="p">,</span><span class="w"> </span><span class="n">fill_ttl_seconds</span><span class="p">,</span><span class="w"> </span><span class="n">requires_security_approval</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;cross-team-non-prod&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">86400</span><span class="p">,</span><span class="w"> </span><span class="k">false</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">policy_rules</span><span class="w"> </span><span class="p">(</span><span class="n">selector</span><span class="p">,</span><span class="w"> </span><span class="n">workflow_id</span><span class="p">,</span><span class="w"> </span><span class="n">priority</span><span class="p">)</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="s1">&#39;{&quot;environment_kind&quot;:&quot;non_prod&quot;,&quot;type&quot;:&quot;cross_team&quot;}&#39;</span><span class="p">::</span><span class="n">jsonb</span><span class="p">,</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">workflow_definitions</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;cross-team-non-prod&#39;</span><span class="p">),</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">  </span><span class="mi">100</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="prod-cross-team-template">PROD cross-team template<a class="headerlink" href="#prod-cross-team-template" title="Permanent link">&para;</a></h3>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">workflow_definitions</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">min_approvers</span><span class="p">,</span><span class="w"> </span><span class="n">fill_ttl_seconds</span><span class="p">,</span><span class="w"> </span><span class="n">requires_security_approval</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;cross-team-prod&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">43200</span><span class="p">,</span><span class="w"> </span><span class="k">true</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">policy_rules</span><span class="w"> </span><span class="p">(</span><span class="n">selector</span><span class="p">,</span><span class="w"> </span><span class="n">workflow_id</span><span class="p">,</span><span class="w"> </span><span class="n">priority</span><span class="p">)</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="s1">&#39;{&quot;environment_kind&quot;:&quot;prod&quot;,&quot;type&quot;:&quot;cross_team&quot;}&#39;</span><span class="p">::</span><span class="n">jsonb</span><span class="p">,</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">workflow_definitions</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;cross-team-prod&#39;</span><span class="p">),</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">  </span><span class="mi">100</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>The 12h fill window is intentional: PROD requests should not sit in
+limbo overnight; the shorter TTL forces escalation rather than silent
+expiry.</p>
+<p>See <a href="../cross-team-requests/">Cross-team requests</a> for the full state
+machine, SoD matrix, and triage SQL.</p>
 <h2 id="hard-rules">Hard rules<a class="headerlink" href="#hard-rules" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1808,6 +1953,8 @@ new <code>workflow_definitions</code> knob.</p>
   <code>kind</code>/<code>risk_level</code>/<code>description</code> model these policies key off.</li>
 <li><a href="../authentication/">Authentication</a> — <code>secret.reveal.direct</code>
   permission and the dev endpoints that consume policy decisions.</li>
+<li><a href="../cross-team-requests/">Cross-team requests</a> — the Slice N flow
+  the cross-team templates above target.</li>
 </ul>
 
 

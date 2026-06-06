@@ -7,19 +7,19 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Model an org as an N-level team tree and grant role scopes that fan out through the subtree.">
+        <meta name="description" content="Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
       
       
-        <link rel="canonical" href="https://secrets-bridge.io/dev/overview/teams-and-section-heads/">
+        <link rel="canonical" href="https://secrets-bridge.io/dev/operations/cross-team-requests/">
       
       
-        <link rel="prev" href="../architecture/">
+        <link rel="prev" href="../reveal-sessions/">
       
       
-        <link rel="next" href="../threat-model/">
+        <link rel="next" href="../config/">
       
       
       <link rel="icon" href="../../assets/favicon.svg">
@@ -27,7 +27,7 @@
     
     
   
-    <title>Teams and section heads - Secrets Bridge</title>
+    <title>Cross-team requests - Secrets Bridge</title>
   
 
     
@@ -72,14 +72,14 @@
   
 
   
-  <link rel="canonical" href="https://secrets-bridge.io/dev/overview/teams-and-section-heads/" />
+  <link rel="canonical" href="https://secrets-bridge.io/dev/operations/cross-team-requests/" />
 
   
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Secrets Bridge" />
-  <meta property="og:title" content="Teams and section heads" />
-  <meta property="og:description" content="Model an org as an N-level team tree and grant role scopes that fan out through the subtree." />
-  <meta property="og:url" content="https://secrets-bridge.io/dev/overview/teams-and-section-heads/" />
+  <meta property="og:title" content="Cross-team requests" />
+  <meta property="og:description" content="Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes." />
+  <meta property="og:url" content="https://secrets-bridge.io/dev/operations/cross-team-requests/" />
   <meta property="og:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -88,8 +88,8 @@
 
   
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Teams and section heads" />
-  <meta name="twitter:description" content="Model an org as an N-level team tree and grant role scopes that fan out through the subtree." />
+  <meta name="twitter:title" content="Cross-team requests" />
+  <meta name="twitter:description" content="Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes." />
   <meta name="twitter:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge — The brain behind your secrets." />
   
@@ -109,9 +109,9 @@
   {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    "headline": "Teams and section heads",
-    "description": "Model an org as an N-level team tree and grant role scopes that fan out through the subtree.",
-    "url": "https://secrets-bridge.io/dev/overview/teams-and-section-heads/",
+    "headline": "Cross-team requests",
+    "description": "Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes.",
+    "url": "https://secrets-bridge.io/dev/operations/cross-team-requests/",
     "image": "https://secrets-bridge.io/assets/og-banner.png",
     "publisher": {
       "@type": "Organization",
@@ -144,7 +144,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#teams-and-section-heads" class="md-skip">
+        <a href="#cross-team-requests" class="md-skip">
           Skip to content
         </a>
       
@@ -183,7 +183,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Teams and section heads
+              Cross-team requests
             
           </span>
         </div>
@@ -306,13 +306,11 @@
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../overview/" class="md-tabs__link">
           
   
     
@@ -368,11 +366,13 @@
         
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../operations/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
           
   
     
@@ -479,8 +479,6 @@
       
   
   
-    
-  
   
   
     
@@ -501,24 +499,23 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
+            <a href="../../overview/" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -529,13 +526,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Overview
@@ -551,7 +548,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
+      <a href="../../overview/architecture/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -569,30 +566,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Teams and section heads
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../overview/teams-and-section-heads/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -601,104 +578,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#the-model" class="md-nav__link">
-    <span class="md-ellipsis">
-      The model
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="The model">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#teams-the-tree" class="md-nav__link">
-    <span class="md-ellipsis">
-      teams — the tree
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#team_members-who-belongs" class="md-nav__link">
-    <span class="md-ellipsis">
-      team_members — who belongs
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#role-grants-scoped-to-a-team" class="md-nav__link">
-    <span class="md-ellipsis">
-      Role grants scoped to a team
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-section-head-pattern" class="md-nav__link">
-    <span class="md-ellipsis">
-      The "section head" pattern
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-requests-respect-the-scope" class="md-nav__link">
-    <span class="md-ellipsis">
-      How requests respect the scope
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-the-ui-uses-this" class="md-nav__link">
-    <span class="md-ellipsis">
-      How the UI uses this
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#practical-advice" class="md-nav__link">
-    <span class="md-ellipsis">
-      Practical advice
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -711,7 +590,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../threat-model/" class="md-nav__link">
+      <a href="../../overview/threat-model/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -732,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../glossary/" class="md-nav__link">
+      <a href="../../overview/glossary/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1094,6 +973,8 @@
       
   
   
+    
+  
   
   
     
@@ -1126,23 +1007,24 @@
     
     
       
+        
+        
+      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../operations/" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   <span class="md-ellipsis">
@@ -1153,13 +1035,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             Operations
@@ -1175,7 +1057,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/docker-compose/" class="md-nav__link">
+      <a href="../docker-compose/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1196,7 +1078,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/bootstrap/" class="md-nav__link">
+      <a href="../bootstrap/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1217,7 +1099,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/authentication/" class="md-nav__link">
+      <a href="../authentication/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1238,7 +1120,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/oidc-authentik/" class="md-nav__link">
+      <a href="../oidc-authentik/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1259,7 +1141,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/project-environments/" class="md-nav__link">
+      <a href="../project-environments/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1280,7 +1162,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/policy-templates/" class="md-nav__link">
+      <a href="../policy-templates/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1301,7 +1183,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/reveal-sessions/" class="md-nav__link">
+      <a href="../reveal-sessions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1319,10 +1201,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../operations/cross-team-requests/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Cross-team requests
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -1331,6 +1233,140 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#target-vs-destination" class="md-nav__link">
+    <span class="md-ellipsis">
+      Target vs destination
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#state-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      State machine
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#separation-of-duties" class="md-nav__link">
+    <span class="md-ellipsis">
+      Separation of duties
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#permissions-and-seed-roles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Permissions and seed roles
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-knobs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Workflow knobs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow knobs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-semantics-frozen-at-submit" class="md-nav__link">
+    <span class="md-ellipsis">
+      Workflow semantics frozen at submit
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hard-rules-what-never-touches-the-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      Hard rules — what NEVER touches the value
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worker-sweepers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Worker sweepers
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reveal-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reveal handling
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spa-surfaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      SPA surfaces
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#triage-sql" class="md-nav__link">
+    <span class="md-ellipsis">
+      Triage SQL
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-code-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error code reference
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1343,7 +1379,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/config/" class="md-nav__link">
+      <a href="../config/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1364,7 +1400,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../operations/troubleshooting/" class="md-nav__link">
+      <a href="../troubleshooting/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1569,37 +1605,55 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-model" class="md-nav__link">
+  <a href="#target-vs-destination" class="md-nav__link">
     <span class="md-ellipsis">
-      The model
+      Target vs destination
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="The model">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#state-machine" class="md-nav__link">
+    <span class="md-ellipsis">
+      State machine
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#separation-of-duties" class="md-nav__link">
+    <span class="md-ellipsis">
+      Separation of duties
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#permissions-and-seed-roles" class="md-nav__link">
+    <span class="md-ellipsis">
+      Permissions and seed roles
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-knobs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Workflow knobs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow knobs">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#teams-the-tree" class="md-nav__link">
+  <a href="#workflow-semantics-frozen-at-submit" class="md-nav__link">
     <span class="md-ellipsis">
-      teams — the tree
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#team_members-who-belongs" class="md-nav__link">
-    <span class="md-ellipsis">
-      team_members — who belongs
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#role-grants-scoped-to-a-team" class="md-nav__link">
-    <span class="md-ellipsis">
-      Role grants scoped to a team
+      Workflow semantics frozen at submit
     </span>
   </a>
   
@@ -1611,36 +1665,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-section-head-pattern" class="md-nav__link">
+  <a href="#hard-rules-what-never-touches-the-value" class="md-nav__link">
     <span class="md-ellipsis">
-      The "section head" pattern
+      Hard rules — what NEVER touches the value
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-requests-respect-the-scope" class="md-nav__link">
+  <a href="#worker-sweepers" class="md-nav__link">
     <span class="md-ellipsis">
-      How requests respect the scope
+      Worker sweepers
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-the-ui-uses-this" class="md-nav__link">
+  <a href="#reveal-handling" class="md-nav__link">
     <span class="md-ellipsis">
-      How the UI uses this
+      Reveal handling
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#practical-advice" class="md-nav__link">
+  <a href="#spa-surfaces" class="md-nav__link">
     <span class="md-ellipsis">
-      Practical advice
+      SPA surfaces
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#triage-sql" class="md-nav__link">
+    <span class="md-ellipsis">
+      Triage SQL
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-code-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      Error code reference
     </span>
   </a>
   
@@ -1661,7 +1733,7 @@
                   
 
   
-    <a href="https://github.com/secrets-bridge/edit/main/docs/overview/teams-and-section-heads.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/secrets-bridge/edit/main/docs/operations/cross-team-requests.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1670,192 +1742,507 @@
     
       
     
-    <a href="https://github.com/secrets-bridge/raw/main/docs/overview/teams-and-section-heads.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/secrets-bridge/raw/main/docs/operations/cross-team-requests.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="teams-and-section-heads">Teams and section heads<a class="headerlink" href="#teams-and-section-heads" title="Permanent link">&para;</a></h1>
-<p>Most organisations don't fit cleanly into a flat list of projects. A
-real engineering org has sections, sub-teams, leads, and members, and
-the people at each level need access to <em>their part of the world</em> —
-no more, no less. The platform models this with a first-class <strong>team
-tree</strong>: an N-level hierarchy where role grants scoped to a team
-automatically fan out through that team's entire subtree.</p>
-<h2 id="the-model">The model<a class="headerlink" href="#the-model" title="Permanent link">&para;</a></h2>
-<p>Three entities, one rule.</p>
-<h3 id="teams-the-tree"><code>teams</code> — the tree<a class="headerlink" href="#teams-the-tree" title="Permanent link">&para;</a></h3>
-<p>Each team carries a name, optional description, status (<code>active</code> /
-<code>archived</code>), and a nullable <code>parent_team_id</code>. Root teams have no
-parent; everything else is a descendant. The depth is N — the schema
-doesn't impose a limit.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>acme
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── platform
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├── platform-east
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   └── platform-west
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>└── security
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    └── security-compliance
-</span></code></pre></div>
-<p>Sibling names must be unique under the same parent — <code>acme/platform/ops</code>
-and <code>acme/security/ops</code> are both fine, two <code>ops</code> under <code>acme/platform</code>
-are not. The constraint is per-parent, so renaming or re-parenting
-never breaks cousins.</p>
-<p>A team cannot be deleted while it has children — unparent or delete
-those first. <code>team_members</code> rows cascade-delete with the team they
-belong to (the user account stays; only the membership row goes).</p>
-<h3 id="team_members-who-belongs"><code>team_members</code> — who belongs<a class="headerlink" href="#team_members-who-belongs" title="Permanent link">&para;</a></h3>
-<p>A simple <code>(team_id, user_id)</code> join. <strong>Structural only</strong> — membership
-does NOT grant any permission on its own. The platform deliberately
-keeps "who you are" and "what you can do" in two tables so you can
-reorganise teams without rewriting RBAC.</p>
-<h3 id="role-grants-scoped-to-a-team">Role grants scoped to a team<a class="headerlink" href="#role-grants-scoped-to-a-team" title="Permanent link">&para;</a></h3>
-<p>The connecting tissue. A row in <code>user_roles</code> carries a <code>scope</code> JSON
-object; setting <code>scope.team_id = &lt;team&gt;</code> tells the access resolver
-<em>"this grant applies to that team's entire subtree"</em>.</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">&quot;user_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;alice&quot;</span><span class="p">,</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">&quot;role_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;approver-role&gt;&quot;</span><span class="p">,</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;team_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;acme/platform&quot;</span><span class="w"> </span><span class="p">}</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>Alice is now an approver for everything inside <code>platform</code> and every
-descendant team. She can approve <code>platform-east</code> requests, approve
-<code>platform-west</code> requests, and approve requests for a new sub-team
-created under <code>platform</code> tomorrow — no follow-up grant needed.</p>
-<h2 id="the-section-head-pattern">The "section head" pattern<a class="headerlink" href="#the-section-head-pattern" title="Permanent link">&para;</a></h2>
-<p>The most useful shape this model unlocks:</p>
-<ol>
-<li><strong>Build the tree</strong> under <code>/admin/teams</code>. Reflect your org chart —
-   a top-level team per section, child teams per squad, grandchild
-   teams if you have feature pods.</li>
-<li><strong>Assign projects to teams</strong> by setting <code>project.team_id</code> on
-   create (or via <code>PUT /projects/:id/team</code> after). This is the wiring
-   that lets the access resolver expand a team-scoped grant into a
-   set of accessible projects.</li>
-<li><strong>Grant the section head</strong> on <code>/admin/assignments</code>: pick the user,
-   pick the role (<code>secret.approve</code> for an approver, <code>secret.list +
-   secret.request</code> for a developer-style lead), and pick the section
-   team in the Team dropdown. Leave Project unset — the team scope
-   makes it implicit.</li>
-</ol>
-<p>That single grant produces this behaviour:</p>
+<h1 id="cross-team-requests">Cross-team requests<a class="headerlink" href="#cross-team-requests" title="Permanent link">&para;</a></h1>
+<p>A cross-team request is a value handoff between two teams that don't
+share direct access to each other's secrets. <strong>Team A</strong> owns a workload
+that needs a value. <strong>Team B</strong> owns the value. Team A submits the
+request; a Team B member fills it; a Team A approver (and, when policy
+requires it, a security approver) verifies; the agent writes the value
+into Team A's provider. The original Team B member never touches Team A's
+workload, and Team A never sees Team B's source of truth.</p>
+<p>Cross-team requests are the safe alternative to "share me your prod
+secret" Slack messages — every value handoff lands in the audit log
+with a justification, a workflow snapshot, and a separation-of-duties
+trail.</p>
+<p>This page covers the operator-facing model: the state machine, the
+permission matrix, the workflow knobs you can tune, and the SQL +
+metrics you'll use to triage. The SPA flow is described from the user's
+point of view inline; the API contract is at
+<a href="../../reference/api-endpoints/#cross-team-requests">HTTP API endpoints — Cross-team requests</a>.</p>
+<h2 id="target-vs-destination">Target vs destination<a class="headerlink" href="#target-vs-destination" title="Permanent link">&para;</a></h2>
+<p>Every cross-team request carries two scopes. They look similar but
+mean opposite things, and operator queries get them confused often
+enough that we make the distinction here.</p>
 <table>
 <thead>
 <tr>
-<th>The section head's view</th>
-<th>How it works</th>
+<th>Scope</th>
+<th>Means</th>
+<th>Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>/secrets</code> shows every secret bound to every project under their section</td>
-<td><code>EffectiveProjectAccess</code> expands <code>team_id</code> → descendant teams (recursive CTE) → projects with <code>team_id</code> in that set</td>
+<td><strong>Target</strong> (<code>target_team_id</code> + <code>target_project_id</code> + <code>target_environment_id</code>)</td>
+<td>The team / project / env that <strong>provides</strong> the value. Team B's territory. The inbox is computed against this.</td>
+<td><code>team-alpha</code> / <code>team-alpha-billing</code> / <code>prod</code></td>
 </tr>
 <tr>
-<td><code>/requests</code> lists requests from any project under their section</td>
-<td>Same expansion, filtered server-side</td>
-</tr>
-<tr>
-<td>Approve / Reject works for any of those requests</td>
-<td>The approve gate runs <code>checkApproverScope</code> with the same resolver</td>
-</tr>
-<tr>
-<td>Approve / Reject <strong>refuses</strong> on any request OUTSIDE their subtree</td>
-<td>Returns 403 with the stable string <code>out_of_scope_project</code></td>
-</tr>
-<tr>
-<td>New sub-team added later under their section</td>
-<td>Auto-covered — no follow-up grant</td>
-</tr>
-<tr>
-<td>Project re-assigned to a different team</td>
-<td>Auto-shifts in/out of scope — no manual cleanup</td>
+<td><strong>Destination</strong> (<code>destination_provider_connection_id</code> + <code>destination_secret_ref</code> + <code>destination_keys</code>)</td>
+<td>Where the value <strong>lands</strong> after approval. Team A's territory. The agent writes here.</td>
+<td><code>vault-prod</code> / <code>tenant-a/web/db</code> / <code>["DB_PASSWORD", "DB_USER"]</code></td>
 </tr>
 </tbody>
 </table>
-<h2 id="how-requests-respect-the-scope">How requests respect the scope<a class="headerlink" href="#how-requests-respect-the-scope" title="Permanent link">&para;</a></h2>
-<p>The check fires at submit time AND at approve time, on top of the
-normal <code>secret.list</code> / <code>secret.request</code> / <code>secret.approve</code> permission
-check:</p>
-<ul>
-<li><strong>Submit gate</strong> — <code>Requests.WithTenancyGate</code> validates the caller's
-  <code>secret.request</code> grants cover the request's <code>project_id</code>, op is in
-  the binding's <code>allowed_ops</code>, and every requested key is in
-  <code>allowed_keys</code> (when non-null). Stable errors:
-  <code>out_of_scope_project</code>, <code>out_of_scope_op</code>, <code>out_of_scope_key</code>.</li>
-<li><strong>Approve gate</strong> — <code>checkApproverScope</code> validates the voter's
-  <code>secret.approve</code> grants cover the request's <code>project_id</code>. Same
-  team-subtree expansion as the submit gate.</li>
-</ul>
-<p>Both gates have the same back-compat behaviour: legacy requests whose
-<code>TargetScope["project_id"]</code> isn't a UUID bypass the team check (so
-installs without scoped projects keep working byte-for-byte).</p>
-<h2 id="how-the-ui-uses-this">How the UI uses this<a class="headerlink" href="#how-the-ui-uses-this" title="Permanent link">&para;</a></h2>
-<p>The SPA hydrates a single <code>/users/me</code> call after login:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w">           </span><span class="s2">&quot;&lt;uuid&gt;&quot;</span><span class="p">,</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">&quot;email&quot;</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;alice@example.com&quot;</span><span class="p">,</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">&quot;display_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nt">&quot;permissions&quot;</span><span class="p">:</span><span class="w">  </span><span class="p">[</span><span class="s2">&quot;secret.list&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;secret.request&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;secret.approve&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">],</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="nt">&quot;teams&quot;</span><span class="p">:</span><span class="w">        </span><span class="p">[{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;...&quot;</span><span class="p">,</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;platform&quot;</span><span class="p">,</span><span class="nt">&quot;parent_team_id&quot;</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="s2">&quot;active&quot;</span><span class="p">}],</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nt">&quot;projects&quot;</span><span class="p">:</span><span class="w">     </span><span class="p">[{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="s2">&quot;...&quot;</span><span class="p">,</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;Billing&quot;</span><span class="p">,</span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="s2">&quot;active&quot;</span><span class="p">}]</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">}</span>
+<p>The destination provider connection MUST be bound to the <strong>source</strong>
+project (Team A's project). The submit endpoint rejects
+<code>destination_provider_unbound</code> if the provider connection doesn't
+belong to the source project. This is the architectural fence that
+keeps Team B from accidentally writing into Team A's neighbours.</p>
+<h2 id="state-machine">State machine<a class="headerlink" href="#state-machine" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>                       ┌─ refused (Team B refused)
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                       │
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        submit ─→ pending_values ─→ pending_verification ─→ approved ─→ executed
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                       │                  │                    │
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                       │                  └─ rejected          └─ failed
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                       │                  
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                       └─ expired (fill_ttl elapsed)
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                       │
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                       └─ cancelled (requester withdrew)
 </span></code></pre></div>
-<ul>
-<li><strong>Sidebar</strong> items gate on the <code>permissions</code> array. The admin
-  section hides entirely if no admin permission is held; individual
-  nav items hide if their gating permission is missing.</li>
-<li><strong><code>/secrets</code></strong> is filtered server-side to only the projects in
-  <code>projects</code> (or every project if the caller holds a global grant).</li>
-<li><strong>Submit drawer</strong> defaults to <em>"From my bindings"</em> mode for scoped
-  users: pick a project from <code>projects</code>, pick one of its bound
-  secrets, the form auto-fills provider type + ref + the allowed-ops
-  / allowed-keys constraints. Admins (holders of <code>team.edit</code>) start
-  on the free-form mode for onboarding new bindings.</li>
-<li><strong><code>/me</code></strong> profile page renders the full payload — identity, the
-  permission set, direct team memberships, and the accessible
-  projects, all read from the same <code>AuthContext</code>.</li>
-</ul>
-<p>Permission gating is strictly <strong>fail-closed</strong>: until <code>/users/me</code>
-returns, <code>hasPermission(...)</code> is <code>false</code> for every key. A session
-restored from <code>sessionStorage</code> shows the Dashboard + a <em>"Loading
-permissions…"</em> line while the request is in flight — there is no
-flash of admin nav for non-admins on rehydration.</p>
-<h2 id="practical-advice">Practical advice<a class="headerlink" href="#practical-advice" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Keep teams shallow when you can.</strong> Two or three levels covers
-  most orgs. The recursive CTE handles depth N just fine, but a
-  flatter tree is easier for admins to reason about.</li>
-<li><strong>Don't reuse <code>team_members</code> as a permission system.</strong> Membership
-  is structural metadata. Always grant capabilities via a role +
-  scope.</li>
-<li><strong>Archive instead of delete</strong> when a team is being wound down. The
-  status flag preserves audit trails — requests filed against
-  projects in an archived team subtree still resolve. Delete only
-  when the team is truly empty and the historical references are no
-  longer interesting.</li>
-<li><strong>A grant can target both <code>project_id</code> and <code>team_id</code></strong> in the same
-  scope object. The resolver computes the union, so a user can be
-  "the section head over <code>platform</code>" PLUS "co-owner of one specific
-  project in <code>security</code>" via two separate grant rows or one combined
-  scope.</li>
-<li><strong>Free-form mode in the submit drawer still works.</strong> It's the
-  default for admins, who are usually the ones submitting the first
-  request against a brand-new binding. The api-side gate is the same
-  in both modes — bound mode is a UX overlay that keeps scoped users
-  from constructing requests that would 403.</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Meaning</th>
+<th>Who transitions it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pending_values</code></td>
+<td>Waiting on Team B to fill</td>
+<td>Filler (POST /fill → pending_verification) or Refuser (POST /refuse → refused) or sweeper (TTL → expired) or requester (POST /cancel → cancelled)</td>
+</tr>
+<tr>
+<td><code>pending_verification</code></td>
+<td>Filled, waiting on source (and optionally security) approval</td>
+<td>Source approver via POST /verify (<code>voted_as=source</code>); security approver via POST /verify (<code>voted_as=security</code>)</td>
+</tr>
+<tr>
+<td><code>approved</code></td>
+<td>All required votes recorded; job enqueued</td>
+<td>JobService transitions it on agent's <code>succeeded</code> (→ executed) or <code>failed</code> (→ failed)</td>
+</tr>
+<tr>
+<td><code>executed</code></td>
+<td>Agent wrote the value to the destination provider</td>
+<td>Terminal</td>
+</tr>
+<tr>
+<td><code>failed</code></td>
+<td>Agent reported job failure</td>
+<td>Terminal</td>
+</tr>
+<tr>
+<td><code>refused</code></td>
+<td>Team B declined to provide the value</td>
+<td>Terminal — requester sees the refuse reason</td>
+</tr>
+<tr>
+<td><code>rejected</code></td>
+<td>Source or security approver rejected</td>
+<td>Terminal — requester sees the rejection reason</td>
+</tr>
+<tr>
+<td><code>cancelled</code></td>
+<td>Requester withdrew</td>
+<td>Terminal</td>
+</tr>
+<tr>
+<td><code>expired</code></td>
+<td>Fill window elapsed before Team B filled</td>
+<td>Terminal</td>
+</tr>
+</tbody>
+</table>
+<p>Terminal states never transition. The
+<a href="#worker-sweepers">N4 worker sweeper</a> handles the expired path so the
+observable state catches up even when no fill attempt arrives.</p>
+<h2 id="separation-of-duties">Separation of duties<a class="headerlink" href="#separation-of-duties" title="Permanent link">&para;</a></h2>
+<p>The cross-team flow enforces a four-actor matrix. No single user can
+play more than one role on the same request — the API checks at every
+mutation:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>requester  ≠  filler  ≠  source approver  ≠  security approver
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Blocked when actor is also…</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST /fill</td>
+<td>requester</td>
+</tr>
+<tr>
+<td>POST /verify (<code>voted_as=source</code>)</td>
+<td>requester or filler</td>
+</tr>
+<tr>
+<td>POST /verify (<code>voted_as=security</code>)</td>
+<td>requester or filler or the source approver on this same request</td>
+</tr>
+</tbody>
+</table>
+<p><code>secret.security.approve</code> is a <strong>global</strong> permission in v1, so a single
+user can carry both source and security capability. The SoD check
+catches the case where they try to cast both votes on the same request
+— the second attempt returns 403 with
+<code>separation_of_duties_violated</code>.</p>
+<p>The SPA mirrors the API: the verify card hides the buttons the caller
+cannot use AND renders the reason ("You provided the values for this
+request.") so the operator knows they aren't broken — they're blocked
+by design.</p>
+<h2 id="permissions-and-seed-roles">Permissions and seed roles<a class="headerlink" href="#permissions-and-seed-roles" title="Permanent link">&para;</a></h2>
+<p>Two new permissions land with Slice N:</p>
+<table>
+<thead>
+<tr>
+<th>Permission</th>
+<th>Scope</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>secret.value.provide</code></td>
+<td><strong>Team-scoped</strong> (<code>team_id</code> in <code>user_roles.scope</code>)</td>
+<td>Holder appears in the inbox for that team and can fill cross-team requests targeting it. The sidebar Inbox entry only renders for users holding this permission at any scope.</td>
+</tr>
+<tr>
+<td><code>secret.security.approve</code></td>
+<td><strong>Global in v1</strong></td>
+<td>Holder can cast the security vote on cross-team requests where the bound workflow has <code>requires_security_approval=true</code>. Per-project / per-environment scoping is deferred to a follow-up.</td>
+</tr>
+</tbody>
+</table>
+<p>Two system roles ship as seed:</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Permissions</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>value_provider</code></td>
+<td><code>secret.value.provide</code></td>
+<td>Assignment <strong>must</strong> carry a <code>team_id</code> in scope. The SPA's Assignments form enforces this with a "no team scope = global inbox access" type-to-confirm gate.</td>
+</tr>
+<tr>
+<td><code>security_approver</code></td>
+<td><code>secret.security.approve</code></td>
+<td>Used carefully — a holder can bypass the source-side workflow on cross-team requests. The Roles editor surfaces a type-to-confirm dialog the first time <code>secret.security.approve</code> is added to a role.</td>
+</tr>
+</tbody>
+</table>
+<p>Both are <code>is_system=true</code>. The permission strings are editable, but the
+roles cannot be deleted — <code>DELETE</code> returns 409 <code>system_row</code>.</p>
+<h2 id="workflow-knobs">Workflow knobs<a class="headerlink" href="#workflow-knobs" title="Permanent link">&para;</a></h2>
+<p><code>workflow_definitions</code> gets two new columns for cross-team semantics:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Default</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fill_ttl_seconds</code></td>
+<td><code>86400</code> (24h)</td>
+<td>How long Team B has to fill before the sweeper expires the request</td>
+</tr>
+<tr>
+<td><code>requires_security_approval</code></td>
+<td><code>false</code></td>
+<td>When <code>true</code>, the bound request also needs a <code>voted_as=security</code> approve before transitioning to <code>approved</code>. PROD workflows typically flip this on.</td>
+</tr>
+</tbody>
+</table>
+<p>The full <code>min_approvers</code> table for cross-team:</p>
+<table>
+<thead>
+<tr>
+<th><code>min_approvers</code></th>
+<th>Semantics</th>
+<th>Supported in v1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0</code></td>
+<td>Auto-approve on fill — verify is a no-op</td>
+<td>✓</td>
+</tr>
+<tr>
+<td><code>1</code></td>
+<td>Single source approver required</td>
+<td>✓</td>
+</tr>
+<tr>
+<td><code>≥ 2</code></td>
+<td>Multi-approver source side</td>
+<td><strong>No</strong> — <code>SubmitCrossTeam</code> returns 412 <code>cross_team_min_approvers_unsupported</code></td>
+</tr>
+</tbody>
+</table>
+<p>Multi-approver cross-team is deferred to v2 because it requires a
+distinct approvals counter on the request row vs the existing
+<code>approvals</code> table. Operators who need it today are blocked at submit;
+the error gives the SPA a clear toast.</p>
+<h3 id="workflow-semantics-frozen-at-submit">Workflow semantics frozen at submit<a class="headerlink" href="#workflow-semantics-frozen-at-submit" title="Permanent link">&para;</a></h3>
+<p>The bound workflow's <code>requires_security_approval</code> and <code>min_approvers</code>
+values are snapshotted onto the request row at submit time
+(<code>snap_requires_security_approval</code> + <code>snap_min_approvers</code> columns) so
+that a later workflow edit doesn't retroactively change in-flight
+semantics. The verify endpoint reads from the snapshot, not the live
+workflow row.</p>
+<p>This is load-bearing: if you turn <code>requires_security_approval=false</code>
+to unblock an emergency, every request <strong>submitted after that change</strong>
+gets the new behaviour, but every request <strong>already in flight</strong> still
+needs the security vote it was submitted under. The audit log records
+both the live workflow ID and the snapshotted bools.</p>
+<h2 id="hard-rules-what-never-touches-the-value">Hard rules — what NEVER touches the value<a class="headerlink" href="#hard-rules-what-never-touches-the-value" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Enforcement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL columns</td>
+<td><code>access_requests</code> carries no value columns; the agent's job consumes wraps via the same KMS-envelope path as the patch flow. The N1 schema CHECK constraints reject any cross-team row that's missing the target / destination / snapshot fields.</td>
+</tr>
+<tr>
+<td>Redis</td>
+<td>Used only for the inbox-count cache + idempotency tokens — no value cache.</td>
+</tr>
+<tr>
+<td>Logs</td>
+<td>The fill / refuse / verify handlers never log values, only key NAMES + actor identifiers.</td>
+</tr>
+<tr>
+<td>API responses</td>
+<td>The verify card response is value-free (no <code>content_hash</code>, no <code>byte_length</code>, no preview). The reveal session response is single-shot through the existing M-slice path.</td>
+</tr>
+<tr>
+<td>Browser state</td>
+<td>The SPA's fill page wipes the values from React state on submit success AND on component unmount. No localStorage / sessionStorage / IndexedDB writes anywhere in the flow.</td>
+</tr>
+<tr>
+<td>Audit metadata</td>
+<td>The audit log captures actor + key NAMES + workflow snapshot + correlation_id — never the value or any derivable canary.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="worker-sweepers">Worker sweepers<a class="headerlink" href="#worker-sweepers" title="Permanent link">&para;</a></h2>
+<p>The <code>cross-team-fill-window-expired</code> sweeper closes the fill window
+for any <code>pending_values</code> request whose <code>fill_expires_at</code> has passed.</p>
+<table>
+<thead>
+<tr>
+<th>Knob</th>
+<th>Default</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SB_WORKER_CROSS_TEAM_FILL_EXPIRED_INTERVAL</code></td>
+<td><code>30s</code></td>
+<td>How often the sweeper runs. 30s is the right cadence because <code>fill_ttl_seconds</code> is hours-scale by default.</td>
+</tr>
+</tbody>
+</table>
+<p>The sweeper is defense in depth: the API's <code>Fill</code> check already
+rejects late writers with <code>fill_window_expired</code>. The sweeper ensures
+observable state (the inbox list, the request detail page, the
+metrics) catches up within 30s even when no fill attempt arrives to
+trigger that rejection.</p>
+<p>Multi-replica safe — each worker takes a Redis lock on
+<code>worker:sweeper:cross-team-fill-window-expired</code> per tick. Lock
+contention is a metric, not a warning log.</p>
+<h2 id="reveal-handling">Reveal handling<a class="headerlink" href="#reveal-handling" title="Permanent link">&para;</a></h2>
+<p>Once a cross-team request lands in <code>executed</code>, the value is in the
+destination provider — but the requester typically wants to see the
+value once, in the SPA, to confirm the flow worked. That's exactly
+what the existing reveal session page handles (Slice M).</p>
+<p>The Slice M4 page accepts both <code>type='read'</code> and (after Slice N3)
+<code>type='cross_team'</code> requests. The requester clicks "Reveal" from
+the request detail page; the SPA opens a single-shot bulk session;
+the page expires on TTL or on hide-now exactly like read flow.</p>
+<p>The reveal session is bound to the <strong>requester</strong>, not the filler. The
+filler never sees the value after submitting it — they handed it off
+and the next time it appears, it's in the requester's provider.</p>
+<h2 id="spa-surfaces">SPA surfaces<a class="headerlink" href="#spa-surfaces" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>Route</th>
+<th>Caller permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Submit drawer</td>
+<td><code>/projects/:id/env/:env_id</code> (third CTA)</td>
+<td><code>secret.request</code></td>
+</tr>
+<tr>
+<td>Inbox list</td>
+<td><code>/inbox</code></td>
+<td><code>secret.value.provide</code> (any scope — fail-closed sidebar)</td>
+</tr>
+<tr>
+<td>Fill / refuse</td>
+<td><code>/inbox/:request_id</code></td>
+<td>Same</td>
+</tr>
+<tr>
+<td>Verify card</td>
+<td><code>/requests/:id</code></td>
+<td><code>secret.approve</code> (source) and/or <code>secret.security.approve</code> (security)</td>
+</tr>
+<tr>
+<td>Roles editor type-to-confirm</td>
+<td><code>/admin/roles</code></td>
+<td><code>role.edit</code></td>
+</tr>
+<tr>
+<td>Assignments team-pick gate</td>
+<td><code>/admin/assignments</code></td>
+<td><code>user_role.edit</code></td>
+</tr>
+</tbody>
+</table>
+<p>Every cross-team mutation in the SPA invalidates both the request
+detail query and the inbox queries so the sidebar badge updates on
+the same tick the request transitions.</p>
+<h2 id="triage-sql">Triage SQL<a class="headerlink" href="#triage-sql" title="Permanent link">&para;</a></h2>
+<p>These queries assume <code>psql</code> against the API's Postgres.</p>
+<p><strong>Open inbox by team</strong></p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">requester_id</span><span class="p">,</span><span class="w"> </span><span class="n">fill_expires_at</span><span class="p">,</span><span class="w"> </span><span class="n">justification</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">access_requests</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;cross_team&#39;</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;pending_values&#39;</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">target_team_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">fill_expires_at</span><span class="p">;</span>
+</span></code></pre></div>
+<p><strong>Pending verification per project</strong></p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">requester_id</span><span class="p">,</span><span class="w"> </span><span class="n">filled_by_user_id</span><span class="p">,</span><span class="w"> </span><span class="n">filled_at</span><span class="p">,</span><span class="w"> </span><span class="n">fill_comment</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">access_requests</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;cross_team&#39;</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;pending_verification&#39;</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">source_project_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">filled_at</span><span class="p">;</span>
+</span></code></pre></div>
+<p><strong>Expired in the last 24h</strong> (sweeper-flipped + service-layer-rejected)</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">requester_id</span><span class="p">,</span><span class="w"> </span><span class="n">target_team_id</span><span class="p">,</span><span class="w"> </span><span class="n">fill_expires_at</span><span class="p">,</span><span class="w"> </span><span class="n">updated_at</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">access_requests</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="k">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;cross_team&#39;</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;expired&#39;</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">updated_at</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">now</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">interval</span><span class="w"> </span><span class="s1">&#39;24 hours&#39;</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">updated_at</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+</span></code></pre></div>
+<p><strong>Audit chain for one request</strong> — every transition surfaces with the
+shared <code>correlation_id</code>:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">created_at</span><span class="p">,</span><span class="w"> </span><span class="n">action</span><span class="p">,</span><span class="w"> </span><span class="n">actor</span><span class="p">,</span><span class="w"> </span><span class="n">metadata</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">audit_events</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">correlation_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">created_at</span><span class="p">;</span>
+</span></code></pre></div>
+<h2 id="error-code-reference">Error code reference<a class="headerlink" href="#error-code-reference" title="Permanent link">&para;</a></h2>
+<p>The API returns stable codes the SPA maps to friendly messages. Operators
+running curl smoke tests see the raw code in the response body.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>out_of_scope_team</code></td>
+<td>403</td>
+<td>Caller doesn't cover this team's inbox</td>
+</tr>
+<tr>
+<td><code>out_of_scope_project</code></td>
+<td>403</td>
+<td>Caller doesn't have access to this project</td>
+</tr>
+<tr>
+<td><code>separation_of_duties_violated</code></td>
+<td>403</td>
+<td>Same actor tried to play two roles on one request</td>
+</tr>
+<tr>
+<td><code>cross_team_invalid_target</code></td>
+<td>412</td>
+<td>Target team / project / env chain doesn't resolve</td>
+</tr>
+<tr>
+<td><code>cross_team_destination_unbound</code></td>
+<td>412</td>
+<td>Destination provider connection isn't bound to the source project</td>
+</tr>
+<tr>
+<td><code>cross_team_keys_empty</code></td>
+<td>412</td>
+<td><code>destination_keys</code> is empty</td>
+</tr>
+<tr>
+<td><code>cross_team_already_filled</code></td>
+<td>409</td>
+<td>Request is past <code>pending_values</code></td>
+</tr>
+<tr>
+<td><code>fill_window_expired</code></td>
+<td>410</td>
+<td>TTL elapsed before fill</td>
+</tr>
+<tr>
+<td><code>cross_team_min_approvers_unsupported</code></td>
+<td>412</td>
+<td>Workflow <code>min_approvers ≥ 2</code> is not supported in v1</td>
+</tr>
+<tr>
+<td><code>cross_team_status_invalid_transition</code></td>
+<td>409</td>
+<td>Action doesn't apply to current status</td>
+</tr>
+<tr>
+<td><code>duplicate_vote</code></td>
+<td>409</td>
+<td>Caller already voted on this request</td>
+</tr>
+</tbody>
+</table>
 
 
 
 
 
 
-
-  
-  
 
 
 
