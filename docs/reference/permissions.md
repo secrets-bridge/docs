@@ -13,11 +13,13 @@ chip picker stays in sync with what the api actually understands.
 Three roles ship as system seeds (migration 0005). Operators can
 edit their permission lists but can't delete the rows.
 
-| Role | Permissions |
-|---|---|
-| `admin` | `role.edit`, `user_role.edit`, `workflow.edit`, `policy.edit`, `agent.mint`, `agent.revoke`, `secret.request`, `secret.approve`, `audit.read` |
-| `approver` | `secret.approve`, `audit.read` |
-| `developer` | `secret.request`, `secret.reveal.direct`, `audit.read` |
+| Role | Permissions | Notes |
+|---|---|---|
+| `admin` | `role.edit`, `user_role.edit`, `workflow.edit`, `policy.edit`, `agent.mint`, `agent.revoke`, `secret.request`, `secret.approve`, `audit.read` | |
+| `approver` | `secret.approve`, `audit.read` | |
+| `developer` | `secret.request`, `secret.reveal.direct`, `audit.read` | |
+| `value_provider` | `secret.value.provide` | Slice N seed — used for the [cross-team flow](../operations/cross-team-requests.md). Assignment **must** carry a `team_id` scope; the Assignments form gates global grants behind a type-to-confirm. |
+| `security_approver` | `secret.security.approve` | Slice N seed — holder can cast the security vote on cross-team requests where the bound workflow has `requires_security_approval=true`. |
 
 ## Catalog by group
 
@@ -50,6 +52,8 @@ edit their permission lists but can't delete the rows.
 | `secret.request` | Submit a read or patch request. |
 | `secret.approve` | Vote on a pending request (approve or reject). |
 | `secret.reveal.direct` | (Slice L4) Eligibility for the auto-executed direct-reveal path. The matched `policy_rules` row MUST ALSO have `direct_reveal_allowed=true` AND the environment's `kind` must be `non_prod`. Without all three, the user is routed through the standard request flow. PROD direct-reveal is impossible by construction. |
+| `secret.value.provide` | (Slice N) Holder appears in the [cross-team inbox](../operations/cross-team-requests.md) for the team scoped on the grant and can fill cross-team requests targeting it. **Team-scoped**: the grant carries `team_id` in `user_roles.scope`. The SPA sidebar's Inbox entry is fail-closed on this permission. |
+| `secret.security.approve` | (Slice N) Holder can cast the security vote on cross-team requests where the bound workflow has `requires_security_approval=true`. **Global in v1**; per-project / per-environment scoping is deferred. Adding this permission to a role triggers a type-to-confirm gate in the SPA Roles editor. |
 
 ### Observability
 
@@ -72,6 +76,7 @@ to a single project / environment / secret-ref prefix / provider:
 
 - `secret.request` (typical scope: `{project_id, environment}`)
 - `secret.approve` (typical scope: `{secret_ref_prefix, environment}`)
+- `secret.value.provide` (typical scope: `{team_id}` — required for the seed `value_provider` role)
 - `agent.mint` (typical scope: `{cluster}`)
 - `agent.revoke` (typical scope: `{cluster}`)
 

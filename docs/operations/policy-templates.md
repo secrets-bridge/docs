@@ -167,9 +167,60 @@ The `secret_ref_prefix` selector key is a **prefix match** — every
 ref starting with `billing/` falls into this rule. Combine with
 `environment: "prod"` to scope it tightly.
 
-Slice N (cross-team integration workflow) will add an explicit
-"Security approval" step as the third approver in this chain via a
-new `workflow_definitions` knob.
+Slice N (cross-team integration workflow) adds an explicit
+"Security approval" step as the third approver in this chain via the
+new `workflow_definitions.requires_security_approval` knob — see
+[Cross-team workflows](#template-4-cross-team-workflows) below.
+
+## Template 4 — Cross-team workflows
+
+Cross-team requests carry their own workflow shape: Team B fills, an
+optional security approver verifies, then the agent writes. Two new
+`workflow_definitions` knobs configure this:
+
+| Knob | Default | Use |
+|---|---|---|
+| `fill_ttl_seconds` | `86400` (24h) | How long Team B has to fill before the request expires. |
+| `requires_security_approval` | `false` | When `true`, a `secret.security.approve` vote is needed in addition to source approval. |
+
+`min_approvers` for cross-team workflows is constrained to `{0, 1}`
+in v1; the submit endpoint refuses `≥ 2` with
+`cross_team_min_approvers_unsupported`.
+
+### Non-prod cross-team template
+
+```sql
+INSERT INTO workflow_definitions (name, min_approvers, fill_ttl_seconds, requires_security_approval, ...)
+VALUES ('cross-team-non-prod', 1, 86400, false, ...);
+
+INSERT INTO policy_rules (selector, workflow_id, priority)
+VALUES (
+  '{"environment_kind":"non_prod","type":"cross_team"}'::jsonb,
+  (SELECT id FROM workflow_definitions WHERE name = 'cross-team-non-prod'),
+  100
+);
+```
+
+### PROD cross-team template
+
+```sql
+INSERT INTO workflow_definitions (name, min_approvers, fill_ttl_seconds, requires_security_approval, ...)
+VALUES ('cross-team-prod', 1, 43200, true, ...);
+
+INSERT INTO policy_rules (selector, workflow_id, priority)
+VALUES (
+  '{"environment_kind":"prod","type":"cross_team"}'::jsonb,
+  (SELECT id FROM workflow_definitions WHERE name = 'cross-team-prod'),
+  100
+);
+```
+
+The 12h fill window is intentional: PROD requests should not sit in
+limbo overnight; the shorter TTL forces escalation rather than silent
+expiry.
+
+See [Cross-team requests](cross-team-requests.md) for the full state
+machine, SoD matrix, and triage SQL.
 
 ## Hard rules
 
@@ -186,3 +237,5 @@ new `workflow_definitions` knob.
   `kind`/`risk_level`/`description` model these policies key off.
 - [Authentication](authentication.md) — `secret.reveal.direct`
   permission and the dev endpoints that consume policy decisions.
+- [Cross-team requests](cross-team-requests.md) — the Slice N flow
+  the cross-team templates above target.

@@ -213,3 +213,6 @@ see **which keys** were exposed without ever holding the values.
 - [API endpoints](../reference/api-endpoints.md#reveal-sessions) — the
   three HTTP routes this surface exposes
 - [Configuration reference](config.md) — the worker sweeper interval
+- [Cross-team requests](cross-team-requests.md) — reveal sessions also
+  work for `type='cross_team'` requests after Slice N; the SPA flow
+  is the same as for read requests.
