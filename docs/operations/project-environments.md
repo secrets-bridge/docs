@@ -122,3 +122,8 @@ ensures no orphaned bindings survive.
   permission + the L4 dev endpoints.
 - API reference: `GET /users/me/projects` returns each project with
   its environments inline (Slice L4).
+- [Cross-team requests](cross-team-requests.md) — Slice N split between
+  the **target** (team / project / environment that provides the value)
+  and the **destination** (provider connection + secret_ref where the
+  value lands). Both reference the project / environment model defined
+  here.

@@ -56,6 +56,37 @@ required to call it.
 | `GET` | `/api/v1/requests/:id/wraps/:wrap_id` | user_id | Single-shot retrieve (consumes) |
 | `GET` | `/api/v1/requests/:id/gitops` | user_id | BRD §26 observation list (404 when feature is off) |
 
+## Cross-team requests
+
+Slice N — Team A → Team B value handoff. See
+[Cross-team requests](../operations/cross-team-requests.md) for the
+operator model, state machine, and SoD matrix.
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| `POST` | `/api/v1/requests/cross-team` | `bearer + secret.request` | `{target_team_id, target_project_id, target_environment_id, destination_provider_connection_id, destination_secret_ref, destination_keys[], justification}` → `AccessRequest`. Refuses `min_approvers ≥ 2` with `cross_team_min_approvers_unsupported`. NO values in body — destination_keys is the NAME list. |
+| `POST` | `/api/v1/requests/:id/fill` | `bearer + secret.value.provide` | `{key_values: {<key>: base64}, fill_comment?}`. Late writers get `fill_window_expired` (410). Same-actor-as-requester returns `separation_of_duties_violated` (403). |
+| `POST` | `/api/v1/requests/:id/refuse` | `bearer + secret.value.provide` | `{reason}` (≥ 10 chars). Transitions to `refused`. |
+| `POST` | `/api/v1/requests/:id/verify` | `bearer + secret.approve` or `secret.security.approve` | `{decision, voted_as, comment?}` → **200 OK** with structured `VerifyResponse` (NOT 412 on partial votes). Body: `{vote_recorded, voted_as, source_votes, security_approval_required, security_vote_present, next_required[]}`. |
+| `GET` | `/api/v1/requests/inbox` | `bearer + secret.value.provide` | `?team_id=` narrows to one team's inbox. Returns `AccessRequest[]` with `pending_values` status. Fail-closed: empty array when caller covers no teams. |
+| `GET` | `/api/v1/requests/inbox/count` | `bearer + secret.value.provide` | `{total, per_team: [{team_id, team_name?, count}]}` — drives the sidebar badge. |
+| `GET` | `/api/v1/provider-connections?project_id=:id` | bearer | Returns the connections bound to that project; the SPA's cross-team submit drawer hits this for the source project's destination dropdown. |
+
+### VerifyResponse routing
+
+The structured response means the SPA can render the right next-step
+toast without a second round trip:
+
+| Scenario | `voted_as` | `security_approval_required` | `security_vote_present` | `next_required[]` |
+|---|---|---|---|---|
+| Source vote, no security required | `source` | `false` | `false` | `[]` — transitions to `approved` |
+| Source vote, security required, not yet voted | `source` | `true` | `false` | `["security_approval"]` — SPA toast "your source vote was recorded; security approval still pending" |
+| Security vote, source already voted | `security` | `true` | `true` | `[]` — transitions to `approved` |
+
+The SPA's `crossTeamErrorMessage(code)` maps the stable 403 codes to
+friendly strings; see the table at the bottom of
+[Cross-team requests](../operations/cross-team-requests.md#error-code-reference).
+
 ## Reveal sessions
 
 Slice M — bulk reveal page surface. Open returns wrap_id + key_name

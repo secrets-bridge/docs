@@ -176,6 +176,7 @@ nav:
       - Project environments: operations/project-environments.md
       - Policy templates: operations/policy-templates.md
       - Reveal sessions: operations/reveal-sessions.md
+      - Cross-team requests: operations/cross-team-requests.md
       - Configuration reference: operations/config.md
       - Troubleshooting: operations/troubleshooting.md
   - Reference:
