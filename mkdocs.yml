@@ -177,6 +177,7 @@ nav:
       - Policy templates: operations/policy-templates.md
       - Reveal sessions: operations/reveal-sessions.md
       - Cross-team requests: operations/cross-team-requests.md
+      - Provider connections: operations/provider-connections.md
       - Configuration reference: operations/config.md
       - Troubleshooting: operations/troubleshooting.md
   - Reference:

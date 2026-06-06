@@ -36,6 +36,19 @@ project (Team A's project). The submit endpoint rejects
 belong to the source project. This is the architectural fence that
 keeps Team B from accidentally writing into Team A's neighbours.
 
+Bindings are managed via the admin page documented at
+[Provider connections](provider-connections.md) — one connection per
+external store, then a `(project, env)` binding row per project that
+needs to consume it. The cross-team submit drawer's destination
+dropdown calls the same `/provider-connections` URL with `project_id`
++ `environment_id` set so the api returns only the sanitized
+`{id, name, type}` projection scoped to the caller's source project +
+env. When the dropdown is empty, the drawer branches the empty-state
+CTA on `hasPermission('integration.edit')` — admins see a "Manage
+provider connections" link, non-admins see "Ask your platform team to
+bind a provider connection." Cross-team submits against a
+**disabled** destination return 409 `connection_disabled`.
+
 ## State machine
 
 ```
@@ -275,3 +288,14 @@ running curl smoke tests see the raw code in the response body.
 | `cross_team_min_approvers_unsupported` | 412 | Workflow `min_approvers ≥ 2` is not supported in v1 |
 | `cross_team_status_invalid_transition` | 409 | Action doesn't apply to current status |
 | `duplicate_vote` | 409 | Caller already voted on this request |
+
+## Related
+
+- [Provider connections](provider-connections.md) — how the destination
+  dropdown is populated and bound
+- [Project environments](project-environments.md) — project / env model
+  the bindings reference
+- [Reveal sessions](reveal-sessions.md) — the alternative flow when the
+  caller can self-serve the value
+- [HTTP API endpoints — Provider connections](../reference/api-endpoints.md#provider-connections)
+- [Permissions catalog](../reference/permissions.md)

@@ -127,3 +127,7 @@ ensures no orphaned bindings survive.
   and the **destination** (provider connection + secret_ref where the
   value lands). Both reference the project / environment model defined
   here.
+- [Provider connections](provider-connections.md) — connection metadata
+  binds at project ± environment granularity via the
+  `project_provider_connections` join table. Project-wide bindings have
+  `environment_id IS NULL`; env-specific bindings narrow to one row.

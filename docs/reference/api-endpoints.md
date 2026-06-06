@@ -165,6 +165,29 @@ guide.
 | `GET` | `/api/v1/gitops-app-mappings` | bearer |
 | `DELETE` | `/api/v1/gitops-app-mappings/:id` | `bearer + integration.edit` |
 
+## Provider connections
+
+EPIC P (api#92) admin surface + developer dropdown. The same
+`GET /provider-connections` URL branches on whether `project_id` is
+present — see [Provider connections — Permissions](../operations/provider-connections.md#permissions)
+for the full branching matrix. All errors land in the EPIC P envelope:
+`{"error_code":"…","message":"…", …}`.
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| `POST` | `/api/v1/provider-connections` | `bearer + integration.edit` | Create. Body: `{name, type, cluster_name?, description?, status?, scope, auth_method?, discover_enabled?, discover_interval_seconds?}`. Returns the full row on 201. |
+| `GET` | `/api/v1/provider-connections` | branched | No `project_id` → admin list (`integration.edit`, full projection). `project_id` (+ optional `environment_id`) → sanitized dropdown (`{id, name, type}` per row, `secret.request` scoped). `environment_id` without `project_id` → 400 `project_id_required` BEFORE auth. |
+| `GET` | `/api/v1/provider-connections/:id` | `bearer + integration.edit` | Single row, full projection. |
+| `PUT` | `/api/v1/provider-connections/:id` | `bearer + integration.edit` | Update. `type` is silently rejected if changed (immutable per §5). |
+| `DELETE` | `/api/v1/provider-connections/:id` | `bearer + integration.edit` | 204 on success. 409 `connection_in_use` with `{bindings_count, open_requests_count}` if any binding or pending request blocks it. |
+| `POST` | `/api/v1/provider-connections/:id/discover-now` | `bearer + integration.edit` | Manual discover. 202 with `{job_id, correlation_id}`. 409 `connection_disabled` / `discovery_already_running` (per-target Redis lock) on contention. 400 `discover_requires_cluster` if `cluster_name` is null. |
+| `POST` | `/api/v1/provider-connections/:id/bindings` | `bearer + integration.edit` | Bind to a (project, env). Body: `{project_id, environment_id?}`. `environment_id` absent or null binds project-wide. 409 `binding_exists` on duplicate; 400 `environment_not_in_project` if mismatched. |
+| `GET` | `/api/v1/provider-connections/:id/bindings` | `bearer + integration.edit` | List bindings for one connection. |
+| `DELETE` | `/api/v1/provider-connection-bindings/:bid` | `bearer + integration.edit` | Unbind. 204 on success. 404 `binding_not_found` otherwise. |
+
+**Error codes** — the full 19-code reference lives in
+[Provider connections — Error code reference](../operations/provider-connections.md#error-code-reference).
+
 ## Permissions catalog
 
 | Method | Path | Auth | Notes |
