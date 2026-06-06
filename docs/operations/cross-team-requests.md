@@ -49,6 +49,18 @@ provider connections" link, non-admins see "Ask your platform team to
 bind a provider connection." Cross-team submits against a
 **disabled** destination return 409 `connection_disabled`.
 
+**Two kinds of binding** affect what shows up in the destination
+dropdown:
+
+| Binding shape | Created by | When it appears in the dropdown |
+|---|---|---|
+| Env-specific (`environment_id IS NOT NULL`) | Platform admins (`integration.edit`) OR scoped binders (`integration.bind`, EPIC Q) via the per-env [Provider Connections card](provider-connections.md#scoped-bindings-integrationbind) on `/projects/:id/env/:env_id` | When the cross-team source project + env match |
+| Project-wide (`environment_id IS NULL`) | Platform admins ONLY — scoped binders cannot create or delete project-wide bindings | When the cross-team source project matches, regardless of env |
+
+A project-wide binding implicitly covers every environment, including
+production, which is why the §2 lock keeps project-wide bindings as
+platform-only.
+
 ## State machine
 
 ```

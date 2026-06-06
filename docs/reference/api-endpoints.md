@@ -176,7 +176,7 @@ for the full branching matrix. All errors land in the EPIC P envelope:
 | Method | Path | Auth | Notes |
 |---|---|---|---|
 | `POST` | `/api/v1/provider-connections` | `bearer + integration.edit` | Create. Body: `{name, type, cluster_name?, description?, status?, scope, auth_method?, discover_enabled?, discover_interval_seconds?}`. Returns the full row on 201. |
-| `GET` | `/api/v1/provider-connections` | branched | No `project_id` → admin list (`integration.edit`, full projection). `project_id` (+ optional `environment_id`) → sanitized dropdown (`{id, name, type}` per row, `secret.request` scoped). `environment_id` without `project_id` → 400 `project_id_required` BEFORE auth. |
+| `GET` | `/api/v1/provider-connections` | branched | 4-way branch (EPIC P + EPIC Q): No `project_id` → admin list (`integration.edit`, full projection). `project_id` (+ optional `environment_id`) without `for_binding` → sanitized dropdown (`{id, name, type}` per row, `secret.request` scoped). `project_id` + `environment_id` + `for_binding=true` → binder picker (`integration.bind` scoped; returns active + `self_service_bindable=true` + NOT-already-bound; refuses `env.kind=prod` with 403 `prod_binding_not_allowed_for_scope`). `environment_id` without `project_id` → 400 `project_id_required` BEFORE auth. `for_binding=true` without `project_id` → 400 `project_id_required`. `for_binding=true` with `project_id` but no `environment_id` → 400 `environment_id_required`. |
 | `GET` | `/api/v1/provider-connections/:id` | `bearer + integration.edit` | Single row, full projection. |
 | `PUT` | `/api/v1/provider-connections/:id` | `bearer + integration.edit` | Update. `type` is silently rejected if changed (immutable per §5). |
 | `DELETE` | `/api/v1/provider-connections/:id` | `bearer + integration.edit` | 204 on success. 409 `connection_in_use` with `{bindings_count, open_requests_count}` if any binding or pending request blocks it. |
@@ -185,7 +185,44 @@ for the full branching matrix. All errors land in the EPIC P envelope:
 | `GET` | `/api/v1/provider-connections/:id/bindings` | `bearer + integration.edit` | List bindings for one connection. |
 | `DELETE` | `/api/v1/provider-connection-bindings/:bid` | `bearer + integration.edit` | Unbind. 204 on success. 404 `binding_not_found` otherwise. |
 
-**Error codes** — the full 19-code reference lives in
+### Project-anchored scoped binding (EPIC Q, api#99)
+
+`integration.bind` callers (typically section heads granted the
+`provider_connection_binder` seed role) use a separate URL family
+that's gated on the binding's project + env. The URL hierarchy
+expresses the §3 mental model split — scoped binding is
+project-ownership work, not platform registry administration. The
+`integration.edit` URLs above are unchanged; admins keep using them.
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| `POST` | `/api/v1/projects/:projectID/provider-connection-bindings` | `bearer + integration.bind` scoped to (project, env) | Bind a self-service-bindable connection to a (project, env). Body: `{provider_connection_id, environment_id}`. `environment_id` is REQUIRED — scoped binders never create project-wide bindings. 403 `connection_not_self_service_bindable` if the platform admin hasn't flipped the flag. 403 `prod_binding_not_allowed_for_scope` for prod envs. 409 `binding_exists`/`connection_disabled` per the locked chain. |
+| `GET` | `/api/v1/projects/:projectID/provider-connection-bindings[?environment_id=:id]` | `bearer` | Joined project bindings — server-side join adds `environment_name`, `environment_kind`, `connection_name`, `connection_type`. Optional `environment_id` narrows to env-specific + project-wide for that env. Sanitized projection (no scope / auth_method / discovery fields). |
+| `DELETE` | `/api/v1/projects/:projectID/provider-connection-bindings/:bindingID` | `bearer + integration.bind` scoped to (project, binding env) | Unbind. 204 on success. **§4 correction pinned**: if `bindingID` exists under a DIFFERENT project, returns 404 `binding_not_found` — never 403 `out_of_scope_binding` (which would leak existence under another project). 403 `prod_binding_not_allowed_for_scope` for prod env bindings (admin path required). |
+
+**New stable error codes** (EPIC Q):
+
+| Code | Status | Meaning |
+|---|---|---|
+| `connection_not_self_service_bindable` | 403 | Scoped caller tried to bind a connection where `self_service_bindable=false`. |
+| `prod_binding_not_allowed_for_scope` | 403 | Scoped caller tried to bind / unbind on `env.kind='prod'`. Envelope includes `{"env_kind": "prod"}`. |
+| `out_of_scope_binding` | 403 | Caller's `integration.bind` grant doesn't cover the target (project, env) per the team-aware resolver. |
+| `environment_id_required` | 400 | The binder picker branch (`for_binding=true`) or scoped bind body lacks `environment_id`. |
+
+**Prometheus counters** (EPIC Q):
+
+```
+provider_connection_bindings_created_total{permission_used, env_kind}
+provider_connection_bindings_deleted_total{permission_used, env_kind}
+provider_connection_bindings_denied_total{reason}
+```
+
+`reason` is a fixed low-cardinality set; the counters NEVER carry
+`actor_id`, `project_id`, `connection_id`, or `environment_id` as
+labels. See [Provider connections — Observability](../operations/provider-connections.md#observability-prometheus-counters) for the operator-facing
+discussion + the audit-event triage SQL that pairs with these.
+
+**Error codes** — the full reference lives in
 [Provider connections — Error code reference](../operations/provider-connections.md#error-code-reference).
 
 ## Permissions catalog
