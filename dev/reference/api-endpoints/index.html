@@ -1002,6 +1002,8 @@
       
         
       
+        
+      
     
     
       
@@ -1206,6 +1208,27 @@
   
   <span class="md-ellipsis">
     Cross-team requests
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/provider-connections/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Provider connections
   </span>
   
 
@@ -1500,6 +1523,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#provider-connections" class="md-nav__link">
+    <span class="md-ellipsis">
+      Provider connections
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#permissions-catalog" class="md-nav__link">
     <span class="md-ellipsis">
       Permissions catalog
@@ -1722,6 +1754,15 @@
   <a href="#integrations-brd-26-gated-by-sb_gitops_enabled" class="md-nav__link">
     <span class="md-ellipsis">
       Integrations (BRD §26 — gated by SB_GITOPS_ENABLED)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#provider-connections" class="md-nav__link">
+    <span class="md-ellipsis">
+      Provider connections
     </span>
   </a>
   
@@ -2396,6 +2437,80 @@ guide.</p>
 </tr>
 </tbody>
 </table>
+<h2 id="provider-connections">Provider connections<a class="headerlink" href="#provider-connections" title="Permanent link">&para;</a></h2>
+<p>EPIC P (api#92) admin surface + developer dropdown. The same
+<code>GET /provider-connections</code> URL branches on whether <code>project_id</code> is
+present — see <a href="../../operations/provider-connections/#permissions">Provider connections — Permissions</a>
+for the full branching matrix. All errors land in the EPIC P envelope:
+<code>{"error_code":"…","message":"…", …}</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/provider-connections</code></td>
+<td><code>bearer + integration.edit</code></td>
+<td>Create. Body: <code>{name, type, cluster_name?, description?, status?, scope, auth_method?, discover_enabled?, discover_interval_seconds?}</code>. Returns the full row on 201.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/provider-connections</code></td>
+<td>branched</td>
+<td>No <code>project_id</code> → admin list (<code>integration.edit</code>, full projection). <code>project_id</code> (+ optional <code>environment_id</code>) → sanitized dropdown (<code>{id, name, type}</code> per row, <code>secret.request</code> scoped). <code>environment_id</code> without <code>project_id</code> → 400 <code>project_id_required</code> BEFORE auth.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/provider-connections/:id</code></td>
+<td><code>bearer + integration.edit</code></td>
+<td>Single row, full projection.</td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/api/v1/provider-connections/:id</code></td>
+<td><code>bearer + integration.edit</code></td>
+<td>Update. <code>type</code> is silently rejected if changed (immutable per §5).</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/provider-connections/:id</code></td>
+<td><code>bearer + integration.edit</code></td>
+<td>204 on success. 409 <code>connection_in_use</code> with <code>{bindings_count, open_requests_count}</code> if any binding or pending request blocks it.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/provider-connections/:id/discover-now</code></td>
+<td><code>bearer + integration.edit</code></td>
+<td>Manual discover. 202 with <code>{job_id, correlation_id}</code>. 409 <code>connection_disabled</code> / <code>discovery_already_running</code> (per-target Redis lock) on contention. 400 <code>discover_requires_cluster</code> if <code>cluster_name</code> is null.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/provider-connections/:id/bindings</code></td>
+<td><code>bearer + integration.edit</code></td>
+<td>Bind to a (project, env). Body: <code>{project_id, environment_id?}</code>. <code>environment_id</code> absent or null binds project-wide. 409 <code>binding_exists</code> on duplicate; 400 <code>environment_not_in_project</code> if mismatched.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/provider-connections/:id/bindings</code></td>
+<td><code>bearer + integration.edit</code></td>
+<td>List bindings for one connection.</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/provider-connection-bindings/:bid</code></td>
+<td><code>bearer + integration.edit</code></td>
+<td>Unbind. 204 on success. 404 <code>binding_not_found</code> otherwise.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Error codes</strong> — the full 19-code reference lives in
+<a href="../../operations/provider-connections/#error-code-reference">Provider connections — Error code reference</a>.</p>
 <h2 id="permissions-catalog">Permissions catalog<a class="headerlink" href="#permissions-catalog" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

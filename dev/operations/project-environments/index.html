@@ -1004,6 +1004,8 @@
       
         
       
+        
+      
     
     
       
@@ -1318,6 +1320,27 @@
   
   <span class="md-ellipsis">
     Cross-team requests
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../provider-connections/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Provider connections
   </span>
   
 
@@ -1819,6 +1842,10 @@ ensures no orphaned bindings survive.</p>
   and the <strong>destination</strong> (provider connection + secret_ref where the
   value lands). Both reference the project / environment model defined
   here.</li>
+<li><a href="../provider-connections/">Provider connections</a> — connection metadata
+  binds at project ± environment granularity via the
+  <code>project_provider_connections</code> join table. Project-wide bindings have
+  <code>environment_id IS NULL</code>; env-specific bindings narrow to one row.</li>
 </ul>
 
 

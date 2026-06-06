@@ -19,7 +19,7 @@
         <link rel="prev" href="../reveal-sessions/">
       
       
-        <link rel="next" href="../config/">
+        <link rel="next" href="../provider-connections/">
       
       
       <link rel="icon" href="../../assets/favicon.svg">
@@ -1004,6 +1004,8 @@
       
         
       
+        
+      
     
     
       
@@ -1363,10 +1365,40 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      Related
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../provider-connections/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Provider connections
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -1718,6 +1750,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      Related
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1796,6 +1837,18 @@ project (Team A's project). The submit endpoint rejects
 <code>destination_provider_unbound</code> if the provider connection doesn't
 belong to the source project. This is the architectural fence that
 keeps Team B from accidentally writing into Team A's neighbours.</p>
+<p>Bindings are managed via the admin page documented at
+<a href="../provider-connections/">Provider connections</a> — one connection per
+external store, then a <code>(project, env)</code> binding row per project that
+needs to consume it. The cross-team submit drawer's destination
+dropdown calls the same <code>/provider-connections</code> URL with <code>project_id</code>
++ <code>environment_id</code> set so the api returns only the sanitized
+<code>{id, name, type}</code> projection scoped to the caller's source project +
+env. When the dropdown is empty, the drawer branches the empty-state
+CTA on <code>hasPermission('integration.edit')</code> — admins see a "Manage
+provider connections" link, non-admins see "Ask your platform team to
+bind a provider connection." Cross-team submits against a
+<strong>disabled</strong> destination return 409 <code>connection_disabled</code>.</p>
 <h2 id="state-machine">State machine<a class="headerlink" href="#state-machine" title="Permanent link">&para;</a></h2>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>                       ┌─ refused (Team B refused)
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                       │
@@ -2237,6 +2290,17 @@ running curl smoke tests see the raw code in the response body.</p>
 </tr>
 </tbody>
 </table>
+<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../provider-connections/">Provider connections</a> — how the destination
+  dropdown is populated and bound</li>
+<li><a href="../project-environments/">Project environments</a> — project / env model
+  the bindings reference</li>
+<li><a href="../reveal-sessions/">Reveal sessions</a> — the alternative flow when the
+  caller can self-serve the value</li>
+<li><a href="../../reference/api-endpoints/#provider-connections">HTTP API endpoints — Provider connections</a></li>
+<li><a href="../../reference/permissions/">Permissions catalog</a></li>
+</ul>
 
 
 
