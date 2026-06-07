@@ -225,6 +225,56 @@ discussion + the audit-event triage SQL that pairs with these.
 **Error codes** — the full reference lives in
 [Provider connections — Error code reference](../operations/provider-connections.md#error-code-reference).
 
+## Project-anchored scoped policy rules (EPIC R, api#108)
+
+`policy.author` callers (typically section heads granted the
+`policy_author` seed role) use a separate URL family that's gated
+on the rule's project. The URL hierarchy expresses the same §3
+mental model split EPIC Q established for bindings — scoped policy
+authoring is project-ownership work, not platform policy
+administration. The `policy.edit` URLs above are unchanged; admins
+keep using them.
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| `POST` | `/api/v1/projects/:projectID/policy-rules` | `bearer + policy.author` scoped to projectID | Author a scoped rule. Body: `{name, selector, priority, workflow_id, enabled}`. Selector MUST carry `environment_kind="non_prod"` OR `environment_id`; the api runs the locked 6-gate chain (coverage → priority<9000 → selector.project_id consistency → env constraint → workflow exists → INSERT). 8 stable codes listed below. |
+| `GET` | `/api/v1/projects/:projectID/policy-rules` | `bearer` | List scoped rules + inherited platform rules. **§4 correction 1 sanitization**: inherited platform rows carry `selector_keys` ONLY; the `selector` field is OMITTED server-side. Scoped rows carry the full selector. Route-pinned not perm-pinned — admins acting via this URL also get the sanitized view. |
+| `GET` | `/api/v1/projects/:projectID/policy-rules/:ruleID` | `bearer` | Single rule with the same sanitization rules as the list. Inherited platform row → sanitized projection. Scoped row whose `project_id` doesn't match URL projectID → 404 `policy_not_found` (§4 mismatch protection). |
+| `PUT` | `/api/v1/projects/:projectID/policy-rules/:ruleID` | `bearer + policy.author` scoped to projectID | Update scoped rule. All body fields optional (omitted = preserve). **§3 Q9 lock**: explicit empty `{}` selector REJECTED with `policy_scope_too_broad.reason=selector_empty`. **§4 lock**: URL projectID mismatch returns `policy_not_found`, NEVER `out_of_scope_policy`. |
+| `DELETE` | `/api/v1/projects/:projectID/policy-rules/:ruleID` | `bearer + policy.author` scoped to projectID | 204 on success. URL projectID mismatch returns 404 `policy_not_found`. Platform NULL rule returns 403 `platform_policy_not_editable`. |
+
+**Stable error codes** (EPIC R):
+
+| Code | Status | Meaning |
+|---|---|---|
+| `policy_not_found` | 404 | Rule doesn't exist OR exists under a different project. The §4 mismatch protection — never leak existence under another parent. |
+| `platform_policy_not_editable` | 403 | Scoped caller tried to edit a NULL `project_id` row OR an `is_system` row via the scoped URL. |
+| `out_of_scope_policy` | 403 | Caller's `policy.author` grant doesn't cover the target project per the team-aware resolver. |
+| `policy_selector_mismatch` | 400 | `selector.project_id` was set but doesn't equal URL projectID. |
+| `prod_policy_not_allowed_for_scope` | 403 | Scoped caller tried to author a rule that resolves to a prod env. Envelope includes `{"env_kind": "prod"}`. |
+| `policy_scope_too_broad` | 400 | Selector doesn't satisfy the non-prod-by-construction invariant. Envelope includes `{"reason": "..."}` — variants: `env_constraint_missing`, `env_kind_invalid`, `selector_empty`, `env_kind_id_inconsistent`. |
+| `policy_priority_reserved` | 400 | Priority `>= 9000` requested; reserved for platform. Envelope includes `{"cap": 9000}`. |
+| `policy_environment_not_in_project` | 400 | `selector.environment_id` doesn't belong to URL projectID. |
+
+**Prometheus counters** (EPIC R):
+
+```
+policy_rules_created_total{permission_used, scope}
+policy_rules_updated_total{permission_used, scope}
+policy_rules_deleted_total{permission_used, scope}
+policy_rules_denied_total{reason}
+```
+
+`reason` is a fixed low-cardinality 8-element set; the counters
+NEVER carry `actor_id`, `project_id`, `policy_rule_id`, or
+`workflow_id` as labels. See
+[Policy templates — Observability](../operations/policy-templates.md#observability-prometheus-counters)
+for the operator-facing discussion + the audit-event triage SQL
+that pairs with these.
+
+**Error codes** — the full reference table lives in
+[Policy templates — Error code reference](../operations/policy-templates.md#error-code-reference).
+
 ## Permissions catalog
 
 | Method | Path | Auth | Notes |
