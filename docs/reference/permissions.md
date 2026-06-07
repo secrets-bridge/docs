@@ -21,6 +21,7 @@ edit their permission lists but can't delete the rows.
 | `value_provider` | `secret.value.provide` | Slice N seed — used for the [cross-team flow](../operations/cross-team-requests.md). Assignment **must** carry a `team_id` scope; the Assignments form gates global grants behind a type-to-confirm. |
 | `security_approver` | `secret.security.approve` | Slice N seed — holder can cast the security vote on cross-team requests where the bound workflow has `requires_security_approval=true`. |
 | `provider_connection_binder` | `integration.bind` | EPIC Q seed — section-head capability for [self-service provider connection binding](../operations/provider-connections.md#scoped-bindings-integrationbind). Assignment carries a `team_id` (covers descendant project subtree) or `project_id` (one project) scope. **Not** auto-granted to `integration.edit` holders — operators grant explicitly. |
+| `policy_author` | `policy.author` | EPIC R seed (api#108) — section-head capability for [scoped non-prod policy authoring](../operations/policy-templates.md#scoped-policy-authoring-policyauthor). Assignment carries `team_id` or `project_id` scope. **Not** auto-granted to `policy.edit` holders — operators grant explicitly. Scoped rules are bounded `priority < 9000` (the platform-reserved band) and rejected against any selector that resolves to a prod environment. |
 
 ## Catalog by group
 
@@ -36,7 +37,8 @@ edit their permission lists but can't delete the rows.
 | Permission | Description |
 |---|---|
 | `workflow.edit` | Create / update / delete workflow definitions. |
-| `policy.edit` | Create / update / delete policy rules. |
+| `policy.edit` | Create / update / delete policy rules. Global scope — affects every project's resolution. Does NOT auto-cover `policy.author` server-side (EPIC R, api#108) — operators grant scoped authoring explicitly via the `policy_author` system role. |
+| `policy.author` | Author project-scoped policy rules for non-prod environments (EPIC R, api#108). Scoped via the existing team-aware resolver. Refuses prod env selectors, priority `>= 9000` (platform reserved), and edits to platform global rules. Granted via the `policy_author` system seed role. |
 
 ### Agents
 

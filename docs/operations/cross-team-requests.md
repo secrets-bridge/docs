@@ -301,6 +301,29 @@ running curl smoke tests see the raw code in the response body.
 | `cross_team_status_invalid_transition` | 409 | Action doesn't apply to current status |
 | `duplicate_vote` | 409 | Caller already voted on this request |
 
+## Workflow resolution + scoped policy authoring
+
+Cross-team requests resolve their workflow via the same
+`PolicyEngine.Resolve(scope)` path every other request type uses
+(`secret.request` / `secret.read` / `cross_team`). EPIC R (api#108)
+added a project-scoped applicability filter to the resolver:
+
+- A scoped `policy_rules` row authored by a section head via
+  `policy.author` lives under a specific `project_id` and only
+  participates in resolution when the request's scope carries that
+  same `project_id`.
+- Platform global rules (`project_id IS NULL`) still apply
+  universally. Platform's reserved priority band (`>= 9000`) wins
+  over scoped overrides for the same selector — so a section head
+  can't accidentally relax a cross-team approval requirement that
+  platform pinned.
+
+If you're authoring cross-team workflow rules at the project level,
+the same hard rules apply — scoped rules cannot match prod
+environments by construction. See
+[Scoped policy authoring](policy-templates.md#scoped-policy-authoring-policyauthor)
+for the full operator model.
+
 ## Related
 
 - [Provider connections](provider-connections.md) — how the destination
@@ -309,5 +332,7 @@ running curl smoke tests see the raw code in the response body.
   the bindings reference
 - [Reveal sessions](reveal-sessions.md) — the alternative flow when the
   caller can self-serve the value
+- [Policy templates — Scoped policy authoring](policy-templates.md#scoped-policy-authoring-policyauthor) — EPIC R section-head model
 - [HTTP API endpoints — Provider connections](../reference/api-endpoints.md#provider-connections)
+- [HTTP API endpoints — Project-anchored scoped policy rules](../reference/api-endpoints.md#project-anchored-scoped-policy-rules-epic-r-api108)
 - [Permissions catalog](../reference/permissions.md)
