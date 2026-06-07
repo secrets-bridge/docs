@@ -1366,6 +1366,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#workflow-resolution-scoped-policy-authoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      Workflow resolution + scoped policy authoring
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#related" class="md-nav__link">
     <span class="md-ellipsis">
       Related
@@ -1745,6 +1754,15 @@
   <a href="#error-code-reference" class="md-nav__link">
     <span class="md-ellipsis">
       Error code reference
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workflow-resolution-scoped-policy-authoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      Workflow resolution + scoped policy authoring
     </span>
   </a>
   
@@ -2316,6 +2334,27 @@ running curl smoke tests see the raw code in the response body.</p>
 </tr>
 </tbody>
 </table>
+<h2 id="workflow-resolution-scoped-policy-authoring">Workflow resolution + scoped policy authoring<a class="headerlink" href="#workflow-resolution-scoped-policy-authoring" title="Permanent link">&para;</a></h2>
+<p>Cross-team requests resolve their workflow via the same
+<code>PolicyEngine.Resolve(scope)</code> path every other request type uses
+(<code>secret.request</code> / <code>secret.read</code> / <code>cross_team</code>). EPIC R (api#108)
+added a project-scoped applicability filter to the resolver:</p>
+<ul>
+<li>A scoped <code>policy_rules</code> row authored by a section head via
+  <code>policy.author</code> lives under a specific <code>project_id</code> and only
+  participates in resolution when the request's scope carries that
+  same <code>project_id</code>.</li>
+<li>Platform global rules (<code>project_id IS NULL</code>) still apply
+  universally. Platform's reserved priority band (<code>&gt;= 9000</code>) wins
+  over scoped overrides for the same selector — so a section head
+  can't accidentally relax a cross-team approval requirement that
+  platform pinned.</li>
+</ul>
+<p>If you're authoring cross-team workflow rules at the project level,
+the same hard rules apply — scoped rules cannot match prod
+environments by construction. See
+<a href="../policy-templates/#scoped-policy-authoring-policyauthor">Scoped policy authoring</a>
+for the full operator model.</p>
 <h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../provider-connections/">Provider connections</a> — how the destination
@@ -2324,7 +2363,9 @@ running curl smoke tests see the raw code in the response body.</p>
   the bindings reference</li>
 <li><a href="../reveal-sessions/">Reveal sessions</a> — the alternative flow when the
   caller can self-serve the value</li>
+<li><a href="../policy-templates/#scoped-policy-authoring-policyauthor">Policy templates — Scoped policy authoring</a> — EPIC R section-head model</li>
 <li><a href="../../reference/api-endpoints/#provider-connections">HTTP API endpoints — Provider connections</a></li>
+<li><a href="../../reference/api-endpoints/#project-anchored-scoped-policy-rules-epic-r-api108">HTTP API endpoints — Project-anchored scoped policy rules</a></li>
 <li><a href="../../reference/permissions/">Permissions catalog</a></li>
 </ul>
 

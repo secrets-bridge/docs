@@ -1547,6 +1547,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#project-anchored-scoped-policy-rules-epic-r-api108" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project-anchored scoped policy rules (EPIC R, api#108)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#permissions-catalog" class="md-nav__link">
     <span class="md-ellipsis">
       Permissions catalog
@@ -1795,6 +1804,15 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-anchored-scoped-policy-rules-epic-r-api108" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project-anchored scoped policy rules (EPIC R, api#108)
+    </span>
+  </a>
   
 </li>
       
@@ -2619,6 +2637,122 @@ labels. See <a href="../../operations/provider-connections/#observability-promet
 discussion + the audit-event triage SQL that pairs with these.</p>
 <p><strong>Error codes</strong> — the full reference lives in
 <a href="../../operations/provider-connections/#error-code-reference">Provider connections — Error code reference</a>.</p>
+<h2 id="project-anchored-scoped-policy-rules-epic-r-api108">Project-anchored scoped policy rules (EPIC R, api#108)<a class="headerlink" href="#project-anchored-scoped-policy-rules-epic-r-api108" title="Permanent link">&para;</a></h2>
+<p><code>policy.author</code> callers (typically section heads granted the
+<code>policy_author</code> seed role) use a separate URL family that's gated
+on the rule's project. The URL hierarchy expresses the same §3
+mental model split EPIC Q established for bindings — scoped policy
+authoring is project-ownership work, not platform policy
+administration. The <code>policy.edit</code> URLs above are unchanged; admins
+keep using them.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/projects/:projectID/policy-rules</code></td>
+<td><code>bearer + policy.author</code> scoped to projectID</td>
+<td>Author a scoped rule. Body: <code>{name, selector, priority, workflow_id, enabled}</code>. Selector MUST carry <code>environment_kind="non_prod"</code> OR <code>environment_id</code>; the api runs the locked 6-gate chain (coverage → priority&lt;9000 → selector.project_id consistency → env constraint → workflow exists → INSERT). 8 stable codes listed below.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/projects/:projectID/policy-rules</code></td>
+<td><code>bearer</code></td>
+<td>List scoped rules + inherited platform rules. <strong>§4 correction 1 sanitization</strong>: inherited platform rows carry <code>selector_keys</code> ONLY; the <code>selector</code> field is OMITTED server-side. Scoped rows carry the full selector. Route-pinned not perm-pinned — admins acting via this URL also get the sanitized view.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/projects/:projectID/policy-rules/:ruleID</code></td>
+<td><code>bearer</code></td>
+<td>Single rule with the same sanitization rules as the list. Inherited platform row → sanitized projection. Scoped row whose <code>project_id</code> doesn't match URL projectID → 404 <code>policy_not_found</code> (§4 mismatch protection).</td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/api/v1/projects/:projectID/policy-rules/:ruleID</code></td>
+<td><code>bearer + policy.author</code> scoped to projectID</td>
+<td>Update scoped rule. All body fields optional (omitted = preserve). <strong>§3 Q9 lock</strong>: explicit empty <code>{}</code> selector REJECTED with <code>policy_scope_too_broad.reason=selector_empty</code>. <strong>§4 lock</strong>: URL projectID mismatch returns <code>policy_not_found</code>, NEVER <code>out_of_scope_policy</code>.</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/projects/:projectID/policy-rules/:ruleID</code></td>
+<td><code>bearer + policy.author</code> scoped to projectID</td>
+<td>204 on success. URL projectID mismatch returns 404 <code>policy_not_found</code>. Platform NULL rule returns 403 <code>platform_policy_not_editable</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Stable error codes</strong> (EPIC R):</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>policy_not_found</code></td>
+<td>404</td>
+<td>Rule doesn't exist OR exists under a different project. The §4 mismatch protection — never leak existence under another parent.</td>
+</tr>
+<tr>
+<td><code>platform_policy_not_editable</code></td>
+<td>403</td>
+<td>Scoped caller tried to edit a NULL <code>project_id</code> row OR an <code>is_system</code> row via the scoped URL.</td>
+</tr>
+<tr>
+<td><code>out_of_scope_policy</code></td>
+<td>403</td>
+<td>Caller's <code>policy.author</code> grant doesn't cover the target project per the team-aware resolver.</td>
+</tr>
+<tr>
+<td><code>policy_selector_mismatch</code></td>
+<td>400</td>
+<td><code>selector.project_id</code> was set but doesn't equal URL projectID.</td>
+</tr>
+<tr>
+<td><code>prod_policy_not_allowed_for_scope</code></td>
+<td>403</td>
+<td>Scoped caller tried to author a rule that resolves to a prod env. Envelope includes <code>{"env_kind": "prod"}</code>.</td>
+</tr>
+<tr>
+<td><code>policy_scope_too_broad</code></td>
+<td>400</td>
+<td>Selector doesn't satisfy the non-prod-by-construction invariant. Envelope includes <code>{"reason": "..."}</code> — variants: <code>env_constraint_missing</code>, <code>env_kind_invalid</code>, <code>selector_empty</code>, <code>env_kind_id_inconsistent</code>.</td>
+</tr>
+<tr>
+<td><code>policy_priority_reserved</code></td>
+<td>400</td>
+<td>Priority <code>&gt;= 9000</code> requested; reserved for platform. Envelope includes <code>{"cap": 9000}</code>.</td>
+</tr>
+<tr>
+<td><code>policy_environment_not_in_project</code></td>
+<td>400</td>
+<td><code>selector.environment_id</code> doesn't belong to URL projectID.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Prometheus counters</strong> (EPIC R):</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>policy_rules_created_total{permission_used, scope}
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>policy_rules_updated_total{permission_used, scope}
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>policy_rules_deleted_total{permission_used, scope}
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>policy_rules_denied_total{reason}
+</span></code></pre></div>
+<p><code>reason</code> is a fixed low-cardinality 8-element set; the counters
+NEVER carry <code>actor_id</code>, <code>project_id</code>, <code>policy_rule_id</code>, or
+<code>workflow_id</code> as labels. See
+<a href="../../operations/policy-templates/#observability-prometheus-counters">Policy templates — Observability</a>
+for the operator-facing discussion + the audit-event triage SQL
+that pairs with these.</p>
+<p><strong>Error codes</strong> — the full reference table lives in
+<a href="../../operations/policy-templates/#error-code-reference">Policy templates — Error code reference</a>.</p>
 <h2 id="permissions-catalog">Permissions catalog<a class="headerlink" href="#permissions-catalog" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
