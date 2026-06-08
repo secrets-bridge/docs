@@ -2292,6 +2292,11 @@ guide.</p>
 </tr>
 <tr>
 <td><code>GET</code></td>
+<td><code>/api/v1/workflows/scoped-policy-authorable</code></td>
+<td><code>bearer + policy.author</code> at any scope</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
 <td><code>/api/v1/workflows/:id</code></td>
 <td>bearer</td>
 </tr>
@@ -2737,6 +2742,11 @@ keep using them.</p>
 <td>400</td>
 <td><code>selector.environment_id</code> doesn't belong to URL projectID.</td>
 </tr>
+<tr>
+<td><code>workflow_not_authorable_for_scope</code></td>
+<td>403</td>
+<td>R-follow-up #1 (api#112). Scoped caller picked a workflow that platform admin hasn't opted into the scoped author surface. Envelope carries <code>{"workflow_id": "&lt;uuid&gt;"}</code> — the actor selected the workflow from a dropdown, so logging it isn't a leak. Distinct from <code>platform_policy_not_editable</code>: the workflow exists and is reachable by admin; it just hasn't been exposed to scoped authors yet.</td>
+</tr>
 </tbody>
 </table>
 <p><strong>Prometheus counters</strong> (EPIC R):</p>
@@ -2745,9 +2755,10 @@ keep using them.</p>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>policy_rules_deleted_total{permission_used, scope}
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>policy_rules_denied_total{reason}
 </span></code></pre></div>
-<p><code>reason</code> is a fixed low-cardinality 8-element set; the counters
-NEVER carry <code>actor_id</code>, <code>project_id</code>, <code>policy_rule_id</code>, or
-<code>workflow_id</code> as labels. See
+<p><code>reason</code> is a fixed low-cardinality 9-element set (<code>workflow_not_authorable</code>
+added by R-follow-up #1, api#112); the counters NEVER carry
+<code>actor_id</code>, <code>project_id</code>, <code>policy_rule_id</code>, or <code>workflow_id</code> as
+labels. See
 <a href="../../operations/policy-templates/#observability-prometheus-counters">Policy templates — Observability</a>
 for the operator-facing discussion + the audit-event triage SQL
 that pairs with these.</p>

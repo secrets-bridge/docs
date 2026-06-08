@@ -1839,7 +1839,7 @@ edit their permission lists but can't delete the rows.</p>
 <tbody>
 <tr>
 <td><code>workflow.edit</code></td>
-<td>Create / update / delete workflow definitions.</td>
+<td>Create / update / delete workflow definitions. R-follow-up #1 (api#112) added the <code>scoped_policy_authorable</code> flag — this permission also gates the toggle that exposes a workflow to the scoped policy author surface (<code>/projects/:id/policies</code>). Default-deny; admin curates explicitly.</td>
 </tr>
 <tr>
 <td><code>policy.edit</code></td>
