@@ -1361,6 +1361,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#adjusting-the-reserved-priority-band" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adjusting the reserved priority band
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#observability-prometheus-counters" class="md-nav__link">
     <span class="md-ellipsis">
       Observability — Prometheus counters
@@ -1857,6 +1866,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#adjusting-the-reserved-priority-band" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adjusting the reserved priority band
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#observability-prometheus-counters" class="md-nav__link">
     <span class="md-ellipsis">
       Observability — Prometheus counters
@@ -2201,8 +2219,8 @@ can't express.</p>
 <td>Service gate 1 → <code>out_of_scope_policy</code> (403)</td>
 </tr>
 <tr>
-<td>Priority <code>&lt; 9000</code> (platform reserved band)</td>
-<td>Service gate 2 → <code>policy_priority_reserved</code> (400) with <code>{"cap": 9000}</code></td>
+<td>Priority <code>&lt; platform_reserved_priority</code> (default <code>9000</code>, admin-configurable per R-follow-up #2)</td>
+<td>Service gate 2 → <code>policy_priority_reserved</code> (400) with <code>{"cap": &lt;live-value&gt;}</code></td>
 </tr>
 <tr>
 <td>Empty <code>{}</code> selector REJECTED</td>
@@ -2413,10 +2431,12 @@ rules can be edited/deleted by another covered actor or by
 <code>policy.edit</code> admin via <code>/admin/policies</code>.</p>
 <p><strong>Diagnose "my scoped rule isn't taking effect"</strong></p>
 <p>Walk the priority band. Platform <code>policy.edit</code> rules have priority
-<code>&gt;= 9000</code>. Scoped rules are bounded <code>&lt; 9000</code>. If a platform rule
-overlaps the scoped selector at higher priority, platform wins by
-design. Triage SQL #1 shows the active rules per project; cross-check
-priorities against the <code>/admin/policies</code> admin view.</p>
+<code>&gt;= platform_reserved_priority</code> (default <code>9000</code>, admin-configurable
+per R-follow-up #2). Scoped rules are bounded
+<code>&lt; platform_reserved_priority</code>. If a platform rule overlaps the
+scoped selector at higher priority, platform wins by design. Triage
+SQL #1 shows the active rules per project; cross-check priorities
+against the <code>/admin/policies</code> admin view.</p>
 <h3 id="curating-workflows-for-scoped-authoring">Curating workflows for scoped authoring<a class="headerlink" href="#curating-workflows-for-scoped-authoring" title="Permanent link">&para;</a></h3>
 <p>R-follow-up #1 (<a href="https://github.com/secrets-bridge/api/issues/112">api#112</a>)
 adds the <code>workflow_definitions.scoped_policy_authorable</code> flag so
@@ -2490,14 +2510,110 @@ that omit it (Get-then-merge), and the SPA's new WorkflowForm tracks
 both the loaded value AND whether the admin TOUCHED the checkbox —
 PUT body only includes the field when one of those is true. Either
 side acting alone is safe.</p>
+<h3 id="adjusting-the-reserved-priority-band">Adjusting the reserved priority band<a class="headerlink" href="#adjusting-the-reserved-priority-band" title="Permanent link">&para;</a></h3>
+<p>R-follow-up #2 (<a href="https://github.com/secrets-bridge/api/issues/113">api#113</a>)
+made the platform-reserved priority band admin-configurable. The cap
+that used to live as the hardcoded constant <code>PlatformReservedPriority
+= 9000</code> is now a row in the <code>platform_settings</code> table seeded with
+<code>{"value": 9000}</code> on first boot; admin edits it without a redeploy.</p>
+<h4 id="what-the-cap-controls">What the cap controls<a class="headerlink" href="#what-the-cap-controls" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Code path</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Service gate 2 (Create + Update)</td>
+<td>Rejects priorities <code>&gt;= cap</code> with <code>policy_priority_reserved</code> (400); envelope carries the live <code>cap</code>.</td>
+</tr>
+<tr>
+<td><code>policy_rules</code> envelope (SPA Author drawer)</td>
+<td>Reads <code>priority_cap</code> from <code>GET /api/v1/projects/:id/policy-rules</code> so the drawer's "Priority (&lt; N — platform reserved)" label reflects the live value at page load.</td>
+</tr>
+<tr>
+<td>Author drawer Zod schema</td>
+<td>Built from the live cap at mount — the <code>&lt; cap</code> validation rejects values at or above whatever admin has flipped to right now.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="editing-through-the-spa-admin">Editing through the SPA (admin)<a class="headerlink" href="#editing-through-the-spa-admin" title="Permanent link">&para;</a></h4>
+<p><code>/admin/platform-settings</code> → <strong>Scoped policy reserved priority</strong> card →
+<strong>Edit</strong> → enter the new value (whole number between <code>100</code> and
+<code>1,000,000</code>) → <strong>Save</strong>.</p>
+<p>The confirm modal carries a grandfathering warning + an inline triage
+SQL block that previews which scoped rules would land in the
+grandfathered band BEFORE you confirm. <strong>Lowering the cap is
+grandfathered</strong> — see the next subsection.</p>
+<p>The change propagates to every api pod within seconds via the Redis
+pub/sub channel <code>secrets-bridge:platform_settings:platform_reserved_priority</code>.
+Subscribers do NOT trust the published payload — they re-fetch the
+row from the database on every notification, so a malicious or
+malformed publish can't poison the cache. A 5-minute TTL backstop
+catches dropped notifications.</p>
+<h4 id="editing-through-the-api">Editing through the API<a class="headerlink" href="#editing-through-the-api" title="Permanent link">&para;</a></h4>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span>/api/v1/platform-settings/platform_reserved_priority<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Authorization: Bearer &lt;jwt&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;value&quot;: 10000}&#39;</span>
+</span></code></pre></div>
+<p>Permission: <code>policy.edit</code>. Bounds: <code>100 ≤ value ≤ 1,000,000</code>, whole
+numbers only. Out-of-bounds and non-integer JSON return
+<code>invalid_platform_setting</code> (400) with <code>{"min": 100, "max": 1000000}</code>
+in the envelope.</p>
+<h4 id="the-grandfather-rule">The grandfather rule<a class="headerlink" href="#the-grandfather-rule" title="Permanent link">&para;</a></h4>
+<p>Lowering the cap does NOT auto-delete scoped rules that now sit in
+the platform-reserved band. <strong>Existing rows keep their priorities;
+they continue to apply.</strong> What changes is:</p>
+<ul>
+<li>New scoped Create requests with <code>priority &gt;= new_cap</code> are rejected.</li>
+<li>Scoped Update requests are revalidated against the new cap on every
+  call (NOT just when priority is changing) — bumping any other field
+  on a rule whose priority sits in the grandfathered band is rejected
+  with <code>policy_priority_reserved</code>.</li>
+<li>Platform admins editing through <code>/admin/policies</code> are unaffected;
+  their permission is <code>policy.edit</code>, not the scoped path.</li>
+</ul>
+<p>This means admin can lower the cap to close off a band without
+breaking pending authoring work — existing rules continue to apply
+while authors migrate to lower priorities.</p>
+<h4 id="triage-sql-list-scoped-rules-in-the-grandfathered-band">Triage SQL — list scoped rules in the grandfathered band<a class="headerlink" href="#triage-sql-list-scoped-rules-in-the-grandfathered-band" title="Permanent link">&para;</a></h4>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">priority</span><span class="p">,</span><span class="w"> </span><span class="n">project_id</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="n">policy_rules</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">is_platform_inherited</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">false</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">   </span><span class="k">AND</span><span class="w"> </span><span class="n">priority</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">new_cap</span><span class="o">&gt;</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">priority</span><span class="w"> </span><span class="k">ASC</span><span class="p">;</span>
+</span></code></pre></div>
+<p>The confirm modal in the SPA admin page embeds this exact query with
+the proposed <code>&lt;new_cap&gt;</code> substituted so an operator can sanity-check
+before saving.</p>
+<h4 id="fail-closed-when-the-settings-cache-is-unavailable">Fail-closed when the settings cache is unavailable<a class="headerlink" href="#fail-closed-when-the-settings-cache-is-unavailable" title="Permanent link">&para;</a></h4>
+<p>If the SettingsService cache reload fails (Postgres outage, KMS
+unavailability cascading through), service gates fall closed: scoped
+Create and Update return <code>platform_setting_unavailable</code> (503). The
+Author drawer renders a disabled form with a red banner explaining
+that authoring stays disabled until the cap is readable — falling
+back to a stale value would let scoped rules into the
+platform-reserved band.</p>
+<h4 id="observability">Observability<a class="headerlink" href="#observability" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>platform_setting_updates_total{key, result}</code> — counter for admin
+  edit attempts. <code>result</code> ∈ <code>{ok, invalid, unavailable, conflict}</code>.</li>
+<li><code>platform_setting_cache_reloads_total{key, trigger}</code> — counter for
+  cache reloads. <code>trigger</code> ∈ <code>{boot, pubsub, on_demand}</code>.</li>
+</ul>
+<p>LOW-CARDINALITY LOCK: counters NEVER carry actor identity. The audit
+events <code>platform_setting.updated</code> carry the actor + old/new values.</p>
 <h3 id="observability-prometheus-counters">Observability — Prometheus counters<a class="headerlink" href="#observability-prometheus-counters" title="Permanent link">&para;</a></h3>
 <p>Four counters, all locked to LOW-CARDINALITY labels. Operator
 shouldn't try to derive per-actor or per-rule rates from these —
 those live in the audit log.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>policy_rules_created_total{permission_used, scope}
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>policy_rules_updated_total{permission_used, scope}
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>policy_rules_deleted_total{permission_used, scope}
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>policy_rules_denied_total{reason}
+<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>policy_rules_created_total{permission_used, scope}
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>policy_rules_updated_total{permission_used, scope}
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>policy_rules_deleted_total{permission_used, scope}
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>policy_rules_denied_total{reason}
 </span></code></pre></div>
 <ul>
 <li><code>permission_used</code> ∈ <code>{policy.author, policy.edit}</code> — tracks which
@@ -2564,8 +2680,8 @@ those up.</p>
 <tr>
 <td><code>policy_priority_reserved</code></td>
 <td>400</td>
-<td>Priority <code>&gt;= 9000</code> requested; reserved for platform</td>
-<td><code>{"cap": 9000}</code></td>
+<td>Priority at or above the platform-reserved band requested. The cap is admin-configurable per R-follow-up #2 (default <code>9000</code>); the envelope echoes the live value.</td>
+<td><code>{"cap": &lt;live-value&gt;}</code></td>
 </tr>
 <tr>
 <td><code>policy_environment_not_in_project</code></td>

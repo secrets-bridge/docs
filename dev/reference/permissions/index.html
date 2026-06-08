@@ -1804,7 +1804,7 @@ edit their permission lists but can't delete the rows.</p>
 <tr>
 <td><code>policy_author</code></td>
 <td><code>policy.author</code></td>
-<td>EPIC R seed (api#108) — section-head capability for <a href="../../operations/policy-templates/#scoped-policy-authoring-policyauthor">scoped non-prod policy authoring</a>. Assignment carries <code>team_id</code> or <code>project_id</code> scope. <strong>Not</strong> auto-granted to <code>policy.edit</code> holders — operators grant explicitly. Scoped rules are bounded <code>priority &lt; 9000</code> (the platform-reserved band) and rejected against any selector that resolves to a prod environment.</td>
+<td>EPIC R seed (api#108) — section-head capability for <a href="../../operations/policy-templates/#scoped-policy-authoring-policyauthor">scoped non-prod policy authoring</a>. Assignment carries <code>team_id</code> or <code>project_id</code> scope. <strong>Not</strong> auto-granted to <code>policy.edit</code> holders — operators grant explicitly. Scoped rules are bounded <code>priority &lt; platform_reserved_priority</code> (default <code>9000</code>, admin-configurable per <a href="../../operations/policy-templates/#adjusting-the-reserved-priority-band">R-follow-up #2 / api#113</a>) and rejected against any selector that resolves to a prod environment.</td>
 </tr>
 </tbody>
 </table>
@@ -1843,11 +1843,11 @@ edit their permission lists but can't delete the rows.</p>
 </tr>
 <tr>
 <td><code>policy.edit</code></td>
-<td>Create / update / delete policy rules. Global scope — affects every project's resolution. Does NOT auto-cover <code>policy.author</code> server-side (EPIC R, api#108) — operators grant scoped authoring explicitly via the <code>policy_author</code> system role.</td>
+<td>Create / update / delete policy rules. Global scope — affects every project's resolution. Does NOT auto-cover <code>policy.author</code> server-side (EPIC R, api#108) — operators grant scoped authoring explicitly via the <code>policy_author</code> system role. R-follow-up #2 (api#113) extended this permission to also gate the <a href="../api-endpoints/#platform-settings-r-follow-up-2-api113">Platform settings</a> admin surface (<code>GET</code> / <code>PUT /api/v1/platform-settings[/:key]</code> + the SPA's <code>/admin/platform-settings</code> page) — the same permission that authors global policy also tunes the platform-reserved priority band scoped authors are bounded below.</td>
 </tr>
 <tr>
 <td><code>policy.author</code></td>
-<td>Author project-scoped policy rules for non-prod environments (EPIC R, api#108). Scoped via the existing team-aware resolver. Refuses prod env selectors, priority <code>&gt;= 9000</code> (platform reserved), and edits to platform global rules. Granted via the <code>policy_author</code> system seed role.</td>
+<td>Author project-scoped policy rules for non-prod environments (EPIC R, api#108). Scoped via the existing team-aware resolver. Refuses prod env selectors, priority at or above the platform-reserved band (cap is admin-configurable via R-follow-up #2 / api#113; default <code>9000</code>), and edits to platform global rules. Granted via the <code>policy_author</code> system seed role.</td>
 </tr>
 </tbody>
 </table>

@@ -1556,6 +1556,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#platform-settings-r-follow-up-2-api113" class="md-nav__link">
+    <span class="md-ellipsis">
+      Platform settings (R-follow-up #2, api#113)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#permissions-catalog" class="md-nav__link">
     <span class="md-ellipsis">
       Permissions catalog
@@ -1811,6 +1820,15 @@
   <a href="#project-anchored-scoped-policy-rules-epic-r-api108" class="md-nav__link">
     <span class="md-ellipsis">
       Project-anchored scoped policy rules (EPIC R, api#108)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platform-settings-r-follow-up-2-api113" class="md-nav__link">
+    <span class="md-ellipsis">
+      Platform settings (R-follow-up #2, api#113)
     </span>
   </a>
   
@@ -2735,7 +2753,7 @@ keep using them.</p>
 <tr>
 <td><code>policy_priority_reserved</code></td>
 <td>400</td>
-<td>Priority <code>&gt;= 9000</code> requested; reserved for platform. Envelope includes <code>{"cap": 9000}</code>.</td>
+<td>Priority at or above the platform-reserved band requested. The cap is admin-configurable per R-follow-up #2 (default <code>9000</code>); envelope echoes the live value: <code>{"cap": &lt;live&gt;}</code>.</td>
 </tr>
 <tr>
 <td><code>policy_environment_not_in_project</code></td>
@@ -2764,6 +2782,109 @@ for the operator-facing discussion + the audit-event triage SQL
 that pairs with these.</p>
 <p><strong>Error codes</strong> — the full reference table lives in
 <a href="../../operations/policy-templates/#error-code-reference">Policy templates — Error code reference</a>.</p>
+<h2 id="platform-settings-r-follow-up-2-api113">Platform settings (R-follow-up #2, api#113)<a class="headerlink" href="#platform-settings-r-follow-up-2-api113" title="Permanent link">&para;</a></h2>
+<p>Admin surface for cross-cutting platform configuration. v1 ships
+exactly one whitelisted key — <code>platform_reserved_priority</code> — that
+controls the priority band scoped policy authors are bounded below.
+Future admin-configurable knobs slot in as new rows in the same table
+without per-knob migrations.</p>
+<p><strong>Hard rule</strong> — <code>platform_settings</code> must NEVER store secrets,
+credentials, tokens, or provider auth material. The service-layer
+whitelist + reviewers + the DB CHECK constraint all enforce this.</p>
+<p>All three routes are gated by <code>policy.edit</code> (the platform policy
+admin permission). The SettingsService keeps an in-memory cache with
+Redis pub/sub-driven invalidation (channel
+<code>secrets-bridge:platform_settings:&lt;key&gt;</code>); subscribers re-fetch from
+Postgres on every notification rather than trusting the payload, with
+a 5-minute TTL backstop for missed messages.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/platform-settings</code></td>
+<td><code>bearer + policy.edit</code></td>
+<td>List all whitelisted rows. Non-whitelisted rows in the table (shouldn't exist in v1) are filtered out service-side.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/platform-settings/:key</code></td>
+<td><code>bearer + policy.edit</code></td>
+<td>One row. Unknown / non-whitelisted key → 404 <code>unknown_platform_setting</code>.</td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/api/v1/platform-settings/:key</code></td>
+<td><code>bearer + policy.edit</code></td>
+<td>Update. Body: <code>{value: &lt;json&gt;}</code>. URL <code>:key</code> wins over any <code>key</code> in the body (defense against URL/body confusion). Transactional: BEGIN → SELECT FOR UPDATE → validate → UPDATE → INSERT audit → COMMIT → pub/sub publish AFTER commit.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response shape</strong> (<code>PlatformSetting</code>):</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;platform_reserved_priority&quot;</span><span class="p">,</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">9000</span><span class="p">,</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-08T12:34:56.789Z&quot;</span><span class="p">,</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nt">&quot;updated_by&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;alice&quot;</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><code>value</code> is generic JSON — callers narrow per-key. For
+<code>platform_reserved_priority</code> it's an integer between <code>100</code> and
+<code>1,000,000</code>.</p>
+<p><strong>Stable error codes</strong> (R-follow-up #2):</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Status</th>
+<th>Meaning</th>
+<th>Envelope extras</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>unknown_platform_setting</code></td>
+<td>404</td>
+<td>Key is not in the v1 whitelist OR the row doesn't exist.</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>invalid_platform_setting</code></td>
+<td>400</td>
+<td>Value failed the per-key validator (out of bounds, wrong JSON shape, non-integer for integer keys). The DB CHECK is a defense-in-depth backstop; the service layer pre-validates and emits the friendly bounds.</td>
+<td><code>{"min": 100, "max": 1000000}</code> for <code>platform_reserved_priority</code></td>
+</tr>
+<tr>
+<td><code>platform_setting_unavailable</code></td>
+<td>503</td>
+<td>The SettingsService cache reload failed (Postgres unreachable, KMS cascading failure, etc.). Service gates that depend on the setting fail closed and return this code; admins and Author drawers can't proceed until the cache is readable again.</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Prometheus counters</strong> (R-follow-up #2):</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>platform_setting_updates_total{key, result}
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>platform_setting_cache_reloads_total{key, trigger}
+</span></code></pre></div>
+<ul>
+<li><code>key</code> is the whitelisted key string (low-cardinality — v1 has one).</li>
+<li><code>result</code> ∈ <code>{ok, invalid, unavailable, conflict}</code>.</li>
+<li><code>trigger</code> ∈ <code>{boot, pubsub, on_demand}</code>.</li>
+</ul>
+<p>LOW-CARDINALITY LOCK — counters NEVER carry <code>actor_id</code>. The
+<code>platform_setting.updated</code> audit event carries the actor + old/new
+value for forensic lookup.</p>
+<p>See
+<a href="../../operations/policy-templates/#adjusting-the-reserved-priority-band">Adjusting the reserved priority band</a>
+for the operator playbook (grandfather rule, triage SQL, fail-closed
+posture).</p>
 <h2 id="permissions-catalog">Permissions catalog<a class="headerlink" href="#permissions-catalog" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
