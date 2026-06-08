@@ -271,7 +271,7 @@ can't express.
 | Rule | What rejects it |
 |---|---|
 | Coverage — `EffectiveProjectAccess(policy.author, projectID)` must succeed | Service gate 1 → `out_of_scope_policy` (403) |
-| Priority `< 9000` (platform reserved band) | Service gate 2 → `policy_priority_reserved` (400) with `{"cap": 9000}` |
+| Priority `< platform_reserved_priority` (default `9000`, admin-configurable per R-follow-up #2) | Service gate 2 → `policy_priority_reserved` (400) with `{"cap": <live-value>}` |
 | Empty `{}` selector REJECTED | Service gate 4 → `policy_scope_too_broad` (400) with `{"reason": "selector_empty"}` |
 | `selector.environment_kind = "non_prod"` OR `selector.environment_id` set | Service gate 4 → `policy_scope_too_broad` (400) with `{"reason": "env_constraint_missing"}` |
 | `selector.environment_id` belongs to URL projectID | Service gate 4 → `policy_environment_not_in_project` (400) |
@@ -476,10 +476,12 @@ rules can be edited/deleted by another covered actor or by
 **Diagnose "my scoped rule isn't taking effect"**
 
 Walk the priority band. Platform `policy.edit` rules have priority
-`>= 9000`. Scoped rules are bounded `< 9000`. If a platform rule
-overlaps the scoped selector at higher priority, platform wins by
-design. Triage SQL #1 shows the active rules per project; cross-check
-priorities against the `/admin/policies` admin view.
+`>= platform_reserved_priority` (default `9000`, admin-configurable
+per R-follow-up #2). Scoped rules are bounded
+`< platform_reserved_priority`. If a platform rule overlaps the
+scoped selector at higher priority, platform wins by design. Triage
+SQL #1 shows the active rules per project; cross-check priorities
+against the `/admin/policies` admin view.
 
 ### Curating workflows for scoped authoring
 
@@ -555,6 +557,106 @@ both the loaded value AND whether the admin TOUCHED the checkbox —
 PUT body only includes the field when one of those is true. Either
 side acting alone is safe.
 
+### Adjusting the reserved priority band
+
+R-follow-up #2 ([api#113](https://github.com/secrets-bridge/api/issues/113))
+made the platform-reserved priority band admin-configurable. The cap
+that used to live as the hardcoded constant `PlatformReservedPriority
+= 9000` is now a row in the `platform_settings` table seeded with
+`{"value": 9000}` on first boot; admin edits it without a redeploy.
+
+#### What the cap controls
+
+| Code path | Behavior |
+|---|---|
+| Service gate 2 (Create + Update) | Rejects priorities `>= cap` with `policy_priority_reserved` (400); envelope carries the live `cap`. |
+| `policy_rules` envelope (SPA Author drawer) | Reads `priority_cap` from `GET /api/v1/projects/:id/policy-rules` so the drawer's "Priority (< N — platform reserved)" label reflects the live value at page load. |
+| Author drawer Zod schema | Built from the live cap at mount — the `< cap` validation rejects values at or above whatever admin has flipped to right now. |
+
+#### Editing through the SPA (admin)
+
+`/admin/platform-settings` → **Scoped policy reserved priority** card →
+**Edit** → enter the new value (whole number between `100` and
+`1,000,000`) → **Save**.
+
+The confirm modal carries a grandfathering warning + an inline triage
+SQL block that previews which scoped rules would land in the
+grandfathered band BEFORE you confirm. **Lowering the cap is
+grandfathered** — see the next subsection.
+
+The change propagates to every api pod within seconds via the Redis
+pub/sub channel `secrets-bridge:platform_settings:platform_reserved_priority`.
+Subscribers do NOT trust the published payload — they re-fetch the
+row from the database on every notification, so a malicious or
+malformed publish can't poison the cache. A 5-minute TTL backstop
+catches dropped notifications.
+
+#### Editing through the API
+
+```bash
+curl -X PUT /api/v1/platform-settings/platform_reserved_priority \
+  -H 'Authorization: Bearer <jwt>' \
+  -H 'Content-Type: application/json' \
+  -d '{"value": 10000}'
+```
+
+Permission: `policy.edit`. Bounds: `100 ≤ value ≤ 1,000,000`, whole
+numbers only. Out-of-bounds and non-integer JSON return
+`invalid_platform_setting` (400) with `{"min": 100, "max": 1000000}`
+in the envelope.
+
+#### The grandfather rule
+
+Lowering the cap does NOT auto-delete scoped rules that now sit in
+the platform-reserved band. **Existing rows keep their priorities;
+they continue to apply.** What changes is:
+
+- New scoped Create requests with `priority >= new_cap` are rejected.
+- Scoped Update requests are revalidated against the new cap on every
+  call (NOT just when priority is changing) — bumping any other field
+  on a rule whose priority sits in the grandfathered band is rejected
+  with `policy_priority_reserved`.
+- Platform admins editing through `/admin/policies` are unaffected;
+  their permission is `policy.edit`, not the scoped path.
+
+This means admin can lower the cap to close off a band without
+breaking pending authoring work — existing rules continue to apply
+while authors migrate to lower priorities.
+
+#### Triage SQL — list scoped rules in the grandfathered band
+
+```sql
+SELECT id, name, priority, project_id
+  FROM policy_rules
+ WHERE is_platform_inherited = false
+   AND priority >= <new_cap>
+ ORDER BY priority ASC;
+```
+
+The confirm modal in the SPA admin page embeds this exact query with
+the proposed `<new_cap>` substituted so an operator can sanity-check
+before saving.
+
+#### Fail-closed when the settings cache is unavailable
+
+If the SettingsService cache reload fails (Postgres outage, KMS
+unavailability cascading through), service gates fall closed: scoped
+Create and Update return `platform_setting_unavailable` (503). The
+Author drawer renders a disabled form with a red banner explaining
+that authoring stays disabled until the cap is readable — falling
+back to a stale value would let scoped rules into the
+platform-reserved band.
+
+#### Observability
+
+- `platform_setting_updates_total{key, result}` — counter for admin
+  edit attempts. `result` ∈ `{ok, invalid, unavailable, conflict}`.
+- `platform_setting_cache_reloads_total{key, trigger}` — counter for
+  cache reloads. `trigger` ∈ `{boot, pubsub, on_demand}`.
+
+LOW-CARDINALITY LOCK: counters NEVER carry actor identity. The audit
+events `platform_setting.updated` carry the actor + old/new values.
+
 ### Observability — Prometheus counters
 
 Four counters, all locked to LOW-CARDINALITY labels. Operator
@@ -593,7 +695,7 @@ those up.
 | `policy_selector_mismatch` | 400 | `selector.project_id` was set but doesn't equal URL projectID | — |
 | `prod_policy_not_allowed_for_scope` | 403 | Scoped caller tried to author a rule that resolves to a prod env | `{"env_kind": "prod"}` |
 | `policy_scope_too_broad` | 400 | Selector doesn't satisfy the non-prod-by-construction invariant | `{"reason": "env_constraint_missing"\|"env_kind_invalid"\|"selector_empty"\|"env_kind_id_inconsistent"}` |
-| `policy_priority_reserved` | 400 | Priority `>= 9000` requested; reserved for platform | `{"cap": 9000}` |
+| `policy_priority_reserved` | 400 | Priority at or above the platform-reserved band requested. The cap is admin-configurable per R-follow-up #2 (default `9000`); the envelope echoes the live value. | `{"cap": <live-value>}` |
 | `policy_environment_not_in_project` | 400 | `selector.environment_id` doesn't belong to URL projectID | — |
 | `workflow_not_authorable_for_scope` | 403 | Scoped caller picked a workflow that platform admin hasn't opted into the scoped author surface (R-follow-up #1, api#112). Distinct from `platform_policy_not_editable`: the workflow exists and is admin-usable; it just isn't exposed to scoped authors yet. | `{"workflow_id": "<uuid>"}` |
 
