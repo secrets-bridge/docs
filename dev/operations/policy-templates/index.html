@@ -1370,18 +1370,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#observability-prometheus-counters" class="md-nav__link">
+  <a href="#team-scoped-policy-authoring-r-follow-up-3-api114" class="md-nav__link">
     <span class="md-ellipsis">
-      Observability — Prometheus counters
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#error-code-reference" class="md-nav__link">
-    <span class="md-ellipsis">
-      Error code reference
+      Team-scoped policy authoring (R-follow-up #3, api#114)
     </span>
   </a>
   
@@ -1389,24 +1380,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#hard-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      Hard rules
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
-    <span class="md-ellipsis">
-      Related
-    </span>
-  </a>
   
 </li>
       
@@ -1875,18 +1848,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#observability-prometheus-counters" class="md-nav__link">
+  <a href="#team-scoped-policy-authoring-r-follow-up-3-api114" class="md-nav__link">
     <span class="md-ellipsis">
-      Observability — Prometheus counters
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#error-code-reference" class="md-nav__link">
-    <span class="md-ellipsis">
-      Error code reference
+      Team-scoped policy authoring (R-follow-up #3, api#114)
     </span>
   </a>
   
@@ -1894,24 +1858,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#hard-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      Hard rules
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
-    <span class="md-ellipsis">
-      Related
-    </span>
-  </a>
   
 </li>
       
@@ -2606,25 +2552,307 @@ platform-reserved band.</p>
 </ul>
 <p>LOW-CARDINALITY LOCK: counters NEVER carry actor identity. The audit
 events <code>platform_setting.updated</code> carry the actor + old/new values.</p>
+<h3 id="team-scoped-policy-authoring-r-follow-up-3-api114">Team-scoped policy authoring (R-follow-up #3, api#114)<a class="headerlink" href="#team-scoped-policy-authoring-r-follow-up-3-api114" title="Permanent link">&para;</a></h3>
+<p>A scoped author covering one project authors per-project rules via
+<code>/projects/:projectID/policy-rules</code>. A section head covering an entire
+team — multiple sibling projects under the same <code>team_id</code> — would
+otherwise have to author N identical rules, one per project. R-follow-up</p>
+<h1 id="3-lifts-that-ceiling-the-third-anchor-team_id-lets-one-rule">3 lifts that ceiling: the third anchor <code>team_id</code> lets one rule<a class="headerlink" href="#3-lifts-that-ceiling-the-third-anchor-team_id-lets-one-rule" title="Permanent link">&para;</a></h1>
+<p>cascade down to every descendant project of the team subtree.</p>
+<h4 id="three-anchor-mental-model">Three-anchor mental model<a class="headerlink" href="#three-anchor-mental-model" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th><code>project_id</code></th>
+<th><code>team_id</code></th>
+<th>Anchor</th>
+<th>Authoring URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NULL</td>
+<td>NULL</td>
+<td>Platform-global</td>
+<td><code>/admin/policies</code> (<code>policy.edit</code>)</td>
+</tr>
+<tr>
+<td>NOT NULL</td>
+<td>NULL</td>
+<td>Project-scoped</td>
+<td><code>/projects/:projectID/policy-rules</code></td>
+</tr>
+<tr>
+<td>NULL</td>
+<td>NOT NULL</td>
+<td><strong>Team-scoped (new)</strong></td>
+<td><code>/teams/:teamID/policy-rules</code></td>
+</tr>
+<tr>
+<td>NOT NULL</td>
+<td>NOT NULL</td>
+<td>INVALID (DB CHECK)</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>The DB CHECK <code>policy_rules_one_anchor</code> enforces mutual exclusion at
+the schema level. Mixed-anchor rows can't exist even via direct SQL.</p>
+<h4 id="cascade-semantics-subtree-down-only">Cascade semantics — subtree-down only<a class="headerlink" href="#cascade-semantics-subtree-down-only" title="Permanent link">&para;</a></h4>
+<p>A team rule cascades to every descendant project of the team subtree
+at resolution time. A rule attached to <code>parent-team</code> applies to
+projects under <code>parent-team</code>, <code>child-team-a</code>, <code>grandchild-team-X</code>, etc.
+A rule attached to <code>child-team-a</code> does NOT apply to a sibling
+<code>child-team-b</code>'s projects — the cascade is subtree-down only.</p>
+<p>The resolver query (<code>pkg/storage/policies.ListEnabledOrderedByPriority</code>)
+walks ancestors of the project's owning team via an inline recursive
+CTE in a single round trip. No separate <code>AncestorIDs</code> helper.</p>
+<h4 id="deterministic-tie-break-5-clause-order-by">Deterministic tie-break — 5-clause ORDER BY<a class="headerlink" href="#deterministic-tie-break-5-clause-order-by" title="Permanent link">&para;</a></h4>
+<p>When multiple rules match the same scope, the resolver picks the
+winner with a deterministic 5-clause chain:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>ORDER BY
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>    priority DESC,                                  -- 1. higher priority wins
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>    CASE                                            -- 2. specificity DESC
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>        WHEN project_id IS NOT NULL THEN 2          --    (project=2 &gt; team=1 &gt; platform=0)
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>        WHEN team_id    IS NOT NULL THEN 1
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>        ELSE 0
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>    END DESC,
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>    tc.distance ASC NULLS LAST,                     -- 3. team distance ASC
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>                                                    --    (smaller = closer = wins)
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a>    created_at ASC,                                 -- 4. older wins
+</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a>    id ASC                                          -- 5. stable final tie-break
+</span></code></pre></div>
+<p><strong>Worked example.</strong> Project <code>billing-app</code> belongs to <code>child-team-a</code>,
+which is a child of <code>parent-team</code>. Three matching rules:</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Anchor</th>
+<th>Priority</th>
+<th>Created</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>platform</td>
+<td>500</td>
+<td>2026-01-01</td>
+</tr>
+<tr>
+<td>B</td>
+<td><code>parent-team</code></td>
+<td>500</td>
+<td>2026-02-01</td>
+</tr>
+<tr>
+<td>C</td>
+<td><code>child-team-a</code></td>
+<td>500</td>
+<td>2026-03-01</td>
+</tr>
+<tr>
+<td>D</td>
+<td><code>billing-app</code> (project)</td>
+<td>500</td>
+<td>2026-04-01</td>
+</tr>
+</tbody>
+</table>
+<p>All four are at priority 500 (tie on clause 1). Specificity DESC:
+- D (project, 2) wins clause 2 → resolver picks D.</p>
+<p>If D didn't exist, C (team, distance 0) would beat B (team, distance
+1) on clause 3, beating A (platform) by clause 2. Higher specificity
+wins; within the same specificity, closer team wins.</p>
+<h4 id="selector-restrictions-for-team-rules-1-c1-strict">Selector restrictions for team rules (§1 C1 strict)<a class="headerlink" href="#selector-restrictions-for-team-rules-1-c1-strict" title="Permanent link">&para;</a></h4>
+<p>Team rules MUST keep their applicability subtree-wide. The DB CHECK
+constraints from migration 0037 + the service layer enforce:</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>environment_kind = "non_prod"</code> (REQUIRED)</td>
+<td>Team rules cascade to descendant projects; the environment selector must be subtree-applicable. <code>environment_id</code> resolves to ONE project's env — forbidden.</td>
+</tr>
+<tr>
+<td><code>selector.project_id</code> MUST be absent</td>
+<td>Would collapse the team rule into a project-scoped rule, defeating the cascade.</td>
+</tr>
+<tr>
+<td><code>selector.environment_id</code> MUST be absent</td>
+<td>Same — pins to one project's env.</td>
+</tr>
+<tr>
+<td><code>selector.team_id</code> MUST be absent (v1 lock)</td>
+<td>The row column <code>team_id</code> is the anchor; a selector key would create a second source of truth. v2 may relax with explicit resolver semantics.</td>
+</tr>
+</tbody>
+</table>
+<p>Safe-list optional selector keys: <code>secret_ref_prefix</code> only in v1.
+<code>provider_type</code> and <code>operation</code> are deferred until the policy
+selector enum is formally locked in a separate design pass.</p>
+<h4 id="authoring-urls-policyauthor-scoped-to-teamid">Authoring URLs — <code>policy.author</code> scoped to teamID<a class="headerlink" href="#authoring-urls-policyauthor-scoped-to-teamid" title="Permanent link">&para;</a></h4>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>POST   /api/v1/teams/:teamID/policy-rules
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>GET    /api/v1/teams/:teamID/policy-rules
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>GET    /api/v1/teams/:teamID/policy-rules/:ruleID
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>PUT    /api/v1/teams/:teamID/policy-rules/:ruleID
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>DELETE /api/v1/teams/:teamID/policy-rules/:ruleID
+</span></code></pre></div>
+<p>All 5 routes require <code>policy.author</code> scoped to the URL teamID via the
+team-aware resolver (subtree-expanded). The coverage gate runs as the
+<strong>first handler line</strong> (not middleware) so denial emits the same
+audit + counter signal as the rest of the gate chain. Same posture
+EPIC R + EPIC Q established for <code>policy.author</code> / <code>integration.bind</code>.</p>
+<h4 id="the-policyedit-boundary">The <code>policy.edit</code> boundary<a class="headerlink" href="#the-policyedit-boundary" title="Permanent link">&para;</a></h4>
+<p><code>policy.edit</code> does NOT auto-allow on <code>/teams/:id/policies</code> or
+<code>/projects/:id/policies</code> — both scoped surfaces are <code>policy.author</code>
+only. Platform admins manage team-scoped rules via <code>/admin/policies</code>
+(which accepts the <code>team_id</code> anchor with the same server-side
+selector safety rules).</p>
+<p>The SPA mirrors this: <code>canEditPolicyRule</code> on the scoped pages reads
+<code>is_platform_inherited</code> / <code>is_team_inherited</code> / <code>is_ancestor_inherited</code>
+to mark inherited rows as read-only regardless of perms.</p>
+<h4 id="team-lineage-change-dynamic-resolution-summary-audit">Team lineage change — dynamic resolution + summary audit<a class="headerlink" href="#team-lineage-change-dynamic-resolution-summary-audit" title="Permanent link">&para;</a></h4>
+<p>Team coverage is resolved dynamically based on the current team
+lineage. Moving a team (changing its <code>parent_team_id</code>) immediately
+affects future Resolve calls — no retroactive rewrite of existing
+rules.</p>
+<p>The <code>teams.UpdateWithLineageAudit</code> path wraps the parent-change
+UPDATE in a transaction with <code>policy.team_lineage_changed</code> audit
+emission. When parent changes:</p>
+<ul>
+<li>Computes <code>affected_project_count</code> (subtree descendants) +
+  <code>team_policy_rule_count</code> INSIDE the same transaction</li>
+<li>INSERTs the audit row with metadata:</li>
+</ul>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="p">{</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span><span class="nt">&quot;team_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span><span class="nt">&quot;old_parent_team_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">  </span><span class="nt">&quot;new_parent_team_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">  </span><span class="nt">&quot;team_policy_rule_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="w">  </span><span class="nt">&quot;affected_project_count&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">12</span>
+</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li>Audit append failure rolls back the parent UPDATE (transactional
+  atomicity).</li>
+</ul>
+<p>When the parent doesn't actually change → no audit event
+(idempotent — name-only updates don't emit lineage events).</p>
+<h4 id="triage-sql-team-scoped-path">Triage SQL — team-scoped path<a class="headerlink" href="#triage-sql-team-scoped-path" title="Permanent link">&para;</a></h4>
+<p><strong>1. List all team-scoped rules across the platform</strong></p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">SELECT</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">    </span><span class="n">t</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">team</span><span class="p">,</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">    </span><span class="n">pr</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">rule</span><span class="p">,</span>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="w">    </span><span class="n">pr</span><span class="p">.</span><span class="n">priority</span><span class="p">,</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">    </span><span class="n">pr</span><span class="p">.</span><span class="n">workflow_id</span><span class="p">,</span>
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="w">    </span><span class="n">pr</span><span class="p">.</span><span class="n">enabled</span>
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="n">policy_rules</span><span class="w"> </span><span class="n">pr</span>
+</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">  </span><span class="k">JOIN</span><span class="w"> </span><span class="n">teams</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pr</span><span class="p">.</span><span class="n">team_id</span>
+</span><span id="__span-25-9"><a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">pr</span><span class="p">.</span><span class="n">team_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span>
+</span><span id="__span-25-10"><a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">pr</span><span class="p">.</span><span class="n">priority</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+</span></code></pre></div>
+<p><strong>2. Find every rule resolving against a specific project</strong></p>
+<p>Uses the same recursive CTE the resolver query uses. Shows which
+team rules cascade down to a project + which project + platform
+rules also match.</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">WITH</span><span class="w"> </span><span class="k">RECURSIVE</span><span class="w"> </span><span class="n">team_chain</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">distance</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">team_id</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">      </span><span class="k">FROM</span><span class="w"> </span><span class="n">projects</span><span class="w"> </span><span class="n">p</span>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">     </span><span class="k">WHERE</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&lt;project-id&gt;&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">team_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">    </span><span class="k">UNION</span><span class="w"> </span><span class="k">ALL</span>
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">parent_team_id</span><span class="p">,</span><span class="w"> </span><span class="n">tc</span><span class="p">.</span><span class="n">distance</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">      </span><span class="k">FROM</span><span class="w"> </span><span class="n">teams</span><span class="w"> </span><span class="n">t</span>
+</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">      </span><span class="k">JOIN</span><span class="w"> </span><span class="n">team_chain</span><span class="w"> </span><span class="n">tc</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tc</span><span class="p">.</span><span class="n">id</span>
+</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w">     </span><span class="k">WHERE</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">parent_team_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span>
+</span><span id="__span-26-10"><a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="p">)</span>
+</span><span id="__span-26-11"><a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">pr</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">pr</span><span class="p">.</span><span class="n">priority</span><span class="p">,</span>
+</span><span id="__span-26-12"><a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="w">       </span><span class="k">CASE</span>
+</span><span id="__span-26-13"><a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a><span class="w">           </span><span class="k">WHEN</span><span class="w"> </span><span class="n">pr</span><span class="p">.</span><span class="n">project_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="s1">&#39;project&#39;</span>
+</span><span id="__span-26-14"><a id="__codelineno-26-14" name="__codelineno-26-14" href="#__codelineno-26-14"></a><span class="w">           </span><span class="k">WHEN</span><span class="w"> </span><span class="n">pr</span><span class="p">.</span><span class="n">team_id</span><span class="w">    </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="s1">&#39;team&#39;</span>
+</span><span id="__span-26-15"><a id="__codelineno-26-15" name="__codelineno-26-15" href="#__codelineno-26-15"></a><span class="w">           </span><span class="k">ELSE</span><span class="w"> </span><span class="s1">&#39;platform&#39;</span>
+</span><span id="__span-26-16"><a id="__codelineno-26-16" name="__codelineno-26-16" href="#__codelineno-26-16"></a><span class="w">       </span><span class="k">END</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">anchor</span><span class="p">,</span>
+</span><span id="__span-26-17"><a id="__codelineno-26-17" name="__codelineno-26-17" href="#__codelineno-26-17"></a><span class="w">       </span><span class="n">tc</span><span class="p">.</span><span class="n">distance</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">team_distance</span>
+</span><span id="__span-26-18"><a id="__codelineno-26-18" name="__codelineno-26-18" href="#__codelineno-26-18"></a><span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="n">policy_rules</span><span class="w"> </span><span class="n">pr</span>
+</span><span id="__span-26-19"><a id="__codelineno-26-19" name="__codelineno-26-19" href="#__codelineno-26-19"></a><span class="w">  </span><span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">team_chain</span><span class="w"> </span><span class="n">tc</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">tc</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pr</span><span class="p">.</span><span class="n">team_id</span>
+</span><span id="__span-26-20"><a id="__codelineno-26-20" name="__codelineno-26-20" href="#__codelineno-26-20"></a><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">pr</span><span class="p">.</span><span class="n">enabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">TRUE</span>
+</span><span id="__span-26-21"><a id="__codelineno-26-21" name="__codelineno-26-21" href="#__codelineno-26-21"></a><span class="w">   </span><span class="k">AND</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-26-22"><a id="__codelineno-26-22" name="__codelineno-26-22" href="#__codelineno-26-22"></a><span class="w">        </span><span class="n">pr</span><span class="p">.</span><span class="n">project_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&lt;project-id&gt;&#39;</span>
+</span><span id="__span-26-23"><a id="__codelineno-26-23" name="__codelineno-26-23" href="#__codelineno-26-23"></a><span class="w">        </span><span class="k">OR</span><span class="w"> </span><span class="p">(</span><span class="n">pr</span><span class="p">.</span><span class="n">project_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">pr</span><span class="p">.</span><span class="n">team_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">)</span>
+</span><span id="__span-26-24"><a id="__codelineno-26-24" name="__codelineno-26-24" href="#__codelineno-26-24"></a><span class="w">        </span><span class="k">OR</span><span class="w"> </span><span class="n">pr</span><span class="p">.</span><span class="n">team_id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">team_chain</span><span class="p">)</span>
+</span><span id="__span-26-25"><a id="__codelineno-26-25" name="__codelineno-26-25" href="#__codelineno-26-25"></a><span class="w">   </span><span class="p">)</span>
+</span><span id="__span-26-26"><a id="__codelineno-26-26" name="__codelineno-26-26" href="#__codelineno-26-26"></a><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">pr</span><span class="p">.</span><span class="n">priority</span><span class="w"> </span><span class="k">DESC</span><span class="p">,</span>
+</span><span id="__span-26-27"><a id="__codelineno-26-27" name="__codelineno-26-27" href="#__codelineno-26-27"></a><span class="w">          </span><span class="k">CASE</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="n">pr</span><span class="p">.</span><span class="n">project_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="mi">2</span>
+</span><span id="__span-26-28"><a id="__codelineno-26-28" name="__codelineno-26-28" href="#__codelineno-26-28"></a><span class="w">               </span><span class="k">WHEN</span><span class="w"> </span><span class="n">pr</span><span class="p">.</span><span class="n">team_id</span><span class="w">    </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="mi">1</span>
+</span><span id="__span-26-29"><a id="__codelineno-26-29" name="__codelineno-26-29" href="#__codelineno-26-29"></a><span class="w">               </span><span class="k">ELSE</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">END</span><span class="w"> </span><span class="k">DESC</span><span class="p">,</span>
+</span><span id="__span-26-30"><a id="__codelineno-26-30" name="__codelineno-26-30" href="#__codelineno-26-30"></a><span class="w">          </span><span class="n">tc</span><span class="p">.</span><span class="n">distance</span><span class="w"> </span><span class="k">ASC</span><span class="w"> </span><span class="n">NULLS</span><span class="w"> </span><span class="k">LAST</span><span class="p">,</span>
+</span><span id="__span-26-31"><a id="__codelineno-26-31" name="__codelineno-26-31" href="#__codelineno-26-31"></a><span class="w">          </span><span class="n">pr</span><span class="p">.</span><span class="n">created_at</span><span class="w"> </span><span class="k">ASC</span><span class="p">,</span>
+</span><span id="__span-26-32"><a id="__codelineno-26-32" name="__codelineno-26-32" href="#__codelineno-26-32"></a><span class="w">          </span><span class="n">pr</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="k">ASC</span><span class="p">;</span>
+</span></code></pre></div>
+<p><strong>3. Verify ancestor-team coverage for an actor</strong></p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">name</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="n">teams</span><span class="w"> </span><span class="n">t</span>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">       </span><span class="k">SELECT</span><span class="w"> </span><span class="p">(</span><span class="k">scope</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;team_id&#39;</span><span class="p">)::</span><span class="n">uuid</span>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">         </span><span class="k">FROM</span><span class="w"> </span><span class="n">user_roles</span><span class="w"> </span><span class="n">ur</span>
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">         </span><span class="k">JOIN</span><span class="w"> </span><span class="n">roles</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ur</span><span class="p">.</span><span class="n">role_id</span>
+</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="w">        </span><span class="k">WHERE</span><span class="w"> </span><span class="n">ur</span><span class="p">.</span><span class="n">user_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&lt;actor-id&gt;&#39;</span>
+</span><span id="__span-27-8"><a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="w">          </span><span class="k">AND</span><span class="w"> </span><span class="s1">&#39;policy.author&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">ANY</span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">jsonb_array_elements_text</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">permissions</span><span class="p">))</span>
+</span><span id="__span-27-9"><a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="w">          </span><span class="k">AND</span><span class="w"> </span><span class="k">scope</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s1">&#39;team_id&#39;</span>
+</span><span id="__span-27-10"><a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="w"> </span><span class="p">);</span>
+</span></code></pre></div>
+<p>The api's <code>EffectiveTeamAccess</code> helper expands these grants through
+the team subtree at request time. Use the
+<a href="../../reference/api-endpoints/#team-anchored-scoped-policy-rules-r-follow-up-3-api114"><code>GET /api/v1/users/me/policy-author-team-coverage</code></a>
+endpoint for the resolved set the SPA sees.</p>
+<p><strong>4. Audit-action compatibility query (post-§4 C2 normalization)</strong></p>
+<p>The R-follow-up #3 slice 1c normalized admin audit emission to
+<code>policy.create</code> / <code>policy.update</code> / <code>policy.delete</code> matching the
+scoped paths' shape. Old EPIC R + R-follow-up #1 events kept their
+original action names (audit is append-only — we don't rewrite
+history). To triage policy mutations across the cutover:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">occurred_at</span><span class="p">,</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">       </span><span class="n">action</span><span class="p">,</span>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;scope&#39;</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">scope</span><span class="p">,</span>
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;actor_permission_used&#39;</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">perm_used</span><span class="p">,</span>
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;policy_rule_id&#39;</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">rule_id</span>
+</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="n">audit_events</span>
+</span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">action</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-28-8"><a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="w">       </span><span class="s1">&#39;policy.create&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;policy.update&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;policy.delete&#39;</span><span class="p">,</span>
+</span><span id="__span-28-9"><a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a><span class="w">       </span><span class="s1">&#39;policy.created_for_scope&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;policy.updated_for_scope&#39;</span><span class="p">,</span>
+</span><span id="__span-28-10"><a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a><span class="w">       </span><span class="s1">&#39;policy.deleted_for_scope&#39;</span>
+</span><span id="__span-28-11"><a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a><span class="w"> </span><span class="p">)</span>
+</span><span id="__span-28-12"><a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="k">DESC</span>
+</span><span id="__span-28-13"><a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+</span></code></pre></div>
 <h3 id="observability-prometheus-counters">Observability — Prometheus counters<a class="headerlink" href="#observability-prometheus-counters" title="Permanent link">&para;</a></h3>
 <p>Four counters, all locked to LOW-CARDINALITY labels. Operator
 shouldn't try to derive per-actor or per-rule rates from these —
 those live in the audit log.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>policy_rules_created_total{permission_used, scope}
-</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>policy_rules_updated_total{permission_used, scope}
-</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>policy_rules_deleted_total{permission_used, scope}
-</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>policy_rules_denied_total{reason}
+<div class="language-text highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>policy_rules_created_total{permission_used, scope}
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>policy_rules_updated_total{permission_used, scope}
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>policy_rules_deleted_total{permission_used, scope}
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>policy_rules_denied_total{reason}
 </span></code></pre></div>
 <ul>
 <li><code>permission_used</code> ∈ <code>{policy.author, policy.edit}</code> — tracks which
   surface ran the mutation.</li>
-<li><code>scope</code> ∈ <code>{platform, project}</code> — <code>project</code> for scoped rules,
-  <code>platform</code> for global rules (admin path adds the label as future
-  work; today admin path doesn't emit these counters).</li>
-<li><code>reason</code> is a fixed 9-element set: <code>out_of_scope</code>, <code>platform_owned</code>,
+<li><code>scope</code> ∈ <code>{platform, project, team}</code> — <code>project</code> for project-scoped
+  rules, <code>team</code> for team-scoped rules (R-follow-up #3), <code>platform</code> for
+  global rules. R-follow-up #3 slice 1d enabled audit + counter
+  emission on the admin path so the <code>{policy.edit, *}</code> cardinality
+  now fires too.</li>
+<li><code>reason</code> is a fixed 11-element set: <code>out_of_scope</code>, <code>platform_owned</code>,
   <code>prod_blocked</code>, <code>scope_too_broad</code>, <code>priority_reserved</code>,
   <code>selector_mismatch</code>, <code>env_not_in_project</code>, <code>not_found</code>,
-  <code>workflow_not_authorable</code> (R-follow-up #1, api#112).</li>
+  <code>workflow_not_authorable</code> (R-follow-up #1, api#112),
+  <code>out_of_team_scope</code>, <code>team_not_found</code> (R-follow-up #3, api#114).</li>
 </ul>
 <p><strong>LOW-CARDINALITY LOCK</strong>: counters NEVER carry <code>actor_id</code>,
 <code>project_id</code>, <code>policy_rule_id</code>, or <code>workflow_id</code> labels. Same posture
@@ -2674,8 +2902,8 @@ those up.</p>
 <tr>
 <td><code>policy_scope_too_broad</code></td>
 <td>400</td>
-<td>Selector doesn't satisfy the non-prod-by-construction invariant</td>
-<td><code>{"reason": "env_constraint_missing"\|"env_kind_invalid"\|"selector_empty"\|"env_kind_id_inconsistent"}</code></td>
+<td>Selector doesn't satisfy the non-prod-by-construction invariant. R-follow-up #3 added 3 new reasons for team-scoped selector safety.</td>
+<td><code>{"reason": "env_constraint_missing"\|"env_kind_invalid"\|"selector_empty"\|"env_kind_id_inconsistent"\|"team_selector_pins_project"\|"team_selector_pins_environment_id"\|"team_selector_pins_team_id"}</code></td>
 </tr>
 <tr>
 <td><code>policy_priority_reserved</code></td>
@@ -2692,8 +2920,20 @@ those up.</p>
 <tr>
 <td><code>workflow_not_authorable_for_scope</code></td>
 <td>403</td>
-<td>Scoped caller picked a workflow that platform admin hasn't opted into the scoped author surface (R-follow-up #1, api#112). Distinct from <code>platform_policy_not_editable</code>: the workflow exists and is admin-usable; it just isn't exposed to scoped authors yet.</td>
+<td>Scoped caller picked a workflow that platform admin hasn't opted into the scoped author surface (R-follow-up #1, api#112). Distinct from <code>platform_policy_not_editable</code>: the workflow exists and is admin-usable; it just isn't exposed to scoped authors yet. R-follow-up #3 §4 C4 collapsed the 3 failure modes (not-found / disabled / not-authorable) into this same code for the team-scoped path too.</td>
 <td><code>{"workflow_id": "&lt;uuid&gt;"}</code></td>
+</tr>
+<tr>
+<td><code>team_not_found</code></td>
+<td>404</td>
+<td>Team-scoped Create gate 2 — the URL teamID doesn't exist or is archived. Race-only path (coverage passed at gate 1). R-follow-up #3 (api#114).</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>out_of_scope_team_policy</code></td>
+<td>403</td>
+<td>Caller's <code>policy.author</code> grant doesn't cover the URL teamID per the team-aware resolver. Mirrors <code>out_of_scope_policy</code> for the team URL family. R-follow-up #3.</td>
+<td>—</td>
 </tr>
 </tbody>
 </table>

@@ -1556,6 +1556,57 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#team-anchored-scoped-policy-rules-r-follow-up-3-api114" class="md-nav__link">
+    <span class="md-ellipsis">
+      Team-anchored scoped policy rules (R-follow-up #3, api#114)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Team-anchored scoped policy rules (R-follow-up #3, api#114)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#project-envelope-extension" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project envelope extension
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1usersmepolicy-author-team-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/users/me/policy-author-team-coverage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#admin-adminpolicies-team-anchor-support-slice-1d-api127" class="md-nav__link">
+    <span class="md-ellipsis">
+      Admin /admin/policies team anchor support (slice 1d, api#127)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#team-lineage-transactional-audit" class="md-nav__link">
+    <span class="md-ellipsis">
+      Team lineage transactional audit
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#platform-settings-r-follow-up-2-api113" class="md-nav__link">
     <span class="md-ellipsis">
       Platform settings (R-follow-up #2, api#113)
@@ -1822,6 +1873,57 @@
       Project-anchored scoped policy rules (EPIC R, api#108)
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#team-anchored-scoped-policy-rules-r-follow-up-3-api114" class="md-nav__link">
+    <span class="md-ellipsis">
+      Team-anchored scoped policy rules (R-follow-up #3, api#114)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Team-anchored scoped policy rules (R-follow-up #3, api#114)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#project-envelope-extension" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project envelope extension
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-apiv1usersmepolicy-author-team-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      GET /api/v1/users/me/policy-author-team-coverage
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#admin-adminpolicies-team-anchor-support-slice-1d-api127" class="md-nav__link">
+    <span class="md-ellipsis">
+      Admin /admin/policies team anchor support (slice 1d, api#127)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#team-lineage-transactional-audit" class="md-nav__link">
+    <span class="md-ellipsis">
+      Team lineage transactional audit
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2782,6 +2884,168 @@ for the operator-facing discussion + the audit-event triage SQL
 that pairs with these.</p>
 <p><strong>Error codes</strong> — the full reference table lives in
 <a href="../../operations/policy-templates/#error-code-reference">Policy templates — Error code reference</a>.</p>
+<h2 id="team-anchored-scoped-policy-rules-r-follow-up-3-api114">Team-anchored scoped policy rules (R-follow-up #3, api#114)<a class="headerlink" href="#team-anchored-scoped-policy-rules-r-follow-up-3-api114" title="Permanent link">&para;</a></h2>
+<p><code>policy.author</code> callers granted scoped to a <code>team_id</code> use this URL
+family to author rules that cascade down to every descendant project
+of the team subtree. The URL hierarchy expresses the §1 D4 mental
+model split: team-anchored authoring is its own surface, parallel to
+the project-anchored EPIC R family above. Platform admins still use
+<code>/admin/policies</code> for global rules; the team URL family stays
+<code>policy.author</code>-only per §4 C3.</p>
+<p>URL is the source of truth for the row's anchor — the <code>team_id</code> is
+never on the wire body (defense against URL/body confusion, same
+posture R-follow-up #2 established for URL-key-wins).</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/teams/:teamID/policy-rules</code></td>
+<td><code>bearer + policy.author</code> scoped to teamID</td>
+<td>Author a team-scoped rule. Body: <code>{name, selector, priority, workflow_id, enabled}</code>. §1 C1 strict — selector MUST carry <code>environment_kind="non_prod"</code> and MUST NOT carry <code>project_id</code>, <code>environment_id</code>, or <code>team_id</code>. The 6-gate chain (coverage → team exists+active → priority &lt; live cap → selector consistency → workflow authorable → INSERT) runs server-side. Live <code>priority_cap</code> echoed in the envelope.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/teams/:teamID/policy-rules</code></td>
+<td><code>bearer + policy.author</code> scoped to teamID</td>
+<td>List team-own rules + inherited ancestor-team rules + inherited platform rules. Inherited rows carry <code>selector_keys</code> only (sanitized). Response envelope carries <code>priority_cap</code>.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/teams/:teamID/policy-rules/:ruleID</code></td>
+<td><code>bearer + policy.author</code> scoped to teamID</td>
+<td>Single rule with the same sanitization rules as the list. Mismatched anchor (project rule via team URL OR rule under a different team) returns 404 <code>policy_not_found</code> per §4 mismatch protection.</td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/api/v1/teams/:teamID/policy-rules/:ruleID</code></td>
+<td><code>bearer + policy.author</code> scoped to teamID</td>
+<td>Update team-scoped rule. R-follow-up #2 §3 critical pin preserved: priority revalidates against the LIVE cap on EVERY call (not only when priority is changing). §4 mismatch returns <code>policy_not_found</code>. Anchor is immutable post-create.</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/teams/:teamID/policy-rules/:ruleID</code></td>
+<td><code>bearer + policy.author</code> scoped to teamID</td>
+<td>204 on success. URL teamID mismatch returns 404 <code>policy_not_found</code>. Platform NULL rule returns 403 <code>platform_policy_not_editable</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Response envelope shape</strong> (all GET / PUT / POST):</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;rule&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="nt">&quot;team_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="nt">&quot;team_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="nt">&quot;workflow_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="nt">&quot;workflow_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="nt">&quot;is_platform_inherited&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="nt">&quot;is_ancestor_inherited&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="nt">&quot;selector_keys&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;environment_kind&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;secret_ref_prefix&quot;</span><span class="p">],</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="nt">&quot;selector&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;environment_kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;non_prod&quot;</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="nt">&quot;priority&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">    </span><span class="nt">&quot;is_system&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="nt">&quot;created_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">    </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;...&quot;</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">  </span><span class="nt">&quot;priority_cap&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">9000</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>For inherited rows (<code>is_platform_inherited = true</code> OR
+<code>is_ancestor_inherited = true</code>), the <code>selector</code> field is OMITTED
+server-side — only <code>selector_keys</code> is exposed. Defense against
+selector leakage across siblings under the same parent team.</p>
+<p><strong>New stable error codes</strong> (R-follow-up #3):</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Status</th>
+<th>Meaning</th>
+<th>Envelope extras</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>team_not_found</code></td>
+<td>404</td>
+<td>Team-scoped Create gate 2 — the URL teamID doesn't exist or is archived. Race-only path (coverage passed at gate 1).</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>out_of_scope_team_policy</code></td>
+<td>403</td>
+<td>Caller's <code>policy.author</code> grant doesn't cover the URL teamID per the team-aware resolver. Mirrors <code>out_of_scope_policy</code> for the team URL family.</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>3 new <code>policy_scope_too_broad.reason</code> variants</strong> (R-follow-up #3):</p>
+<ul>
+<li><code>team_selector_pins_project</code> — team rule selector pinned <code>project_id</code></li>
+<li><code>team_selector_pins_environment_id</code> — team rule selector pinned <code>environment_id</code></li>
+<li><code>team_selector_pins_team_id</code> — team rule selector pinned <code>team_id</code> (v1 lock)</li>
+</ul>
+<p>The full reason set on <code>policy_scope_too_broad</code> is now 7 variants.</p>
+<p><strong>Workflow validation collapse (§4 C4)</strong>: workflow not-found,
+workflow disabled, and workflow not-<code>scoped_policy_authorable</code> all
+return the SAME response: <code>403 workflow_not_authorable_for_scope</code>
+with envelope <code>{workflow_id}</code>. The SPA doesn't have to handle three
+separate envelopes; the api collapses them into one for cleaner UX.</p>
+<h3 id="project-envelope-extension">Project envelope extension<a class="headerlink" href="#project-envelope-extension" title="Permanent link">&para;</a></h3>
+<p><code>GET /api/v1/projects/:projectID/policy-rules</code> (the existing EPIC R
+surface) now also carries team-inherited rows. The projection adds:</p>
+<ul>
+<li><code>is_team_inherited</code> — <code>true</code> when the rule's <code>team_id</code> is set</li>
+<li><code>team_name</code> — populated for team-inherited rows via server-side JOIN</li>
+<li><code>workflow_name</code> — populated for ALL rows via server-side JOIN
+  (eliminates the SPA's N+1 lookup against <code>/workflows</code>)</li>
+</ul>
+<p>Inherited team rows are sanitized identically to inherited platform
+rows: <code>selector_keys</code> only, no <code>selector</code>. Read-only on the scoped
+URL; manage on the team's own page or via <code>/admin/policies</code>.</p>
+<h3 id="get-apiv1usersmepolicy-author-team-coverage"><code>GET /api/v1/users/me/policy-author-team-coverage</code><a class="headerlink" href="#get-apiv1usersmepolicy-author-team-coverage" title="Permanent link">&para;</a></h3>
+<p>NEW (R-follow-up #3, api#126). Returns the resolved team set from the
+api's <code>EffectiveTeamAccess(actor, policy.author)</code> helper — every team
+the actor's grants cover, subtree-expanded.</p>
+<p>Permission: bearer only. Exposes ONLY the caller's own coverage; not
+enumerable across other users.</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">&quot;global&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">&quot;team_ids&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;&lt;uuid&gt;&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;&lt;uuid&gt;&quot;</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="p">]</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>SPA reads this to drive sidebar visibility + <code>canAuthorTeamPolicy</code>
+without walking the team tree client-side.</p>
+<h3 id="admin-adminpolicies-team-anchor-support-slice-1d-api127">Admin /admin/policies team anchor support (slice 1d, api#127)<a class="headerlink" href="#admin-adminpolicies-team-anchor-support-slice-1d-api127" title="Permanent link">&para;</a></h3>
+<p><code>POST /api/v1/policies</code> and <code>PUT /api/v1/policies/:id</code> now accept the
+<code>team_id</code> anchor in the body. Server-side selector safety per §5 C5
+applies even on the admin path: team-anchored rules can't carry
+<code>selector.project_id</code>, <code>selector.environment_id</code>, or
+<code>selector.team_id</code>, and <code>selector.environment_kind</code> must equal
+<code>"non_prod"</code>. Same <code>policy_scope_too_broad.reason</code> envelope.</p>
+<p>Counter cardinality <code>{permission_used="policy.edit", scope="team"}</code>
+fires when admin creates a team-scoped rule from <code>/admin/policies</code>.
+Admin audit events emit the normalized <code>policy.create</code> /
+<code>policy.update</code> / <code>policy.delete</code> action names with <code>scope</code> reflecting
+the actual anchor + <code>actor_permission_used: "policy.edit"</code>.</p>
+<h3 id="team-lineage-transactional-audit">Team lineage transactional audit<a class="headerlink" href="#team-lineage-transactional-audit" title="Permanent link">&para;</a></h3>
+<p><code>PUT /api/v1/teams/:id</code> (existing) now emits the
+<code>policy.team_lineage_changed</code> audit event in the SAME transaction as
+the <code>parent_team_id</code> UPDATE when the parent actually changes. Metadata
+carries the new + old parent IDs + <code>team_policy_rule_count</code> +
+<code>affected_project_count</code> (subtree size). When parent doesn't change
+(name-only update) → no audit event (idempotent).</p>
+<p>If audit append fails, the parent UPDATE rolls back — transactional
+atomicity preserved.</p>
 <h2 id="platform-settings-r-follow-up-2-api113">Platform settings (R-follow-up #2, api#113)<a class="headerlink" href="#platform-settings-r-follow-up-2-api113" title="Permanent link">&para;</a></h2>
 <p>Admin surface for cross-cutting platform configuration. v1 ships
 exactly one whitelisted key — <code>platform_reserved_priority</code> — that
@@ -2828,12 +3092,12 @@ a 5-minute TTL backstop for missed messages.</p>
 </tbody>
 </table>
 <p><strong>Response shape</strong> (<code>PlatformSetting</code>):</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;platform_reserved_priority&quot;</span><span class="p">,</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">9000</span><span class="p">,</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-08T12:34:56.789Z&quot;</span><span class="p">,</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nt">&quot;updated_by&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;alice&quot;</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;platform_reserved_priority&quot;</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">9000</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-08T12:34:56.789Z&quot;</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nt">&quot;updated_by&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;alice&quot;</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">}</span>
 </span></code></pre></div>
 <p><code>value</code> is generic JSON — callers narrow per-key. For
 <code>platform_reserved_priority</code> it's an integer between <code>100</code> and
@@ -2870,8 +3134,8 @@ a 5-minute TTL backstop for missed messages.</p>
 </tbody>
 </table>
 <p><strong>Prometheus counters</strong> (R-follow-up #2):</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>platform_setting_updates_total{key, result}
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>platform_setting_cache_reloads_total{key, trigger}
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>platform_setting_updates_total{key, result}
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>platform_setting_cache_reloads_total{key, trigger}
 </span></code></pre></div>
 <ul>
 <li><code>key</code> is the whitelisted key string (low-cardinality — v1 has one).</li>
