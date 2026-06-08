@@ -254,7 +254,7 @@ keep using them.
 | `policy_selector_mismatch` | 400 | `selector.project_id` was set but doesn't equal URL projectID. |
 | `prod_policy_not_allowed_for_scope` | 403 | Scoped caller tried to author a rule that resolves to a prod env. Envelope includes `{"env_kind": "prod"}`. |
 | `policy_scope_too_broad` | 400 | Selector doesn't satisfy the non-prod-by-construction invariant. Envelope includes `{"reason": "..."}` — variants: `env_constraint_missing`, `env_kind_invalid`, `selector_empty`, `env_kind_id_inconsistent`. |
-| `policy_priority_reserved` | 400 | Priority `>= 9000` requested; reserved for platform. Envelope includes `{"cap": 9000}`. |
+| `policy_priority_reserved` | 400 | Priority at or above the platform-reserved band requested. The cap is admin-configurable per R-follow-up #2 (default `9000`); envelope echoes the live value: `{"cap": <live>}`. |
 | `policy_environment_not_in_project` | 400 | `selector.environment_id` doesn't belong to URL projectID. |
 | `workflow_not_authorable_for_scope` | 403 | R-follow-up #1 (api#112). Scoped caller picked a workflow that platform admin hasn't opted into the scoped author surface. Envelope carries `{"workflow_id": "<uuid>"}` — the actor selected the workflow from a dropdown, so logging it isn't a leak. Distinct from `platform_policy_not_editable`: the workflow exists and is reachable by admin; it just hasn't been exposed to scoped authors yet. |
 
@@ -277,6 +277,74 @@ that pairs with these.
 
 **Error codes** — the full reference table lives in
 [Policy templates — Error code reference](../operations/policy-templates.md#error-code-reference).
+
+## Platform settings (R-follow-up #2, api#113)
+
+Admin surface for cross-cutting platform configuration. v1 ships
+exactly one whitelisted key — `platform_reserved_priority` — that
+controls the priority band scoped policy authors are bounded below.
+Future admin-configurable knobs slot in as new rows in the same table
+without per-knob migrations.
+
+**Hard rule** — `platform_settings` must NEVER store secrets,
+credentials, tokens, or provider auth material. The service-layer
+whitelist + reviewers + the DB CHECK constraint all enforce this.
+
+All three routes are gated by `policy.edit` (the platform policy
+admin permission). The SettingsService keeps an in-memory cache with
+Redis pub/sub-driven invalidation (channel
+`secrets-bridge:platform_settings:<key>`); subscribers re-fetch from
+Postgres on every notification rather than trusting the payload, with
+a 5-minute TTL backstop for missed messages.
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| `GET` | `/api/v1/platform-settings` | `bearer + policy.edit` | List all whitelisted rows. Non-whitelisted rows in the table (shouldn't exist in v1) are filtered out service-side. |
+| `GET` | `/api/v1/platform-settings/:key` | `bearer + policy.edit` | One row. Unknown / non-whitelisted key → 404 `unknown_platform_setting`. |
+| `PUT` | `/api/v1/platform-settings/:key` | `bearer + policy.edit` | Update. Body: `{value: <json>}`. URL `:key` wins over any `key` in the body (defense against URL/body confusion). Transactional: BEGIN → SELECT FOR UPDATE → validate → UPDATE → INSERT audit → COMMIT → pub/sub publish AFTER commit. |
+
+**Response shape** (`PlatformSetting`):
+
+```json
+{
+  "key": "platform_reserved_priority",
+  "value": 9000,
+  "updated_at": "2026-06-08T12:34:56.789Z",
+  "updated_by": "alice"
+}
+```
+
+`value` is generic JSON — callers narrow per-key. For
+`platform_reserved_priority` it's an integer between `100` and
+`1,000,000`.
+
+**Stable error codes** (R-follow-up #2):
+
+| Code | Status | Meaning | Envelope extras |
+|---|---|---|---|
+| `unknown_platform_setting` | 404 | Key is not in the v1 whitelist OR the row doesn't exist. | — |
+| `invalid_platform_setting` | 400 | Value failed the per-key validator (out of bounds, wrong JSON shape, non-integer for integer keys). The DB CHECK is a defense-in-depth backstop; the service layer pre-validates and emits the friendly bounds. | `{"min": 100, "max": 1000000}` for `platform_reserved_priority` |
+| `platform_setting_unavailable` | 503 | The SettingsService cache reload failed (Postgres unreachable, KMS cascading failure, etc.). Service gates that depend on the setting fail closed and return this code; admins and Author drawers can't proceed until the cache is readable again. | — |
+
+**Prometheus counters** (R-follow-up #2):
+
+```
+platform_setting_updates_total{key, result}
+platform_setting_cache_reloads_total{key, trigger}
+```
+
+- `key` is the whitelisted key string (low-cardinality — v1 has one).
+- `result` ∈ `{ok, invalid, unavailable, conflict}`.
+- `trigger` ∈ `{boot, pubsub, on_demand}`.
+
+LOW-CARDINALITY LOCK — counters NEVER carry `actor_id`. The
+`platform_setting.updated` audit event carries the actor + old/new
+value for forensic lookup.
+
+See
+[Adjusting the reserved priority band](../operations/policy-templates.md#adjusting-the-reserved-priority-band)
+for the operator playbook (grandfather rule, triage SQL, fail-closed
+posture).
 
 ## Permissions catalog
 
