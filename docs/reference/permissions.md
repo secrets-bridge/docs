@@ -36,7 +36,7 @@ edit their permission lists but can't delete the rows.
 
 | Permission | Description |
 |---|---|
-| `workflow.edit` | Create / update / delete workflow definitions. |
+| `workflow.edit` | Create / update / delete workflow definitions. R-follow-up #1 (api#112) added the `scoped_policy_authorable` flag — this permission also gates the toggle that exposes a workflow to the scoped policy author surface (`/projects/:id/policies`). Default-deny; admin curates explicitly. |
 | `policy.edit` | Create / update / delete policy rules. Global scope — affects every project's resolution. Does NOT auto-cover `policy.author` server-side (EPIC R, api#108) — operators grant scoped authoring explicitly via the `policy_author` system role. |
 | `policy.author` | Author project-scoped policy rules for non-prod environments (EPIC R, api#108). Scoped via the existing team-aware resolver. Refuses prod env selectors, priority `>= 9000` (platform reserved), and edits to platform global rules. Granted via the `policy_author` system seed role. |
 

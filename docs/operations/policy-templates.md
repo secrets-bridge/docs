@@ -408,6 +408,37 @@ selector VALUES out of the audit log entirely. If you need to know
 what `secret_ref_prefix` a scoped author pinned, look at the rule
 row directly (it's not exfiltrated through audit).
 
+**5. Recent `policy.denied_workflow_not_authorable` events (R-follow-up #1)**
+
+```sql
+SELECT actor, occurred_at,
+       metadata->>'attempted_workflow_id' AS attempted_workflow,
+       metadata->>'attempted_project_id' AS attempted_project,
+       metadata->>'actor_permission_attempted' AS perm
+FROM audit_events
+WHERE action = 'policy.denied_workflow_not_authorable'
+  AND occurred_at > now() - interval '7 days'
+ORDER BY occurred_at DESC
+LIMIT 100;
+```
+
+**Audit metadata differences** from `policy.denied_out_of_scope`:
+
+- `attempted_workflow_id` IS included. The actor picked the workflow
+  from the dropdown they were just shown; logging the id is fine for
+  triage and isn't a leak.
+- `policy_rule_id` is DELIBERATELY absent. The gate fires BEFORE
+  the rule is INSERTed (Create path) or BEFORE the UPDATE runs
+  (Update path) — including the id would defeat the same gate-order
+  protection EPIC Q's `binding.denied_out_of_scope` and EPIC R's
+  `policy.denied_out_of_scope` apply.
+
+Use this query to spot a scoped author repeatedly trying to use a
+workflow platform has deliberately walled off. If `attempted_workflow_
+id` is the same across many rows for one actor, it's worth a
+conversation — they probably need that workflow opted in, or they
+need pointed at the alternatives.
+
 ### Operator playbook
 
 **Grant a section head policy authoring capability**
@@ -450,6 +481,80 @@ overlaps the scoped selector at higher priority, platform wins by
 design. Triage SQL #1 shows the active rules per project; cross-check
 priorities against the `/admin/policies` admin view.
 
+### Curating workflows for scoped authoring
+
+R-follow-up #1 ([api#112](https://github.com/secrets-bridge/api/issues/112))
+adds the `workflow_definitions.scoped_policy_authorable` flag so
+platform admin curates which workflows scoped authors see in their
+`/projects/:id/policies` author drawer. Default-deny: every workflow
+is invisible to scoped authors until explicitly opted in.
+
+#### What the flag does
+
+| `scoped_policy_authorable` | Effect |
+|---|---|
+| `false` (default) | Workflow stays admin-only. `/admin/workflows` still shows it; `/admin/policies` admin can still use it for global rules. Scoped authors at `/projects/:id/policies` do NOT see it in their dropdown, and trying to use it via API returns 403 `workflow_not_authorable_for_scope`. |
+| `true` | Workflow appears in the scoped author drawer's workflow dropdown. Admin can still use it through `/admin/policies` exactly as before. |
+
+#### Opting a workflow in (admin SPA)
+
+`/admin/workflows` → open the workflow you want to expose → scroll
+to the **"Scoped author access"** section at the bottom of the form
+→ tick **"Available for scoped policy authoring"** → Save. A small
+`[scoped]` chip appears on the workflow's row in the admin list.
+
+Any open author drawer on `/projects/:id/policies` sees the new
+workflow within ~30 seconds without a page reload — both the admin
+workflow list cache key AND the scoped author dropdown cache key are
+invalidated on every workflow mutation.
+
+#### Opting a workflow in (API)
+
+```bash
+# Get the workflow id
+gh api .../api/v1/workflows | jq '.[] | select(.name=="standard") | .id'
+
+# Flip the flag — Get-then-merge in the api preserves all other fields
+curl -X PUT /api/v1/workflows/<id> \
+  -H 'Authorization: Bearer <jwt>' \
+  -H 'Content-Type: application/json' \
+  -d '{"scoped_policy_authorable": true}'
+```
+
+The api's `UpdateWorkflow` does a Get-then-merge when fields are
+omitted, so a partial PUT body only touches what it carries. Send
+`false` to opt out; OMIT to preserve. **Never send the literal value
+`false` to a workflow you don't want to change** — that's a
+no-op-looking write that flips the flag off.
+
+#### Grandfathering existing rules on opt-out
+
+When platform admin opts a workflow OUT after scoped authors have
+already used it, EXISTING rules referencing that workflow KEEP
+working. The §1 Q4 grandfather rule on the api side enforces this:
+
+- A scoped author can still UPDATE priority / selector / name /
+  enabled state on rules attached to the now-opted-out workflow.
+- A scoped author CAN'T attach the rule to a different workflow that
+  ISN'T also opted in — `UpdateForScopedAuthor` runs the authorable
+  check whenever `workflow_id` changes.
+- A scoped author CAN'T CREATE a NEW rule on the now-opted-out
+  workflow — `CreateForScopedAuthor` runs the check unconditionally.
+
+This means an admin opting a workflow out doesn't break any pending
+policy work; new authoring on that workflow simply stops until it's
+opted back in.
+
+#### Rolling deploy safety
+
+The flag landed in api migration 0035. Admin clients that don't yet
+know about the field (older SPA build during rolling deploy) keep
+working: the api's UpdateWorkflow preserves the flag on PUT bodies
+that omit it (Get-then-merge), and the SPA's new WorkflowForm tracks
+both the loaded value AND whether the admin TOUCHED the checkbox —
+PUT body only includes the field when one of those is true. Either
+side acting alone is safe.
+
 ### Observability — Prometheus counters
 
 Four counters, all locked to LOW-CARDINALITY labels. Operator
@@ -468,9 +573,10 @@ policy_rules_denied_total{reason}
 - `scope` ∈ `{platform, project}` — `project` for scoped rules,
   `platform` for global rules (admin path adds the label as future
   work; today admin path doesn't emit these counters).
-- `reason` is a fixed 8-element set: `out_of_scope`, `platform_owned`,
+- `reason` is a fixed 9-element set: `out_of_scope`, `platform_owned`,
   `prod_blocked`, `scope_too_broad`, `priority_reserved`,
-  `selector_mismatch`, `env_not_in_project`, `not_found`.
+  `selector_mismatch`, `env_not_in_project`, `not_found`,
+  `workflow_not_authorable` (R-follow-up #1, api#112).
 
 **LOW-CARDINALITY LOCK**: counters NEVER carry `actor_id`,
 `project_id`, `policy_rule_id`, or `workflow_id` labels. Same posture
@@ -489,6 +595,7 @@ those up.
 | `policy_scope_too_broad` | 400 | Selector doesn't satisfy the non-prod-by-construction invariant | `{"reason": "env_constraint_missing"\|"env_kind_invalid"\|"selector_empty"\|"env_kind_id_inconsistent"}` |
 | `policy_priority_reserved` | 400 | Priority `>= 9000` requested; reserved for platform | `{"cap": 9000}` |
 | `policy_environment_not_in_project` | 400 | `selector.environment_id` doesn't belong to URL projectID | — |
+| `workflow_not_authorable_for_scope` | 403 | Scoped caller picked a workflow that platform admin hasn't opted into the scoped author surface (R-follow-up #1, api#112). Distinct from `platform_policy_not_editable`: the workflow exists and is admin-usable; it just isn't exposed to scoped authors yet. | `{"workflow_id": "<uuid>"}` |
 
 The SPA's `src/api/policyErrors.ts` ships `toPolicyRuleErrorToast(err)`
 which surfaces the `policy_scope_too_broad.reason` variants + the
