@@ -116,8 +116,9 @@ guide.
 | `GET` | `/api/v1/users/:userID/roles` | bearer |
 | `POST` | `/api/v1/workflows` | `bearer + workflow.edit` |
 | `GET` | `/api/v1/workflows` | bearer |
+| `GET` | `/api/v1/workflows/scoped-policy-authorable` | `bearer + policy.author` at any scope | R-follow-up #1 (api#112). Returns workflows where `enabled=true AND scoped_policy_authorable=true`. Auth uses the new `auth.RequireAny` middleware — admits any non-empty scope match because `policy.author` is always scoped. Mounted BEFORE the dynamic `:id` route per the route-ordering correction. |
 | `GET` | `/api/v1/workflows/:id` | bearer |
-| `PUT` | `/api/v1/workflows/:id` | `bearer + workflow.edit` |
+| `PUT` | `/api/v1/workflows/:id` | `bearer + workflow.edit` | R-follow-up #1 added `scoped_policy_authorable` to the body shape. Field is `*bool` with COALESCE-preserve semantic: omit the field to keep the existing value (the handler does a Get-then-merge); send `true`/`false` to flip. Critical for rolling-deploy safety with older admin clients that don't yet know about the field. |
 | `DELETE` | `/api/v1/workflows/:id` | `bearer + workflow.edit` |
 | `POST` | `/api/v1/policies` | `bearer + policy.edit` |
 | `GET` | `/api/v1/policies` | bearer |
@@ -255,6 +256,7 @@ keep using them.
 | `policy_scope_too_broad` | 400 | Selector doesn't satisfy the non-prod-by-construction invariant. Envelope includes `{"reason": "..."}` — variants: `env_constraint_missing`, `env_kind_invalid`, `selector_empty`, `env_kind_id_inconsistent`. |
 | `policy_priority_reserved` | 400 | Priority `>= 9000` requested; reserved for platform. Envelope includes `{"cap": 9000}`. |
 | `policy_environment_not_in_project` | 400 | `selector.environment_id` doesn't belong to URL projectID. |
+| `workflow_not_authorable_for_scope` | 403 | R-follow-up #1 (api#112). Scoped caller picked a workflow that platform admin hasn't opted into the scoped author surface. Envelope carries `{"workflow_id": "<uuid>"}` — the actor selected the workflow from a dropdown, so logging it isn't a leak. Distinct from `platform_policy_not_editable`: the workflow exists and is reachable by admin; it just hasn't been exposed to scoped authors yet. |
 
 **Prometheus counters** (EPIC R):
 
@@ -265,9 +267,10 @@ policy_rules_deleted_total{permission_used, scope}
 policy_rules_denied_total{reason}
 ```
 
-`reason` is a fixed low-cardinality 8-element set; the counters
-NEVER carry `actor_id`, `project_id`, `policy_rule_id`, or
-`workflow_id` as labels. See
+`reason` is a fixed low-cardinality 9-element set (`workflow_not_authorable`
+added by R-follow-up #1, api#112); the counters NEVER carry
+`actor_id`, `project_id`, `policy_rule_id`, or `workflow_id` as
+labels. See
 [Policy templates — Observability](../operations/policy-templates.md#observability-prometheus-counters)
 for the operator-facing discussion + the audit-event triage SQL
 that pairs with these.
