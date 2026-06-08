@@ -278,6 +278,139 @@ that pairs with these.
 **Error codes** — the full reference table lives in
 [Policy templates — Error code reference](../operations/policy-templates.md#error-code-reference).
 
+## Team-anchored scoped policy rules (R-follow-up #3, api#114)
+
+`policy.author` callers granted scoped to a `team_id` use this URL
+family to author rules that cascade down to every descendant project
+of the team subtree. The URL hierarchy expresses the §1 D4 mental
+model split: team-anchored authoring is its own surface, parallel to
+the project-anchored EPIC R family above. Platform admins still use
+`/admin/policies` for global rules; the team URL family stays
+`policy.author`-only per §4 C3.
+
+URL is the source of truth for the row's anchor — the `team_id` is
+never on the wire body (defense against URL/body confusion, same
+posture R-follow-up #2 established for URL-key-wins).
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| `POST` | `/api/v1/teams/:teamID/policy-rules` | `bearer + policy.author` scoped to teamID | Author a team-scoped rule. Body: `{name, selector, priority, workflow_id, enabled}`. §1 C1 strict — selector MUST carry `environment_kind="non_prod"` and MUST NOT carry `project_id`, `environment_id`, or `team_id`. The 6-gate chain (coverage → team exists+active → priority < live cap → selector consistency → workflow authorable → INSERT) runs server-side. Live `priority_cap` echoed in the envelope. |
+| `GET` | `/api/v1/teams/:teamID/policy-rules` | `bearer + policy.author` scoped to teamID | List team-own rules + inherited ancestor-team rules + inherited platform rules. Inherited rows carry `selector_keys` only (sanitized). Response envelope carries `priority_cap`. |
+| `GET` | `/api/v1/teams/:teamID/policy-rules/:ruleID` | `bearer + policy.author` scoped to teamID | Single rule with the same sanitization rules as the list. Mismatched anchor (project rule via team URL OR rule under a different team) returns 404 `policy_not_found` per §4 mismatch protection. |
+| `PUT` | `/api/v1/teams/:teamID/policy-rules/:ruleID` | `bearer + policy.author` scoped to teamID | Update team-scoped rule. R-follow-up #2 §3 critical pin preserved: priority revalidates against the LIVE cap on EVERY call (not only when priority is changing). §4 mismatch returns `policy_not_found`. Anchor is immutable post-create. |
+| `DELETE` | `/api/v1/teams/:teamID/policy-rules/:ruleID` | `bearer + policy.author` scoped to teamID | 204 on success. URL teamID mismatch returns 404 `policy_not_found`. Platform NULL rule returns 403 `platform_policy_not_editable`. |
+
+**Response envelope shape** (all GET / PUT / POST):
+
+```json
+{
+  "rule": {
+    "id": "...",
+    "name": "...",
+    "team_id": "...",
+    "team_name": "...",
+    "workflow_id": "...",
+    "workflow_name": "...",
+    "is_platform_inherited": false,
+    "is_ancestor_inherited": false,
+    "selector_keys": ["environment_kind", "secret_ref_prefix"],
+    "selector": { "environment_kind": "non_prod", ... },
+    "priority": 100,
+    "enabled": true,
+    "is_system": false,
+    "created_at": "...",
+    "updated_at": "..."
+  },
+  "priority_cap": 9000
+}
+```
+
+For inherited rows (`is_platform_inherited = true` OR
+`is_ancestor_inherited = true`), the `selector` field is OMITTED
+server-side — only `selector_keys` is exposed. Defense against
+selector leakage across siblings under the same parent team.
+
+**New stable error codes** (R-follow-up #3):
+
+| Code | Status | Meaning | Envelope extras |
+|---|---|---|---|
+| `team_not_found` | 404 | Team-scoped Create gate 2 — the URL teamID doesn't exist or is archived. Race-only path (coverage passed at gate 1). | — |
+| `out_of_scope_team_policy` | 403 | Caller's `policy.author` grant doesn't cover the URL teamID per the team-aware resolver. Mirrors `out_of_scope_policy` for the team URL family. | — |
+
+**3 new `policy_scope_too_broad.reason` variants** (R-follow-up #3):
+
+- `team_selector_pins_project` — team rule selector pinned `project_id`
+- `team_selector_pins_environment_id` — team rule selector pinned `environment_id`
+- `team_selector_pins_team_id` — team rule selector pinned `team_id` (v1 lock)
+
+The full reason set on `policy_scope_too_broad` is now 7 variants.
+
+**Workflow validation collapse (§4 C4)**: workflow not-found,
+workflow disabled, and workflow not-`scoped_policy_authorable` all
+return the SAME response: `403 workflow_not_authorable_for_scope`
+with envelope `{workflow_id}`. The SPA doesn't have to handle three
+separate envelopes; the api collapses them into one for cleaner UX.
+
+### Project envelope extension
+
+`GET /api/v1/projects/:projectID/policy-rules` (the existing EPIC R
+surface) now also carries team-inherited rows. The projection adds:
+
+- `is_team_inherited` — `true` when the rule's `team_id` is set
+- `team_name` — populated for team-inherited rows via server-side JOIN
+- `workflow_name` — populated for ALL rows via server-side JOIN
+  (eliminates the SPA's N+1 lookup against `/workflows`)
+
+Inherited team rows are sanitized identically to inherited platform
+rows: `selector_keys` only, no `selector`. Read-only on the scoped
+URL; manage on the team's own page or via `/admin/policies`.
+
+### `GET /api/v1/users/me/policy-author-team-coverage`
+
+NEW (R-follow-up #3, api#126). Returns the resolved team set from the
+api's `EffectiveTeamAccess(actor, policy.author)` helper — every team
+the actor's grants cover, subtree-expanded.
+
+Permission: bearer only. Exposes ONLY the caller's own coverage; not
+enumerable across other users.
+
+```json
+{
+  "global": false,
+  "team_ids": ["<uuid>", "<uuid>", ...]
+}
+```
+
+SPA reads this to drive sidebar visibility + `canAuthorTeamPolicy`
+without walking the team tree client-side.
+
+### Admin /admin/policies team anchor support (slice 1d, api#127)
+
+`POST /api/v1/policies` and `PUT /api/v1/policies/:id` now accept the
+`team_id` anchor in the body. Server-side selector safety per §5 C5
+applies even on the admin path: team-anchored rules can't carry
+`selector.project_id`, `selector.environment_id`, or
+`selector.team_id`, and `selector.environment_kind` must equal
+`"non_prod"`. Same `policy_scope_too_broad.reason` envelope.
+
+Counter cardinality `{permission_used="policy.edit", scope="team"}`
+fires when admin creates a team-scoped rule from `/admin/policies`.
+Admin audit events emit the normalized `policy.create` /
+`policy.update` / `policy.delete` action names with `scope` reflecting
+the actual anchor + `actor_permission_used: "policy.edit"`.
+
+### Team lineage transactional audit
+
+`PUT /api/v1/teams/:id` (existing) now emits the
+`policy.team_lineage_changed` audit event in the SAME transaction as
+the `parent_team_id` UPDATE when the parent actually changes. Metadata
+carries the new + old parent IDs + `team_policy_rule_count` +
+`affected_project_count` (subtree size). When parent doesn't change
+(name-only update) → no audit event (idempotent).
+
+If audit append fails, the parent UPDATE rolls back — transactional
+atomicity preserved.
+
 ## Platform settings (R-follow-up #2, api#113)
 
 Admin surface for cross-cutting platform configuration. v1 ships

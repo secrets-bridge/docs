@@ -657,6 +657,252 @@ platform-reserved band.
 LOW-CARDINALITY LOCK: counters NEVER carry actor identity. The audit
 events `platform_setting.updated` carry the actor + old/new values.
 
+### Team-scoped policy authoring (R-follow-up #3, api#114)
+
+A scoped author covering one project authors per-project rules via
+`/projects/:projectID/policy-rules`. A section head covering an entire
+team — multiple sibling projects under the same `team_id` — would
+otherwise have to author N identical rules, one per project. R-follow-up
+#3 lifts that ceiling: the third anchor `team_id` lets one rule
+cascade down to every descendant project of the team subtree.
+
+#### Three-anchor mental model
+
+| `project_id` | `team_id` | Anchor | Authoring URL |
+|---|---|---|---|
+| NULL | NULL | Platform-global | `/admin/policies` (`policy.edit`) |
+| NOT NULL | NULL | Project-scoped | `/projects/:projectID/policy-rules` |
+| NULL | NOT NULL | **Team-scoped (new)** | `/teams/:teamID/policy-rules` |
+| NOT NULL | NOT NULL | INVALID (DB CHECK) | — |
+
+The DB CHECK `policy_rules_one_anchor` enforces mutual exclusion at
+the schema level. Mixed-anchor rows can't exist even via direct SQL.
+
+#### Cascade semantics — subtree-down only
+
+A team rule cascades to every descendant project of the team subtree
+at resolution time. A rule attached to `parent-team` applies to
+projects under `parent-team`, `child-team-a`, `grandchild-team-X`, etc.
+A rule attached to `child-team-a` does NOT apply to a sibling
+`child-team-b`'s projects — the cascade is subtree-down only.
+
+The resolver query (`pkg/storage/policies.ListEnabledOrderedByPriority`)
+walks ancestors of the project's owning team via an inline recursive
+CTE in a single round trip. No separate `AncestorIDs` helper.
+
+#### Deterministic tie-break — 5-clause ORDER BY
+
+When multiple rules match the same scope, the resolver picks the
+winner with a deterministic 5-clause chain:
+
+```
+ORDER BY
+    priority DESC,                                  -- 1. higher priority wins
+    CASE                                            -- 2. specificity DESC
+        WHEN project_id IS NOT NULL THEN 2          --    (project=2 > team=1 > platform=0)
+        WHEN team_id    IS NOT NULL THEN 1
+        ELSE 0
+    END DESC,
+    tc.distance ASC NULLS LAST,                     -- 3. team distance ASC
+                                                    --    (smaller = closer = wins)
+    created_at ASC,                                 -- 4. older wins
+    id ASC                                          -- 5. stable final tie-break
+```
+
+**Worked example.** Project `billing-app` belongs to `child-team-a`,
+which is a child of `parent-team`. Three matching rules:
+
+| Rule | Anchor | Priority | Created |
+|---|---|---|---|
+| A | platform | 500 | 2026-01-01 |
+| B | `parent-team` | 500 | 2026-02-01 |
+| C | `child-team-a` | 500 | 2026-03-01 |
+| D | `billing-app` (project) | 500 | 2026-04-01 |
+
+All four are at priority 500 (tie on clause 1). Specificity DESC:
+- D (project, 2) wins clause 2 → resolver picks D.
+
+If D didn't exist, C (team, distance 0) would beat B (team, distance
+1) on clause 3, beating A (platform) by clause 2. Higher specificity
+wins; within the same specificity, closer team wins.
+
+#### Selector restrictions for team rules (§1 C1 strict)
+
+Team rules MUST keep their applicability subtree-wide. The DB CHECK
+constraints from migration 0037 + the service layer enforce:
+
+| Rule | Why |
+|---|---|
+| `environment_kind = "non_prod"` (REQUIRED) | Team rules cascade to descendant projects; the environment selector must be subtree-applicable. `environment_id` resolves to ONE project's env — forbidden. |
+| `selector.project_id` MUST be absent | Would collapse the team rule into a project-scoped rule, defeating the cascade. |
+| `selector.environment_id` MUST be absent | Same — pins to one project's env. |
+| `selector.team_id` MUST be absent (v1 lock) | The row column `team_id` is the anchor; a selector key would create a second source of truth. v2 may relax with explicit resolver semantics. |
+
+Safe-list optional selector keys: `secret_ref_prefix` only in v1.
+`provider_type` and `operation` are deferred until the policy
+selector enum is formally locked in a separate design pass.
+
+#### Authoring URLs — `policy.author` scoped to teamID
+
+```
+POST   /api/v1/teams/:teamID/policy-rules
+GET    /api/v1/teams/:teamID/policy-rules
+GET    /api/v1/teams/:teamID/policy-rules/:ruleID
+PUT    /api/v1/teams/:teamID/policy-rules/:ruleID
+DELETE /api/v1/teams/:teamID/policy-rules/:ruleID
+```
+
+All 5 routes require `policy.author` scoped to the URL teamID via the
+team-aware resolver (subtree-expanded). The coverage gate runs as the
+**first handler line** (not middleware) so denial emits the same
+audit + counter signal as the rest of the gate chain. Same posture
+EPIC R + EPIC Q established for `policy.author` / `integration.bind`.
+
+#### The `policy.edit` boundary
+
+`policy.edit` does NOT auto-allow on `/teams/:id/policies` or
+`/projects/:id/policies` — both scoped surfaces are `policy.author`
+only. Platform admins manage team-scoped rules via `/admin/policies`
+(which accepts the `team_id` anchor with the same server-side
+selector safety rules).
+
+The SPA mirrors this: `canEditPolicyRule` on the scoped pages reads
+`is_platform_inherited` / `is_team_inherited` / `is_ancestor_inherited`
+to mark inherited rows as read-only regardless of perms.
+
+#### Team lineage change — dynamic resolution + summary audit
+
+Team coverage is resolved dynamically based on the current team
+lineage. Moving a team (changing its `parent_team_id`) immediately
+affects future Resolve calls — no retroactive rewrite of existing
+rules.
+
+The `teams.UpdateWithLineageAudit` path wraps the parent-change
+UPDATE in a transaction with `policy.team_lineage_changed` audit
+emission. When parent changes:
+
+- Computes `affected_project_count` (subtree descendants) +
+  `team_policy_rule_count` INSIDE the same transaction
+- INSERTs the audit row with metadata:
+
+```json
+{
+  "team_id": "...",
+  "old_parent_team_id": "...",
+  "new_parent_team_id": "...",
+  "team_policy_rule_count": 3,
+  "affected_project_count": 12
+}
+```
+
+- Audit append failure rolls back the parent UPDATE (transactional
+  atomicity).
+
+When the parent doesn't actually change → no audit event
+(idempotent — name-only updates don't emit lineage events).
+
+#### Triage SQL — team-scoped path
+
+**1. List all team-scoped rules across the platform**
+
+```sql
+SELECT
+    t.name AS team,
+    pr.name AS rule,
+    pr.priority,
+    pr.workflow_id,
+    pr.enabled
+  FROM policy_rules pr
+  JOIN teams t ON t.id = pr.team_id
+ WHERE pr.team_id IS NOT NULL
+ ORDER BY t.name, pr.priority DESC;
+```
+
+**2. Find every rule resolving against a specific project**
+
+Uses the same recursive CTE the resolver query uses. Shows which
+team rules cascade down to a project + which project + platform
+rules also match.
+
+```sql
+WITH RECURSIVE team_chain(id, distance) AS (
+    SELECT p.team_id, 0
+      FROM projects p
+     WHERE p.id = '<project-id>' AND p.team_id IS NOT NULL
+    UNION ALL
+    SELECT t.parent_team_id, tc.distance + 1
+      FROM teams t
+      JOIN team_chain tc ON t.id = tc.id
+     WHERE t.parent_team_id IS NOT NULL
+)
+SELECT pr.name, pr.priority,
+       CASE
+           WHEN pr.project_id IS NOT NULL THEN 'project'
+           WHEN pr.team_id    IS NOT NULL THEN 'team'
+           ELSE 'platform'
+       END AS anchor,
+       tc.distance AS team_distance
+  FROM policy_rules pr
+  LEFT JOIN team_chain tc ON tc.id = pr.team_id
+ WHERE pr.enabled = TRUE
+   AND (
+        pr.project_id = '<project-id>'
+        OR (pr.project_id IS NULL AND pr.team_id IS NULL)
+        OR pr.team_id IN (SELECT id FROM team_chain)
+   )
+ ORDER BY pr.priority DESC,
+          CASE WHEN pr.project_id IS NOT NULL THEN 2
+               WHEN pr.team_id    IS NOT NULL THEN 1
+               ELSE 0 END DESC,
+          tc.distance ASC NULLS LAST,
+          pr.created_at ASC,
+          pr.id ASC;
+```
+
+**3. Verify ancestor-team coverage for an actor**
+
+```sql
+SELECT t.id, t.name
+  FROM teams t
+ WHERE t.id IN (
+       SELECT (scope->>'team_id')::uuid
+         FROM user_roles ur
+         JOIN roles r ON r.id = ur.role_id
+        WHERE ur.user_id = '<actor-id>'
+          AND 'policy.author' = ANY(SELECT jsonb_array_elements_text(r.permissions))
+          AND scope ? 'team_id'
+ );
+```
+
+The api's `EffectiveTeamAccess` helper expands these grants through
+the team subtree at request time. Use the
+[`GET /api/v1/users/me/policy-author-team-coverage`](../reference/api-endpoints.md#team-anchored-scoped-policy-rules-r-follow-up-3-api114)
+endpoint for the resolved set the SPA sees.
+
+**4. Audit-action compatibility query (post-§4 C2 normalization)**
+
+The R-follow-up #3 slice 1c normalized admin audit emission to
+`policy.create` / `policy.update` / `policy.delete` matching the
+scoped paths' shape. Old EPIC R + R-follow-up #1 events kept their
+original action names (audit is append-only — we don't rewrite
+history). To triage policy mutations across the cutover:
+
+```sql
+SELECT occurred_at,
+       action,
+       metadata->>'scope' AS scope,
+       metadata->>'actor_permission_used' AS perm_used,
+       metadata->>'policy_rule_id' AS rule_id
+  FROM audit_events
+ WHERE action IN (
+       'policy.create', 'policy.update', 'policy.delete',
+       'policy.created_for_scope', 'policy.updated_for_scope',
+       'policy.deleted_for_scope'
+ )
+ ORDER BY occurred_at DESC
+ LIMIT 100;
+```
+
 ### Observability — Prometheus counters
 
 Four counters, all locked to LOW-CARDINALITY labels. Operator
@@ -672,13 +918,16 @@ policy_rules_denied_total{reason}
 
 - `permission_used` ∈ `{policy.author, policy.edit}` — tracks which
   surface ran the mutation.
-- `scope` ∈ `{platform, project}` — `project` for scoped rules,
-  `platform` for global rules (admin path adds the label as future
-  work; today admin path doesn't emit these counters).
-- `reason` is a fixed 9-element set: `out_of_scope`, `platform_owned`,
+- `scope` ∈ `{platform, project, team}` — `project` for project-scoped
+  rules, `team` for team-scoped rules (R-follow-up #3), `platform` for
+  global rules. R-follow-up #3 slice 1d enabled audit + counter
+  emission on the admin path so the `{policy.edit, *}` cardinality
+  now fires too.
+- `reason` is a fixed 11-element set: `out_of_scope`, `platform_owned`,
   `prod_blocked`, `scope_too_broad`, `priority_reserved`,
   `selector_mismatch`, `env_not_in_project`, `not_found`,
-  `workflow_not_authorable` (R-follow-up #1, api#112).
+  `workflow_not_authorable` (R-follow-up #1, api#112),
+  `out_of_team_scope`, `team_not_found` (R-follow-up #3, api#114).
 
 **LOW-CARDINALITY LOCK**: counters NEVER carry `actor_id`,
 `project_id`, `policy_rule_id`, or `workflow_id` labels. Same posture
@@ -694,10 +943,12 @@ those up.
 | `out_of_scope_policy` | 403 | Caller's `policy.author` grant doesn't cover the target project per the team-aware resolver | — |
 | `policy_selector_mismatch` | 400 | `selector.project_id` was set but doesn't equal URL projectID | — |
 | `prod_policy_not_allowed_for_scope` | 403 | Scoped caller tried to author a rule that resolves to a prod env | `{"env_kind": "prod"}` |
-| `policy_scope_too_broad` | 400 | Selector doesn't satisfy the non-prod-by-construction invariant | `{"reason": "env_constraint_missing"\|"env_kind_invalid"\|"selector_empty"\|"env_kind_id_inconsistent"}` |
+| `policy_scope_too_broad` | 400 | Selector doesn't satisfy the non-prod-by-construction invariant. R-follow-up #3 added 3 new reasons for team-scoped selector safety. | `{"reason": "env_constraint_missing"\|"env_kind_invalid"\|"selector_empty"\|"env_kind_id_inconsistent"\|"team_selector_pins_project"\|"team_selector_pins_environment_id"\|"team_selector_pins_team_id"}` |
 | `policy_priority_reserved` | 400 | Priority at or above the platform-reserved band requested. The cap is admin-configurable per R-follow-up #2 (default `9000`); the envelope echoes the live value. | `{"cap": <live-value>}` |
 | `policy_environment_not_in_project` | 400 | `selector.environment_id` doesn't belong to URL projectID | — |
-| `workflow_not_authorable_for_scope` | 403 | Scoped caller picked a workflow that platform admin hasn't opted into the scoped author surface (R-follow-up #1, api#112). Distinct from `platform_policy_not_editable`: the workflow exists and is admin-usable; it just isn't exposed to scoped authors yet. | `{"workflow_id": "<uuid>"}` |
+| `workflow_not_authorable_for_scope` | 403 | Scoped caller picked a workflow that platform admin hasn't opted into the scoped author surface (R-follow-up #1, api#112). Distinct from `platform_policy_not_editable`: the workflow exists and is admin-usable; it just isn't exposed to scoped authors yet. R-follow-up #3 §4 C4 collapsed the 3 failure modes (not-found / disabled / not-authorable) into this same code for the team-scoped path too. | `{"workflow_id": "<uuid>"}` |
+| `team_not_found` | 404 | Team-scoped Create gate 2 — the URL teamID doesn't exist or is archived. Race-only path (coverage passed at gate 1). R-follow-up #3 (api#114). | — |
+| `out_of_scope_team_policy` | 403 | Caller's `policy.author` grant doesn't cover the URL teamID per the team-aware resolver. Mirrors `out_of_scope_policy` for the team URL family. R-follow-up #3. | — |
 
 The SPA's `src/api/policyErrors.ts` ships `toPolicyRuleErrorToast(err)`
 which surfaces the `policy_scope_too_broad.reason` variants + the
