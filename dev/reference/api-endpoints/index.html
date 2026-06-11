@@ -1607,6 +1607,48 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#policy-rule-change-history-r-follow-up-5-api132" class="md-nav__link">
+    <span class="md-ellipsis">
+      Policy rule change history (R-follow-up #5, api#132)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Policy rule change history (R-follow-up #5, api#132)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#counter" class="md-nav__link">
+    <span class="md-ellipsis">
+      Counter
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit-emit-on-read" class="md-nav__link">
+    <span class="md-ellipsis">
+      Audit emit on read
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#snapshot-extension-on-the-existing-emit-sites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Snapshot extension on the existing emit sites
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#platform-settings-r-follow-up-2-api113" class="md-nav__link">
     <span class="md-ellipsis">
       Platform settings (R-follow-up #2, api#113)
@@ -1917,6 +1959,48 @@
   <a href="#team-lineage-transactional-audit" class="md-nav__link">
     <span class="md-ellipsis">
       Team lineage transactional audit
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#policy-rule-change-history-r-follow-up-5-api132" class="md-nav__link">
+    <span class="md-ellipsis">
+      Policy rule change history (R-follow-up #5, api#132)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Policy rule change history (R-follow-up #5, api#132)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#counter" class="md-nav__link">
+    <span class="md-ellipsis">
+      Counter
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audit-emit-on-read" class="md-nav__link">
+    <span class="md-ellipsis">
+      Audit emit on read
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#snapshot-extension-on-the-existing-emit-sites" class="md-nav__link">
+    <span class="md-ellipsis">
+      Snapshot extension on the existing emit sites
     </span>
   </a>
   
@@ -3046,6 +3130,154 @@ carries the new + old parent IDs + <code>team_policy_rule_count</code> +
 (name-only update) → no audit event (idempotent).</p>
 <p>If audit append fails, the parent UPDATE rolls back — transactional
 atomicity preserved.</p>
+<h2 id="policy-rule-change-history-r-follow-up-5-api132">Policy rule change history (R-follow-up #5, api#132)<a class="headerlink" href="#policy-rule-change-history-r-follow-up-5-api132" title="Permanent link">&para;</a></h2>
+<p>Three read endpoints expose the audit chain for a single policy
+rule. The api walks the chain in time order, computes a diff
+between consecutive snapshots, normalizes legacy action names, and
+returns a rendered timeline. UI consumes this via the per-anchor
+Detail pages.</p>
+<p>Hard rule — the §6 selector lock from EPIC R is unwavering. The
+wire response carries <code>selector_keys</code> (set-based, sorted) and
+<strong>NEVER</strong> selector VALUES, on every entry of the chain.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/projects/:projectID/policy-rules/:ruleID/history</code></td>
+<td><code>bearer + policy.author</code> covering projectID</td>
+<td>Scoped (project). 404 <code>policy_not_found</code> on missing rule OR anchor mismatch (silent — gate-order enumeration protection). After delete: 404.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/teams/:teamID/policy-rules/:ruleID/history</code></td>
+<td><code>bearer + policy.author</code> covering teamID</td>
+<td>Scoped (team). Coverage gate runs as a HANDLER helper (not middleware) so denial emits the same audit + counter signal as the rest of the gate chain (per R-follow-up #3 §3 C3). After delete: 404.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/policies/:ruleID/history</code></td>
+<td><code>bearer + policy.edit</code></td>
+<td>Admin. <strong>Existence check via the audit chain, NOT <code>policyRepo.Get</code></strong> — admin retains forensic visibility after delete if at least one event exists. NO anchor routing — admin sees regardless of anchor.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Query params</strong> — all 3 endpoints support:</p>
+<ul>
+<li><code>limit=&lt;int&gt;</code> — default 50; cap 500 (<code>storage.MaxPolicyHistoryLimit</code>). Server-side cap defends against operator typos.</li>
+</ul>
+<p><strong>Response envelope shape</strong> (200):</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&quot;rule_id&quot;</span><span class="p">:</span><span class="w">  </span><span class="s2">&quot;&lt;uuid&gt;&quot;</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w">    </span><span class="s2">&quot;platform&quot;</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">&quot;project&quot;</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">&quot;team&quot;</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">&quot;entries&quot;</span><span class="p">:</span><span class="w">  </span><span class="p">[</span><span class="err">&lt;His</span><span class="kc">t</span><span class="err">oryE</span><span class="kc">ntr</span><span class="err">y&gt;</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="p">],</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nt">&quot;has_more&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="nt">&quot;limit&quot;</span><span class="p">:</span><span class="w">    </span><span class="mi">50</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><code>scope</code> reflects the rule's anchor (not the URL family). For the
+admin endpoint with a deleted rule, scope is derived from the most
+recent event's metadata; falls back to <code>"platform"</code> for pre-§4 C2
+legacy events with no scope key.</p>
+<p><code>has_more=true</code> indicates an older event was capped by <code>limit</code>. The
+SPA grows <code>limit</code> per "Load more" click (50 → 100 → 200 …) per
+OQ3-A — cursor pagination is deferred.</p>
+<p><strong><code>HistoryEntry</code> shape</strong>:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&quot;event_id&quot;</span><span class="p">:</span><span class="w">             </span><span class="s2">&quot;&lt;uuid&gt;&quot;</span><span class="p">,</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">&quot;occurred_at&quot;</span><span class="p">:</span><span class="w">          </span><span class="s2">&quot;&lt;rfc3339&gt;&quot;</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">&quot;actor&quot;</span><span class="p">:</span><span class="w">                </span><span class="s2">&quot;user:&lt;uuid&gt;&quot;</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">&quot;agent:&lt;uuid&gt;&quot;</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">&quot;system:&lt;kind&gt;&quot;</span><span class="p">,</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nt">&quot;actor_display&quot;</span><span class="p">:</span><span class="w">        </span><span class="s2">&quot;&lt;resolved name&gt;&quot;</span><span class="p">,</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nt">&quot;correlation_id&quot;</span><span class="p">:</span><span class="w">       </span><span class="s2">&quot;&lt;uuid&gt;&quot;</span><span class="p">,</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w">               </span><span class="s2">&quot;policy.create&quot;</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">&quot;policy.update&quot;</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">&quot;policy.delete&quot;</span><span class="p">,</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="nt">&quot;actor_permission_used&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;policy.author&quot;</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">&quot;policy.edit&quot;</span><span class="p">,</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w">                </span><span class="s2">&quot;platform&quot;</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">&quot;project&quot;</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">&quot;team&quot;</span><span class="p">,</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="nt">&quot;changes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;priority&quot;</span><span class="p">,</span><span class="w">      </span><span class="nt">&quot;before&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">  </span><span class="nt">&quot;after&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;name&quot;</span><span class="p">,</span><span class="w">          </span><span class="nt">&quot;before&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;old&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;after&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;new&quot;</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;enabled&quot;</span><span class="p">,</span><span class="w">       </span><span class="nt">&quot;before&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">  </span><span class="nt">&quot;after&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;workflow_id&quot;</span><span class="p">,</span><span class="w">   </span><span class="nt">&quot;before&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;uuid&gt;&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;after&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;uuid&gt;&quot;</span><span class="p">,</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="w">      </span><span class="nt">&quot;before_workflow_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;approval-v1&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;after_workflow_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;approval-v2&quot;</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;selector_keys&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;before&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;environment_kind&quot;</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;after&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;environment_kind&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;secret_ref_prefix&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">  </span><span class="p">],</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="w">  </span><span class="nt">&quot;snapshot_after&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w">          </span><span class="s2">&quot;...&quot;</span><span class="p">,</span>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="w">    </span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="w">       </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="w">    </span><span class="nt">&quot;priority&quot;</span><span class="p">:</span><span class="w">      </span><span class="mi">100</span><span class="p">,</span>
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="w">    </span><span class="nt">&quot;workflow_id&quot;</span><span class="p">:</span><span class="w">   </span><span class="s2">&quot;&lt;uuid&gt;&quot;</span><span class="p">,</span>
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="w">    </span><span class="nt">&quot;workflow_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;approval-v1&quot;</span><span class="p">,</span>
+</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="w">    </span><span class="nt">&quot;selector_keys&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;...&quot;</span><span class="p">]</span>
+</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="p">}</span>
+</span></code></pre></div>
+<ul>
+<li><code>action</code> is always the <strong>normalized</strong> name. Legacy events from
+  before R-follow-up #3 §4 C2 (action names <code>policy.created_for_scope</code>
+  etc.) are mapped server-side before return — the SPA sees one
+  stable enum.</li>
+<li><code>changes</code> is empty on <code>policy.create</code> (chain head) and on
+  <code>policy.delete</code> (terminal event; <code>snapshot_after</code> carries the
+  last-known snapshot from the prior event per §3 D3 step 5).</li>
+<li>For legacy events lacking the <code>name</code>/<code>enabled</code> snapshot fields
+  (pre-slice-1b), <code>snapshot_after.name</code> / <code>.enabled</code> are omitted
+  on the wire; SPA renders <code>(unknown)</code> placeholders.</li>
+<li><code>workflow_name</code> is resolved server-side via batch lookup
+  (<code>workflows.ListByIDs</code>). When the workflow has been deleted, the
+  field is omitted; SPA renders <code>(deleted)</code>.</li>
+</ul>
+<p><strong>Anchor mismatch — silent 404, no audit emit</strong></p>
+<p>Scoped endpoints route through the same enumeration-protection
+pattern as the per-anchor <code>Get</code> handlers: if the rule's
+<code>project_id</code> (or <code>team_id</code>) doesn't match the URL's, the response
+is <code>404 policy_not_found</code> — same envelope as a truly missing rule.
+NO <code>policy.denied_anchor_mismatch</code> audit event; that would defeat
+the very enumeration protection it claims to enhance. Slice 1c §4
+OQ4-1 lock.</p>
+<h3 id="counter">Counter<a class="headerlink" href="#counter" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>policy_rule_history_views_total{scope}
+</span></code></pre></div>
+<p>LOW-CARDINALITY LOCK preserved: <code>scope ∈ {platform, project, team}</code> —
+3 values total. NEVER carries <code>actor_id</code>, <code>rule_id</code>, <code>project_id</code>,
+or <code>team_id</code> labels. Per-rule reads live in the audit log via
+<code>audit.read.policy_history</code> (see below).</p>
+<h3 id="audit-emit-on-read">Audit emit on read<a class="headerlink" href="#audit-emit-on-read" title="Permanent link">&para;</a></h3>
+<p>Every successful history list emits one audit event:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">{</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">&quot;action&quot;</span><span class="p">:</span><span class="w">   </span><span class="s2">&quot;audit.read.policy_history&quot;</span><span class="p">,</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">&quot;actor&quot;</span><span class="p">:</span><span class="w">    </span><span class="s2">&quot;&lt;actor&gt;&quot;</span><span class="p">,</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nt">&quot;resource&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;policy_rule:&lt;rule-uuid&gt;&quot;</span><span class="p">,</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="nt">&quot;policy_rule_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;uuid&gt;&quot;</span><span class="p">,</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w">          </span><span class="s2">&quot;platform&quot;</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">&quot;project&quot;</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">&quot;team&quot;</span><span class="p">,</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="nt">&quot;entry_count&quot;</span><span class="p">:</span><span class="w">    </span><span class="err">&lt;i</span><span class="kc">nt</span><span class="err">&gt;</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Provides forensic traceability for "who read whose history" — a
+post-incident query for <code>action='audit.read.policy_history'</code>
+returns every history view across the entire span. Operators
+investigating leaked screenshots / "who saw the old version"
+scenarios reach for this surface.</p>
+<h3 id="snapshot-extension-on-the-existing-emit-sites">Snapshot extension on the existing emit sites<a class="headerlink" href="#snapshot-extension-on-the-existing-emit-sites" title="Permanent link">&para;</a></h3>
+<p>Slice 1b extended the metadata on <code>policy.create / .update / .delete</code>
+across all 3 emit sites (admin, project-scoped, team-scoped). New
+events carry:</p>
+<ul>
+<li><code>name</code> (the rule's current name)</li>
+<li><code>enabled</code> (the rule's current enabled state)</li>
+<li>Project-scoped path also now carries <code>scope: "project"</code> and
+  <code>team_id: null</code> for cross-cohort consistency (was missing from the
+  R-follow-up #3 §4 C2 normalization; slice 1b closes the gap).</li>
+</ul>
+<p>No data backfill — append-only audit. Legacy events render gracefully
+in the SPA as <code>(unknown)</code> for the missing keys.</p>
 <h2 id="platform-settings-r-follow-up-2-api113">Platform settings (R-follow-up #2, api#113)<a class="headerlink" href="#platform-settings-r-follow-up-2-api113" title="Permanent link">&para;</a></h2>
 <p>Admin surface for cross-cutting platform configuration. v1 ships
 exactly one whitelisted key — <code>platform_reserved_priority</code> — that
@@ -3092,12 +3324,12 @@ a 5-minute TTL backstop for missed messages.</p>
 </tbody>
 </table>
 <p><strong>Response shape</strong> (<code>PlatformSetting</code>):</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;platform_reserved_priority&quot;</span><span class="p">,</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">9000</span><span class="p">,</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-08T12:34:56.789Z&quot;</span><span class="p">,</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nt">&quot;updated_by&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;alice&quot;</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;platform_reserved_priority&quot;</span><span class="p">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">9000</span><span class="p">,</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">&quot;updated_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-06-08T12:34:56.789Z&quot;</span><span class="p">,</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">&quot;updated_by&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;alice&quot;</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">}</span>
 </span></code></pre></div>
 <p><code>value</code> is generic JSON — callers narrow per-key. For
 <code>platform_reserved_priority</code> it's an integer between <code>100</code> and
@@ -3134,8 +3366,8 @@ a 5-minute TTL backstop for missed messages.</p>
 </tbody>
 </table>
 <p><strong>Prometheus counters</strong> (R-follow-up #2):</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>platform_setting_updates_total{key, result}
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>platform_setting_cache_reloads_total{key, trigger}
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>platform_setting_updates_total{key, result}
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>platform_setting_cache_reloads_total{key, trigger}
 </span></code></pre></div>
 <ul>
 <li><code>key</code> is the whitelisted key string (low-cardinality — v1 has one).</li>

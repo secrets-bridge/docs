@@ -2831,14 +2831,249 @@ history). To triage policy mutations across the cutover:</p>
 </span><span id="__span-28-12"><a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="k">DESC</span>
 </span><span id="__span-28-13"><a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
 </span></code></pre></div>
+<h3 id="policy-rule-change-history-r-follow-up-5-api132">Policy rule change history (R-follow-up #5, api#132)<a class="headerlink" href="#policy-rule-change-history-r-follow-up-5-api132" title="Permanent link">&para;</a></h3>
+<p>After R-follow-up #3 ships, every policy mutation emits an audit
+event with a post-mutation snapshot in its metadata. R-follow-up #5
+makes that history navigable: a per-rule timeline view in the SPA
+plus three read endpoints (one per anchor URL family) that walk the
+audit chain and compute a diff between consecutive snapshots.</p>
+<h4 id="timeline-behavior">Timeline behavior<a class="headerlink" href="#timeline-behavior" title="Permanent link">&para;</a></h4>
+<p>The Detail page is reached from the per-rule list:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>/projects/:id/policies/:ruleID    →  ProjectPolicyDetail
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>/teams/:id/policies/:ruleID       →  TeamPolicyDetail
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>/admin/policies/:ruleID           →  AdminPolicyDetail
+</span></code></pre></div>
+<p>Each Detail page has a tab bar <code>Overview | History</code>. The History tab
+loads <code>GET .../policy-rules/:ruleID/history</code> (or <code>/policies/:ruleID/history</code>
+for admin) and renders the audit chain in time order, oldest first.
+Each entry shows the actor, timestamp, action, the diff against the
+prior snapshot, and a collapsed view of the full snapshot.</p>
+<h4 id="whats-recorded-vs-not-recorded">What's recorded vs not recorded<a class="headerlink" href="#whats-recorded-vs-not-recorded" title="Permanent link">&para;</a></h4>
+<p>The audit metadata snapshot used to drive the diff (slice 1b added
+the bold fields):</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Recorded?</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>✅ (slice 1b+)</td>
+<td>post-mutation rule state</td>
+</tr>
+<tr>
+<td><code>enabled</code></td>
+<td>✅ (slice 1b+)</td>
+<td>post-mutation rule state</td>
+</tr>
+<tr>
+<td><code>priority</code></td>
+<td>✅</td>
+<td>post-mutation rule state</td>
+</tr>
+<tr>
+<td><code>workflow_id</code></td>
+<td>✅</td>
+<td>post-mutation rule state</td>
+</tr>
+<tr>
+<td><code>workflow_name</code></td>
+<td>✅</td>
+<td>server-side JOIN at render time</td>
+</tr>
+<tr>
+<td><code>selector_keys</code></td>
+<td>✅</td>
+<td>set-based (sorted)</td>
+</tr>
+<tr>
+<td><code>actor_permission_used</code></td>
+<td>✅</td>
+<td><code>policy.author</code> or <code>policy.edit</code></td>
+</tr>
+<tr>
+<td><code>scope</code></td>
+<td>✅ (slice 1b+ on all 3 paths)</td>
+<td><code>platform</code> / <code>project</code> / <code>team</code></td>
+</tr>
+<tr>
+<td><strong><code>selector</code> VALUES</strong></td>
+<td>❌</td>
+<td><strong>§6 lock — never exposed</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Selector-values-never rule.</strong> The §6 selector lock from EPIC R is
+unwavering. The audit log records <em>which keys</em> the selector had at
+each point (e.g. <code>[environment_kind, secret_ref_prefix]</code>), but
+NEVER the values (e.g. <code>non_prod</code>, <code>billing/prod/</code>). Operators
+needing to see the values at the time of a mutation correlate
+out-of-band: the <code>correlation_id</code> on each entry can be cross-
+referenced with the actor's session / change-ticket / pairing
+partner.</p>
+<p>This rule applies on the wire too — the SPA renders selector_keys
+as set-diff chips (kept / removed / added) but never the values.</p>
+<h4 id="legacy-event-caveat">Legacy event caveat<a class="headerlink" href="#legacy-event-caveat" title="Permanent link">&para;</a></h4>
+<p>R-follow-up #5 slice 1b extended the metadata. Events from BEFORE
+slice 1b shipped do NOT carry <code>name</code> or <code>enabled</code> in their snapshot.
+The audit table is append-only — those rows are NEVER rewritten.
+The SPA renders missing fields as <code>(unknown)</code> placeholders; the
+chain still works because the diff algorithm consults only the
+snapshots' presence of each key (a missing field on event N is
+"absent" — flagged as a change when event N+1 carries it).</p>
+<h4 id="chain-head-initial-snapshot-observed-caveat">Chain head "Initial snapshot observed" caveat<a class="headerlink" href="#chain-head-initial-snapshot-observed-caveat" title="Permanent link">&para;</a></h4>
+<p>When the audit chain's first event isn't a <code>policy.create</code> — for
+rules created before EPIC R's audit emit shipped, or rules whose
+oldest event was rotated out of retention — the timeline renders
+that first row with:</p>
+<blockquote>
+<p>Initial snapshot observed.</p>
+</blockquote>
+<p>No <code>changes</code> block is shown. Subsequent rows diff against this
+synthetic chain head. Operators see best-effort history without
+misleading "from nothing" deltas.</p>
+<h4 id="permission-model">Permission model<a class="headerlink" href="#permission-model" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Permission</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /api/v1/projects/:projectID/policy-rules/:ruleID/history</code></td>
+<td><code>policy.author</code> covering the project</td>
+</tr>
+<tr>
+<td><code>GET /api/v1/teams/:teamID/policy-rules/:ruleID/history</code></td>
+<td><code>policy.author</code> covering the team</td>
+</tr>
+<tr>
+<td><code>GET /api/v1/policies/:ruleID/history</code></td>
+<td><code>policy.edit</code> (admin)</td>
+</tr>
+</tbody>
+</table>
+<p>The SPA's <code>canViewPolicyRuleHistory</code> helper gates the History tab
+on the SAME perm as the parent list page — there is NO separate
+"view-only" permission in v1. Future <code>policy.list</code> is a noted
+design follow-up; not blocking.</p>
+<h4 id="post-delete-admin-only-forensic-visibility">Post-delete admin-only forensic visibility<a class="headerlink" href="#post-delete-admin-only-forensic-visibility" title="Permanent link">&para;</a></h4>
+<p>The three endpoints diverge on what happens after the rule has been
+deleted:</p>
+<table>
+<thead>
+<tr>
+<th>Surface</th>
+<th>After delete</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/projects/.../policy-rules/:ruleID/history</code> (scoped)</td>
+<td>404 <code>policy_not_found</code> — scoped access lost at delete</td>
+</tr>
+<tr>
+<td><code>/teams/.../policy-rules/:ruleID/history</code> (scoped)</td>
+<td>404 <code>policy_not_found</code> — same</td>
+</tr>
+<tr>
+<td><code>/policies/:ruleID/history</code> (admin)</td>
+<td><strong>200 with full chain</strong> if at least one event exists</td>
+</tr>
+</tbody>
+</table>
+<p>The admin endpoint uses a different existence check: instead of
+loading the rule row (which is gone), it checks
+<code>audit_events.ListPolicyRuleHistory(ruleID, 1)</code> for at least one
+event. This is <strong>intentional</strong>: post-incident forensics often
+requires reviewing rules that were rolled back or removed. Scoped
+authors lose visibility (the rule is no longer "theirs"); admins
+retain it via the audit-chain path.</p>
+<p>The SPA's <code>AdminPolicyDetail</code> renders a yellow caveat when the
+rule's <code>Get</code> returns 404: "Rule has been deleted. History below
+loads from the audit chain (admin post-delete forensic visibility)."</p>
+<h4 id="raw-audit-triage-sql">Raw audit triage SQL<a class="headerlink" href="#raw-audit-triage-sql" title="Permanent link">&para;</a></h4>
+<p>When the SPA timeline isn't enough — or when the operator wants
+to query a span of multiple rules — the <code>audit.read</code> permission
+gives direct access to the raw events:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="c1">-- All mutations on a single rule (ASC for chain order, mirroring</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="c1">-- the SPA&#39;s render order):</span>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">occurred_at</span><span class="p">,</span>
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">       </span><span class="n">actor</span><span class="p">,</span>
+</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="w">       </span><span class="n">action</span><span class="p">,</span>
+</span><span id="__span-30-6"><a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;scope&#39;</span><span class="w">                </span><span class="k">AS</span><span class="w"> </span><span class="k">scope</span><span class="p">,</span>
+</span><span id="__span-30-7"><a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;actor_permission_used&#39;</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">perm</span><span class="p">,</span>
+</span><span id="__span-30-8"><a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;priority&#39;</span><span class="w">             </span><span class="k">AS</span><span class="w"> </span><span class="n">priority</span><span class="p">,</span>
+</span><span id="__span-30-9"><a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;workflow_id&#39;</span><span class="w">          </span><span class="k">AS</span><span class="w"> </span><span class="n">workflow_id</span><span class="p">,</span>
+</span><span id="__span-30-10"><a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;selector_keys&#39;</span><span class="w">        </span><span class="k">AS</span><span class="w"> </span><span class="n">selector_keys</span><span class="p">,</span>
+</span><span id="__span-30-11"><a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a><span class="w">       </span><span class="n">correlation_id</span>
+</span><span id="__span-30-12"><a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a><span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="n">audit_events</span>
+</span><span id="__span-30-13"><a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;policy_rule:&lt;RULE_UUID&gt;&#39;</span>
+</span><span id="__span-30-14"><a id="__codelineno-30-14" name="__codelineno-30-14" href="#__codelineno-30-14"></a><span class="w">   </span><span class="k">AND</span><span class="w"> </span><span class="n">action</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span>
+</span><span id="__span-30-15"><a id="__codelineno-30-15" name="__codelineno-30-15" href="#__codelineno-30-15"></a><span class="w">       </span><span class="s1">&#39;policy.create&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;policy.update&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;policy.delete&#39;</span><span class="p">,</span>
+</span><span id="__span-30-16"><a id="__codelineno-30-16" name="__codelineno-30-16" href="#__codelineno-30-16"></a><span class="w">       </span><span class="s1">&#39;policy.created_for_scope&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;policy.updated_for_scope&#39;</span><span class="p">,</span>
+</span><span id="__span-30-17"><a id="__codelineno-30-17" name="__codelineno-30-17" href="#__codelineno-30-17"></a><span class="w">       </span><span class="s1">&#39;policy.deleted_for_scope&#39;</span>
+</span><span id="__span-30-18"><a id="__codelineno-30-18" name="__codelineno-30-18" href="#__codelineno-30-18"></a><span class="w">   </span><span class="p">)</span>
+</span><span id="__span-30-19"><a id="__codelineno-30-19" name="__codelineno-30-19" href="#__codelineno-30-19"></a><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="k">ASC</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">ASC</span><span class="p">;</span>
+</span></code></pre></div>
+<p>The <code>WHERE action IN (...)</code> clause reads both the normalized names
+AND the R-follow-up #3 pre-cutover names — same compatibility set
+the api's <code>AuditEvents.ListPolicyRuleHistory</code> uses. Operators on a
+clean cutover can drop the legacy names from the IN list.</p>
+<p>The tie-break <code>ORDER BY occurred_at ASC, id ASC</code> is deterministic
+for sub-millisecond races (test fixtures, batched migrations). Same
+posture as R-follow-up #3 §1 C2's policy resolution tie-break.</p>
+<h4 id="history-view-audit-trail">History view audit trail<a class="headerlink" href="#history-view-audit-trail" title="Permanent link">&para;</a></h4>
+<p>Every successful history list emits its own audit event:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>action</code></td>
+<td><code>audit.read.policy_history</code></td>
+</tr>
+<tr>
+<td><code>actor</code></td>
+<td>the requesting user / agent / admin</td>
+</tr>
+<tr>
+<td><code>resource</code></td>
+<td><code>policy_rule:&lt;rule-uuid&gt;</code></td>
+</tr>
+<tr>
+<td><code>metadata</code></td>
+<td><code>{policy_rule_id, scope, entry_count}</code></td>
+</tr>
+</tbody>
+</table>
+<p>Operators investigating a leaked-screenshot or
+"who-saw-the-old-version" scenario query:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">occurred_at</span><span class="p">,</span><span class="w"> </span><span class="n">actor</span><span class="p">,</span><span class="w"> </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;scope&#39;</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">scope</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="n">audit_events</span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;audit.read.policy_history&#39;</span>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="w">   </span><span class="k">AND</span><span class="w"> </span><span class="n">resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;policy_rule:&lt;RULE_UUID&gt;&#39;</span>
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
+</span></code></pre></div>
 <h3 id="observability-prometheus-counters">Observability — Prometheus counters<a class="headerlink" href="#observability-prometheus-counters" title="Permanent link">&para;</a></h3>
 <p>Four counters, all locked to LOW-CARDINALITY labels. Operator
 shouldn't try to derive per-actor or per-rule rates from these —
 those live in the audit log.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>policy_rules_created_total{permission_used, scope}
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>policy_rules_updated_total{permission_used, scope}
-</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>policy_rules_deleted_total{permission_used, scope}
-</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>policy_rules_denied_total{reason}
+<div class="language-text highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>policy_rules_created_total{permission_used, scope}
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>policy_rules_updated_total{permission_used, scope}
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>policy_rules_deleted_total{permission_used, scope}
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>policy_rules_denied_total{reason}
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>policy_rule_history_views_total{scope}
 </span></code></pre></div>
 <ul>
 <li><code>permission_used</code> ∈ <code>{policy.author, policy.edit}</code> — tracks which
@@ -2853,6 +3088,12 @@ those live in the audit log.</p>
   <code>selector_mismatch</code>, <code>env_not_in_project</code>, <code>not_found</code>,
   <code>workflow_not_authorable</code> (R-follow-up #1, api#112),
   <code>out_of_team_scope</code>, <code>team_not_found</code> (R-follow-up #3, api#114).</li>
+<li><code>policy_rule_history_views_total{scope}</code> (R-follow-up #5, api#132)
+  increments once per successful history read. <code>scope</code> values are
+  the same <code>{platform, project, team}</code> set — <code>team</code>/<code>project</code> for
+  the scoped URL family, <code>platform</code> for any rule reached via the
+  admin endpoint (the scope label there is derived from the rule's
+  anchor, not the URL family).</li>
 </ul>
 <p><strong>LOW-CARDINALITY LOCK</strong>: counters NEVER carry <code>actor_id</code>,
 <code>project_id</code>, <code>policy_rule_id</code>, or <code>workflow_id</code> labels. Same posture
