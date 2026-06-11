@@ -903,6 +903,177 @@ SELECT occurred_at,
  LIMIT 100;
 ```
 
+### Policy rule change history (R-follow-up #5, api#132)
+
+After R-follow-up #3 ships, every policy mutation emits an audit
+event with a post-mutation snapshot in its metadata. R-follow-up #5
+makes that history navigable: a per-rule timeline view in the SPA
+plus three read endpoints (one per anchor URL family) that walk the
+audit chain and compute a diff between consecutive snapshots.
+
+#### Timeline behavior
+
+The Detail page is reached from the per-rule list:
+
+```
+/projects/:id/policies/:ruleID    →  ProjectPolicyDetail
+/teams/:id/policies/:ruleID       →  TeamPolicyDetail
+/admin/policies/:ruleID           →  AdminPolicyDetail
+```
+
+Each Detail page has a tab bar `Overview | History`. The History tab
+loads `GET .../policy-rules/:ruleID/history` (or `/policies/:ruleID/history`
+for admin) and renders the audit chain in time order, oldest first.
+Each entry shows the actor, timestamp, action, the diff against the
+prior snapshot, and a collapsed view of the full snapshot.
+
+#### What's recorded vs not recorded
+
+The audit metadata snapshot used to drive the diff (slice 1b added
+the bold fields):
+
+| Field | Recorded? | Source |
+|---|---|---|
+| `name` | ✅ (slice 1b+) | post-mutation rule state |
+| `enabled` | ✅ (slice 1b+) | post-mutation rule state |
+| `priority` | ✅ | post-mutation rule state |
+| `workflow_id` | ✅ | post-mutation rule state |
+| `workflow_name` | ✅ | server-side JOIN at render time |
+| `selector_keys` | ✅ | set-based (sorted) |
+| `actor_permission_used` | ✅ | `policy.author` or `policy.edit` |
+| `scope` | ✅ (slice 1b+ on all 3 paths) | `platform` / `project` / `team` |
+| **`selector` VALUES** | ❌ | **§6 lock — never exposed** |
+
+**Selector-values-never rule.** The §6 selector lock from EPIC R is
+unwavering. The audit log records *which keys* the selector had at
+each point (e.g. `[environment_kind, secret_ref_prefix]`), but
+NEVER the values (e.g. `non_prod`, `billing/prod/`). Operators
+needing to see the values at the time of a mutation correlate
+out-of-band: the `correlation_id` on each entry can be cross-
+referenced with the actor's session / change-ticket / pairing
+partner.
+
+This rule applies on the wire too — the SPA renders selector_keys
+as set-diff chips (kept / removed / added) but never the values.
+
+#### Legacy event caveat
+
+R-follow-up #5 slice 1b extended the metadata. Events from BEFORE
+slice 1b shipped do NOT carry `name` or `enabled` in their snapshot.
+The audit table is append-only — those rows are NEVER rewritten.
+The SPA renders missing fields as `(unknown)` placeholders; the
+chain still works because the diff algorithm consults only the
+snapshots' presence of each key (a missing field on event N is
+"absent" — flagged as a change when event N+1 carries it).
+
+#### Chain head "Initial snapshot observed" caveat
+
+When the audit chain's first event isn't a `policy.create` — for
+rules created before EPIC R's audit emit shipped, or rules whose
+oldest event was rotated out of retention — the timeline renders
+that first row with:
+
+> Initial snapshot observed.
+
+No `changes` block is shown. Subsequent rows diff against this
+synthetic chain head. Operators see best-effort history without
+misleading "from nothing" deltas.
+
+#### Permission model
+
+| Endpoint | Permission |
+|---|---|
+| `GET /api/v1/projects/:projectID/policy-rules/:ruleID/history` | `policy.author` covering the project |
+| `GET /api/v1/teams/:teamID/policy-rules/:ruleID/history` | `policy.author` covering the team |
+| `GET /api/v1/policies/:ruleID/history` | `policy.edit` (admin) |
+
+The SPA's `canViewPolicyRuleHistory` helper gates the History tab
+on the SAME perm as the parent list page — there is NO separate
+"view-only" permission in v1. Future `policy.list` is a noted
+design follow-up; not blocking.
+
+#### Post-delete admin-only forensic visibility
+
+The three endpoints diverge on what happens after the rule has been
+deleted:
+
+| Surface | After delete |
+|---|---|
+| `/projects/.../policy-rules/:ruleID/history` (scoped) | 404 `policy_not_found` — scoped access lost at delete |
+| `/teams/.../policy-rules/:ruleID/history` (scoped) | 404 `policy_not_found` — same |
+| `/policies/:ruleID/history` (admin) | **200 with full chain** if at least one event exists |
+
+The admin endpoint uses a different existence check: instead of
+loading the rule row (which is gone), it checks
+`audit_events.ListPolicyRuleHistory(ruleID, 1)` for at least one
+event. This is **intentional**: post-incident forensics often
+requires reviewing rules that were rolled back or removed. Scoped
+authors lose visibility (the rule is no longer "theirs"); admins
+retain it via the audit-chain path.
+
+The SPA's `AdminPolicyDetail` renders a yellow caveat when the
+rule's `Get` returns 404: "Rule has been deleted. History below
+loads from the audit chain (admin post-delete forensic visibility)."
+
+#### Raw audit triage SQL
+
+When the SPA timeline isn't enough — or when the operator wants
+to query a span of multiple rules — the `audit.read` permission
+gives direct access to the raw events:
+
+```sql
+-- All mutations on a single rule (ASC for chain order, mirroring
+-- the SPA's render order):
+SELECT occurred_at,
+       actor,
+       action,
+       metadata->>'scope'                AS scope,
+       metadata->>'actor_permission_used' AS perm,
+       metadata->>'priority'             AS priority,
+       metadata->>'workflow_id'          AS workflow_id,
+       metadata->>'selector_keys'        AS selector_keys,
+       correlation_id
+  FROM audit_events
+ WHERE resource = 'policy_rule:<RULE_UUID>'
+   AND action IN (
+       'policy.create', 'policy.update', 'policy.delete',
+       'policy.created_for_scope', 'policy.updated_for_scope',
+       'policy.deleted_for_scope'
+   )
+ ORDER BY occurred_at ASC, id ASC;
+```
+
+The `WHERE action IN (...)` clause reads both the normalized names
+AND the R-follow-up #3 pre-cutover names — same compatibility set
+the api's `AuditEvents.ListPolicyRuleHistory` uses. Operators on a
+clean cutover can drop the legacy names from the IN list.
+
+The tie-break `ORDER BY occurred_at ASC, id ASC` is deterministic
+for sub-millisecond races (test fixtures, batched migrations). Same
+posture as R-follow-up #3 §1 C2's policy resolution tie-break.
+
+#### History view audit trail
+
+Every successful history list emits its own audit event:
+
+| Field | Value |
+|---|---|
+| `action` | `audit.read.policy_history` |
+| `actor` | the requesting user / agent / admin |
+| `resource` | `policy_rule:<rule-uuid>` |
+| `metadata` | `{policy_rule_id, scope, entry_count}` |
+
+Operators investigating a leaked-screenshot or
+"who-saw-the-old-version" scenario query:
+
+```sql
+SELECT occurred_at, actor, metadata->>'scope' AS scope
+  FROM audit_events
+ WHERE action = 'audit.read.policy_history'
+   AND resource = 'policy_rule:<RULE_UUID>'
+ ORDER BY occurred_at DESC;
+```
+
 ### Observability — Prometheus counters
 
 Four counters, all locked to LOW-CARDINALITY labels. Operator
@@ -914,6 +1085,7 @@ policy_rules_created_total{permission_used, scope}
 policy_rules_updated_total{permission_used, scope}
 policy_rules_deleted_total{permission_used, scope}
 policy_rules_denied_total{reason}
+policy_rule_history_views_total{scope}
 ```
 
 - `permission_used` ∈ `{policy.author, policy.edit}` — tracks which
@@ -928,6 +1100,12 @@ policy_rules_denied_total{reason}
   `selector_mismatch`, `env_not_in_project`, `not_found`,
   `workflow_not_authorable` (R-follow-up #1, api#112),
   `out_of_team_scope`, `team_not_found` (R-follow-up #3, api#114).
+- `policy_rule_history_views_total{scope}` (R-follow-up #5, api#132)
+  increments once per successful history read. `scope` values are
+  the same `{platform, project, team}` set — `team`/`project` for
+  the scoped URL family, `platform` for any rule reached via the
+  admin endpoint (the scope label there is derived from the rule's
+  anchor, not the URL family).
 
 **LOW-CARDINALITY LOCK**: counters NEVER carry `actor_id`,
 `project_id`, `policy_rule_id`, or `workflow_id` labels. Same posture
