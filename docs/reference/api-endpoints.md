@@ -411,6 +411,153 @@ carries the new + old parent IDs + `team_policy_rule_count` +
 If audit append fails, the parent UPDATE rolls back — transactional
 atomicity preserved.
 
+## Policy rule change history (R-follow-up #5, api#132)
+
+Three read endpoints expose the audit chain for a single policy
+rule. The api walks the chain in time order, computes a diff
+between consecutive snapshots, normalizes legacy action names, and
+returns a rendered timeline. UI consumes this via the per-anchor
+Detail pages.
+
+Hard rule — the §6 selector lock from EPIC R is unwavering. The
+wire response carries `selector_keys` (set-based, sorted) and
+**NEVER** selector VALUES, on every entry of the chain.
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| `GET` | `/api/v1/projects/:projectID/policy-rules/:ruleID/history` | `bearer + policy.author` covering projectID | Scoped (project). 404 `policy_not_found` on missing rule OR anchor mismatch (silent — gate-order enumeration protection). After delete: 404. |
+| `GET` | `/api/v1/teams/:teamID/policy-rules/:ruleID/history` | `bearer + policy.author` covering teamID | Scoped (team). Coverage gate runs as a HANDLER helper (not middleware) so denial emits the same audit + counter signal as the rest of the gate chain (per R-follow-up #3 §3 C3). After delete: 404. |
+| `GET` | `/api/v1/policies/:ruleID/history` | `bearer + policy.edit` | Admin. **Existence check via the audit chain, NOT `policyRepo.Get`** — admin retains forensic visibility after delete if at least one event exists. NO anchor routing — admin sees regardless of anchor. |
+
+**Query params** — all 3 endpoints support:
+
+- `limit=<int>` — default 50; cap 500 (`storage.MaxPolicyHistoryLimit`). Server-side cap defends against operator typos.
+
+**Response envelope shape** (200):
+
+```json
+{
+  "rule_id":  "<uuid>",
+  "scope":    "platform" | "project" | "team",
+  "entries":  [<HistoryEntry>, ...],
+  "has_more": false,
+  "limit":    50
+}
+```
+
+`scope` reflects the rule's anchor (not the URL family). For the
+admin endpoint with a deleted rule, scope is derived from the most
+recent event's metadata; falls back to `"platform"` for pre-§4 C2
+legacy events with no scope key.
+
+`has_more=true` indicates an older event was capped by `limit`. The
+SPA grows `limit` per "Load more" click (50 → 100 → 200 …) per
+OQ3-A — cursor pagination is deferred.
+
+**`HistoryEntry` shape**:
+
+```json
+{
+  "event_id":             "<uuid>",
+  "occurred_at":          "<rfc3339>",
+  "actor":                "user:<uuid>" | "agent:<uuid>" | "system:<kind>",
+  "actor_display":        "<resolved name>",
+  "correlation_id":       "<uuid>",
+  "action":               "policy.create" | "policy.update" | "policy.delete",
+  "actor_permission_used": "policy.author" | "policy.edit",
+  "scope":                "platform" | "project" | "team",
+  "changes": [
+    { "key": "priority",      "before": 100,  "after": 200 },
+    { "key": "name",          "before": "old", "after": "new" },
+    { "key": "enabled",       "before": true,  "after": false },
+    { "key": "workflow_id",   "before": "<uuid>", "after": "<uuid>",
+      "before_workflow_name": "approval-v1", "after_workflow_name": "approval-v2" },
+    { "key": "selector_keys", "before": ["environment_kind"], "after": ["environment_kind", "secret_ref_prefix"] }
+  ],
+  "snapshot_after": {
+    "name":          "...",
+    "enabled":       true,
+    "priority":      100,
+    "workflow_id":   "<uuid>",
+    "workflow_name": "approval-v1",
+    "selector_keys": ["..."]
+  }
+}
+```
+
+- `action` is always the **normalized** name. Legacy events from
+  before R-follow-up #3 §4 C2 (action names `policy.created_for_scope`
+  etc.) are mapped server-side before return — the SPA sees one
+  stable enum.
+- `changes` is empty on `policy.create` (chain head) and on
+  `policy.delete` (terminal event; `snapshot_after` carries the
+  last-known snapshot from the prior event per §3 D3 step 5).
+- For legacy events lacking the `name`/`enabled` snapshot fields
+  (pre-slice-1b), `snapshot_after.name` / `.enabled` are omitted
+  on the wire; SPA renders `(unknown)` placeholders.
+- `workflow_name` is resolved server-side via batch lookup
+  (`workflows.ListByIDs`). When the workflow has been deleted, the
+  field is omitted; SPA renders `(deleted)`.
+
+**Anchor mismatch — silent 404, no audit emit**
+
+Scoped endpoints route through the same enumeration-protection
+pattern as the per-anchor `Get` handlers: if the rule's
+`project_id` (or `team_id`) doesn't match the URL's, the response
+is `404 policy_not_found` — same envelope as a truly missing rule.
+NO `policy.denied_anchor_mismatch` audit event; that would defeat
+the very enumeration protection it claims to enhance. Slice 1c §4
+OQ4-1 lock.
+
+### Counter
+
+```
+policy_rule_history_views_total{scope}
+```
+
+LOW-CARDINALITY LOCK preserved: `scope ∈ {platform, project, team}` —
+3 values total. NEVER carries `actor_id`, `rule_id`, `project_id`,
+or `team_id` labels. Per-rule reads live in the audit log via
+`audit.read.policy_history` (see below).
+
+### Audit emit on read
+
+Every successful history list emits one audit event:
+
+```json
+{
+  "action":   "audit.read.policy_history",
+  "actor":    "<actor>",
+  "resource": "policy_rule:<rule-uuid>",
+  "metadata": {
+    "policy_rule_id": "<uuid>",
+    "scope":          "platform" | "project" | "team",
+    "entry_count":    <int>
+  }
+}
+```
+
+Provides forensic traceability for "who read whose history" — a
+post-incident query for `action='audit.read.policy_history'`
+returns every history view across the entire span. Operators
+investigating leaked screenshots / "who saw the old version"
+scenarios reach for this surface.
+
+### Snapshot extension on the existing emit sites
+
+Slice 1b extended the metadata on `policy.create / .update / .delete`
+across all 3 emit sites (admin, project-scoped, team-scoped). New
+events carry:
+
+- `name` (the rule's current name)
+- `enabled` (the rule's current enabled state)
+- Project-scoped path also now carries `scope: "project"` and
+  `team_id: null` for cross-cohort consistency (was missing from the
+  R-follow-up #3 §4 C2 normalization; slice 1b closes the gap).
+
+No data backfill — append-only audit. Legacy events render gracefully
+in the SPA as `(unknown)` for the missing keys.
+
 ## Platform settings (R-follow-up #2, api#113)
 
 Admin surface for cross-cutting platform configuration. v1 ships
