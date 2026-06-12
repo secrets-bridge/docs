@@ -278,8 +278,55 @@ can't express.
 | `selector.environment_id.kind = "non_prod"` (JOINed at write time) | Service gate 4 → `prod_policy_not_allowed_for_scope` (403) with `{"env_kind": "prod"}` |
 | `selector.environment_kind` + `selector.environment_id` agree when both present | Service gate 4 → `policy_scope_too_broad` (400) with `{"reason": "env_kind_id_inconsistent"}` |
 | `selector.project_id`, when present, equals URL projectID | Service gate 3 → `policy_selector_mismatch` (400) |
+| `selector.provider_type`, when present, is a known enum value | Service gate 3.5 → `policy_scope_too_broad` (400) with `{"reason": "provider_type_invalid"}` |
 | Cannot edit platform NULL rules via the scoped URL | Service gate 4 (Update/Delete) → `platform_policy_not_editable` (403) |
 | Cannot edit `is_system` rules | Service gate 5 (Update/Delete) → `ErrSystemRow` → `platform_policy_not_editable` (403) |
+
+### Selector enum values are backend-owned
+
+The `selector.provider_type` key, when present, MUST be one of a fixed
+set the backend owns (api#139). The canonical list lives in
+`pkg/storage/provider_connections.go`
+(`storage.IsPolicySelectorProviderType`); the SPA mirrors it in
+`src/api/policySelectorEnums.ts`. Both move together — there is no
+runtime `GET` endpoint for these values (five stable strings, rare
+changes, code review catches drift).
+
+Allowed `provider_type` values today:
+
+`aws-sm`, `vault`, `gcp-sm`, `azure-kv`, `kubernetes`
+
+Rules:
+
+- **Absent is wildcard.** Omitting `provider_type` matches any
+  provider. The SPA dropdowns offer a blank "— any —" option that
+  omits the key entirely — they never submit `provider_type: ""`.
+- **Present must be a known value.** An empty string, a non-string,
+  or an unknown provider type is rejected at write time on ALL three
+  authoring paths (project-scoped, team-scoped, admin) with
+  `policy_scope_too_broad` / `provider_type_invalid`. Admins are not
+  exempt — the `/admin/policies` form is gated by the same validator.
+- **UI must not invent values.** New provider types ship as a
+  coordinated pair: the storage enum + the SPA mirror in the same
+  change. The SPA never adds an option the backend doesn't accept.
+
+The allowed values are product metadata, not sensitive data — it is
+safe to surface them in error envelopes, dropdowns, and these docs.
+
+#### `operation` is intentionally deferred
+
+The policy selector model has room for an `operation` dimension
+(read / patch / discover …), but it is **NOT** in v1. Adding it
+requires three things that don't exist yet:
+
+1. A semantic definition — which request operations are selectable.
+2. Resolver / request-context thread-through so the engine can match
+   on it.
+3. A UI contract for the dropdown.
+
+Until those land in a dedicated design pass, the team and admin
+authoring surfaces deliberately omit `operation`. Do not add it to a
+selector form ahead of the backend.
 
 ### `policy.edit` does NOT auto-cover `policy.author`
 
@@ -738,9 +785,11 @@ constraints from migration 0037 + the service layer enforce:
 | `selector.environment_id` MUST be absent | Same — pins to one project's env. |
 | `selector.team_id` MUST be absent (v1 lock) | The row column `team_id` is the anchor; a selector key would create a second source of truth. v2 may relax with explicit resolver semantics. |
 
-Safe-list optional selector keys: `secret_ref_prefix` only in v1.
-`provider_type` and `operation` are deferred until the policy
-selector enum is formally locked in a separate design pass.
+Safe-list optional selector keys: `secret_ref_prefix` and
+`provider_type` (the latter locked to the backend-owned enum per
+api#139 — see [Selector enum values are backend-owned](#selector-enum-values-are-backend-owned)).
+`operation` remains deferred until its semantics + resolver
+thread-through land in a separate design pass.
 
 #### Authoring URLs — `policy.author` scoped to teamID
 
