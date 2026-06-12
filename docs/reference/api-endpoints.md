@@ -253,7 +253,7 @@ keep using them.
 | `out_of_scope_policy` | 403 | Caller's `policy.author` grant doesn't cover the target project per the team-aware resolver. |
 | `policy_selector_mismatch` | 400 | `selector.project_id` was set but doesn't equal URL projectID. |
 | `prod_policy_not_allowed_for_scope` | 403 | Scoped caller tried to author a rule that resolves to a prod env. Envelope includes `{"env_kind": "prod"}`. |
-| `policy_scope_too_broad` | 400 | Selector doesn't satisfy the non-prod-by-construction invariant. Envelope includes `{"reason": "..."}` — variants: `env_constraint_missing`, `env_kind_invalid`, `selector_empty`, `env_kind_id_inconsistent`. |
+| `policy_scope_too_broad` | 400 | Selector doesn't satisfy the non-prod-by-construction invariant, OR carries an unknown `provider_type`. Envelope includes `{"reason": "..."}` — base variants: `env_constraint_missing`, `env_kind_invalid`, `selector_empty`, `env_kind_id_inconsistent`, `provider_type_invalid` (api#139). |
 | `policy_priority_reserved` | 400 | Priority at or above the platform-reserved band requested. The cap is admin-configurable per R-follow-up #2 (default `9000`); envelope echoes the live value: `{"cap": <live>}`. |
 | `policy_environment_not_in_project` | 400 | `selector.environment_id` doesn't belong to URL projectID. |
 | `workflow_not_authorable_for_scope` | 403 | R-follow-up #1 (api#112). Scoped caller picked a workflow that platform admin hasn't opted into the scoped author surface. Envelope carries `{"workflow_id": "<uuid>"}` — the actor selected the workflow from a dropdown, so logging it isn't a leak. Distinct from `platform_policy_not_editable`: the workflow exists and is reachable by admin; it just hasn't been exposed to scoped authors yet. |
@@ -343,7 +343,14 @@ selector leakage across siblings under the same parent team.
 - `team_selector_pins_environment_id` — team rule selector pinned `environment_id`
 - `team_selector_pins_team_id` — team rule selector pinned `team_id` (v1 lock)
 
-The full reason set on `policy_scope_too_broad` is now 7 variants.
+A later slice (api#139) added an eighth variant, `provider_type_invalid`,
+fired when `selector.provider_type` is present but not in the
+backend-owned enum (`aws-sm`, `vault`, `gcp-sm`, `azure-kv`,
+`kubernetes`). It applies on ALL three authoring paths — project,
+team, and admin. See the operator guide's
+[Selector enum values are backend-owned](../operations/policy-templates.md#selector-enum-values-are-backend-owned).
+
+The full reason set on `policy_scope_too_broad` is now 8 variants.
 
 **Workflow validation collapse (§4 C4)**: workflow not-found,
 workflow disabled, and workflow not-`scoped_policy_authorable` all
