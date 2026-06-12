@@ -279,6 +279,7 @@ can't express.
 | `selector.environment_kind` + `selector.environment_id` agree when both present | Service gate 4 → `policy_scope_too_broad` (400) with `{"reason": "env_kind_id_inconsistent"}` |
 | `selector.project_id`, when present, equals URL projectID | Service gate 3 → `policy_selector_mismatch` (400) |
 | `selector.provider_type`, when present, is a known enum value | Service gate 3.5 → `policy_scope_too_broad` (400) with `{"reason": "provider_type_invalid"}` |
+| `selector.operation`, when present, is a known enum value | Service gate 3.5 → `policy_scope_too_broad` (400) with `{"reason": "operation_invalid"}` (api#141) |
 | Cannot edit platform NULL rules via the scoped URL | Service gate 4 (Update/Delete) → `platform_policy_not_editable` (403) |
 | Cannot edit `is_system` rules | Service gate 5 (Update/Delete) → `ErrSystemRow` → `platform_policy_not_editable` (403) |
 
@@ -313,20 +314,53 @@ Rules:
 The allowed values are product metadata, not sensitive data — it is
 safe to surface them in error envelopes, dropdowns, and these docs.
 
-#### `operation` is intentionally deferred
+#### The `operation` dimension
 
-The policy selector model has room for an `operation` dimension
-(read / patch / discover …), but it is **NOT** in v1. Adding it
-requires three things that don't exist yet:
+The `selector.operation` key follows the exact same backend-owned
+pattern (api#141). The canonical list lives in
+`internal/services/policy.go` (`services.IsPolicySelectorOperation`);
+the SPA mirrors it in `src/api/policySelectorEnums.ts`
+(`POLICY_SELECTOR_OPERATIONS`). As with `provider_type`, both move
+together and there is no runtime `GET` endpoint (three stable strings,
+rare changes, code review catches drift).
 
-1. A semantic definition — which request operations are selectable.
-2. Resolver / request-context thread-through so the engine can match
-   on it.
-3. A UI contract for the dropdown.
+Allowed `operation` values today:
 
-Until those land in a dedicated design pass, the team and admin
-authoring surfaces deliberately omit `operation`. Do not add it to a
-selector form ahead of the backend.
+`read`, `patch`, `reveal`
+
+It pins a rule to the kind of request being made. Each `Resolve` call
+site stamps the operation onto the request scope:
+
+| Request | `operation` |
+|---|---|
+| value patch / write (`Submit`) | `patch` |
+| value read (`SubmitRead`) | `read` |
+| direct reveal (`SubmitDirectReveal`) | `reveal` |
+| reveal-session TTL compute | `reveal` |
+| cross-team value provision | `patch` |
+
+The same rules apply as for `provider_type`:
+
+- **Absent is wildcard.** A rule that omits `operation` matches every
+  request regardless of operation. The SPA dropdowns offer a blank
+  "— any operation —" option that omits the key — they never submit
+  `operation: ""`.
+- **Present must be a known value.** Empty string, non-string, or an
+  unknown operation is rejected on ALL three authoring paths with
+  `policy_scope_too_broad` / `operation_invalid`. Admins are not exempt.
+- **A pinned operation only matches when the scope carries it.** Because
+  every value flow stamps its operation, a rule with `operation=read`
+  applies exactly to read requests and is wildcard-skipped by none of
+  them. (If a future request path forgets to stamp its operation, a rule
+  pinning that operation would silently never match — the api carries a
+  resolver-level test guarding this.)
+
+!!! note "`cross_team` is NOT an operation value"
+    Cross-team value provision resolves as `operation=patch` in v1, not
+    a distinct `cross_team` operation. Routing flavor
+    (`standard` vs `cross_team`) is a separate axis deferred to a future
+    `request_flavor` dimension — `operation` is deliberately not
+    overloaded with routing semantics (EPIC api#141, D6).
 
 ### `policy.edit` does NOT auto-cover `policy.author`
 
@@ -785,11 +819,10 @@ constraints from migration 0037 + the service layer enforce:
 | `selector.environment_id` MUST be absent | Same — pins to one project's env. |
 | `selector.team_id` MUST be absent (v1 lock) | The row column `team_id` is the anchor; a selector key would create a second source of truth. v2 may relax with explicit resolver semantics. |
 
-Safe-list optional selector keys: `secret_ref_prefix` and
-`provider_type` (the latter locked to the backend-owned enum per
-api#139 — see [Selector enum values are backend-owned](#selector-enum-values-are-backend-owned)).
-`operation` remains deferred until its semantics + resolver
-thread-through land in a separate design pass.
+Safe-list optional selector keys: `secret_ref_prefix`, `provider_type`,
+and `operation` (the latter two locked to backend-owned enums per
+api#139 / api#141 — see
+[Selector enum values are backend-owned](#selector-enum-values-are-backend-owned)).
 
 #### Authoring URLs — `policy.author` scoped to teamID
 
