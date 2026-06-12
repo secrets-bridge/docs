@@ -378,6 +378,25 @@ The SPA enforces the same split:
   `policy.edit` holders (so platform engineers wandering onto a
   project's policies page see the right escape hatch)
 
+#### Who authors (and tests) where
+
+The two authoring surfaces map to two distinct permissions and two
+distinct UIs. Testing or operating one as the wrong actor reads as a
+"missing feature" when it is actually the gate working:
+
+| Actor / permission | Surface | Authors |
+|---|---|---|
+| Platform admin — `policy.edit` | `/admin/policies` | Platform, project- and team-*anchored* rules, any priority (incl. the reserved band) |
+| Scoped author — `policy.author` (scoped to a project/team) | `/projects/:id/policies`, `/teams/:id/policies` | Non-prod rules for that project/team, priority `< cap` |
+| Developer — `secret.request` | request forms | read / patch / reveal requests (consumes policy, does not author it) |
+| Approver — `secret.approve` | approval queue | Approves/rejects requests |
+
+A `policy.edit` admin viewing `/teams/:id/policies` gets a permission
+panel, not a rule list — the scoped list endpoint is `policy.author`-only.
+That is expected; the admin manages those rules from `/admin/policies`.
+To exercise the scoped author drawer, use an identity granted the
+`policy_author` role scoped to the project/team (below).
+
 ### `policy_author` seed role
 
 Migration 0034 seeds the system role:
@@ -653,6 +672,27 @@ that used to live as the hardcoded constant `PlatformReservedPriority
 | Service gate 2 (Create + Update) | Rejects priorities `>= cap` with `policy_priority_reserved` (400); envelope carries the live `cap`. |
 | `policy_rules` envelope (SPA Author drawer) | Reads `priority_cap` from `GET /api/v1/projects/:id/policy-rules` so the drawer's "Priority (< N — platform reserved)" label reflects the live value at page load. |
 | Author drawer Zod schema | Built from the live cap at mount — the `< cap` validation rejects values at or above whatever admin has flipped to right now. |
+
+!!! important "The cap is author-scoped, not anchor-scoped"
+    The reserved band is bound to **who authors**, not to **what the rule
+    anchors to**:
+
+    - **Scoped authors** (`policy.author`, via
+      `/projects/:id/policy-rules` + `/teams/:id/policy-rules`) are
+      rejected with `policy_priority_reserved` when `priority >= cap`.
+    - **Platform admins** (`policy.edit`, via `/admin/policies`) **may**
+      author rules — including project- and team-*anchored* ones — at any
+      priority, **including inside the reserved band**. That is the band's
+      purpose: a space only platform admins can occupy, so platform rules
+      win over scoped overrides.
+
+    So an admin creating a *team-anchored* rule at priority `50000`
+    succeeds — that is **working as designed**, not a missing check. The
+    band protects against scoped authors escalating into the platform
+    tier; it does not stop admins from intentionally placing high-priority
+    anchored rules there. The admin Author form surfaces an informational
+    notice when a `policy.edit` admin sets an anchored rule's priority at
+    or above the live cap, so the choice is explicit.
 
 #### Editing through the SPA (admin)
 
