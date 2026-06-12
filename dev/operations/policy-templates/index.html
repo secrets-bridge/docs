@@ -2334,6 +2334,46 @@ scoped URL family.</p>
   <code>policy.edit</code> holders (so platform engineers wandering onto a
   project's policies page see the right escape hatch)</li>
 </ul>
+<h4 id="who-authors-and-tests-where">Who authors (and tests) where<a class="headerlink" href="#who-authors-and-tests-where" title="Permanent link">&para;</a></h4>
+<p>The two authoring surfaces map to two distinct permissions and two
+distinct UIs. Testing or operating one as the wrong actor reads as a
+"missing feature" when it is actually the gate working:</p>
+<table>
+<thead>
+<tr>
+<th>Actor / permission</th>
+<th>Surface</th>
+<th>Authors</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Platform admin — <code>policy.edit</code></td>
+<td><code>/admin/policies</code></td>
+<td>Platform, project- and team-<em>anchored</em> rules, any priority (incl. the reserved band)</td>
+</tr>
+<tr>
+<td>Scoped author — <code>policy.author</code> (scoped to a project/team)</td>
+<td><code>/projects/:id/policies</code>, <code>/teams/:id/policies</code></td>
+<td>Non-prod rules for that project/team, priority <code>&lt; cap</code></td>
+</tr>
+<tr>
+<td>Developer — <code>secret.request</code></td>
+<td>request forms</td>
+<td>read / patch / reveal requests (consumes policy, does not author it)</td>
+</tr>
+<tr>
+<td>Approver — <code>secret.approve</code></td>
+<td>approval queue</td>
+<td>Approves/rejects requests</td>
+</tr>
+</tbody>
+</table>
+<p>A <code>policy.edit</code> admin viewing <code>/teams/:id/policies</code> gets a permission
+panel, not a rule list — the scoped list endpoint is <code>policy.author</code>-only.
+That is expected; the admin manages those rules from <code>/admin/policies</code>.
+To exercise the scoped author drawer, use an identity granted the
+<code>policy_author</code> role scoped to the project/team (below).</p>
 <h3 id="policy_author-seed-role"><code>policy_author</code> seed role<a class="headerlink" href="#policy_author-seed-role" title="Permanent link">&para;</a></h3>
 <p>Migration 0034 seeds the system role:</p>
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">roles</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">description</span><span class="p">,</span><span class="w"> </span><span class="n">permissions</span><span class="p">,</span><span class="w"> </span><span class="n">is_system</span><span class="p">)</span>
@@ -2603,6 +2643,28 @@ that used to live as the hardcoded constant <code>PlatformReservedPriority
 </tr>
 </tbody>
 </table>
+<div class="admonition important">
+<p class="admonition-title">The cap is author-scoped, not anchor-scoped</p>
+<p>The reserved band is bound to <strong>who authors</strong>, not to <strong>what the rule
+anchors to</strong>:</p>
+<ul>
+<li><strong>Scoped authors</strong> (<code>policy.author</code>, via
+  <code>/projects/:id/policy-rules</code> + <code>/teams/:id/policy-rules</code>) are
+  rejected with <code>policy_priority_reserved</code> when <code>priority &gt;= cap</code>.</li>
+<li><strong>Platform admins</strong> (<code>policy.edit</code>, via <code>/admin/policies</code>) <strong>may</strong>
+  author rules — including project- and team-<em>anchored</em> ones — at any
+  priority, <strong>including inside the reserved band</strong>. That is the band's
+  purpose: a space only platform admins can occupy, so platform rules
+  win over scoped overrides.</li>
+</ul>
+<p>So an admin creating a <em>team-anchored</em> rule at priority <code>50000</code>
+succeeds — that is <strong>working as designed</strong>, not a missing check. The
+band protects against scoped authors escalating into the platform
+tier; it does not stop admins from intentionally placing high-priority
+anchored rules there. The admin Author form surfaces an informational
+notice when a <code>policy.edit</code> admin sets an anchored rule's priority at
+or above the live cap, so the choice is explicit.</p>
+</div>
 <h4 id="editing-through-the-spa-admin">Editing through the SPA (admin)<a class="headerlink" href="#editing-through-the-spa-admin" title="Permanent link">&para;</a></h4>
 <p><code>/admin/platform-settings</code> → <strong>Scoped policy reserved priority</strong> card →
 <strong>Edit</strong> → enter the new value (whole number between <code>100</code> and
