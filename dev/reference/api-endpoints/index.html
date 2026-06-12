@@ -2934,7 +2934,7 @@ keep using them.</p>
 <tr>
 <td><code>policy_scope_too_broad</code></td>
 <td>400</td>
-<td>Selector doesn't satisfy the non-prod-by-construction invariant. Envelope includes <code>{"reason": "..."}</code> — variants: <code>env_constraint_missing</code>, <code>env_kind_invalid</code>, <code>selector_empty</code>, <code>env_kind_id_inconsistent</code>.</td>
+<td>Selector doesn't satisfy the non-prod-by-construction invariant, OR carries an unknown <code>provider_type</code>. Envelope includes <code>{"reason": "..."}</code> — base variants: <code>env_constraint_missing</code>, <code>env_kind_invalid</code>, <code>selector_empty</code>, <code>env_kind_id_inconsistent</code>, <code>provider_type_invalid</code> (api#139).</td>
 </tr>
 <tr>
 <td><code>policy_priority_reserved</code></td>
@@ -3078,7 +3078,13 @@ selector leakage across siblings under the same parent team.</p>
 <li><code>team_selector_pins_environment_id</code> — team rule selector pinned <code>environment_id</code></li>
 <li><code>team_selector_pins_team_id</code> — team rule selector pinned <code>team_id</code> (v1 lock)</li>
 </ul>
-<p>The full reason set on <code>policy_scope_too_broad</code> is now 7 variants.</p>
+<p>A later slice (api#139) added an eighth variant, <code>provider_type_invalid</code>,
+fired when <code>selector.provider_type</code> is present but not in the
+backend-owned enum (<code>aws-sm</code>, <code>vault</code>, <code>gcp-sm</code>, <code>azure-kv</code>,
+<code>kubernetes</code>). It applies on ALL three authoring paths — project,
+team, and admin. See the operator guide's
+<a href="../../operations/policy-templates/#selector-enum-values-are-backend-owned">Selector enum values are backend-owned</a>.</p>
+<p>The full reason set on <code>policy_scope_too_broad</code> is now 8 variants.</p>
 <p><strong>Workflow validation collapse (§4 C4)</strong>: workflow not-found,
 workflow disabled, and workflow not-<code>scoped_policy_authorable</code> all
 return the SAME response: <code>403 workflow_not_authorable_for_scope</code>

@@ -1307,6 +1307,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#selector-enum-values-are-backend-owned" class="md-nav__link">
+    <span class="md-ellipsis">
+      Selector enum values are backend-owned
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#policyedit-does-not-auto-cover-policyauthor" class="md-nav__link">
     <span class="md-ellipsis">
       policy.edit does NOT auto-cover policy.author
@@ -1785,6 +1794,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#selector-enum-values-are-backend-owned" class="md-nav__link">
+    <span class="md-ellipsis">
+      Selector enum values are backend-owned
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#policyedit-does-not-auto-cover-policyauthor" class="md-nav__link">
     <span class="md-ellipsis">
       policy.edit does NOT auto-cover policy.author
@@ -2193,6 +2211,10 @@ can't express.</p>
 <td>Service gate 3 → <code>policy_selector_mismatch</code> (400)</td>
 </tr>
 <tr>
+<td><code>selector.provider_type</code>, when present, is a known enum value</td>
+<td>Service gate 3.5 → <code>policy_scope_too_broad</code> (400) with <code>{"reason": "provider_type_invalid"}</code></td>
+</tr>
+<tr>
 <td>Cannot edit platform NULL rules via the scoped URL</td>
 <td>Service gate 4 (Update/Delete) → <code>platform_policy_not_editable</code> (403)</td>
 </tr>
@@ -2202,6 +2224,45 @@ can't express.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="selector-enum-values-are-backend-owned">Selector enum values are backend-owned<a class="headerlink" href="#selector-enum-values-are-backend-owned" title="Permanent link">&para;</a></h3>
+<p>The <code>selector.provider_type</code> key, when present, MUST be one of a fixed
+set the backend owns (api#139). The canonical list lives in
+<code>pkg/storage/provider_connections.go</code>
+(<code>storage.IsPolicySelectorProviderType</code>); the SPA mirrors it in
+<code>src/api/policySelectorEnums.ts</code>. Both move together — there is no
+runtime <code>GET</code> endpoint for these values (five stable strings, rare
+changes, code review catches drift).</p>
+<p>Allowed <code>provider_type</code> values today:</p>
+<p><code>aws-sm</code>, <code>vault</code>, <code>gcp-sm</code>, <code>azure-kv</code>, <code>kubernetes</code></p>
+<p>Rules:</p>
+<ul>
+<li><strong>Absent is wildcard.</strong> Omitting <code>provider_type</code> matches any
+  provider. The SPA dropdowns offer a blank "— any —" option that
+  omits the key entirely — they never submit <code>provider_type: ""</code>.</li>
+<li><strong>Present must be a known value.</strong> An empty string, a non-string,
+  or an unknown provider type is rejected at write time on ALL three
+  authoring paths (project-scoped, team-scoped, admin) with
+  <code>policy_scope_too_broad</code> / <code>provider_type_invalid</code>. Admins are not
+  exempt — the <code>/admin/policies</code> form is gated by the same validator.</li>
+<li><strong>UI must not invent values.</strong> New provider types ship as a
+  coordinated pair: the storage enum + the SPA mirror in the same
+  change. The SPA never adds an option the backend doesn't accept.</li>
+</ul>
+<p>The allowed values are product metadata, not sensitive data — it is
+safe to surface them in error envelopes, dropdowns, and these docs.</p>
+<h4 id="operation-is-intentionally-deferred"><code>operation</code> is intentionally deferred<a class="headerlink" href="#operation-is-intentionally-deferred" title="Permanent link">&para;</a></h4>
+<p>The policy selector model has room for an <code>operation</code> dimension
+(read / patch / discover …), but it is <strong>NOT</strong> in v1. Adding it
+requires three things that don't exist yet:</p>
+<ol>
+<li>A semantic definition — which request operations are selectable.</li>
+<li>Resolver / request-context thread-through so the engine can match
+   on it.</li>
+<li>A UI contract for the dropdown.</li>
+</ol>
+<p>Until those land in a dedicated design pass, the team and admin
+authoring surfaces deliberately omit <code>operation</code>. Do not add it to a
+selector form ahead of the backend.</p>
 <h3 id="policyedit-does-not-auto-cover-policyauthor"><code>policy.edit</code> does NOT auto-cover <code>policy.author</code><a class="headerlink" href="#policyedit-does-not-auto-cover-policyauthor" title="Permanent link">&para;</a></h3>
 <p>A deliberate design choice. Operators must explicitly grant the
 <code>policy_author</code> role (or a custom role carrying <code>policy.author</code>) to
@@ -2694,9 +2755,11 @@ constraints from migration 0037 + the service layer enforce:</p>
 </tr>
 </tbody>
 </table>
-<p>Safe-list optional selector keys: <code>secret_ref_prefix</code> only in v1.
-<code>provider_type</code> and <code>operation</code> are deferred until the policy
-selector enum is formally locked in a separate design pass.</p>
+<p>Safe-list optional selector keys: <code>secret_ref_prefix</code> and
+<code>provider_type</code> (the latter locked to the backend-owned enum per
+api#139 — see <a href="#selector-enum-values-are-backend-owned">Selector enum values are backend-owned</a>).
+<code>operation</code> remains deferred until its semantics + resolver
+thread-through land in a separate design pass.</p>
 <h4 id="authoring-urls-policyauthor-scoped-to-teamid">Authoring URLs — <code>policy.author</code> scoped to teamID<a class="headerlink" href="#authoring-urls-policyauthor-scoped-to-teamid" title="Permanent link">&para;</a></h4>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>POST   /api/v1/teams/:teamID/policy-rules
 </span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>GET    /api/v1/teams/:teamID/policy-rules
