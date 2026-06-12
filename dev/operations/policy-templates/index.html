@@ -2215,6 +2215,10 @@ can't express.</p>
 <td>Service gate 3.5 → <code>policy_scope_too_broad</code> (400) with <code>{"reason": "provider_type_invalid"}</code></td>
 </tr>
 <tr>
+<td><code>selector.operation</code>, when present, is a known enum value</td>
+<td>Service gate 3.5 → <code>policy_scope_too_broad</code> (400) with <code>{"reason": "operation_invalid"}</code> (api#141)</td>
+</tr>
+<tr>
 <td>Cannot edit platform NULL rules via the scoped URL</td>
 <td>Service gate 4 (Update/Delete) → <code>platform_policy_not_editable</code> (403)</td>
 </tr>
@@ -2250,19 +2254,72 @@ changes, code review catches drift).</p>
 </ul>
 <p>The allowed values are product metadata, not sensitive data — it is
 safe to surface them in error envelopes, dropdowns, and these docs.</p>
-<h4 id="operation-is-intentionally-deferred"><code>operation</code> is intentionally deferred<a class="headerlink" href="#operation-is-intentionally-deferred" title="Permanent link">&para;</a></h4>
-<p>The policy selector model has room for an <code>operation</code> dimension
-(read / patch / discover …), but it is <strong>NOT</strong> in v1. Adding it
-requires three things that don't exist yet:</p>
-<ol>
-<li>A semantic definition — which request operations are selectable.</li>
-<li>Resolver / request-context thread-through so the engine can match
-   on it.</li>
-<li>A UI contract for the dropdown.</li>
-</ol>
-<p>Until those land in a dedicated design pass, the team and admin
-authoring surfaces deliberately omit <code>operation</code>. Do not add it to a
-selector form ahead of the backend.</p>
+<h4 id="the-operation-dimension">The <code>operation</code> dimension<a class="headerlink" href="#the-operation-dimension" title="Permanent link">&para;</a></h4>
+<p>The <code>selector.operation</code> key follows the exact same backend-owned
+pattern (api#141). The canonical list lives in
+<code>internal/services/policy.go</code> (<code>services.IsPolicySelectorOperation</code>);
+the SPA mirrors it in <code>src/api/policySelectorEnums.ts</code>
+(<code>POLICY_SELECTOR_OPERATIONS</code>). As with <code>provider_type</code>, both move
+together and there is no runtime <code>GET</code> endpoint (three stable strings,
+rare changes, code review catches drift).</p>
+<p>Allowed <code>operation</code> values today:</p>
+<p><code>read</code>, <code>patch</code>, <code>reveal</code></p>
+<p>It pins a rule to the kind of request being made. Each <code>Resolve</code> call
+site stamps the operation onto the request scope:</p>
+<table>
+<thead>
+<tr>
+<th>Request</th>
+<th><code>operation</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>value patch / write (<code>Submit</code>)</td>
+<td><code>patch</code></td>
+</tr>
+<tr>
+<td>value read (<code>SubmitRead</code>)</td>
+<td><code>read</code></td>
+</tr>
+<tr>
+<td>direct reveal (<code>SubmitDirectReveal</code>)</td>
+<td><code>reveal</code></td>
+</tr>
+<tr>
+<td>reveal-session TTL compute</td>
+<td><code>reveal</code></td>
+</tr>
+<tr>
+<td>cross-team value provision</td>
+<td><code>patch</code></td>
+</tr>
+</tbody>
+</table>
+<p>The same rules apply as for <code>provider_type</code>:</p>
+<ul>
+<li><strong>Absent is wildcard.</strong> A rule that omits <code>operation</code> matches every
+  request regardless of operation. The SPA dropdowns offer a blank
+  "— any operation —" option that omits the key — they never submit
+  <code>operation: ""</code>.</li>
+<li><strong>Present must be a known value.</strong> Empty string, non-string, or an
+  unknown operation is rejected on ALL three authoring paths with
+  <code>policy_scope_too_broad</code> / <code>operation_invalid</code>. Admins are not exempt.</li>
+<li><strong>A pinned operation only matches when the scope carries it.</strong> Because
+  every value flow stamps its operation, a rule with <code>operation=read</code>
+  applies exactly to read requests and is wildcard-skipped by none of
+  them. (If a future request path forgets to stamp its operation, a rule
+  pinning that operation would silently never match — the api carries a
+  resolver-level test guarding this.)</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title"><code>cross_team</code> is NOT an operation value</p>
+<p>Cross-team value provision resolves as <code>operation=patch</code> in v1, not
+a distinct <code>cross_team</code> operation. Routing flavor
+(<code>standard</code> vs <code>cross_team</code>) is a separate axis deferred to a future
+<code>request_flavor</code> dimension — <code>operation</code> is deliberately not
+overloaded with routing semantics (EPIC api#141, D6).</p>
+</div>
 <h3 id="policyedit-does-not-auto-cover-policyauthor"><code>policy.edit</code> does NOT auto-cover <code>policy.author</code><a class="headerlink" href="#policyedit-does-not-auto-cover-policyauthor" title="Permanent link">&para;</a></h3>
 <p>A deliberate design choice. Operators must explicitly grant the
 <code>policy_author</code> role (or a custom role carrying <code>policy.author</code>) to
@@ -2755,11 +2812,10 @@ constraints from migration 0037 + the service layer enforce:</p>
 </tr>
 </tbody>
 </table>
-<p>Safe-list optional selector keys: <code>secret_ref_prefix</code> and
-<code>provider_type</code> (the latter locked to the backend-owned enum per
-api#139 — see <a href="#selector-enum-values-are-backend-owned">Selector enum values are backend-owned</a>).
-<code>operation</code> remains deferred until its semantics + resolver
-thread-through land in a separate design pass.</p>
+<p>Safe-list optional selector keys: <code>secret_ref_prefix</code>, <code>provider_type</code>,
+and <code>operation</code> (the latter two locked to backend-owned enums per
+api#139 / api#141 — see
+<a href="#selector-enum-values-are-backend-owned">Selector enum values are backend-owned</a>).</p>
 <h4 id="authoring-urls-policyauthor-scoped-to-teamid">Authoring URLs — <code>policy.author</code> scoped to teamID<a class="headerlink" href="#authoring-urls-policyauthor-scoped-to-teamid" title="Permanent link">&para;</a></h4>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>POST   /api/v1/teams/:teamID/policy-rules
 </span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>GET    /api/v1/teams/:teamID/policy-rules
