@@ -1698,6 +1698,17 @@ Plane never sees them.</p>
             CP--&gt;&gt;Agent: job or 204
         end
     end</code></pre>
+<div class="admonition note">
+<p class="admonition-title">Heartbeat response shape</p>
+<p>A <strong>bodyless</strong> heartbeat returns an empty <strong>204</strong> — the shape existing
+agents rely on. A heartbeat with an optional JSON body
+(<code>status</code> / <code>agent_version</code> / <code>capabilities</code>) returns <strong>200</strong>
+<code>{status, server_time, next_heartbeat_seconds}</code> and records the reported
+fields; the first heartbeat also transitions an <code>enrolled</code> agent to
+<code>active</code>. Agents are onboarded via the enrollment-token flow
+(<code>POST /provider-connections/:id/agent-enrollment-token</code> →
+<code>POST /agents/enroll</code>); see the <a href="../../reference/api-endpoints/#agents">HTTP API reference</a>.</p>
+</div>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

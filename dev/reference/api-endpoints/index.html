@@ -1433,6 +1433,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Agents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#onboarding-admin-management-session-auth-permission" class="md-nav__link">
+    <span class="md-ellipsis">
+      Onboarding &amp; admin management (session auth + permission)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent-data-plane-x-agent-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agent data plane (X-Agent-Secret)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1796,6 +1820,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Agents">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#onboarding-admin-management-session-auth-permission" class="md-nav__link">
+    <span class="md-ellipsis">
+      Onboarding &amp; admin management (session auth + permission)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent-data-plane-x-agent-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      Agent data plane (X-Agent-Secret)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2144,6 +2192,11 @@ required to call it.</p>
 </tbody>
 </table>
 <h2 id="agents">Agents<a class="headerlink" href="#agents" title="Permanent link">&para;</a></h2>
+<p>Onboarding is <strong>self-enrollment by default</strong>: an admin mints a one-time,
+provider-connection-bound enrollment token; the agent exchanges it for its
+persistent credential. The legacy direct mint is disabled unless explicitly
+enabled as a break-glass admin action.</p>
+<h3 id="onboarding-admin-management-session-auth-permission">Onboarding &amp; admin management (session auth + permission)<a class="headerlink" href="#onboarding-admin-management-session-auth-permission" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -2156,22 +2209,71 @@ required to call it.</p>
 <tbody>
 <tr>
 <td><code>POST</code></td>
+<td><code>/api/v1/provider-connections/:id/agent-enrollment-token</code></td>
+<td><code>bearer + agent.mint</code></td>
+<td>Mint a one-time, connection-bound enrollment token (returned ONCE)</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/agents/enroll</code></td>
+<td>enrollment token</td>
+<td>Exchange the token for a persistent <code>agent_token</code> (returned ONCE); creates a connection-bound agent</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
 <td><code>/api/v1/agents</code></td>
 <td><code>bearer + agent.mint</code></td>
-<td>Mint; returns <code>agent_secret</code> ONCE</td>
+<td><strong>Legacy direct mint — disabled by default</strong> → <code>403 direct_agent_mint_disabled</code>. Break-glass only via <code>SB_ALLOW_DIRECT_AGENT_MINT=true</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/agents</code></td>
-<td>bearer</td>
-<td>List (no credentials in projection)</td>
+<td><code>bearer + agent.list</code></td>
+<td>Thin list. New integrations should prefer the admin/provider projections below</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/admin/agents</code></td>
+<td><code>bearer + agent.list</code></td>
+<td>Rich admin list + filters (<code>provider_connection_id</code>, <code>status</code>, <code>cluster_name</code>, <code>provider_type</code>); shows <code>provider_connection_id</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/admin/agents/:id</code></td>
+<td><code>bearer + agent.list</code></td>
+<td>Rich admin get</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/provider-connections/:id/agents</code></td>
+<td><code>bearer + agent.list</code></td>
+<td>Agents for a provider connection (UI Agents tab)</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
-<td><code>/api/v1/agents/:id/revoke</code></td>
+<td><code>/api/v1/admin/agents/:id/revoke</code></td>
 <td><code>bearer + agent.revoke</code></td>
-<td>Transition status → <code>revoked</code></td>
+<td>Revoke with <code>reason</code> → <code>revoked_at</code>/<code>revoked_by</code>; emits <code>agent.revoked</code> audit (<code>agent_id</code>, <code>provider_connection_id</code>, <code>reason</code>)</td>
 </tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/agent-enrollment-tokens/:id/revoke</code></td>
+<td><code>bearer + agent.mint</code></td>
+<td>Revoke an UNUSED enrollment token</td>
+</tr>
+</tbody>
+</table>
+<h3 id="agent-data-plane-x-agent-secret">Agent data plane (<code>X-Agent-Secret</code>)<a class="headerlink" href="#agent-data-plane-x-agent-secret" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/agents/:id/public-key</code></td>
@@ -2182,7 +2284,7 @@ required to call it.</p>
 <td><code>POST</code></td>
 <td><code>/api/v1/agents/:id/heartbeat</code></td>
 <td>agent</td>
-<td>204; bumps <code>last_seen_at</code></td>
+<td>Bodyless → <strong>204</strong> (unchanged). With an optional body (<code>status</code>/<code>agent_version</code>/<code>capabilities</code>) → <strong>200</strong> <code>{status, server_time, next_heartbeat_seconds}</code>. Bumps <code>last_seen_at</code>; first heartbeat flips <code>enrolled</code>→<code>active</code></td>
 </tr>
 <tr>
 <td><code>POST</code></td>
@@ -2222,6 +2324,14 @@ required to call it.</p>
 </tr>
 </tbody>
 </table>
+<div class="admonition note">
+<p class="admonition-title">Release notes — agent management</p>
+<ul>
+<li><strong>Heartbeat response shape.</strong> A heartbeat <em>with a body</em> now returns <strong>200</strong> <code>{status, server_time, next_heartbeat_seconds}</code>. A <strong>bodyless</strong> heartbeat keeps the original empty <strong>204</strong> — existing agents are unaffected.</li>
+<li><strong>Revoke audit action.</strong> New revocations emit <code>agent.revoked</code> (metadata: <code>agent_id</code>, <code>provider_connection_id</code>, <code>reason</code>). Legacy audit rows may still carry the older <code>agent.revoke</code> action — dashboards should alias both.</li>
+<li><strong>Prefer the admin/provider projections.</strong> <code>GET /api/v1/agents</code> remains a thin list. New integrations should use <code>GET /api/v1/admin/agents</code>, <code>GET /api/v1/admin/agents/:id</code>, or <code>GET /api/v1/provider-connections/:id/agents</code> (richer projection incl. <code>provider_connection_id</code>).</li>
+</ul>
+</div>
 <h2 id="requests-access-requests">Requests (access requests)<a class="headerlink" href="#requests-access-requests" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
