@@ -22,12 +22,13 @@ hide:
 
 <div class="sb-hero__wordmark">SecretsBridge</div>
 
-<h2 class="sb-hero__tagline">The brain behind your secrets.</h2>
+<h2 class="sb-hero__tagline">The control plane for secrets governance.</h2>
 
 <p class="sb-hero__subhead">
-A distributed secrets control plane that connects and governs
-secrets across every provider — without replacing the tools your
-teams already use. One brain, every provider. Values stay home.
+Keep secrets in Vault, AWS Secrets Manager, Azure Key Vault, GCP
+Secret Manager, or Kubernetes. Secrets Bridge governs who can
+request, approve, reveal, patch, and audit access — without storing
+plaintext secrets in the control plane.
 </p>
 
 <div class="sb-hero__ctas" markdown>
@@ -37,6 +38,19 @@ teams already use. One brain, every provider. Values stay home.
 </div>
 
 </div>
+
+<h2 class="sb-section-heading">What is Secrets Bridge?</h2>
+
+Secrets Bridge is a **unified secrets control plane** for governing secrets
+across external providers **without storing secret values in the control
+plane**.
+
+It **does not replace** HashiCorp Vault, AWS Secrets Manager, Azure Key Vault,
+GCP Secret Manager, or Kubernetes External Secrets. It governs **access,
+workflows, approvals, audit, and agent execution** around them — the values stay
+in your provider.
+
+[:material-check-decagram: See what's live, QA-certified, and on the roadmap](overview/product-status.md){ .md-button .md-button--primary }
 
 <h2 class="sb-section-heading">Why Secrets Bridge</h2>
 
@@ -100,17 +114,21 @@ teams already use. One brain, every provider. Values stay home.
 | KMS choice | ✅ Vault Transit / AWS KMS / local | n/a | AWS KMS only | Provider-controlled |
 | Agent uses **only** outbound traffic | ✅ Loopback probes; no inbound | n/a | n/a | Varies |
 
-<h2 class="sb-section-heading">What it doesn't do (yet)</h2>
+<h2 class="sb-section-heading">On the roadmap (not live yet)</h2>
 
-- **OIDC SSO** lands as a follow-up — today the api ships with a
-  local-admin email/password flow plus a JWT issued via HS256.
-- **Per-tenant KMS scoping** — one CMK per deployment for now;
-  multi-tenant scoping is the next major slice.
-- **Slack / PagerDuty notifications** — webhook is in; native
-  sinks are stubs.
-- **GCP Secret Manager + Azure Key Vault** discovery — the agent's
-  resolvers ship Vault + AWS-SM today; the others land per
-  design partner request.
+Listed here because they are **not** shipped. See the
+[product status page](overview/product-status.md) for the exact
+Live / QA-certified / In-progress / Roadmap split.
+
+- **Azure Key Vault** and **GCP Secret Manager** providers — the agent's
+  resolvers ship Vault + AWS Secrets Manager today; the others are next.
+- **HashiCorp Vault advanced flows** and deeper **Kubernetes External Secrets**
+  integration.
+- **Flux** integration (read-only ArgoCD observation ships today).
+- **Per-tenant KMS scoping** — one CMK per deployment for now.
+- **Agent connection-scoped job claim** and a **richer agent fleet dashboard**.
+- **Native Slack / PagerDuty** notification sinks — webhook is in; native
+  sinks are next.
 
 <div class="sb-status" markdown>
 <p class="sb-status__title">🚧 Pre-v1.0</p>
