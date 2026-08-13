@@ -7,19 +7,19 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes.">
+        <meta name="description" content="How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked — no inbound ports, no cluster-API access.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
       
       
-        <link rel="canonical" href="https://secrets-bridge.io/dev/reference/kms-backends/">
+        <link rel="canonical" href="https://secrets-bridge.io/dev/operations/agent-onboarding/">
       
       
-        <link rel="prev" href="../providers/">
+        <link rel="prev" href="../bootstrap/">
       
       
-        <link rel="next" href="../permissions/">
+        <link rel="next" href="../authentication/">
       
       
       <link rel="icon" href="../../assets/favicon.svg">
@@ -27,7 +27,7 @@
     
     
   
-    <title>KMS backends - Secrets Bridge</title>
+    <title>Agent onboarding - Secrets Bridge</title>
   
 
     
@@ -72,14 +72,14 @@
   
 
   
-  <link rel="canonical" href="https://secrets-bridge.io/dev/reference/kms-backends/" />
+  <link rel="canonical" href="https://secrets-bridge.io/dev/operations/agent-onboarding/" />
 
   
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Secrets Bridge" />
-  <meta property="og:title" content="KMS backends" />
-  <meta property="og:description" content="Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes." />
-  <meta property="og:url" content="https://secrets-bridge.io/dev/reference/kms-backends/" />
+  <meta property="og:title" content="Agent onboarding" />
+  <meta property="og:description" content="How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked — no inbound ports, no cluster-API access." />
+  <meta property="og:url" content="https://secrets-bridge.io/dev/operations/agent-onboarding/" />
   <meta property="og:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -88,8 +88,8 @@
 
   
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="KMS backends" />
-  <meta name="twitter:description" content="Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes." />
+  <meta name="twitter:title" content="Agent onboarding" />
+  <meta name="twitter:description" content="How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked — no inbound ports, no cluster-API access." />
   <meta name="twitter:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge — The brain behind your secrets." />
   
@@ -109,9 +109,9 @@
   {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    "headline": "KMS backends",
-    "description": "Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes.",
-    "url": "https://secrets-bridge.io/dev/reference/kms-backends/",
+    "headline": "Agent onboarding",
+    "description": "How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked — no inbound ports, no cluster-API access.",
+    "url": "https://secrets-bridge.io/dev/operations/agent-onboarding/",
     "image": "https://secrets-bridge.io/assets/og-banner.png",
     "publisher": {
       "@type": "Organization",
@@ -144,7 +144,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#kms-backends" class="md-skip">
+        <a href="#agent-onboarding" class="md-skip">
           Skip to content
         </a>
       
@@ -183,7 +183,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              KMS backends
+              Agent onboarding
             
           </span>
         </div>
@@ -366,11 +366,13 @@
         
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../operations/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
           
   
     
@@ -386,13 +388,11 @@
         
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../reference/" class="md-tabs__link">
           
   
     
@@ -996,347 +996,6 @@
       
   
   
-  
-  
-    
-    
-      
-        
-          
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../../operations/" class="md-nav__link ">
-              
-  
-  <span class="md-ellipsis">
-    Operations
-  </span>
-  
-
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
-            Operations
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/docker-compose/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Deploying with docker-compose
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/bootstrap/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Bootstrap & first sign-in
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/agent-onboarding/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Agent onboarding
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/authentication/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Authentication
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/oidc-authentik/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    OIDC with Authentik
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/project-environments/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Project environments
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/policy-templates/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Policy templates
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/reveal-sessions/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Reveal sessions
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/cross-team-requests/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Cross-team requests
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/provider-connections/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Provider connections
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/config/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Configuration reference
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../operations/troubleshooting/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Troubleshooting
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
     
   
   
@@ -1346,6 +1005,22 @@
       
         
           
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
         
       
         
@@ -1371,7 +1046,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
           
@@ -1380,23 +1055,23 @@
               
   
   <span class="md-ellipsis">
-    Reference
+    Operations
   </span>
   
 
             </a>
             
               
-              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_6">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
-            Reference
+            Operations
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1409,11 +1084,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../api-endpoints/" class="md-nav__link">
+      <a href="../docker-compose/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    HTTP API endpoints
+    Deploying with docker-compose
   </span>
   
 
@@ -1430,11 +1105,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../providers/" class="md-nav__link">
+      <a href="../bootstrap/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Providers supported
+    Bootstrap & first sign-in
   </span>
   
 
@@ -1464,7 +1139,7 @@
           
   
   <span class="md-ellipsis">
-    KMS backends
+    Agent onboarding
   </span>
   
 
@@ -1475,7 +1150,7 @@
         
   
   <span class="md-ellipsis">
-    KMS backends
+    Agent onboarding
   </span>
   
 
@@ -1497,120 +1172,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#local" class="md-nav__link">
+  <a href="#the-flow" class="md-nav__link">
     <span class="md-ellipsis">
-      local
+      The flow
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#vault-transit" class="md-nav__link">
+  <a href="#what-happens-step-by-step" class="md-nav__link">
     <span class="md-ellipsis">
-      vault-transit
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="vault-transit">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      Configuration
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#setup" class="md-nav__link">
-    <span class="md-ellipsis">
-      Setup
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#key-rotation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Key rotation
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#aws-kms" class="md-nav__link">
-    <span class="md-ellipsis">
-      aws-kms
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="aws-kms">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#configuration_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Configuration
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#key-resolution" class="md-nav__link">
-    <span class="md-ellipsis">
-      Key resolution
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#setup_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Setup
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#key-rotation_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Key rotation
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#choosing-between-vault-transit-and-aws-kms" class="md-nav__link">
-    <span class="md-ellipsis">
-      Choosing between vault-transit and aws-kms
+      What happens, step by step
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#per-tenant-kms-scoping" class="md-nav__link">
+  <a href="#safety-properties" class="md-nav__link">
     <span class="md-ellipsis">
-      Per-tenant KMS scoping
+      Safety properties
     </span>
   </a>
   
@@ -1632,7 +1214,332 @@
   
   
     <li class="md-nav__item">
-      <a href="../permissions/" class="md-nav__link">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Authentication
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oidc-authentik/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OIDC with Authentik
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../project-environments/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Project environments
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../policy-templates/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Policy templates
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reveal-sessions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Reveal sessions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cross-team-requests/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Cross-team requests
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../provider-connections/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Provider connections
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configuration reference
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../reference/" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Reference
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/api-endpoints/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    HTTP API endpoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/providers/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Providers supported
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/kms-backends/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KMS backends
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/permissions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1680,120 +1587,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#local" class="md-nav__link">
+  <a href="#the-flow" class="md-nav__link">
     <span class="md-ellipsis">
-      local
+      The flow
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#vault-transit" class="md-nav__link">
+  <a href="#what-happens-step-by-step" class="md-nav__link">
     <span class="md-ellipsis">
-      vault-transit
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="vault-transit">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      Configuration
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#setup" class="md-nav__link">
-    <span class="md-ellipsis">
-      Setup
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#key-rotation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Key rotation
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#aws-kms" class="md-nav__link">
-    <span class="md-ellipsis">
-      aws-kms
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="aws-kms">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#configuration_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Configuration
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#key-resolution" class="md-nav__link">
-    <span class="md-ellipsis">
-      Key resolution
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#setup_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Setup
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#key-rotation_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      Key rotation
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#choosing-between-vault-transit-and-aws-kms" class="md-nav__link">
-    <span class="md-ellipsis">
-      Choosing between vault-transit and aws-kms
+      What happens, step by step
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#per-tenant-kms-scoping" class="md-nav__link">
+  <a href="#safety-properties" class="md-nav__link">
     <span class="md-ellipsis">
-      Per-tenant KMS scoping
+      Safety properties
     </span>
   </a>
   
@@ -1814,7 +1628,7 @@
                   
 
   
-    <a href="https://github.com/secrets-bridge/edit/main/docs/reference/kms-backends.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/secrets-bridge/edit/main/docs/operations/agent-onboarding.md" title="Edit this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1823,258 +1637,82 @@
     
       
     
-    <a href="https://github.com/secrets-bridge/raw/main/docs/reference/kms-backends.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/secrets-bridge/raw/main/docs/operations/agent-onboarding.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="kms-backends">KMS backends<a class="headerlink" href="#kms-backends" title="Permanent link">&para;</a></h1>
-<p>Secrets Bridge uses <strong>envelope encryption</strong> for every wrap and
-every ArgoCD token: a per-row data key (DEK) wraps the value with
-AES-256-GCM; the DEK itself is wrapped by a KMS-managed master
-key. The KMS backend is pluggable behind one env var.</p>
-<table>
-<thead>
-<tr>
-<th>Backend</th>
-<th>Status</th>
-<th>When to use</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>local</code></td>
-<td>✅ ships</td>
-<td><strong>Dev only.</strong> Master key from <code>SB_WRAP_MASTER_KEY</code>. Single-machine; not for production.</td>
-</tr>
-<tr>
-<td><code>vault-transit</code></td>
-<td>✅ ships</td>
-<td>OSS-first production. HashiCorp Vault's <code>transit</code> engine.</td>
-</tr>
-<tr>
-<td><code>aws-kms</code></td>
-<td>✅ ships</td>
-<td>AWS production. Uses standard SDK chain (IRSA / instance role).</td>
-</tr>
-<tr>
-<td>GCP KMS</td>
-<td>placeholder</td>
-<td>Slots in via the same interface</td>
-</tr>
-<tr>
-<td>Azure Key Vault</td>
-<td>placeholder</td>
-<td>Slots in via the same interface</td>
-</tr>
-</tbody>
-</table>
-<p>Selected via:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">SB_KMS_BACKEND</span><span class="o">=</span><span class="nb">local</span><span class="w">         </span><span class="c1"># default — dev only</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">SB_KMS_BACKEND</span><span class="o">=</span>vault-transit
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">SB_KMS_BACKEND</span><span class="o">=</span>aws-kms
-</span></code></pre></div>
-<h2 id="local"><code>local</code><a class="headerlink" href="#local" title="Permanent link">&para;</a></h2>
-<p>The dev backend. Master key in an env var.</p>
-<table>
-<thead>
-<tr>
-<th>Env var</th>
-<th>Required</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>SB_WRAP_MASTER_KEY</code></td>
-<td>yes</td>
-<td>base64 32 bytes (<code>openssl rand -base64 32</code>)</td>
-</tr>
-</tbody>
-</table>
-<p><code>KeyID</code> in the audit + row metadata is the SHA-256 of the master,
-so operators can spot rotation in the trail without the key
-appearing.</p>
-<div class="admonition danger">
-<p class="admonition-title">Never use in production</p>
-<p>The master key lives in the same process env as the api. A
-process dump, a logged crash, or a misconfigured <code>env</code> command
-surfaces it. The whole point of a KMS is to move the master out
-of the workload — <code>local</code> defeats that.</p>
-<p>A future PR will WARN at boot when <code>SB_KMS_BACKEND=local</code> is
-set outside a clearly-marked dev profile (tracked as
-<a href="https://github.com/secrets-bridge/api/issues/29">api#29</a>) and
-the Helm chart will default to <code>vault-transit</code> (tracked as
-<a href="https://github.com/secrets-bridge/charts/issues/2">charts#2</a>).</p>
+<h1 id="agent-onboarding">Agent onboarding<a class="headerlink" href="#agent-onboarding" title="Permanent link">&para;</a></h1>
+<p>An agent runs <strong>inside your boundary</strong> (a Kubernetes cluster, a VPC, an account)
+and talks <strong>outbound only</strong> to the control plane and its local provider. Onboarding
+is <strong>self-enrollment</strong>: an admin issues a short-lived, one-time token; the agent
+exchanges it for a persistent credential exactly once.</p>
+<h2 id="the-flow">The flow<a class="headerlink" href="#the-flow" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>sequenceDiagram
+    autonumber
+    participant Admin
+    participant CP as Control Plane
+    participant Agent
+    Admin-&gt;&gt;CP: Create one-time enrollment token&lt;br/&gt;(bound to a provider connection)
+    CP--&gt;&gt;Admin: enrollment_token (returned once, hash-only at rest)
+    Admin-&gt;&gt;Agent: deliver enrollment_token (via a Secret)
+    Agent-&gt;&gt;CP: POST /agents/enroll { enrollment_token, ... }
+    CP--&gt;&gt;Agent: agent_token (returned ONCE) + agent_id
+    Note over Agent: persist {agent_id, agent_token} safely;&lt;br/&gt;token is spent — never reused
+    loop heartbeat
+        Agent-&gt;&gt;CP: POST /agents/:id/heartbeat (X-Agent-Secret)
+        CP--&gt;&gt;Agent: 200 { next_heartbeat_seconds }
+    end
+    Admin-&gt;&gt;CP: Revoke agent (when needed)
+    CP--&gt;&gt;Agent: subsequent heartbeats / job polls rejected</code></pre>
+<h2 id="what-happens-step-by-step">What happens, step by step<a class="headerlink" href="#what-happens-step-by-step" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Admin creates a one-time enrollment token</strong>, bound to a specific provider
+   connection. The token is short-lived, stored <strong>hash-only</strong>, and returned
+   exactly once.</li>
+<li><strong>The agent calls <code>POST /agents/enroll</code></strong> with the token (the token travels in
+   the request body — never a header, never a log line).</li>
+<li><strong>The control plane returns a persistent <code>agent_token</code> once</strong> and creates the
+   agent, bound to that provider connection.</li>
+<li><strong>The agent stores its identity safely</strong> and, on restart, reuses it — it never
+   spends a second enrollment token.</li>
+<li><strong>The agent heartbeats</strong> using the <code>X-Agent-Secret</code> header; the control plane
+   drives the cadence.</li>
+<li><strong>An admin can revoke the agent</strong> at any time; its heartbeats and job polling
+   stop being accepted immediately.</li>
+</ol>
+<h2 id="safety-properties">Safety properties<a class="headerlink" href="#safety-properties" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>One-time tokens</strong> — hash-only at rest, short TTL, returned once, consumed
+  once. Reuse is refused (<code>409</code>).</li>
+<li><strong>Provider-bound</strong> — an enrolled agent is tied to a single provider connection.</li>
+<li><strong>Outbound-only</strong> — no inbound ports; no Postgres / Redis / Kubernetes-API
+  dependency.</li>
+<li><strong>Metadata-only audit</strong> — enrollment, rejection, and revocation events record
+  IDs, reasons, and timestamps; never the token or the agent credential.</li>
+<li><strong>Legacy direct mint is disabled by default</strong> — the older direct
+  agent-mint endpoint is off unless explicitly enabled as a break-glass admin
+  action; enrollment is the standard path.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Never expose credential material</p>
+<p>Enrollment tokens and agent credentials are secrets. Deliver them through a
+Kubernetes Secret (or your secret-distribution mechanism), never as a
+plaintext value in configuration, a log line, a screenshot, or a commit.</p>
 </div>
-<h2 id="vault-transit"><code>vault-transit</code><a class="headerlink" href="#vault-transit" title="Permanent link">&para;</a></h2>
-<p>HashiCorp Vault's
-<a href="https://developer.hashicorp.com/vault/docs/secrets/transit">Transit secrets engine</a>.
-The master key never leaves Vault; the api receives DEK + DEK-
-ciphertext from Vault per <code>GenerateDataKey</code> call, uses the
-plaintext DEK for AES-GCM, and stores the opaque <code>vault:v1:...</code>
-envelope as <code>data_key_ciphertext</code>.</p>
-<h3 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Env var</th>
-<th>Required</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>SB_KMS_VAULT_ADDR</code></td>
-<td>yes</td>
-<td><code>https://vault.example.com</code></td>
-</tr>
-<tr>
-<td><code>SB_KMS_VAULT_TOKEN</code></td>
-<td>yes</td>
-<td>Today; Kubernetes auth lands per follow-up</td>
-</tr>
-<tr>
-<td><code>SB_KMS_VAULT_KEY</code></td>
-<td>yes</td>
-<td>Transit key name</td>
-</tr>
-<tr>
-<td><code>SB_KMS_VAULT_MOUNT</code></td>
-<td>no (default <code>transit</code>)</td>
-<td>Mount path</td>
-</tr>
-</tbody>
-</table>
-<h3 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># In Vault:</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>vault<span class="w"> </span>secrets<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>transit
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>vault<span class="w"> </span>write<span class="w"> </span>-f<span class="w"> </span>transit/keys/sb-wrap
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># In the api env:</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_BACKEND</span><span class="o">=</span>vault-transit
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_VAULT_ADDR</span><span class="o">=</span>https://vault.example.com
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_VAULT_TOKEN</span><span class="o">=</span>hvs.CAESI...
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_VAULT_KEY</span><span class="o">=</span>sb-wrap
-</span></code></pre></div>
-<p>The api logs the resolved backend at boot:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>{&quot;msg&quot;:&quot;keymgmt backend ready&quot;,&quot;key_id&quot;:&quot;vault-transit:transit/sb-wrap&quot;}
-</span></code></pre></div>
-<h3 id="key-rotation">Key rotation<a class="headerlink" href="#key-rotation" title="Permanent link">&para;</a></h3>
-<p>Use Vault's native rotation:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>vault<span class="w"> </span>write<span class="w"> </span>-f<span class="w"> </span>transit/keys/sb-wrap/rotate
-</span></code></pre></div>
-<p>New rows wrap with the new key version automatically; old rows
-decrypt with the original version (Vault retains all versions until
-explicitly trimmed). A <strong>tested rotation runbook</strong> (covering both
-Vault rotation and a full master swap) is tracked as
-<a href="https://github.com/secrets-bridge/api/issues/31">api#31</a>.</p>
-<h2 id="aws-kms"><code>aws-kms</code><a class="headerlink" href="#aws-kms" title="Permanent link">&para;</a></h2>
-<p>AWS KMS. The api calls <code>kms.GenerateDataKey(KeySpec=AES_256)</code> for
-every wrap and stores the opaque ciphertext blob; on decrypt it
-calls <code>kms.Decrypt</code>.</p>
-<h3 id="configuration_1">Configuration<a class="headerlink" href="#configuration_1" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Env var</th>
-<th>Required</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>SB_KMS_AWS_REGION</code></td>
-<td>yes</td>
-<td><code>us-east-1</code></td>
-</tr>
-<tr>
-<td><code>SB_KMS_AWS_KEY_ID</code></td>
-<td>yes</td>
-<td>CMK ARN, key id, or <code>alias/&lt;name&gt;</code></td>
-</tr>
-<tr>
-<td><code>SB_KMS_AWS_ENDPOINT</code></td>
-<td>no</td>
-<td>LocalStack / VPC endpoint override</td>
-</tr>
-</tbody>
-</table>
-<p><strong>No new credential env vars.</strong> The standard AWS SDK chain
-applies — IRSA in EKS, instance role on EC2, profile in dev.</p>
-<h3 id="key-resolution">Key resolution<a class="headerlink" href="#key-resolution" title="Permanent link">&para;</a></h3>
-<p><code>KeyID</code> stored in <code>kms_key_id</code> is the <strong>resolved ARN</strong> — even when
-you pass an alias. So if you rotate <code>alias/sb-wrap</code> to point at a
-new CMK, the old rows still tell you which exact key wrapped them.
-Critical for forensic audit.</p>
-<h3 id="setup_1">Setup<a class="headerlink" href="#setup_1" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>aws<span class="w"> </span>kms<span class="w"> </span>create-key<span class="w"> </span>--description<span class="w"> </span><span class="s2">&quot;Secrets Bridge wrap key&quot;</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>aws<span class="w"> </span>kms<span class="w"> </span>create-alias<span class="w"> </span>--alias-name<span class="w"> </span>alias/sb-wrap<span class="w"> </span>--target-key-id<span class="w"> </span>&lt;key-id&gt;
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_BACKEND</span><span class="o">=</span>aws-kms
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_AWS_REGION</span><span class="o">=</span>us-east-1
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_AWS_KEY_ID</span><span class="o">=</span>alias/sb-wrap
-</span></code></pre></div>
-<h3 id="key-rotation_1">Key rotation<a class="headerlink" href="#key-rotation_1" title="Permanent link">&para;</a></h3>
-<p>AWS KMS handles rotation automatically (enable annual rotation on
-the CMK):</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>aws<span class="w"> </span>kms<span class="w"> </span>enable-key-rotation<span class="w"> </span>--key-id<span class="w"> </span>alias/sb-wrap
-</span></code></pre></div>
-<p>The CMK retains a backing-key version per rotation; AWS picks the
-right one on decrypt. Rows wrapped with the old version still
-decrypt; new rows use the new version. No app change needed.</p>
-<h2 id="choosing-between-vault-transit-and-aws-kms">Choosing between <code>vault-transit</code> and <code>aws-kms</code><a class="headerlink" href="#choosing-between-vault-transit-and-aws-kms" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Question</th>
-<th>If yes → <code>vault-transit</code></th>
-<th>If yes → <code>aws-kms</code></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Are you already running Vault for other reasons?</td>
-<td>✅</td>
-<td></td>
-</tr>
-<tr>
-<td>Is your workload on AWS with IRSA already wired?</td>
-<td></td>
-<td>✅</td>
-</tr>
-<tr>
-<td>Do you need multi-cloud or cloud-portable?</td>
-<td>✅</td>
-<td></td>
-</tr>
-<tr>
-<td>Are you OK paying per-call (AWS KMS pricing)?</td>
-<td></td>
-<td>✅</td>
-</tr>
-<tr>
-<td>Do you want the simplest path on a single AWS account?</td>
-<td></td>
-<td>✅</td>
-</tr>
-</tbody>
-</table>
-<p>Both back the <strong>same</strong> <code>KeyManager</code> interface. Switching is a
-<strong>re-wrap</strong> operation, not a code change.</p>
-<h2 id="per-tenant-kms-scoping">Per-tenant KMS scoping<a class="headerlink" href="#per-tenant-kms-scoping" title="Permanent link">&para;</a></h2>
-<p>Today: one CMK per deployment. <strong>Piece 8c</strong> (tracked) introduces a
-scope through <code>KeyManager</code> so different rows can be wrapped by
-different CMKs (per-project, per-environment, or per-tenant).
-Existing single-backend deployments keep working unchanged.</p>
+<p>See the <a href="../../components/agent/">agent component reference</a> and the
+<a href="../../reference/api-endpoints/#agents">HTTP API endpoints</a> for the exact contract.</p>
 
 
 
 
 
 
+
+  
+  
 
 
 
