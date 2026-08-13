@@ -27,19 +27,42 @@ required to call it.
 
 ## Agents
 
+Onboarding is **self-enrollment by default**: an admin mints a one-time,
+provider-connection-bound enrollment token; the agent exchanges it for its
+persistent credential. The legacy direct mint is disabled unless explicitly
+enabled as a break-glass admin action.
+
+### Onboarding & admin management (session auth + permission)
+
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| `POST` | `/api/v1/agents` | `bearer + agent.mint` | Mint; returns `agent_secret` ONCE |
-| `GET` | `/api/v1/agents` | bearer | List (no credentials in projection) |
-| `POST` | `/api/v1/agents/:id/revoke` | `bearer + agent.revoke` | Transition status → `revoked` |
+| `POST` | `/api/v1/provider-connections/:id/agent-enrollment-token` | `bearer + agent.mint` | Mint a one-time, connection-bound enrollment token (returned ONCE) |
+| `POST` | `/api/v1/agents/enroll` | enrollment token | Exchange the token for a persistent `agent_token` (returned ONCE); creates a connection-bound agent |
+| `POST` | `/api/v1/agents` | `bearer + agent.mint` | **Legacy direct mint — disabled by default** → `403 direct_agent_mint_disabled`. Break-glass only via `SB_ALLOW_DIRECT_AGENT_MINT=true` |
+| `GET` | `/api/v1/agents` | `bearer + agent.list` | Thin list. New integrations should prefer the admin/provider projections below |
+| `GET` | `/api/v1/admin/agents` | `bearer + agent.list` | Rich admin list + filters (`provider_connection_id`, `status`, `cluster_name`, `provider_type`); shows `provider_connection_id` |
+| `GET` | `/api/v1/admin/agents/:id` | `bearer + agent.list` | Rich admin get |
+| `GET` | `/api/v1/provider-connections/:id/agents` | `bearer + agent.list` | Agents for a provider connection (UI Agents tab) |
+| `POST` | `/api/v1/admin/agents/:id/revoke` | `bearer + agent.revoke` | Revoke with `reason` → `revoked_at`/`revoked_by`; emits `agent.revoked` audit (`agent_id`, `provider_connection_id`, `reason`) |
+| `POST` | `/api/v1/agent-enrollment-tokens/:id/revoke` | `bearer + agent.mint` | Revoke an UNUSED enrollment token |
+
+### Agent data plane (`X-Agent-Secret`)
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
 | `PUT` | `/api/v1/agents/:id/public-key` | agent | Self-register X25519 wire-envelope pubkey |
-| `POST` | `/api/v1/agents/:id/heartbeat` | agent | 204; bumps `last_seen_at` |
+| `POST` | `/api/v1/agents/:id/heartbeat` | agent | Bodyless → **204** (unchanged). With an optional body (`status`/`agent_version`/`capabilities`) → **200** `{status, server_time, next_heartbeat_seconds}`. Bumps `last_seen_at`; first heartbeat flips `enrolled`→`active` |
 | `POST` | `/api/v1/agents/:id/jobs/claim` | agent | 200 with job or 204 (queue empty) |
 | `POST` | `/api/v1/agents/:id/jobs/:job_id/complete` | agent | `{status, error?}`; 204 |
 | `POST` | `/api/v1/agents/:id/dek` | agent | Issue a KMS-wrapped DEK for wire-envelope encryption |
 | `POST` | `/api/v1/agents/:id/wraps` | agent | Read flow: agent posts a fetched value |
 | `GET` | `/api/v1/agents/:id/wraps/:wrap_id` | agent | Patch flow: agent retrieves a value (single-shot) |
 | `POST` | `/api/v1/agents/:id/secrets/bulk` | agent | Discovery: bulk-upsert discovered secrets |
+
+!!! note "Release notes — agent management"
+    - **Heartbeat response shape.** A heartbeat *with a body* now returns **200** `{status, server_time, next_heartbeat_seconds}`. A **bodyless** heartbeat keeps the original empty **204** — existing agents are unaffected.
+    - **Revoke audit action.** New revocations emit `agent.revoked` (metadata: `agent_id`, `provider_connection_id`, `reason`). Legacy audit rows may still carry the older `agent.revoke` action — dashboards should alias both.
+    - **Prefer the admin/provider projections.** `GET /api/v1/agents` remains a thin list. New integrations should use `GET /api/v1/admin/agents`, `GET /api/v1/admin/agents/:id`, or `GET /api/v1/provider-connections/:id/agents` (richer projection incl. `provider_connection_id`).
 
 ## Requests (access requests)
 

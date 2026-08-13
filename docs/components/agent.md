@@ -45,6 +45,16 @@ sequenceDiagram
     end
 ```
 
+!!! note "Heartbeat response shape"
+    A **bodyless** heartbeat returns an empty **204** — the shape existing
+    agents rely on. A heartbeat with an optional JSON body
+    (`status` / `agent_version` / `capabilities`) returns **200**
+    `{status, server_time, next_heartbeat_seconds}` and records the reported
+    fields; the first heartbeat also transitions an `enrolled` agent to
+    `active`. Agents are onboarded via the enrollment-token flow
+    (`POST /provider-connections/:id/agent-enrollment-token` →
+    `POST /agents/enroll`); see the [HTTP API reference](../reference/api-endpoints.md#agents).
+
 ## Configuration
 
 | Env var | Required | Default | Notes |
