@@ -87,7 +87,11 @@ jobs:
             VERSION="${FULL%.*}"      # v0.2.0 → v0.2
             ALIAS="latest"
           elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            VERSION="dev"
+            # Pre-release: the public rolling version IS `latest`, so the
+            # canonical URLs, OG tags, and version chip all read `latest`
+            # (never `dev`). A real v* tag later publishes a pinned version
+            # and moves `latest` onto it.
+            VERSION="latest"
             ALIAS=""
           else
             echo "::error::Unsupported trigger ref ${{ github.ref }}"
@@ -102,30 +106,30 @@ jobs:
           set -euo pipefail
           VERSION="${{ steps.resolve.outputs.version }}"
           ALIAS="${{ steps.resolve.outputs.alias }}"
+          # Migration: retire a stale `dev` version (the pre-release rolling
+          # version was renamed dev → latest) so /dev/ never appears in the
+          # public version selector, canonical URLs, or OG tags.
+          if mike list 2>/dev/null | grep -qw dev; then
+            mike delete --push dev
+          fi
           if [[ -n "$ALIAS" ]]; then
+            # A real release: deploy the pinned VERSION and move `latest`
+            # onto it. If `latest` currently exists as a VERSION (the
+            # pre-release rolling one), retire it first so it can become an
+            # alias of the release.
+            if [[ "$ALIAS" == "latest" ]] && mike list --json 2>/dev/null \
+                 | python3 -c "import sys,json; sys.exit(0 if any(v.get('version')=='latest' for v in json.load(sys.stdin)) else 1)"; then
+              mike delete --push latest
+            fi
             mike deploy --push --update-aliases "$VERSION" "$ALIAS"
-          elif [[ "$VERSION" == "dev" ]] && ! mike list 2>/dev/null | grep -qE 'v[0-9]'; then
-            # No tagged release exists yet — roll the public `latest` alias
-            # WITH `dev` so the site root (/latest/) always serves current
-            # content instead of exposing an unstable-looking /dev/ URL.
-            # A real `v*` tag later re-points `latest` at the release, after
-            # which a `dev` push no longer touches `latest` (the grep sees a
-            # `v*` version and takes the plain-deploy branch below).
-            mike deploy --push --update-aliases dev latest
           else
             mike deploy --push "$VERSION"
           fi
 
-      # Landing version for `/`: prefer `latest` (a release, or the
-      # dev-rolling alias created above) so the root redirects to `/latest/`,
-      # not `/dev/`. Falls back to `dev` only before any `latest` exists.
-      # One canonical URL per page either way (SEO P0-1, 2026-05-30).
+      # Landing version for `/`: always `latest` (the rolling pre-release
+      # version, or the alias a release moved onto its pinned version) — so
+      # `/` redirects to `/latest/` and there's one canonical URL per page
+      # (SEO P0-1, 2026-05-30).
       - name: Set default landing version
         if: github.ref == 'refs/heads/main' || steps.resolve.outputs.alias == 'latest'
-        run: |
-          set -euo pipefail
-          if mike list 2>/dev/null | grep -qw latest; then
-            mike set-default --push latest
-          else
-            mike set-default --push dev
-          fi
+        run: mike set-default --push latest
