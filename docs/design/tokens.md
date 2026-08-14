@@ -13,7 +13,7 @@ tokens. The Figma file is the source; the SPA's
 | `surface` | `#0F172A` | Card / panel surface (Dark Navy) |
 | `text` | `#CBD5E1` | Body copy (Slate 300) |
 | `muted` | `#64748B` | Secondary text / labels (Slate 500) |
-| `accent` | `#06B6D4` | **Primary accent** — Cyan |
+| `accent` | `#06B6D4` | **Primary accent** (Cyan) |
 | `accent-bright` | `#22D3EE` | Highlight / hover |
 | `border` | `#1E293B` | Card edges, separators |
 | `teal` | `#14B8A6` | Secondary accent |
@@ -25,14 +25,14 @@ tokens. The Figma file is the source; the SPA's
 
 | Variant | When |
 |---|---|
-| `success` | Green outline / fill — agent active, request approved, audit success, secret present |
-| `warning` | Yellow outline / fill — agent stale, audit denied, env uat, archived project, applied_unverified |
-| `error` | Red outline / fill — request rejected/failed, env prod, audit failure |
-| `pending` | Yellow — request pending |
-| `accent` | Cyan — role badges, env staging |
-| `system` | Cyan outline — system-seed row marker |
-| `neutral` | Muted — env other, preview chips |
-| `cancelled` | Muted strikethrough — consumed wraps |
+| `success` | Green outline / fill: agent active, request approved, audit success, secret present |
+| `warning` | Yellow outline / fill: agent stale, audit denied, env uat, archived project, applied_unverified |
+| `error` | Red outline / fill: request rejected/failed, env prod, audit failure |
+| `pending` | Yellow: request pending |
+| `accent` | Cyan: role badges, env staging |
+| `system` | Cyan outline: system-seed row marker |
+| `neutral` | Muted: env other, preview chips |
+| `cancelled` | Muted strikethrough: consumed wraps |
 
 ## Type tokens
 
@@ -87,7 +87,7 @@ border-l-4 callout, not a new gradient.
 
 | File | What |
 |---|---|
-| [`ui/tailwind.config.js`](https://github.com/secrets-bridge/ui/blob/main/tailwind.config.js) | The canonical Tailwind config — every token above |
+| [`ui/tailwind.config.js`](https://github.com/secrets-bridge/ui/blob/main/tailwind.config.js) | The canonical Tailwind config: every token above |
 | [`ui/src/ui/`](https://github.com/secrets-bridge/ui/tree/main/src/ui) | The shared primitives that consume the tokens: `Button`, `Card`, `StatusPill`, `Drawer`, `ConfirmModal`, `PageHeader`, `LogoMark` |
 | [`skills/ui/design/tokens/`](https://github.com/secrets-bridge/skills/tree/main/ui/design/tokens) | The Figma → JSON sync output; the `sync.sh` script + `design-tokens.json` + `mapping.md` |
 | [`skills/ui/design/BRAND_VOICE.md`](https://github.com/secrets-bridge/skills/blob/main/ui/design/BRAND_VOICE.md) | The canonical brand voice doc |
@@ -99,12 +99,12 @@ The flow is **Figma → skills/ui/design → tailwind.config.js**:
 1. Make the change in the Figma file (versions 02 Foundations).
 2. Re-run `skills/ui/design/tokens/sync.sh` to pull the latest
    token definitions into `design-tokens.json`.
-3. Update `ui/tailwind.config.js` to match — same Tailwind names,
+3. Update `ui/tailwind.config.js` to match: same Tailwind names,
    new hex values.
 4. Rebuild the SPA; visual diff against the Figma frames in
    `skills/ui/design/frames/` (six PNG renders cached at last
    sync).
-5. Open a PR against both `ui` and `skills` — they ship together.
+5. Open a PR against both `ui` and `skills`; they ship together.
 
 The reverse direction (code → Figma) is not supported. Figma is
 upstream; the SPA is downstream.

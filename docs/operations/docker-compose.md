@@ -38,7 +38,7 @@ You should land on the Dashboard.
     docker compose up -d
     ```
 
-    The bootstrap step is idempotent — once `local_users` has any
+    The bootstrap step is idempotent. Once `local_users` has any
     row, the env vars are ignored. To re-seed, wipe the volume:
 
     ```bash
@@ -54,7 +54,7 @@ docker compose --profile worker up -d
 # Vault dev container (needed for the agent to read/write real values)
 docker compose --profile vault up -d
 
-# Agent — REQUIRES a manual mint step first; see below
+# Agent: REQUIRES a manual mint step first; see below
 docker compose --profile agent up -d
 
 # Everything at once
@@ -105,8 +105,8 @@ docker exec secrets-bridge-vault-1 sh -c \
 | Host port | Container | What |
 |---|---|---|
 | `18080` | ingress (nginx shim) | Front door. UI on `/`, api on `/api/v1/*`, probes on `/healthz` / `/readyz` |
-| `5432` (only if exposed) | postgres | Postgres — **not exposed by default** |
-| `6379` (only if exposed) | redis | Redis — **not exposed by default** |
+| `5432` (only if exposed) | postgres | Postgres, **not exposed by default** |
+| `6379` (only if exposed) | redis | Redis, **not exposed by default** |
 | `8200` (`--profile vault`) | vault | Vault dev mode |
 
 Override the host port via `INGRESS_HOST_PORT`:

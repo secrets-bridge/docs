@@ -11,7 +11,7 @@ curl -fsS http://localhost:18080/readyz
 ```
 
 If 503, the api can see Postgres or Redis but one of them isn't
-ready — the response body lists which:
+ready, the response body lists which:
 
 ```json
 {"status":"unready","checks":{"postgres":"ping failed: dial tcp ..."}}
@@ -65,7 +65,7 @@ Two possibilities:
    who submitted the request.
 2. **The agent failed before posting the wrap.** Check
    `GET /audit-events?correlation_id=<request-uuid>` for the full
-   chain — you should see `wrap.create` events on success.
+   chain, you should see `wrap.create` events on success.
 
 ### "Failed to load audit events"
 
@@ -136,7 +136,7 @@ curl -fsS "http://localhost:18080/api/v1/audit-events?action=wrap.retrieve" \
   | jq '.[] | {time:.occurred_at, actor, resource, status}'
 ```
 
-This is the SOC2-friendly query — every plaintext reveal across
+This is the SOC2-friendly query, every plaintext reveal across
 the platform, append-only, with the actor and timestamp.
 
 ## Reading the metrics

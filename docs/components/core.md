@@ -4,7 +4,7 @@ Repo: [`secrets-bridge/core`](https://github.com/secrets-bridge/core)
 · Stack: Go 1.24, **infra-free**
 
 Shared types + the provider interface every other Go service
-depends on. Deliberately small — adding anything Postgres-shaped or
+depends on. Deliberately small: adding anything Postgres-shaped or
 Redis-shaped here is a CI failure on the dependent repos.
 
 ## What lives in `core`
@@ -31,7 +31,7 @@ whole project. The CP only ever needs metadata; the agent only
 ever needs values. Different processes hold different trust.
 
 `SecretValue.String()` and `.GoString()` both return `"<redacted>"`,
-verified across every default formatting verb in `core#3` — so a
+verified across every default formatting verb in `core#3`, so a
 casual `log.Printf("%+v", value)` can't leak.
 
 ## What `core` deliberately doesn't have

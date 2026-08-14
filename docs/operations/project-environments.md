@@ -7,7 +7,7 @@ operationally.
 
 ## What an environment is
 
-An **environment** is a lifecycle boundary inside a project — `dev`,
+An **environment** is a lifecycle boundary inside a project: `dev`,
 `staging`, `uat`, `prod`, or any other name your team uses. The
 schema (`api/pkg/storage/migrations/0001_initial_schema.up.sql`) has
 carried environments since v0.1; Slice L1 added three classifying
@@ -19,17 +19,17 @@ fields:
 | `risk_level` | `SMALLINT 0-4`. Future fine-grain policy knob; today it drives a UI badge intensity only. |
 | `description` | Operator notes. No semantic load. |
 
-The existing `type` column (dev / staging / uat / prod / other) stays —
-operators use it as a free lifecycle label that doesn't have to
+The existing `type` column (dev / staging / uat / prod / other) stays.
+Operators use it as a free lifecycle label that doesn't have to
 agree with `kind`. The two are independently mutable for the case
 where a staging-labelled env actually carries prod data: set
 `type='staging'` but `kind='prod'` and the PROD invariant fires.
 
-## kind vs type — why both
+## kind vs type, why both
 
 The free-string `type` was useful as a lifecycle label, but it was
 also doing double duty as the implicit risk signal. Operators
-naturally write `type='uat'` for non-production environments — and a
+naturally write `type='uat'` for non-production environments, and a
 single typo or rename can silently un-gate a sensitive flow. `kind`
 is the hard, two-value classifier that the engine actually consults.
 
@@ -104,7 +104,7 @@ ensures no orphaned bindings survive.
 2. Bind the secrets the env should expose via
    `POST /projects/:project_id/secrets` with the new
    `environment_id` field set (Slice L3). The legacy
-   `secrets.labels.Env` label is no longer the authorization key —
+   `secrets.labels.Env` label is no longer the authorization key.
    `project_secrets.environment_id` is.
 3. Add a `policy_rules` row scoped to this env that picks the right
    workflow. See [Policy templates](policy-templates.md) for the
@@ -112,22 +112,22 @@ ensures no orphaned bindings survive.
 4. (Optional) Grant the `secret.reveal.direct` permission to the
    `developer` role (it's seeded by default; revoke if you want a
    stricter baseline). See
-   [Authentication — direct reveal permission](authentication.md#direct-reveal-permission-slice-l4).
+   [Authentication, direct reveal permission](authentication.md#direct-reveal-permission-slice-l4).
 
 ## Related
 
-- [Policy templates](policy-templates.md) — non_prod / prod policy
+- [Policy templates](policy-templates.md), non_prod / prod policy
   rule examples.
-- [Authentication](authentication.md) — `secret.reveal.direct`
+- [Authentication](authentication.md), `secret.reveal.direct`
   permission + the L4 dev endpoints.
 - API reference: `GET /users/me/projects` returns each project with
   its environments inline (Slice L4).
-- [Cross-team requests](cross-team-requests.md) — Slice N split between
+- [Cross-team requests](cross-team-requests.md), Slice N split between
   the **target** (team / project / environment that provides the value)
   and the **destination** (provider connection + secret_ref where the
   value lands). Both reference the project / environment model defined
   here.
-- [Provider connections](provider-connections.md) — connection metadata
+- [Provider connections](provider-connections.md), connection metadata
   binds at project ± environment granularity via the
   `project_provider_connections` join table. Project-wide bindings have
   `environment_id IS NULL`; env-specific bindings narrow to one row.

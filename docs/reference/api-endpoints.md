@@ -5,7 +5,7 @@ required to call it.
 
 | Auth | Meaning |
 |---|---|
-| `public` | No auth — open route (probes, login) |
+| `public` | No auth, open route (probes, login) |
 | `bearer` | A valid login JWT in `Authorization: Bearer <jwt>` |
 | `bearer + perm` | Bearer JWT + the named permission via `auth.Require(perm)` |
 | `agent` | An agent's `X-Agent-Secret` header (validated by `AgentAuth` middleware) |
@@ -38,7 +38,7 @@ enabled as a break-glass admin action.
 |---|---|---|---|
 | `POST` | `/api/v1/provider-connections/:id/agent-enrollment-token` | `bearer + agent.mint` | Mint a one-time, connection-bound enrollment token (returned ONCE) |
 | `POST` | `/api/v1/agents/enroll` | enrollment token | Exchange the token for a persistent `agent_token` (returned ONCE); creates a connection-bound agent |
-| `POST` | `/api/v1/agents` | `bearer + agent.mint` | **Legacy direct mint — disabled by default** → `403 direct_agent_mint_disabled`. Break-glass only via `SB_ALLOW_DIRECT_AGENT_MINT=true` |
+| `POST` | `/api/v1/agents` | `bearer + agent.mint` | **Legacy direct mint, disabled by default** → `403 direct_agent_mint_disabled`. Break-glass only via `SB_ALLOW_DIRECT_AGENT_MINT=true` |
 | `GET` | `/api/v1/agents` | `bearer + agent.list` | Thin list. New integrations should prefer the admin/provider projections below |
 | `GET` | `/api/v1/admin/agents` | `bearer + agent.list` | Rich admin list + filters (`provider_connection_id`, `status`, `cluster_name`, `provider_type`); shows `provider_connection_id` |
 | `GET` | `/api/v1/admin/agents/:id` | `bearer + agent.list` | Rich admin get |
@@ -59,9 +59,9 @@ enabled as a break-glass admin action.
 | `GET` | `/api/v1/agents/:id/wraps/:wrap_id` | agent | Patch flow: agent retrieves a value (single-shot) |
 | `POST` | `/api/v1/agents/:id/secrets/bulk` | agent | Discovery: bulk-upsert discovered secrets |
 
-!!! note "Release notes — agent management"
-    - **Heartbeat response shape.** A heartbeat *with a body* now returns **200** `{status, server_time, next_heartbeat_seconds}`. A **bodyless** heartbeat keeps the original empty **204** — existing agents are unaffected.
-    - **Revoke audit action.** New revocations emit `agent.revoked` (metadata: `agent_id`, `provider_connection_id`, `reason`). Legacy audit rows may still carry the older `agent.revoke` action — dashboards should alias both.
+!!! note "Release notes: agent management"
+    - **Heartbeat response shape.** A heartbeat *with a body* now returns **200** `{status, server_time, next_heartbeat_seconds}`. A **bodyless** heartbeat keeps the original empty **204**. Existing agents are unaffected.
+    - **Revoke audit action.** New revocations emit `agent.revoked` (metadata: `agent_id`, `provider_connection_id`, `reason`). Legacy audit rows may still carry the older `agent.revoke` action, so dashboards should alias both.
     - **Prefer the admin/provider projections.** `GET /api/v1/agents` remains a thin list. New integrations should use `GET /api/v1/admin/agents`, `GET /api/v1/admin/agents/:id`, or `GET /api/v1/provider-connections/:id/agents` (richer projection incl. `provider_connection_id`).
 
 ## Requests (access requests)
@@ -74,25 +74,25 @@ enabled as a break-glass admin action.
 | `GET` | `/api/v1/requests/:id` | bearer | Get one + inline approvals |
 | `POST` | `/api/v1/requests/:id/approve` | bearer | `{approver_id, comment?}` |
 | `POST` | `/api/v1/requests/:id/reject` | bearer | `{approver_id, reason}` |
-| `POST` | `/api/v1/requests/:id/cancel` | bearer | `{actor_id}` — only the requester |
+| `POST` | `/api/v1/requests/:id/cancel` | bearer | `{actor_id}` (only the requester) |
 | `GET` | `/api/v1/requests/:id/wraps` | user_id | List value-free wrap summaries |
 | `GET` | `/api/v1/requests/:id/wraps/:wrap_id` | user_id | Single-shot retrieve (consumes) |
 | `GET` | `/api/v1/requests/:id/gitops` | user_id | BRD §26 observation list (404 when feature is off) |
 
 ## Cross-team requests
 
-Slice N — Team A → Team B value handoff. See
+Slice N: Team A → Team B value handoff. See
 [Cross-team requests](../operations/cross-team-requests.md) for the
 operator model, state machine, and SoD matrix.
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| `POST` | `/api/v1/requests/cross-team` | `bearer + secret.request` | `{target_team_id, target_project_id, target_environment_id, destination_provider_connection_id, destination_secret_ref, destination_keys[], justification}` → `AccessRequest`. Refuses `min_approvers ≥ 2` with `cross_team_min_approvers_unsupported`. NO values in body — destination_keys is the NAME list. |
+| `POST` | `/api/v1/requests/cross-team` | `bearer + secret.request` | `{target_team_id, target_project_id, target_environment_id, destination_provider_connection_id, destination_secret_ref, destination_keys[], justification}` → `AccessRequest`. Refuses `min_approvers ≥ 2` with `cross_team_min_approvers_unsupported`. NO values in body. destination_keys is the NAME list. |
 | `POST` | `/api/v1/requests/:id/fill` | `bearer + secret.value.provide` | `{key_values: {<key>: base64}, fill_comment?}`. Late writers get `fill_window_expired` (410). Same-actor-as-requester returns `separation_of_duties_violated` (403). |
 | `POST` | `/api/v1/requests/:id/refuse` | `bearer + secret.value.provide` | `{reason}` (≥ 10 chars). Transitions to `refused`. |
 | `POST` | `/api/v1/requests/:id/verify` | `bearer + secret.approve` or `secret.security.approve` | `{decision, voted_as, comment?}` → **200 OK** with structured `VerifyResponse` (NOT 412 on partial votes). Body: `{vote_recorded, voted_as, source_votes, security_approval_required, security_vote_present, next_required[]}`. |
 | `GET` | `/api/v1/requests/inbox` | `bearer + secret.value.provide` | `?team_id=` narrows to one team's inbox. Returns `AccessRequest[]` with `pending_values` status. Fail-closed: empty array when caller covers no teams. |
-| `GET` | `/api/v1/requests/inbox/count` | `bearer + secret.value.provide` | `{total, per_team: [{team_id, team_name?, count}]}` — drives the sidebar badge. |
+| `GET` | `/api/v1/requests/inbox/count` | `bearer + secret.value.provide` | `{total, per_team: [{team_id, team_name?, count}]}`. Drives the sidebar badge. |
 | `GET` | `/api/v1/provider-connections?project_id=:id` | bearer | Returns the connections bound to that project; the SPA's cross-team submit drawer hits this for the source project's destination dropdown. |
 
 ### VerifyResponse routing
@@ -102,9 +102,9 @@ toast without a second round trip:
 
 | Scenario | `voted_as` | `security_approval_required` | `security_vote_present` | `next_required[]` |
 |---|---|---|---|---|
-| Source vote, no security required | `source` | `false` | `false` | `[]` — transitions to `approved` |
-| Source vote, security required, not yet voted | `source` | `true` | `false` | `["security_approval"]` — SPA toast "your source vote was recorded; security approval still pending" |
-| Security vote, source already voted | `security` | `true` | `true` | `[]` — transitions to `approved` |
+| Source vote, no security required | `source` | `false` | `false` | `[]` (transitions to `approved`) |
+| Source vote, security required, not yet voted | `source` | `true` | `false` | `["security_approval"]`: SPA toast "your source vote was recorded; security approval still pending" |
+| Security vote, source already voted | `security` | `true` | `true` | `[]` (transitions to `approved`) |
 
 The SPA's `crossTeamErrorMessage(code)` maps the stable 403 codes to
 friendly strings; see the table at the bottom of
@@ -112,7 +112,7 @@ friendly strings; see the table at the bottom of
 
 ## Reveal sessions
 
-Slice M — bulk reveal page surface. Open returns wrap_id + key_name
+Slice M: bulk reveal page surface. Open returns wrap_id + key_name
 handles; the SPA loops over them calling the single-shot
 `/requests/:id/wraps/:wrap_id` retrieve for each plaintext. See
 [Reveal sessions](../operations/reveal-sessions.md) for the operator
@@ -139,7 +139,7 @@ guide.
 | `GET` | `/api/v1/users/:userID/roles` | bearer |
 | `POST` | `/api/v1/workflows` | `bearer + workflow.edit` |
 | `GET` | `/api/v1/workflows` | bearer |
-| `GET` | `/api/v1/workflows/scoped-policy-authorable` | `bearer + policy.author` at any scope | R-follow-up #1 (api#112). Returns workflows where `enabled=true AND scoped_policy_authorable=true`. Auth uses the new `auth.RequireAny` middleware — admits any non-empty scope match because `policy.author` is always scoped. Mounted BEFORE the dynamic `:id` route per the route-ordering correction. |
+| `GET` | `/api/v1/workflows/scoped-policy-authorable` | `bearer + policy.author` at any scope | R-follow-up #1 (api#112). Returns workflows where `enabled=true AND scoped_policy_authorable=true`. Auth uses the new `auth.RequireAny` middleware, which admits any non-empty scope match because `policy.author` is always scoped. Mounted BEFORE the dynamic `:id` route per the route-ordering correction. |
 | `GET` | `/api/v1/workflows/:id` | bearer |
 | `PUT` | `/api/v1/workflows/:id` | `bearer + workflow.edit` | R-follow-up #1 added `scoped_policy_authorable` to the body shape. Field is `*bool` with COALESCE-preserve semantic: omit the field to keep the existing value (the handler does a Get-then-merge); send `true`/`false` to flip. Critical for rolling-deploy safety with older admin clients that don't yet know about the field. |
 | `DELETE` | `/api/v1/workflows/:id` | `bearer + workflow.edit` |
@@ -176,7 +176,7 @@ guide.
 |---|---|---|
 | `POST` | `/api/v1/jobs` | bearer |
 
-## Integrations (BRD §26 — gated by `SB_GITOPS_ENABLED`)
+## Integrations (BRD §26, gated by `SB_GITOPS_ENABLED`)
 
 | Method | Path | Auth |
 |---|---|---|
@@ -193,7 +193,7 @@ guide.
 
 EPIC P (api#92) admin surface + developer dropdown. The same
 `GET /provider-connections` URL branches on whether `project_id` is
-present — see [Provider connections — Permissions](../operations/provider-connections.md#permissions)
+present. See [Provider connections: Permissions](../operations/provider-connections.md#permissions)
 for the full branching matrix. All errors land in the EPIC P envelope:
 `{"error_code":"…","message":"…", …}`.
 
@@ -214,15 +214,15 @@ for the full branching matrix. All errors land in the EPIC P envelope:
 `integration.bind` callers (typically section heads granted the
 `provider_connection_binder` seed role) use a separate URL family
 that's gated on the binding's project + env. The URL hierarchy
-expresses the §3 mental model split — scoped binding is
+expresses the §3 mental model split: scoped binding is
 project-ownership work, not platform registry administration. The
 `integration.edit` URLs above are unchanged; admins keep using them.
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| `POST` | `/api/v1/projects/:projectID/provider-connection-bindings` | `bearer + integration.bind` scoped to (project, env) | Bind a self-service-bindable connection to a (project, env). Body: `{provider_connection_id, environment_id}`. `environment_id` is REQUIRED — scoped binders never create project-wide bindings. 403 `connection_not_self_service_bindable` if the platform admin hasn't flipped the flag. 403 `prod_binding_not_allowed_for_scope` for prod envs. 409 `binding_exists`/`connection_disabled` per the locked chain. |
-| `GET` | `/api/v1/projects/:projectID/provider-connection-bindings[?environment_id=:id]` | `bearer` | Joined project bindings — server-side join adds `environment_name`, `environment_kind`, `connection_name`, `connection_type`. Optional `environment_id` narrows to env-specific + project-wide for that env. Sanitized projection (no scope / auth_method / discovery fields). |
-| `DELETE` | `/api/v1/projects/:projectID/provider-connection-bindings/:bindingID` | `bearer + integration.bind` scoped to (project, binding env) | Unbind. 204 on success. **§4 correction pinned**: if `bindingID` exists under a DIFFERENT project, returns 404 `binding_not_found` — never 403 `out_of_scope_binding` (which would leak existence under another project). 403 `prod_binding_not_allowed_for_scope` for prod env bindings (admin path required). |
+| `POST` | `/api/v1/projects/:projectID/provider-connection-bindings` | `bearer + integration.bind` scoped to (project, env) | Bind a self-service-bindable connection to a (project, env). Body: `{provider_connection_id, environment_id}`. `environment_id` is REQUIRED. Scoped binders never create project-wide bindings. 403 `connection_not_self_service_bindable` if the platform admin hasn't flipped the flag. 403 `prod_binding_not_allowed_for_scope` for prod envs. 409 `binding_exists`/`connection_disabled` per the locked chain. |
+| `GET` | `/api/v1/projects/:projectID/provider-connection-bindings[?environment_id=:id]` | `bearer` | Joined project bindings. Server-side join adds `environment_name`, `environment_kind`, `connection_name`, `connection_type`. Optional `environment_id` narrows to env-specific + project-wide for that env. Sanitized projection (no scope / auth_method / discovery fields). |
+| `DELETE` | `/api/v1/projects/:projectID/provider-connection-bindings/:bindingID` | `bearer + integration.bind` scoped to (project, binding env) | Unbind. 204 on success. **§4 correction pinned**: if `bindingID` exists under a DIFFERENT project, returns 404 `binding_not_found`, never 403 `out_of_scope_binding` (which would leak existence under another project). 403 `prod_binding_not_allowed_for_scope` for prod env bindings (admin path required). |
 
 **New stable error codes** (EPIC Q):
 
@@ -243,18 +243,18 @@ provider_connection_bindings_denied_total{reason}
 
 `reason` is a fixed low-cardinality set; the counters NEVER carry
 `actor_id`, `project_id`, `connection_id`, or `environment_id` as
-labels. See [Provider connections — Observability](../operations/provider-connections.md#observability-prometheus-counters) for the operator-facing
+labels. See [Provider connections: Observability](../operations/provider-connections.md#observability-prometheus-counters) for the operator-facing
 discussion + the audit-event triage SQL that pairs with these.
 
-**Error codes** — the full reference lives in
-[Provider connections — Error code reference](../operations/provider-connections.md#error-code-reference).
+**Error codes**: the full reference lives in
+[Provider connections: Error code reference](../operations/provider-connections.md#error-code-reference).
 
 ## Project-anchored scoped policy rules (EPIC R, api#108)
 
 `policy.author` callers (typically section heads granted the
 `policy_author` seed role) use a separate URL family that's gated
 on the rule's project. The URL hierarchy expresses the same §3
-mental model split EPIC Q established for bindings — scoped policy
+mental model split EPIC Q established for bindings: scoped policy
 authoring is project-ownership work, not platform policy
 administration. The `policy.edit` URLs above are unchanged; admins
 keep using them.
@@ -262,7 +262,7 @@ keep using them.
 | Method | Path | Auth | Notes |
 |---|---|---|---|
 | `POST` | `/api/v1/projects/:projectID/policy-rules` | `bearer + policy.author` scoped to projectID | Author a scoped rule. Body: `{name, selector, priority, workflow_id, enabled}`. Selector MUST carry `environment_kind="non_prod"` OR `environment_id`; the api runs the locked 6-gate chain (coverage → priority<9000 → selector.project_id consistency → env constraint → workflow exists → INSERT). 8 stable codes listed below. |
-| `GET` | `/api/v1/projects/:projectID/policy-rules` | `bearer` | List scoped rules + inherited platform rules. **§4 correction 1 sanitization**: inherited platform rows carry `selector_keys` ONLY; the `selector` field is OMITTED server-side. Scoped rows carry the full selector. Route-pinned not perm-pinned — admins acting via this URL also get the sanitized view. |
+| `GET` | `/api/v1/projects/:projectID/policy-rules` | `bearer` | List scoped rules + inherited platform rules. **§4 correction 1 sanitization**: inherited platform rows carry `selector_keys` ONLY; the `selector` field is OMITTED server-side. Scoped rows carry the full selector. Route-pinned not perm-pinned; admins acting via this URL also get the sanitized view. |
 | `GET` | `/api/v1/projects/:projectID/policy-rules/:ruleID` | `bearer` | Single rule with the same sanitization rules as the list. Inherited platform row → sanitized projection. Scoped row whose `project_id` doesn't match URL projectID → 404 `policy_not_found` (§4 mismatch protection). |
 | `PUT` | `/api/v1/projects/:projectID/policy-rules/:ruleID` | `bearer + policy.author` scoped to projectID | Update scoped rule. All body fields optional (omitted = preserve). **§3 Q9 lock**: explicit empty `{}` selector REJECTED with `policy_scope_too_broad.reason=selector_empty`. **§4 lock**: URL projectID mismatch returns `policy_not_found`, NEVER `out_of_scope_policy`. |
 | `DELETE` | `/api/v1/projects/:projectID/policy-rules/:ruleID` | `bearer + policy.author` scoped to projectID | 204 on success. URL projectID mismatch returns 404 `policy_not_found`. Platform NULL rule returns 403 `platform_policy_not_editable`. |
@@ -271,15 +271,15 @@ keep using them.
 
 | Code | Status | Meaning |
 |---|---|---|
-| `policy_not_found` | 404 | Rule doesn't exist OR exists under a different project. The §4 mismatch protection — never leak existence under another parent. |
+| `policy_not_found` | 404 | Rule doesn't exist OR exists under a different project. The §4 mismatch protection: never leak existence under another parent. |
 | `platform_policy_not_editable` | 403 | Scoped caller tried to edit a NULL `project_id` row OR an `is_system` row via the scoped URL. |
 | `out_of_scope_policy` | 403 | Caller's `policy.author` grant doesn't cover the target project per the team-aware resolver. |
 | `policy_selector_mismatch` | 400 | `selector.project_id` was set but doesn't equal URL projectID. |
 | `prod_policy_not_allowed_for_scope` | 403 | Scoped caller tried to author a rule that resolves to a prod env. Envelope includes `{"env_kind": "prod"}`. |
-| `policy_scope_too_broad` | 400 | Selector doesn't satisfy the non-prod-by-construction invariant, OR carries an unknown `provider_type` / `operation`. Envelope includes `{"reason": "..."}` — base variants: `env_constraint_missing`, `env_kind_invalid`, `selector_empty`, `env_kind_id_inconsistent`, `provider_type_invalid` (api#139), `operation_invalid` (api#141). |
+| `policy_scope_too_broad` | 400 | Selector doesn't satisfy the non-prod-by-construction invariant, OR carries an unknown `provider_type` / `operation`. Envelope includes `{"reason": "..."}`. Base variants: `env_constraint_missing`, `env_kind_invalid`, `selector_empty`, `env_kind_id_inconsistent`, `provider_type_invalid` (api#139), `operation_invalid` (api#141). |
 | `policy_priority_reserved` | 400 | Priority at or above the platform-reserved band requested. The cap is admin-configurable per R-follow-up #2 (default `9000`); envelope echoes the live value: `{"cap": <live>}`. |
 | `policy_environment_not_in_project` | 400 | `selector.environment_id` doesn't belong to URL projectID. |
-| `workflow_not_authorable_for_scope` | 403 | R-follow-up #1 (api#112). Scoped caller picked a workflow that platform admin hasn't opted into the scoped author surface. Envelope carries `{"workflow_id": "<uuid>"}` — the actor selected the workflow from a dropdown, so logging it isn't a leak. Distinct from `platform_policy_not_editable`: the workflow exists and is reachable by admin; it just hasn't been exposed to scoped authors yet. |
+| `workflow_not_authorable_for_scope` | 403 | R-follow-up #1 (api#112). Scoped caller picked a workflow that platform admin hasn't opted into the scoped author surface. Envelope carries `{"workflow_id": "<uuid>"}`. The actor selected the workflow from a dropdown, so logging it isn't a leak. Distinct from `platform_policy_not_editable`: the workflow exists and is reachable by admin; it just hasn't been exposed to scoped authors yet. |
 
 **Prometheus counters** (EPIC R):
 
@@ -294,12 +294,12 @@ policy_rules_denied_total{reason}
 added by R-follow-up #1, api#112); the counters NEVER carry
 `actor_id`, `project_id`, `policy_rule_id`, or `workflow_id` as
 labels. See
-[Policy templates — Observability](../operations/policy-templates.md#observability-prometheus-counters)
+[Policy templates: Observability](../operations/policy-templates.md#observability-prometheus-counters)
 for the operator-facing discussion + the audit-event triage SQL
 that pairs with these.
 
-**Error codes** — the full reference table lives in
-[Policy templates — Error code reference](../operations/policy-templates.md#error-code-reference).
+**Error codes**: the full reference table lives in
+[Policy templates: Error code reference](../operations/policy-templates.md#error-code-reference).
 
 ## Team-anchored scoped policy rules (R-follow-up #3, api#114)
 
@@ -311,13 +311,13 @@ the project-anchored EPIC R family above. Platform admins still use
 `/admin/policies` for global rules; the team URL family stays
 `policy.author`-only per §4 C3.
 
-URL is the source of truth for the row's anchor — the `team_id` is
+URL is the source of truth for the row's anchor: the `team_id` is
 never on the wire body (defense against URL/body confusion, same
 posture R-follow-up #2 established for URL-key-wins).
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| `POST` | `/api/v1/teams/:teamID/policy-rules` | `bearer + policy.author` scoped to teamID | Author a team-scoped rule. Body: `{name, selector, priority, workflow_id, enabled}`. §1 C1 strict — selector MUST carry `environment_kind="non_prod"` and MUST NOT carry `project_id`, `environment_id`, or `team_id`. The 6-gate chain (coverage → team exists+active → priority < live cap → selector consistency → workflow authorable → INSERT) runs server-side. Live `priority_cap` echoed in the envelope. |
+| `POST` | `/api/v1/teams/:teamID/policy-rules` | `bearer + policy.author` scoped to teamID | Author a team-scoped rule. Body: `{name, selector, priority, workflow_id, enabled}`. §1 C1 strict: selector MUST carry `environment_kind="non_prod"` and MUST NOT carry `project_id`, `environment_id`, or `team_id`. The 6-gate chain (coverage → team exists+active → priority < live cap → selector consistency → workflow authorable → INSERT) runs server-side. Live `priority_cap` echoed in the envelope. |
 | `GET` | `/api/v1/teams/:teamID/policy-rules` | `bearer + policy.author` scoped to teamID | List team-own rules + inherited ancestor-team rules + inherited platform rules. Inherited rows carry `selector_keys` only (sanitized). Response envelope carries `priority_cap`. |
 | `GET` | `/api/v1/teams/:teamID/policy-rules/:ruleID` | `bearer + policy.author` scoped to teamID | Single rule with the same sanitization rules as the list. Mismatched anchor (project rule via team URL OR rule under a different team) returns 404 `policy_not_found` per §4 mismatch protection. |
 | `PUT` | `/api/v1/teams/:teamID/policy-rules/:ruleID` | `bearer + policy.author` scoped to teamID | Update team-scoped rule. R-follow-up #2 §3 critical pin preserved: priority revalidates against the LIVE cap on EVERY call (not only when priority is changing). §4 mismatch returns `policy_not_found`. Anchor is immutable post-create. |
@@ -350,21 +350,21 @@ posture R-follow-up #2 established for URL-key-wins).
 
 For inherited rows (`is_platform_inherited = true` OR
 `is_ancestor_inherited = true`), the `selector` field is OMITTED
-server-side — only `selector_keys` is exposed. Defense against
+server-side. Only `selector_keys` is exposed. Defense against
 selector leakage across siblings under the same parent team.
 
 **New stable error codes** (R-follow-up #3):
 
 | Code | Status | Meaning | Envelope extras |
 |---|---|---|---|
-| `team_not_found` | 404 | Team-scoped Create gate 2 — the URL teamID doesn't exist or is archived. Race-only path (coverage passed at gate 1). | — |
-| `out_of_scope_team_policy` | 403 | Caller's `policy.author` grant doesn't cover the URL teamID per the team-aware resolver. Mirrors `out_of_scope_policy` for the team URL family. | — |
+| `team_not_found` | 404 | Team-scoped Create gate 2: the URL teamID doesn't exist or is archived. Race-only path (coverage passed at gate 1). | - |
+| `out_of_scope_team_policy` | 403 | Caller's `policy.author` grant doesn't cover the URL teamID per the team-aware resolver. Mirrors `out_of_scope_policy` for the team URL family. | - |
 
 **3 new `policy_scope_too_broad.reason` variants** (R-follow-up #3):
 
-- `team_selector_pins_project` — team rule selector pinned `project_id`
-- `team_selector_pins_environment_id` — team rule selector pinned `environment_id`
-- `team_selector_pins_team_id` — team rule selector pinned `team_id` (v1 lock)
+- `team_selector_pins_project`: team rule selector pinned `project_id`
+- `team_selector_pins_environment_id`: team rule selector pinned `environment_id`
+- `team_selector_pins_team_id`: team rule selector pinned `team_id` (v1 lock)
 
 A later slice (api#139) added an eighth variant, `provider_type_invalid`,
 fired when `selector.provider_type` is present but not in the
@@ -372,7 +372,7 @@ backend-owned enum (`aws-sm`, `vault`, `gcp-sm`, `azure-kv`,
 `kubernetes`). A sibling slice (api#141) added a ninth,
 `operation_invalid`, fired when `selector.operation` is present but not
 in the backend-owned enum (`read`, `patch`, `reveal`). Both apply on ALL
-three authoring paths — project, team, and admin. See the operator
+three authoring paths: project, team, and admin. See the operator
 guide's
 [Selector enum values are backend-owned](../operations/policy-templates.md#selector-enum-values-are-backend-owned).
 
@@ -389,9 +389,9 @@ separate envelopes; the api collapses them into one for cleaner UX.
 `GET /api/v1/projects/:projectID/policy-rules` (the existing EPIC R
 surface) now also carries team-inherited rows. The projection adds:
 
-- `is_team_inherited` — `true` when the rule's `team_id` is set
-- `team_name` — populated for team-inherited rows via server-side JOIN
-- `workflow_name` — populated for ALL rows via server-side JOIN
+- `is_team_inherited`: `true` when the rule's `team_id` is set
+- `team_name`: populated for team-inherited rows via server-side JOIN
+- `workflow_name`: populated for ALL rows via server-side JOIN
   (eliminates the SPA's N+1 lookup against `/workflows`)
 
 Inherited team rows are sanitized identically to inherited platform
@@ -401,7 +401,7 @@ URL; manage on the team's own page or via `/admin/policies`.
 ### `GET /api/v1/users/me/policy-author-team-coverage`
 
 NEW (R-follow-up #3, api#126). Returns the resolved team set from the
-api's `EffectiveTeamAccess(actor, policy.author)` helper — every team
+api's `EffectiveTeamAccess(actor, policy.author)` helper: every team
 the actor's grants cover, subtree-expanded.
 
 Permission: bearer only. Exposes ONLY the caller's own coverage; not
@@ -441,8 +441,8 @@ carries the new + old parent IDs + `team_policy_rule_count` +
 `affected_project_count` (subtree size). When parent doesn't change
 (name-only update) → no audit event (idempotent).
 
-If audit append fails, the parent UPDATE rolls back — transactional
-atomicity preserved.
+If audit append fails, the parent UPDATE rolls back, so transactional
+atomicity is preserved.
 
 ## Policy rule change history (R-follow-up #5, api#132)
 
@@ -452,19 +452,19 @@ between consecutive snapshots, normalizes legacy action names, and
 returns a rendered timeline. UI consumes this via the per-anchor
 Detail pages.
 
-Hard rule — the §6 selector lock from EPIC R is unwavering. The
+Hard rule: the §6 selector lock from EPIC R is unwavering. The
 wire response carries `selector_keys` (set-based, sorted) and
 **NEVER** selector VALUES, on every entry of the chain.
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| `GET` | `/api/v1/projects/:projectID/policy-rules/:ruleID/history` | `bearer + policy.author` covering projectID | Scoped (project). 404 `policy_not_found` on missing rule OR anchor mismatch (silent — gate-order enumeration protection). After delete: 404. |
+| `GET` | `/api/v1/projects/:projectID/policy-rules/:ruleID/history` | `bearer + policy.author` covering projectID | Scoped (project). 404 `policy_not_found` on missing rule OR anchor mismatch (silent, gate-order enumeration protection). After delete: 404. |
 | `GET` | `/api/v1/teams/:teamID/policy-rules/:ruleID/history` | `bearer + policy.author` covering teamID | Scoped (team). Coverage gate runs as a HANDLER helper (not middleware) so denial emits the same audit + counter signal as the rest of the gate chain (per R-follow-up #3 §3 C3). After delete: 404. |
-| `GET` | `/api/v1/policies/:ruleID/history` | `bearer + policy.edit` | Admin. **Existence check via the audit chain, NOT `policyRepo.Get`** — admin retains forensic visibility after delete if at least one event exists. NO anchor routing — admin sees regardless of anchor. |
+| `GET` | `/api/v1/policies/:ruleID/history` | `bearer + policy.edit` | Admin. **Existence check via the audit chain, NOT `policyRepo.Get`**. Admin retains forensic visibility after delete if at least one event exists. NO anchor routing; admin sees regardless of anchor. |
 
-**Query params** — all 3 endpoints support:
+**Query params** that all 3 endpoints support:
 
-- `limit=<int>` — default 50; cap 500 (`storage.MaxPolicyHistoryLimit`). Server-side cap defends against operator typos.
+- `limit=<int>`: default 50; cap 500 (`storage.MaxPolicyHistoryLimit`). Server-side cap defends against operator typos.
 
 **Response envelope shape** (200):
 
@@ -485,7 +485,7 @@ legacy events with no scope key.
 
 `has_more=true` indicates an older event was capped by `limit`. The
 SPA grows `limit` per "Load more" click (50 → 100 → 200 …) per
-OQ3-A — cursor pagination is deferred.
+OQ3-A; cursor pagination is deferred.
 
 **`HistoryEntry` shape**:
 
@@ -520,7 +520,7 @@ OQ3-A — cursor pagination is deferred.
 
 - `action` is always the **normalized** name. Legacy events from
   before R-follow-up #3 §4 C2 (action names `policy.created_for_scope`
-  etc.) are mapped server-side before return — the SPA sees one
+  etc.) are mapped server-side before return. The SPA sees one
   stable enum.
 - `changes` is empty on `policy.create` (chain head) and on
   `policy.delete` (terminal event; `snapshot_after` carries the
@@ -532,12 +532,12 @@ OQ3-A — cursor pagination is deferred.
   (`workflows.ListByIDs`). When the workflow has been deleted, the
   field is omitted; SPA renders `(deleted)`.
 
-**Anchor mismatch — silent 404, no audit emit**
+**Anchor mismatch: silent 404, no audit emit**
 
 Scoped endpoints route through the same enumeration-protection
 pattern as the per-anchor `Get` handlers: if the rule's
 `project_id` (or `team_id`) doesn't match the URL's, the response
-is `404 policy_not_found` — same envelope as a truly missing rule.
+is `404 policy_not_found`, the same envelope as a truly missing rule.
 NO `policy.denied_anchor_mismatch` audit event; that would defeat
 the very enumeration protection it claims to enhance. Slice 1c §4
 OQ4-1 lock.
@@ -548,7 +548,7 @@ OQ4-1 lock.
 policy_rule_history_views_total{scope}
 ```
 
-LOW-CARDINALITY LOCK preserved: `scope ∈ {platform, project, team}` —
+LOW-CARDINALITY LOCK preserved: `scope ∈ {platform, project, team}`,
 3 values total. NEVER carries `actor_id`, `rule_id`, `project_id`,
 or `team_id` labels. Per-rule reads live in the audit log via
 `audit.read.policy_history` (see below).
@@ -570,7 +570,7 @@ Every successful history list emits one audit event:
 }
 ```
 
-Provides forensic traceability for "who read whose history" — a
+Provides forensic traceability for "who read whose history": a
 post-incident query for `action='audit.read.policy_history'`
 returns every history view across the entire span. Operators
 investigating leaked screenshots / "who saw the old version"
@@ -588,18 +588,18 @@ events carry:
   `team_id: null` for cross-cohort consistency (was missing from the
   R-follow-up #3 §4 C2 normalization; slice 1b closes the gap).
 
-No data backfill — append-only audit. Legacy events render gracefully
+No data backfill; append-only audit. Legacy events render gracefully
 in the SPA as `(unknown)` for the missing keys.
 
 ## Platform settings (R-follow-up #2, api#113)
 
 Admin surface for cross-cutting platform configuration. v1 ships
-exactly one whitelisted key — `platform_reserved_priority` — that
+exactly one whitelisted key (`platform_reserved_priority`) that
 controls the priority band scoped policy authors are bounded below.
 Future admin-configurable knobs slot in as new rows in the same table
 without per-knob migrations.
 
-**Hard rule** — `platform_settings` must NEVER store secrets,
+**Hard rule**: `platform_settings` must NEVER store secrets,
 credentials, tokens, or provider auth material. The service-layer
 whitelist + reviewers + the DB CHECK constraint all enforce this.
 
@@ -627,7 +627,7 @@ a 5-minute TTL backstop for missed messages.
 }
 ```
 
-`value` is generic JSON — callers narrow per-key. For
+`value` is generic JSON. Callers narrow per-key. For
 `platform_reserved_priority` it's an integer between `100` and
 `1,000,000`.
 
@@ -635,9 +635,9 @@ a 5-minute TTL backstop for missed messages.
 
 | Code | Status | Meaning | Envelope extras |
 |---|---|---|---|
-| `unknown_platform_setting` | 404 | Key is not in the v1 whitelist OR the row doesn't exist. | — |
+| `unknown_platform_setting` | 404 | Key is not in the v1 whitelist OR the row doesn't exist. | - |
 | `invalid_platform_setting` | 400 | Value failed the per-key validator (out of bounds, wrong JSON shape, non-integer for integer keys). The DB CHECK is a defense-in-depth backstop; the service layer pre-validates and emits the friendly bounds. | `{"min": 100, "max": 1000000}` for `platform_reserved_priority` |
-| `platform_setting_unavailable` | 503 | The SettingsService cache reload failed (Postgres unreachable, KMS cascading failure, etc.). Service gates that depend on the setting fail closed and return this code; admins and Author drawers can't proceed until the cache is readable again. | — |
+| `platform_setting_unavailable` | 503 | The SettingsService cache reload failed (Postgres unreachable, KMS cascading failure, etc.). Service gates that depend on the setting fail closed and return this code; admins and Author drawers can't proceed until the cache is readable again. | - |
 
 **Prometheus counters** (R-follow-up #2):
 
@@ -646,11 +646,11 @@ platform_setting_updates_total{key, result}
 platform_setting_cache_reloads_total{key, trigger}
 ```
 
-- `key` is the whitelisted key string (low-cardinality — v1 has one).
+- `key` is the whitelisted key string (low-cardinality, v1 has one).
 - `result` ∈ `{ok, invalid, unavailable, conflict}`.
 - `trigger` ∈ `{boot, pubsub, on_demand}`.
 
-LOW-CARDINALITY LOCK — counters NEVER carry `actor_id`. The
+LOW-CARDINALITY LOCK: counters NEVER carry `actor_id`. The
 `platform_setting.updated` audit event carries the actor + old/new
 value for forensic lookup.
 

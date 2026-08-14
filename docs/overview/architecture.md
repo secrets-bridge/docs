@@ -15,7 +15,7 @@ flowchart LR
     end
 
     subgraph control_plane ["Control Plane (Secrets Bridge)"]
-        API["api — Fiber v3"]
+        API["api (Fiber v3)"]
         Postgres[("Postgres<br/>append-only audit")]
         Redis[("Redis<br/>locks, cache,<br/>rate limit")]
         Worker["worker<br/>sweepers + gitops"]
@@ -43,17 +43,17 @@ flowchart LR
     Agent --> GCPSM
 ```
 
-## Trust boundaries — what holds what
+## Trust boundaries: what holds what
 
 | Component | What it holds | What it must never hold |
 |---|---|---|
 | **UI** | A short-lived JWT in React state | Any provider credential, any plaintext value beyond the reveal-once modal lifetime |
 | **API** | KMS-wrapped envelopes (single-shot, TTL'd), audit rows, policy rules, role catalogs | Raw plaintext values, provider master credentials |
-| **Postgres** | Hashes + envelopes + metadata + append-only audit | The decryption key — that lives in the KMS backend, *outside* Postgres |
+| **Postgres** | Hashes + envelopes + metadata + append-only audit | The decryption key, which lives in the KMS backend, *outside* Postgres |
 | **Redis** | Idempotency tokens, distributed locks, rate-limit windows, pub/sub messages | Any value-bearing payload (the `runtime` package doesn't even expose a generic `Set()` ) |
 | **Worker** | The same Postgres + Redis access as the API | Provider credentials, plaintext values |
 | **Agent** | Provider credentials *for its own network boundary*, plaintext values for the duration of one request | Anything from another cluster / account; no inbound listener; no Postgres / Redis client |
-| **Providers** | The actual secret values | n/a — these are unchanged systems |
+| **Providers** | The actual secret values | n/a (these are unchanged systems) |
 
 ## The four request lifecycles
 
@@ -176,11 +176,11 @@ flowchart LR
 Three layers of encryption protect every value-bearing flow:
 
 ```
-TLS (mandatory)              — passive sniffers, compromised system CA
+TLS (mandatory)              - passive sniffers, compromised system CA
   ↓
-Wire envelope (Piece 8b)     — TLS-terminating proxies, CP-side log leaks
+Wire envelope (Piece 8b)     - TLS-terminating proxies, CP-side log leaks
   ↓
-Storage envelope (Piece 8a)  — DB exfiltration, offline backup theft
+Storage envelope (Piece 8a)  - DB exfiltration, offline backup theft
 ```
 
 | Direction | Wire envelope scheme |
@@ -191,15 +191,15 @@ Storage envelope (Piece 8a)  — DB exfiltration, offline backup theft
 
 ## Why polyrepo
 
-Eight repositories, one product. The `core` library is infra-free —
-no Postgres driver, no Redis client, no Fiber import — so the
+Eight repositories, one product. The `core` library is infra-free
+(no Postgres driver, no Redis client, no Fiber import), so the
 `agent` and `controller` can depend on it without pulling in
 storage. The `api` and `worker` share Postgres/Redis but the worker
 imports `api/pkg/*` only (never `internal/*`), so the dependency
 direction is one-way and reviewable.
 
-CI in every repo greps `go.sum` to enforce these boundaries — for
-example the agent's CI fails the build if it ever picks up
+CI in every repo greps `go.sum` to enforce these boundaries. For
+example, the agent's CI fails the build if it ever picks up
 `jackc/pgx`, `lib/pq`, `redis/go-redis`, or similar drivers.
 
 Read more: [REFACTOR_PLAN.md §4 polyrepo dependency graph](https://github.com/secrets-bridge/.github/blob/main/REFACTOR_PLAN.md).

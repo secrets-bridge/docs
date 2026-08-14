@@ -1,7 +1,7 @@
 # Provider connections
 
 A **provider connection** is the Control Plane's metadata registry for an
-external secret store — its URL, region, KV mount, role hint, and the
+external secret store, its URL, region, KV mount, role hint, and the
 project / environment scopes it can be consumed from. It is **not** a
 credential. The agent authenticates with its own workload identity
 (IRSA / Kubernetes auth / instance role); the Control Plane never holds
@@ -34,15 +34,15 @@ via this page.
 |---|---|
 | `id` | UUID |
 | `name` | unique per Control Plane; editable; appears in dropdowns + audit |
-| `type` | `vault` / `aws-sm` / `azure-kv` / `gcp-sm` / `kubernetes` — **immutable** after create (the SPA disables the select on edit) |
+| `type` | `vault` / `aws-sm` / `azure-kv` / `gcp-sm` / `kubernetes`, **immutable** after create (the SPA disables the select on edit) |
 | `cluster_name` | matches the agent's `SB_CLUSTER_NAME`; required when `discover_enabled=true` (DB CHECK enforces) |
 | `description` | optional, ≤ 500 characters |
 | `status` | `active` (default) or `disabled` |
-| `scope` | JSON object — provider-specific connection metadata. **No credentials.** |
+| `scope` | JSON object, provider-specific connection metadata. **No credentials.** |
 | `auth_method` | optional provider hint (e.g. `kubernetes` for Vault) |
 | `discover_enabled` | toggles whether the worker schedules periodic discovery |
 | `discover_interval_seconds` | between 60 and 86400 |
-| `last_discover_*` | `at` / `status` / `started_at` / `error` — written by the worker after each discover job |
+| `last_discover_*` | `at` / `status` / `started_at` / `error`, written by the worker after each discover job |
 
 ### Project binding model
 
@@ -52,8 +52,8 @@ different environments. The rules:
 
 | Row shape | Means |
 |---|---|
-| `(connection_id, project_id, environment_id=NULL)` | Project-wide binding — every environment in the project sees this connection in the dropdown |
-| `(connection_id, project_id, environment_id=<env>)` | Env-specific binding — only that environment sees it |
+| `(connection_id, project_id, environment_id=NULL)` | Project-wide binding, every environment in the project sees this connection in the dropdown |
+| `(connection_id, project_id, environment_id=<env>)` | Env-specific binding, only that environment sees it |
 
 Two partial UNIQUE indexes (one with `WHERE environment_id IS NULL`,
 one with `WHERE environment_id IS NOT NULL`) enforce no-duplicate
@@ -64,7 +64,7 @@ api projects `{id, name, type}` and ignores duplicate ids).
 
 ## Scope JSON shape per provider
 
-The `scope` JSON is **metadata only** — the agent reads it to know
+The `scope` JSON is **metadata only**, the agent reads it to know
 *where* to connect, never *what credential* to use. The keys below are
 the minimum the api validates; provider connectors may accept more.
 
@@ -113,14 +113,14 @@ violate them returns a stable 4xx with a structured envelope:
 
 | Rule | How enforced |
 |---|---|
-| **No credentials in `scope`** | Service-layer refuses 14 credential-shaped keys (case-insensitive) — `aws_access_key_id`, `awsAccessKey`, `password`, `token`, `clientSecret`, `privateKey`, etc. Returns 400 `credential_in_scope` with the banned key. |
+| **No credentials in `scope`** | Service-layer refuses 14 credential-shaped keys (case-insensitive), `aws_access_key_id`, `awsAccessKey`, `password`, `token`, `clientSecret`, `privateKey`, etc. Returns 400 `credential_in_scope` with the banned key. |
 | **No secret-shaped values in `scope`** | Regex pass over every string value: AWS keys (`AKIA…`), Vault tokens (`hvs.…`), JWTs (`eyJ…`), Google OAuth (`ya29.…`). Returns 400 `secret_in_scope` with the field. Deployment-level override `SB_PROVIDER_CONN_REJECT_SECRETS=false` for emergencies; **audited at boot**. |
 | **Valid provider URL** | Vault `address` parsed for scheme, no userinfo, no token-shaped query params. Returns 400 `invalid_provider_url`. |
 | **Valid AWS role ARN** | `^arn:aws:iam::\d{12}:role/[A-Za-z0-9+=,.@_/-]+$`. Returns 400 `invalid_role_arn`. |
 | **`discover_enabled=true ⇒ cluster_name IS NOT NULL`** | DB CHECK constraint + service-layer pre-flight. Returns 400 `discover_requires_cluster`. |
-| **`last_discover_error` is sanitized** | Pre-persist pipeline: credential redaction → JSON blob strip → 280-char truncate (order is load-bearing — see [API + scope hard rules](#api-scope-hard-rules) below). |
+| **`last_discover_error` is sanitized** | Pre-persist pipeline: credential redaction → JSON blob strip → 280-char truncate (order is load-bearing, see [API + scope hard rules](#api-scope-hard-rules) below). |
 
-The same sanitizer runs in two places — the api side (P2,
+The same sanitizer runs in two places, the api side (P2,
 `api/pkg/sanitize.DiscoverError`) and the worker side (P4, defense in
 depth before `MarkDiscoverFinished`). Belt + braces.
 
@@ -129,7 +129,7 @@ depth before `MarkDiscoverFinished`). Belt + braces.
 | Permission | Where it gates |
 |---|---|
 | `integration.edit` | Sidebar entry; admin list path; all CRUD; discover-now; bindings; delete |
-| `secret.request` (scoped to project, env) | Developer dropdown — `GET /provider-connections?project_id=…&environment_id=…` returns only the bound connections, sanitized to `{id, name, type}` |
+| `secret.request` (scoped to project, env) | Developer dropdown, `GET /provider-connections?project_id=…&environment_id=…` returns only the bound connections, sanitized to `{id, name, type}` |
 
 The same URL `GET /provider-connections` branches by query-string
 shape:
@@ -138,14 +138,14 @@ shape:
   projection (scope, auth_method, discovery status).
 - `project_id` + (optional `environment_id`) → developer dropdown
   (`secret.request` scoped). Sanitized projection: id + name + type
-  only — never scope, auth_method, or discovery fields.
+  only, never scope, auth_method, or discovery fields.
 - `environment_id` **without** `project_id` → 400 `project_id_required`
   **before** any permission check (no enumeration leak).
 
 ## Discovery model
 
 A discover job runs `ListMetadata` against the external store and upserts
-the result into the `secrets` table — the discovery feed the UI's
+the result into the `secrets` table, the discovery feed the UI's
 [Secrets](../components/ui.md) page reads from.
 
 | Setting | Behavior |
@@ -165,12 +165,12 @@ NULL ── start ──▶ running ── success ──▶ success
                        ╰── 2× interval elapsed (worker sweeper) ──▶ failure
 ```
 
-`MarkDiscoverFinished` rejects `running` as a terminal status —
-terminal-only is `success` / `failure`. The worker's
+`MarkDiscoverFinished` rejects `running` as a terminal status.
+Terminal-only is `success` / `failure`. The worker's
 `PostDiscoverScheduler` long-stale sweeper (worker#13, P-follow-up)
 will flip rows stuck in `running` past `2 × discover_interval_seconds`.
 
-### "Possibly stale" — UI-only derivation
+### "Possibly stale", UI-only derivation
 
 The admin SPA's discover column renders a `warning` pill labelled
 "possibly stale" when:
@@ -180,7 +180,7 @@ last_discover_status === 'running' AND
 last_discover_started_at + 2 * discover_interval_seconds * 1000 < now
 ```
 
-This is **pure client-side derivation** — no backend mutation. The pill
+This is **pure client-side derivation**, no backend mutation. The pill
 is a visual nudge that something needs operator attention; the connection
 is still safe to use. The worker sweeper is the system-of-record for
 reconciliation.
@@ -203,7 +203,7 @@ The audit trail will show the next discover scheduler tick as a fresh
 
 ## Disable semantics
 
-Flipping `status` from `active` to `disabled` is **graceful** — it
+Flipping `status` from `active` to `disabled` is **graceful**, it
 doesn't blow up in-flight requests, but it stops every new dependency:
 
 | What stops | What doesn't |
@@ -211,7 +211,7 @@ doesn't blow up in-flight requests, but it stops every new dependency:
 | Dropdown returns the row (developers can't pick it for new submits) | Existing bindings stay in the table |
 | Periodic discovery scheduler skips the row | `secrets` rows previously discovered remain queryable |
 | Manual "Discover now" returns 409 `connection_disabled` | Audit history stays intact |
-| Cross-team submit with a disabled destination returns 409 `connection_disabled` | In-flight requests that *already* enqueued an agent job complete normally — the agent fails at provider resolve time and the request transitions to `failed` |
+| Cross-team submit with a disabled destination returns 409 `connection_disabled` | In-flight requests that *already* enqueued an agent job complete normally, the agent fails at provider resolve time and the request transitions to `failed` |
 | New requests can't pick the row | Re-enabling restores everything; no data migration needed |
 
 The "fail at agent resolve" path is intentional. The api can't reach back
@@ -228,7 +228,7 @@ lifecycle (create, update, delete, discover-now); scoped users can only
 bind / unbind, and only on connections platform has explicitly enabled
 for self-service.
 
-### `self_service_bindable` — the platform opt-in flag
+### `self_service_bindable`, the platform opt-in flag
 
 Migration 0031 added a `BOOLEAN NOT NULL DEFAULT false` flag on
 `provider_connections`. Default-deny: every existing row stays
@@ -241,26 +241,26 @@ ALTER TABLE provider_connections
 ```
 
 A connection that is `self_service_bindable=false` behaves exactly as
-before EPIC Q — only `integration.edit` callers see and bind it.
+before EPIC Q, only `integration.edit` callers see and bind it.
 
 ### Hard rules for scoped binders
 
 | Action | Rule |
 |---|---|
 | Bind | Requires `environment_id` in the body. Project-wide bindings (`environment_id IS NULL`) are platform-only. |
-| Bind | Refused on `env.kind='prod'` — production bindings are platform-team territory. |
+| Bind | Refused on `env.kind='prod'`, production bindings are platform-team territory. |
 | Bind | Refused on `status='disabled'` connections (409 `connection_disabled`). |
 | Bind | Refused on `self_service_bindable=false` connections (403 `connection_not_self_service_bindable`). |
-| Unbind | Allowed regardless of current `self_service_bindable` — cleanup is always allowed for bindings the user could have created. |
-| Unbind | Refused on `env.kind='prod'` — admin path required. |
-| Unbind | Refused on project-wide bindings (`environment_id IS NULL`) — platform-only. |
+| Unbind | Allowed regardless of current `self_service_bindable`, cleanup is always allowed for bindings the user could have created. |
+| Unbind | Refused on `env.kind='prod'`, admin path required. |
+| Unbind | Refused on project-wide bindings (`environment_id IS NULL`), platform-only. |
 | Both | Requires actor coverage of `(project_id, environment_id)` via the existing team-aware resolver. |
 
 ### `integration.edit` does NOT auto-cover `integration.bind` server-side
 
 This is a deliberate decision per the §2 Q6 sign-off. Granting an
 operator `integration.edit` does **not** automatically grant them
-`integration.bind` at the API layer — the api treats the two
+`integration.bind` at the API layer, the api treats the two
 permissions as distinct. The SPA's capability helper unifies them in
 the UI (admins get the binder CTA on every env page for ergonomics),
 but the api still gates each endpoint strictly.
@@ -279,7 +279,7 @@ Role:         provider_connection_binder
 Permission:   integration.bind
 Scope at:     user_roles.scope = {project_id: "..."} OR {team_id: "..."}
 is_system:    true (editable, not deletable)
-Auto-granted: no — operators grant explicitly
+Auto-granted: no, operators grant explicitly
 ```
 
 Team-scoped grants automatically cover the team's descendant project
@@ -297,15 +297,15 @@ the action:
 |---|---|
 | `integration.edit` | `POST /provider-connections/:id/bindings` + `DELETE /provider-connection-bindings/:id` (admin) |
 | `integration.bind` | `POST /projects/:id/provider-connection-bindings` + `DELETE /projects/:id/provider-connection-bindings/:bid` (scoped) |
-| `null` | UI hides the action — server still enforces a stable 403 if anyone tries |
+| `null` | UI hides the action, server still enforces a stable 403 if anyone tries |
 
 The generic `hasPermission('integration.bind')` keeps its strict
-semantic everywhere else in the SPA — it returns `true` only for
+semantic everywhere else in the SPA, it returns `true` only for
 explicit `integration.bind` grants. The capability helpers are the
 ONLY place that knows "admin can act on every env including prod via
 the admin URLs."
 
-### Triage SQL — scoped bindings
+### Triage SQL, scoped bindings
 
 **What connections are currently bindable for self-service:**
 
@@ -316,7 +316,7 @@ WHERE status = 'active' AND self_service_bindable = true
 ORDER BY name;
 ```
 
-**Recent out-of-scope binding probes (security signal — operators
+**Recent out-of-scope binding probes (security signal, operators
 should know when section heads are reaching outside their subtree):**
 
 ```sql
@@ -330,12 +330,12 @@ ORDER BY occurred_at DESC
 LIMIT 20;
 ```
 
-Note: this audit event deliberately omits `provider_connection_id` —
-the gate-order protection means the actor failed coverage BEFORE the
+Note: this audit event deliberately omits `provider_connection_id`.
+The gate-order protection means the actor failed coverage BEFORE the
 connection was loaded, and including it would defeat the whole
 enumeration-leak protection.
 
-**Bind-path breakdown (last 7 days — who's using scoped vs admin?):**
+**Bind-path breakdown (last 7 days, who's using scoped vs admin?):**
 
 ```sql
 SELECT
@@ -346,7 +346,7 @@ WHERE action = 'binding.create'
   AND occurred_at > NOW() - INTERVAL '7 days';
 ```
 
-**Bindings owned by a specific actor (incident response — when a
+**Bindings owned by a specific actor (incident response, when a
 section head's account is compromised):**
 
 ```sql
@@ -374,7 +374,7 @@ ORDER BY occurred_at DESC;
 
 1. Identify the team or project subtree the section head should cover.
 2. Assign the `provider_connection_binder` system role scoped to that
-   team_id (preferred — covers the descendant project subtree
+   team_id (preferred, covers the descendant project subtree
    automatically) or project_id (one project only).
 3. The section head can now bind any `self_service_bindable=true`
    connection to non-prod envs in their subtree via the per-env card
@@ -391,11 +391,11 @@ existing bindings:**
 
 1. Revoke the `provider_connection_binder` role assignment (via
    `/admin/assignments` or `DELETE /user-roles/:id`).
-2. Their existing bindings remain in place — revoking the role does
+2. Their existing bindings remain in place, revoking the role does
    NOT cascade-unbind. If you need to remove specific bindings, the
    platform admin uses the admin URL family.
 
-### Observability — Prometheus counters
+### Observability, Prometheus counters
 
 EPIC Q added three counters scraped from `/metrics`:
 
@@ -411,7 +411,7 @@ provider_connection_bindings_denied_total{reason}
 `binding_exists`, `binding_not_found`.
 
 **LOW-CARDINALITY LOCK:** the counters never carry `actor_id`,
-`project_id`, `connection_id`, or `environment_id` as labels — those
+`project_id`, `connection_id`, or `environment_id` as labels, those
 go to the audit trail, not Prometheus. A `denied_total{reason="prod_blocked"}`
 spike on the dashboard means "scoped binders are running into the
 prod wall a lot," not "any specific row is misconfigured." Pair with
@@ -479,9 +479,9 @@ SELECT
 ## API + scope hard rules
 
 The 9 endpoints are documented at
-[HTTP API endpoints — Provider connections](../reference/api-endpoints.md#provider-connections).
+[HTTP API endpoints, Provider connections](../reference/api-endpoints.md#provider-connections).
 
-Every endpoint returns errors in the **EPIC P envelope** — distinct from
+Every endpoint returns errors in the **EPIC P envelope**, distinct from
 the legacy `{code, error}` shape some older endpoints still use:
 
 ```json
@@ -492,7 +492,7 @@ the legacy `{code, error}` shape some older endpoints still use:
 }
 ```
 
-19 stable error codes — see the
+19 stable error codes, see the
 [Error code reference](#error-code-reference) below.
 
 The sanitizer pipeline ordering for `last_discover_error` is
@@ -502,7 +502,7 @@ The sanitizer pipeline ordering for `last_discover_error` is
 credential redaction (AKIA…, hvs.…, JWT, OAuth) → JSON blob strip → truncate to 280 chars
 ```
 
-Truncating first would lose credentials that span the cut point — a
+Truncating first would lose credentials that span the cut point, a
 provider error like `"failed: token=hvs.AAAA…"` truncated to 280 chars
 might cut the token mid-string but still leak its prefix. Redacting
 first guarantees no credential-shaped substring survives the truncate.
@@ -510,7 +510,7 @@ first guarantees no credential-shaped substring survives the truncate.
 ## Cross-team destination wiring
 
 The cross-team submit drawer (Slice N5) reads its destination dropdown
-from `GET /provider-connections?project_id=…&environment_id=…` — the
+from `GET /provider-connections?project_id=…&environment_id=…`, the
 sanitized projection. The connection must be **bound to the source
 project + env** for it to appear. If the dropdown is empty, the drawer
 branches:
@@ -522,9 +522,9 @@ branches:
 
 This is the same dropdown that powers any future "destination picker"
 flows; the developer never sees the connection's scope, auth method, or
-discovery state — just its name and provider type.
+discovery state, just its name and provider type.
 
-See also: [Cross-team requests — Target vs destination](cross-team-requests.md#target-vs-destination).
+See also: [Cross-team requests, Target vs destination](cross-team-requests.md#target-vs-destination).
 
 ## SB_DISCOVER_TARGETS_JSON deprecation
 
@@ -551,22 +551,22 @@ worker#13 (P-follow-up) tracks the final removal.
 The full P loop against the docker-compose stack from
 [Deploying with docker-compose](docker-compose.md):
 
-1. **Admin creates `vault-prod`** —
+1. **Admin creates `vault-prod`**:
    `POST /provider-connections` with `type=vault`, `cluster_name=cluster-a`,
    `scope={"address":"https://vault.example.com", "kvMount":"secret"}`,
    `discover_enabled=true`, `discover_interval_seconds=3600`. Returns 201
    with the new row.
-2. **Admin binds to `tenant-a/prod` + `tenant-a` (project-wide)** —
+2. **Admin binds to `tenant-a/prod` + `tenant-a` (project-wide)**:
    two `POST /provider-connections/:id/bindings` calls. Both 201.
-3. **Developer in `tenant-a/prod` opens cross-team submit** — drawer's
+3. **Developer in `tenant-a/prod` opens cross-team submit**, drawer's
    destination dropdown shows `vault-prod (vault)` and nothing else.
-   Sanitized projection — no scope, no auth method, no discovery state.
-4. **Admin disables `vault-prod`** — `PUT /provider-connections/:id`
+   Sanitized projection, no scope, no auth method, no discovery state.
+4. **Admin disables `vault-prod`**, `PUT /provider-connections/:id`
    with `status=disabled`. Drawer dropdown is empty on next render.
    Caller has `integration.edit` → "Manage provider connections" link
    surfaces. Caller doesn't → "Ask your platform team" text surfaces.
-5. **Admin re-enables** — drawer dropdown shows `vault-prod` again.
-6. **Admin clicks "Discover now"** —
+5. **Admin re-enables**, drawer dropdown shows `vault-prod` again.
+6. **Admin clicks "Discover now"**:
    `POST /provider-connections/:id/discover-now` returns 202 with
    `job_id` + `correlation_id`. SPA row flips to `running` pill.
    Worker claims + executes the job; api `OnDiscoverJobCompleted`
@@ -574,7 +574,7 @@ The full P loop against the docker-compose stack from
 7. **Developer submits a cross-team request** picking `vault-prod`
    as the destination. Request lands in the source-team approver's
    inbox; agent eventually writes values to `secret/data/<ref>`.
-8. **Admin tries to delete `vault-prod`** — returns 409
+8. **Admin tries to delete `vault-prod`**, returns 409
    `connection_in_use` with the count envelope:
    ```json
    {"error_code":"connection_in_use","message":"…","bindings_count":2,"open_requests_count":1}
@@ -584,7 +584,7 @@ The full P loop against the docker-compose stack from
 9. **Approver closes the open request; admin unbinds both bindings**
    via `DELETE /provider-connection-bindings/:bid` ×2. Counts drop to
    0. Delete succeeds (204).
-10. **Worker sweep with `SB_DISCOVER_TARGETS_JSON` ALSO set** — start
+10. **Worker sweep with `SB_DISCOVER_TARGETS_JSON` ALSO set**, start
     the worker with the env var pointed at a separate fake target
     AND with a DB row due for discovery. The WARN log fires; only the
     DB target is enqueued. Then a canary scan confirms no plaintext
@@ -607,7 +607,7 @@ The full P loop against the docker-compose stack from
 
 ## Error code reference
 
-23 stable codes — 19 from the EPIC P §6.A locked spec, plus 4 added
+23 stable codes, 19 from the EPIC P §6.A locked spec, plus 4 added
 by EPIC Q (api#99). Returned in the `{error_code, message, …}`
 envelope. The SPA maps every code to a friendly toast string via
 `providerConnectionErrorMessage`; operators running raw `curl` see
@@ -629,25 +629,25 @@ the code in the body.
 | `connection_in_use` | 409 | DELETE blocked; envelope adds `bindings_count` + `open_requests_count` |
 | `connection_disabled` | 409 | Action requires `status=active` (Discover now / cross-team destination / scoped bind) |
 | `binding_exists` | 409 | (project, env) already bound |
-| `binding_not_found` | 404 | Unbind on a missing binding id, OR scoped DELETE where the URL `projectID` doesn't match the binding's stored `project_id` (§4 correction — NEVER `out_of_scope_binding` on mismatch, which would leak existence) |
+| `binding_not_found` | 404 | Unbind on a missing binding id, OR scoped DELETE where the URL `projectID` doesn't match the binding's stored `project_id` (§4 correction, NEVER `out_of_scope_binding` on mismatch, which would leak existence) |
 | `environment_not_in_project` | 400 | Binding references an env that doesn't belong to the project |
 | `project_id_required` | 400 | `environment_id` or `for_binding=true` passed without `project_id` to the shared GET |
-| `discovery_already_running` | 409 | Per-target Redis lock held — another Discover now is in flight |
+| `discovery_already_running` | 409 | Per-target Redis lock held, another Discover now is in flight |
 | `out_of_scope_project` | 403 | Dropdown caller lacks `secret.request` scoped to (project, env) |
-| `connection_not_self_service_bindable` | 403 | EPIC Q — scoped caller tried to bind a connection where `self_service_bindable=false`. Platform must opt the connection in via the admin SPA. |
-| `prod_binding_not_allowed_for_scope` | 403 | EPIC Q — scoped caller tried to bind / unbind on `env.kind='prod'`. Envelope includes `{"env_kind": "prod"}`. Admin path (`integration.edit`) required for prod bindings. |
-| `out_of_scope_binding` | 403 | EPIC Q — caller's `integration.bind` grant doesn't cover the target (project, env) per the team-aware resolver. Audit emits `binding.denied_out_of_scope` (security signal). |
-| `environment_id_required` | 400 | EPIC Q — the binder picker (`for_binding=true`) or scoped bind body lacks `environment_id`. Scoped binders never create project-wide bindings. |
+| `connection_not_self_service_bindable` | 403 | EPIC Q, scoped caller tried to bind a connection where `self_service_bindable=false`. Platform must opt the connection in via the admin SPA. |
+| `prod_binding_not_allowed_for_scope` | 403 | EPIC Q, scoped caller tried to bind / unbind on `env.kind='prod'`. Envelope includes `{"env_kind": "prod"}`. Admin path (`integration.edit`) required for prod bindings. |
+| `out_of_scope_binding` | 403 | EPIC Q, caller's `integration.bind` grant doesn't cover the target (project, env) per the team-aware resolver. Audit emits `binding.denied_out_of_scope` (security signal). |
+| `environment_id_required` | 400 | EPIC Q, the binder picker (`for_binding=true`) or scoped bind body lacks `environment_id`. Scoped binders never create project-wide bindings. |
 
 ## Related
 
-- [Cross-team requests](cross-team-requests.md) — the destination
+- [Cross-team requests](cross-team-requests.md), the destination
   dropdown's primary consumer
-- [Project environments](project-environments.md) — connections bind at
+- [Project environments](project-environments.md), connections bind at
   project ± env granularity
-- [HTTP API endpoints](../reference/api-endpoints.md#provider-connections)
-  — full request/response shapes
-- [Permissions catalog](../reference/permissions.md) — `integration.edit`
+- [HTTP API endpoints](../reference/api-endpoints.md#provider-connections),
+  full request/response shapes
+- [Permissions catalog](../reference/permissions.md), `integration.edit`
   reused (no new permission)
-- [Worker — discover scheduler](../components/worker.md) — implementation
+- [Worker, discover scheduler](../components/worker.md), implementation
   of the DB-backed scheduler

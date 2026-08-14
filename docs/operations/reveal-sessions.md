@@ -1,6 +1,6 @@
 # Reveal sessions
 
-Slice M introduced **reveal sessions** — the time-limited bulk-reveal
+Slice M introduced **reveal sessions**, the time-limited bulk-reveal
 surface that replaces the per-row "click, see one secret, modal
 closes" flow from earlier slices. This page is the operator-facing
 reference: what a session is, what knobs control it, what
@@ -10,7 +10,7 @@ happens when the window closes.
 If you came here from
 [Policy templates](policy-templates.md#anatomy-of-a-policy-rule)
 looking for `reveal_ttl_seconds`, the section
-[**TTL — `reveal_ttl_seconds`**](#ttl-reveal_ttl_seconds) is the
+[**TTL, `reveal_ttl_seconds`**](#ttl-reveal_ttl_seconds) is the
 short answer.
 
 ## What a reveal session is
@@ -29,7 +29,7 @@ read request. The row lives in `reveal_sessions` and carries:
 | `wrap_ids` | The `secret_wraps` rows the session has authority to reveal. |
 | `ttl_seconds` | Server-enforced TTL (see below). |
 | `opened_at` / `expires_at` | The window. |
-| `expired_at` + `expired_reason` | Set when the session ends — `ttl` (sweeper), `user_hide` (Hide Now), or `unmount` (SPA navigated away). |
+| `expired_at` + `expired_reason` | Set when the session ends, `ttl` (sweeper), `user_hide` (Hide Now), or `unmount` (SPA navigated away). |
 
 The row **never** carries a plaintext value. The plaintexts live in
 the SPA's React state during the open window and are wiped at TTL=0
@@ -41,7 +41,7 @@ Before Slice M, the only way to retrieve a value was the per-wrap
 single-shot endpoint
 ([`GET /api/v1/requests/:id/wraps/:wrap_id`](../reference/api-endpoints.md)).
 Each click consumed exactly one wrap; the user typed in the SPA's
-modal, copied, closed — and to view another key they clicked again
+modal, copied, closed, and to view another key they clicked again
 on another wrap.
 
 The reveal session is **bulk + time-bound** instead:
@@ -54,7 +54,7 @@ The reveal session is **bulk + time-bound** instead:
 | Operator audit row | `wrap.retrieve` per click | `reveal.session.opened` once + `wrap.retrieve` per fetch + `reveal.session.expired` |
 | UX | Modal per key | Page with a countdown |
 
-The single-shot flow still exists — `RevealModal` in the request
+The single-shot flow still exists, `RevealModal` in the request
 detail page uses it for legacy flows. The reveal session is the new
 default for the direct-reveal path; approval-flow reads still pass
 through the modal until Slice N migrates them.
@@ -82,7 +82,7 @@ SPA renders table + countdown over expires_at - now
                                   (fire-and-forget; sweeper is the safety net)
 ```
 
-## TTL — `reveal_ttl_seconds`
+## TTL, `reveal_ttl_seconds`
 
 TTL is **policy-driven**, not caller-driven. The matched
 [policy rule's](policy-templates.md#anatomy-of-a-policy-rule)
@@ -103,11 +103,11 @@ The api **clamps** out-of-range values defensively (the schema CHECK
 also rejects them, but the service-layer clamp guards legacy /
 imported rules); a value of 0 falls back to 60.
 
-The TTL is **not** the wrap's TTL — that comes from the workflow's
+The TTL is **not** the wrap's TTL, that comes from the workflow's
 `wrap_ttl_*` columns. `reveal_ttl_seconds` only bounds the session
 window. When the window expires (or on Hide Now), the underlying
 wraps' `expires_at` is advanced to "now" so a leaked wrap_id is
-unusable after the window — see
+unusable after the window, see
 [The server-side guarantee](#the-server-side-guarantee) below.
 
 ## Hard rules
@@ -144,14 +144,14 @@ This holds even when the SPA has already cleared its plaintext: a
 leaked wrap_id is **server-side unusable** after the session ends.
 
 The sweeper runs at `SB_WORKER_REVEAL_SESSIONS_EXPIRED_INTERVAL`
-(default `5s`) — fast enough that a leaked wrap_id stays unusable
+(default `5s`), fast enough that a leaked wrap_id stays unusable
 within a few seconds of TTL elapse. See
 [Configuration reference](config.md) for the full env var.
 
 ## Copy All policy
 
 PRD §15 calls out a Copy-All button on the bulk reveal page. Today
-the UI ships a per-row Copy CTA only — Copy-All is a future PRD §15
+the UI ships a per-row Copy CTA only, Copy-All is a future PRD §15
 follow-up that will be **disabled by default in PROD** via a policy
 knob (the exact column is TBD; the contract is: PROD environments
 must opt in explicitly, non-PROD environments default opt-out unless
@@ -186,7 +186,7 @@ WHERE expired_at IS NULL
 ```
 
 A non-zero count means the sweeper has not run since the row aged
-past TTL — investigate the worker. The `worker_scheduler_runs_total
+past TTL, investigate the worker. The `worker_scheduler_runs_total
 {task="reveal-sessions-expired"}` Prometheus counter is the
 authoritative liveness signal.
 
@@ -206,13 +206,13 @@ see **which keys** were exposed without ever holding the values.
 
 ## Related
 
-- [Policy templates](policy-templates.md) — how to wire
+- [Policy templates](policy-templates.md), how to wire
   `reveal_ttl_seconds` per (project, env) scope
-- [Project environments](project-environments.md) — the `kind=prod`
+- [Project environments](project-environments.md), the `kind=prod`
   hard boundary the PolicyEngine enforces alongside reveal sessions
-- [API endpoints](../reference/api-endpoints.md#reveal-sessions) — the
+- [API endpoints](../reference/api-endpoints.md#reveal-sessions), the
   three HTTP routes this surface exposes
-- [Configuration reference](config.md) — the worker sweeper interval
-- [Cross-team requests](cross-team-requests.md) — reveal sessions also
+- [Configuration reference](config.md), the worker sweeper interval
+- [Cross-team requests](cross-team-requests.md), reveal sessions also
   work for `type='cross_team'` requests after Slice N; the SPA flow
   is the same as for read requests.

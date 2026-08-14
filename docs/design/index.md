@@ -1,23 +1,23 @@
 ---
 title: Design system
-description: The Figma file, brand voice, design tokens, and asset library that keep every Secrets Bridge surface — SPA, docs, README banners, social cards — feeling like one product.
+description: The Figma file, brand voice, design tokens, and asset library that keep every Secrets Bridge surface (SPA, docs, README banners, social cards) feeling like one product.
 ---
 
 # Design system
 
-Secrets Bridge has a real, intentional brand. The SPA, the GitHub
+Secrets Bridge has a consistent brand. The SPA, the GitHub
 org, the README banners, and these docs all use the same tokens,
-the same fonts, and the same canonical phrasing — so the product
-feels like one product no matter where you encounter it.
+the same fonts, and the same canonical phrasing, so it feels
+like one product no matter where you encounter it.
 
 If you're contributing copy, building a new page, or shipping
 external comms, **read these three pages first**:
 
-1. **[Brand voice](brand-voice.md)** — the tagline, wordmark
+1. **[Brand voice](brand-voice.md)**: the tagline, wordmark
    conventions, metaphor family, voice rules
-2. **[Tokens & theme](tokens.md)** — the color palette, type
+2. **[Tokens & theme](tokens.md)**: the color palette, type
    ramp, spacing, and how they're consumed in Tailwind
-3. **[Figma file & assets](figma.md)** — where the canonical
+3. **[Figma file & assets](figma.md)**: where the canonical
    design lives, how to download the brand assets, the sync
    scripts that pull tokens from Figma into the SPA
 
@@ -46,7 +46,7 @@ and we'll either update the system or document the exception.
 | Code / CLI font? | [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono) |
 | Primary accent color? | Cyan `#06B6D4` (`text-accent` in Tailwind) |
 | Base background? | Navy 900 `#0B1220` (`bg-bg` in Tailwind) |
-| Canonical Figma file | [Secrets Bridge — Brand](figma.md) |
+| Canonical Figma file | [Secrets Bridge - Brand](figma.md) |
 
-Everything else is detail — but it's detail we've thought about,
+Everything else is detail, but it's detail we've thought about,
 written down, and want you to use.

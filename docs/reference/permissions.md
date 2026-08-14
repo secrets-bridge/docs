@@ -5,7 +5,7 @@ The canonical list of permission strings used by `auth.Require(perm)`.
 Source: [`api/internal/auth/permissions.go`](https://github.com/secrets-bridge/api/blob/main/internal/auth/permissions.go).
 The api also serves the live catalog at
 `GET /api/v1/permissions` (with descriptions), cached for 5
-minutes — the UI's Roles admin page hydrates from there so the
+minutes. The UI's Roles admin page hydrates from there so the
 chip picker stays in sync with what the api actually understands.
 
 ## Seed roles
@@ -18,10 +18,10 @@ edit their permission lists but can't delete the rows.
 | `admin` | `role.edit`, `user_role.edit`, `workflow.edit`, `policy.edit`, `agent.mint`, `agent.revoke`, `secret.request`, `secret.approve`, `audit.read` | |
 | `approver` | `secret.approve`, `audit.read` | |
 | `developer` | `secret.request`, `secret.reveal.direct`, `audit.read` | |
-| `value_provider` | `secret.value.provide` | Slice N seed — used for the [cross-team flow](../operations/cross-team-requests.md). Assignment **must** carry a `team_id` scope; the Assignments form gates global grants behind a type-to-confirm. |
-| `security_approver` | `secret.security.approve` | Slice N seed — holder can cast the security vote on cross-team requests where the bound workflow has `requires_security_approval=true`. |
-| `provider_connection_binder` | `integration.bind` | EPIC Q seed — section-head capability for [self-service provider connection binding](../operations/provider-connections.md#scoped-bindings-integrationbind). Assignment carries a `team_id` (covers descendant project subtree) or `project_id` (one project) scope. **Not** auto-granted to `integration.edit` holders — operators grant explicitly. |
-| `policy_author` | `policy.author` | EPIC R seed (api#108) — section-head capability for [scoped non-prod policy authoring](../operations/policy-templates.md#scoped-policy-authoring-policyauthor). Assignment carries `team_id` or `project_id` scope. **Not** auto-granted to `policy.edit` holders — operators grant explicitly. Scoped rules are bounded `priority < platform_reserved_priority` (default `9000`, admin-configurable per [R-follow-up #2 / api#113](../operations/policy-templates.md#adjusting-the-reserved-priority-band)) and rejected against any selector that resolves to a prod environment. R-follow-up #3 (api#114) added the team-anchored authoring surface — a `team_id`-scoped grant lets the holder author rules at `/teams/:teamID/policy-rules` that cascade down to every descendant project. |
+| `value_provider` | `secret.value.provide` | Slice N seed, used for the [cross-team flow](../operations/cross-team-requests.md). Assignment **must** carry a `team_id` scope; the Assignments form gates global grants behind a type-to-confirm. |
+| `security_approver` | `secret.security.approve` | Slice N seed. Holder can cast the security vote on cross-team requests where the bound workflow has `requires_security_approval=true`. |
+| `provider_connection_binder` | `integration.bind` | EPIC Q seed: section-head capability for [self-service provider connection binding](../operations/provider-connections.md#scoped-bindings-integrationbind). Assignment carries a `team_id` (covers descendant project subtree) or `project_id` (one project) scope. **Not** auto-granted to `integration.edit` holders; operators grant explicitly. |
+| `policy_author` | `policy.author` | EPIC R seed (api#108): section-head capability for [scoped non-prod policy authoring](../operations/policy-templates.md#scoped-policy-authoring-policyauthor). Assignment carries `team_id` or `project_id` scope. **Not** auto-granted to `policy.edit` holders; operators grant explicitly. Scoped rules are bounded `priority < platform_reserved_priority` (default `9000`, admin-configurable per [R-follow-up #2 / api#113](../operations/policy-templates.md#adjusting-the-reserved-priority-band)) and rejected against any selector that resolves to a prod environment. R-follow-up #3 (api#114) added the team-anchored authoring surface: a `team_id`-scoped grant lets the holder author rules at `/teams/:teamID/policy-rules` that cascade down to every descendant project. |
 
 ## Catalog by group
 
@@ -36,17 +36,17 @@ edit their permission lists but can't delete the rows.
 
 | Permission | Description |
 |---|---|
-| `workflow.edit` | Create / update / delete workflow definitions. R-follow-up #1 (api#112) added the `scoped_policy_authorable` flag — this permission also gates the toggle that exposes a workflow to the scoped policy author surface (`/projects/:id/policies`). Default-deny; admin curates explicitly. |
-| `policy.edit` | Create / update / delete policy rules. Global scope — affects every project's resolution. Does NOT auto-cover `policy.author` server-side (EPIC R, api#108) — operators grant scoped authoring explicitly via the `policy_author` system role. R-follow-up #2 (api#113) extended this permission to also gate the [Platform settings](api-endpoints.md#platform-settings-r-follow-up-2-api113) admin surface. R-follow-up #3 (api#114) extended the `/admin/policies` surface with team-anchored rule support; platform admins retain full lifecycle control over team rules via the admin path while the team URL family stays `policy.author`-only. `policy.edit` does NOT auto-allow on `/teams/:id/policies` or `/projects/:id/policies` — both scoped surfaces are `policy.author` only by design. R-follow-up #5 (api#132) added the admin [policy rule history](api-endpoints.md#policy-rule-change-history-r-follow-up-5-api132) endpoint at `/policies/:ruleID/history` — gated by this permission. Post-delete forensic visibility is admin-only: the admin history endpoint checks the audit chain for existence (not `policyRepo.Get`), so admins retain visibility into deleted rules. Scoped paths return 404 after delete. |
-| `policy.author` | Author scoped policy rules for non-prod environments. Two scope flavors: **project-scoped** (EPIC R, api#108) via `/projects/:projectID/policy-rules`, and **team-scoped** (R-follow-up #3, api#114) via `/teams/:teamID/policy-rules` — the latter cascades the rule down to every descendant project of the team subtree. Grants scoped to a `team_id` expand through the subtree via the existing team-aware resolver. Refuses prod env selectors, priority at or above the platform-reserved band (cap admin-configurable via R-follow-up #2 / api#113; default `9000`), and edits to platform global rules. Granted via the `policy_author` system seed role. R-follow-up #5 (api#132) added the scoped [policy rule history](api-endpoints.md#policy-rule-change-history-r-follow-up-5-api132) endpoints — `policy.author` covering the URL anchor gates the View. Scoped authors lose history visibility at delete time (the rule itself is checked, not the audit chain). |
+| `workflow.edit` | Create / update / delete workflow definitions. R-follow-up #1 (api#112) added the `scoped_policy_authorable` flag. This permission also gates the toggle that exposes a workflow to the scoped policy author surface (`/projects/:id/policies`). Default-deny; admin curates explicitly. |
+| `policy.edit` | Create / update / delete policy rules. Global scope: affects every project's resolution. Does NOT auto-cover `policy.author` server-side (EPIC R, api#108). Operators grant scoped authoring explicitly via the `policy_author` system role. R-follow-up #2 (api#113) extended this permission to also gate the [Platform settings](api-endpoints.md#platform-settings-r-follow-up-2-api113) admin surface. R-follow-up #3 (api#114) extended the `/admin/policies` surface with team-anchored rule support; platform admins retain full lifecycle control over team rules via the admin path while the team URL family stays `policy.author`-only. `policy.edit` does NOT auto-allow on `/teams/:id/policies` or `/projects/:id/policies`; both scoped surfaces are `policy.author` only by design. R-follow-up #5 (api#132) added the admin [policy rule history](api-endpoints.md#policy-rule-change-history-r-follow-up-5-api132) endpoint at `/policies/:ruleID/history`, gated by this permission. Post-delete forensic visibility is admin-only: the admin history endpoint checks the audit chain for existence (not `policyRepo.Get`), so admins retain visibility into deleted rules. Scoped paths return 404 after delete. |
+| `policy.author` | Author scoped policy rules for non-prod environments. Two scope flavors: **project-scoped** (EPIC R, api#108) via `/projects/:projectID/policy-rules`, and **team-scoped** (R-follow-up #3, api#114) via `/teams/:teamID/policy-rules`; the latter cascades the rule down to every descendant project of the team subtree. Grants scoped to a `team_id` expand through the subtree via the existing team-aware resolver. Refuses prod env selectors, priority at or above the platform-reserved band (cap admin-configurable via R-follow-up #2 / api#113; default `9000`), and edits to platform global rules. Granted via the `policy_author` system seed role. R-follow-up #5 (api#132) added the scoped [policy rule history](api-endpoints.md#policy-rule-change-history-r-follow-up-5-api132) endpoints; `policy.author` covering the URL anchor gates the View. Scoped authors lose history visibility at delete time (the rule itself is checked, not the audit chain). |
 
 ### Agents
 
 | Permission | Description |
 |---|---|
 | `agent.mint` | Mint a new agent identity and return its credentials. |
-| `agent.revoke` | Revoke an agent — heartbeats stop being accepted. |
-| `agent.list` | (Reserved) List agents in the projection — today this is open to any signed-in user. |
+| `agent.revoke` | Revoke an agent. Heartbeats stop being accepted. |
+| `agent.list` | (Reserved) List agents in the projection. Today this is open to any signed-in user. |
 
 ### Secrets
 
@@ -68,19 +68,19 @@ edit their permission lists but can't delete the rows.
 
 | Permission | Description |
 |---|---|
-| `integration.edit` | Create / update / delete ArgoCD endpoints + GitOps app mappings + Provider connections (EPIC P, api#92). One permission, three surfaces — does **not** auto-cover `integration.bind` server-side; the SPA's capability helper unifies them in the UI but the api treats each endpoint family strictly. |
-| `integration.bind` | Bind / unbind self-service-bindable provider connections on projects + environments you cover (EPIC Q, api#99). Scoped via the existing team-aware resolver. Never auto-covered by `integration.edit` — grant explicitly via the `provider_connection_binder` system role (or any custom role carrying this permission). Refuses prod envs, disabled connections, and connections without `self_service_bindable=true`. |
+| `integration.edit` | Create / update / delete ArgoCD endpoints + GitOps app mappings + Provider connections (EPIC P, api#92). One permission, three surfaces. It does **not** auto-cover `integration.bind` server-side; the SPA's capability helper unifies them in the UI but the api treats each endpoint family strictly. |
+| `integration.bind` | Bind / unbind self-service-bindable provider connections on projects + environments you cover (EPIC Q, api#99). Scoped via the existing team-aware resolver. Never auto-covered by `integration.edit`; grant explicitly via the `provider_connection_binder` system role (or any custom role carrying this permission). Refuses prod envs, disabled connections, and connections without `self_service_bindable=true`. |
 
 ## Scoped permissions (today)
 
-Most permissions today gate via `auth.Require(perm)` — the user
+Most permissions today gate via `auth.Require(perm)`: the user
 holds the permission or they don't. A few are intended to gate
 via `auth.RequireScoped(perm, scopeFn)` so a grant can be narrowed
 to a single project / environment / secret-ref prefix / provider:
 
 - `secret.request` (typical scope: `{project_id, environment}`)
 - `secret.approve` (typical scope: `{secret_ref_prefix, environment}`)
-- `secret.value.provide` (typical scope: `{team_id}` — required for the seed `value_provider` role)
+- `secret.value.provide` (typical scope: `{team_id}`, required for the seed `value_provider` role)
 - `agent.mint` (typical scope: `{cluster}`)
 - `agent.revoke` (typical scope: `{cluster}`)
 
@@ -99,7 +99,7 @@ If a role contains a permission string the catalog doesn't know
 about (e.g. a legacy custom permission from before
 [api#32](https://github.com/secrets-bridge/api/issues/32) shipped
 the catalog), the UI renders it in a separate **Custom / unknown**
-group at the bottom — so old roles stay editable.
+group at the bottom, so old roles stay editable.
 
 ## How to add a permission
 
@@ -117,11 +117,11 @@ var Catalog = []Descriptor{
 }
 ```
 
-That's it — `Catalog` is the source of truth; the `Keys()` /
+That's it: `Catalog` is the source of truth; the `Keys()` /
 `IsKnown()` helpers + the HTTP endpoint + the drift-guard test all
 pick it up automatically.
 
 A drift-guard test asserts that **every permission string
-referenced in seed migrations is present in the Catalog** —
-otherwise the seed roles would request unknown permissions on
+referenced in seed migrations is present in the Catalog**.
+Otherwise the seed roles would request unknown permissions on
 first boot.

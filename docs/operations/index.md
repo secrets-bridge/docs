@@ -5,18 +5,18 @@ description: Deploy, bootstrap, troubleshoot. The pre-production hardening check
 
 # Operations
 
-Everything you need to actually run Secrets Bridge.
+Everything you need to run Secrets Bridge.
 
 | Page | When you'd read it |
 |---|---|
 | [Deploying with docker-compose](docker-compose.md) | First time trying it locally; smoke tests in CI |
-| [Bootstrap & first sign-in](bootstrap.md) | After the stack is up — how to sign in, mint your first agent, run your first request |
+| [Bootstrap & first sign-in](bootstrap.md) | After the stack is up, how to sign in, mint your first agent, run your first request |
 | [Configuration reference](config.md) | Exhaustive env-var table for `api` / `agent` / `worker` / `controller` |
-| [Troubleshooting](troubleshooting.md) | When things go wrong — common pitfalls + how to read the audit log |
+| [Troubleshooting](troubleshooting.md) | When things go wrong, common pitfalls + how to read the audit log |
 
 ## Production deployment
 
-The Helm chart bundle (`charts` repo) is **in progress** — see the
+The Helm chart bundle (`charts` repo) is **in progress**. See the
 [org project board](https://github.com/orgs/secrets-bridge/projects/1).
 Until it ships, production deployments work via:
 
@@ -24,7 +24,7 @@ Until it ships, production deployments work via:
   publish to GHCR under `ghcr.io/secrets-bridge/`)
 - A managed Postgres + Redis (we test against Postgres 17 +
   Redis 7)
-- A real KMS backend (`vault-transit` or `aws-kms` — **never**
+- A real KMS backend (`vault-transit` or `aws-kms`, **never**
   `local` outside dev)
 - A `Secret` per component holding the env-var triplet (JWT
   secret, KMS config, bootstrap admin)
@@ -45,14 +45,14 @@ Until it ships, production deployments work via:
   after first login
 - [ ] The admin user has a real OIDC identity assigned (once
   api#26 ships) and the local admin is disabled
-- [ ] Postgres is on a private network — the api is the only
+- [ ] Postgres is on a private network: the api is the only
   client
-- [ ] Redis is on a private network — the api + worker are the
+- [ ] Redis is on a private network: the api + worker are the
   only clients
 - [ ] Audit-event shipping is configured (the schema-level
   append-only triggers are a defense, not a substitute for
   off-host log shipping)
-- [ ] Backup the KMS master key / Vault Transit key / AWS CMK —
+- [ ] Backup the KMS master key / Vault Transit key / AWS CMK:
   it's the only thing that can unwrap your envelopes
 
 See the [Threat model](../overview/threat-model.md) for the

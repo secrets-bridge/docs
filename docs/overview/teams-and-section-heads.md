@@ -7,8 +7,8 @@ description: "Model an org as an N-level team tree and grant role scopes that fa
 
 Most organisations don't fit cleanly into a flat list of projects. A
 real engineering org has sections, sub-teams, leads, and members, and
-the people at each level need access to *their part of the world* —
-no more, no less. The platform models this with a first-class **team
+the people at each level need access to *their part of the world*, no
+more and no less. The platform models this with a first-class **team
 tree**: an N-level hierarchy where role grants scoped to a team
 automatically fan out through that team's entire subtree.
 
@@ -16,11 +16,11 @@ automatically fan out through that team's entire subtree.
 
 Three entities, one rule.
 
-### `teams` — the tree
+### `teams`: the tree
 
 Each team carries a name, optional description, status (`active` /
 `archived`), and a nullable `parent_team_id`. Root teams have no
-parent; everything else is a descendant. The depth is N — the schema
+parent; everything else is a descendant. The depth is N. The schema
 doesn't impose a limit.
 
 ```text
@@ -32,18 +32,18 @@ acme
     └── security-compliance
 ```
 
-Sibling names must be unique under the same parent — `acme/platform/ops`
-and `acme/security/ops` are both fine, two `ops` under `acme/platform`
+Sibling names must be unique under the same parent. `acme/platform/ops`
+and `acme/security/ops` are both fine; two `ops` under `acme/platform`
 are not. The constraint is per-parent, so renaming or re-parenting
 never breaks cousins.
 
-A team cannot be deleted while it has children — unparent or delete
+A team cannot be deleted while it has children; unparent or delete
 those first. `team_members` rows cascade-delete with the team they
 belong to (the user account stays; only the membership row goes).
 
-### `team_members` — who belongs
+### `team_members`: who belongs
 
-A simple `(team_id, user_id)` join. **Structural only** — membership
+A simple `(team_id, user_id)` join. **Structural only**: membership
 does NOT grant any permission on its own. The platform deliberately
 keeps "who you are" and "what you can do" in two tables so you can
 reorganise teams without rewriting RBAC.
@@ -63,15 +63,15 @@ object; setting `scope.team_id = <team>` tells the access resolver
 ```
 
 Alice is now an approver for everything inside `platform` and every
-descendant team. She can approve `platform-east` requests, approve
-`platform-west` requests, and approve requests for a new sub-team
-created under `platform` tomorrow — no follow-up grant needed.
+descendant team. She can approve `platform-east` and `platform-west`
+requests, and requests for a new sub-team created under `platform`
+tomorrow, with no follow-up grant needed.
 
 ## The "section head" pattern
 
-The most useful shape this model unlocks:
+A common shape this model unlocks:
 
-1. **Build the tree** under `/admin/teams`. Reflect your org chart —
+1. **Build the tree** under `/admin/teams`. Reflect your org chart:
    a top-level team per section, child teams per squad, grandchild
    teams if you have feature pods.
 2. **Assign projects to teams** by setting `project.team_id` on
@@ -81,7 +81,7 @@ The most useful shape this model unlocks:
 3. **Grant the section head** on `/admin/assignments`: pick the user,
    pick the role (`secret.approve` for an approver, `secret.list +
    secret.request` for a developer-style lead), and pick the section
-   team in the Team dropdown. Leave Project unset — the team scope
+   team in the Team dropdown. Leave Project unset; the team scope
    makes it implicit.
 
 That single grant produces this behaviour:
@@ -92,8 +92,8 @@ That single grant produces this behaviour:
 | `/requests` lists requests from any project under their section | Same expansion, filtered server-side |
 | Approve / Reject works for any of those requests | The approve gate runs `checkApproverScope` with the same resolver |
 | Approve / Reject **refuses** on any request OUTSIDE their subtree | Returns 403 with the stable string `out_of_scope_project` |
-| New sub-team added later under their section | Auto-covered — no follow-up grant |
-| Project re-assigned to a different team | Auto-shifts in/out of scope — no manual cleanup |
+| New sub-team added later under their section | Auto-covered, no follow-up grant |
+| Project re-assigned to a different team | Auto-shifts in/out of scope, no manual cleanup |
 
 ## How requests respect the scope
 
@@ -101,12 +101,12 @@ The check fires at submit time AND at approve time, on top of the
 normal `secret.list` / `secret.request` / `secret.approve` permission
 check:
 
-- **Submit gate** — `Requests.WithTenancyGate` validates the caller's
+- **Submit gate**: `Requests.WithTenancyGate` validates the caller's
   `secret.request` grants cover the request's `project_id`, op is in
   the binding's `allowed_ops`, and every requested key is in
   `allowed_keys` (when non-null). Stable errors:
   `out_of_scope_project`, `out_of_scope_op`, `out_of_scope_key`.
-- **Approve gate** — `checkApproverScope` validates the voter's
+- **Approve gate**: `checkApproverScope` validates the voter's
   `secret.approve` grants cover the request's `project_id`. Same
   team-subtree expansion as the submit gate.
 
@@ -139,14 +139,14 @@ The SPA hydrates a single `/users/me` call after login:
   secrets, the form auto-fills provider type + ref + the allowed-ops
   / allowed-keys constraints. Admins (holders of `team.edit`) start
   on the free-form mode for onboarding new bindings.
-- **`/me`** profile page renders the full payload — identity, the
+- **`/me`** profile page renders the full payload: identity, the
   permission set, direct team memberships, and the accessible
   projects, all read from the same `AuthContext`.
 
 Permission gating is strictly **fail-closed**: until `/users/me`
 returns, `hasPermission(...)` is `false` for every key. A session
 restored from `sessionStorage` shows the Dashboard + a *"Loading
-permissions…"* line while the request is in flight — there is no
+permissions…"* line while the request is in flight; there is no
 flash of admin nav for non-admins on rehydration.
 
 ## Practical advice
@@ -158,7 +158,7 @@ flash of admin nav for non-admins on rehydration.
   is structural metadata. Always grant capabilities via a role +
   scope.
 - **Archive instead of delete** when a team is being wound down. The
-  status flag preserves audit trails — requests filed against
+  status flag preserves audit trails: requests filed against
   projects in an archived team subtree still resolve. Delete only
   when the team is truly empty and the historical references are no
   longer interesting.
@@ -170,5 +170,5 @@ flash of admin nav for non-admins on rehydration.
 - **Free-form mode in the submit drawer still works.** It's the
   default for admins, who are usually the ones submitting the first
   request against a brand-new binding. The api-side gate is the same
-  in both modes — bound mode is a UX overlay that keeps scoped users
+  in both modes; bound mode is a UX overlay that keeps scoped users
   from constructing requests that would 403.

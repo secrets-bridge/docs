@@ -1,12 +1,12 @@
 # Brand voice & canonical phrasing
 
 Source of truth: Figma file
-[Secrets Bridge — Brand](figma.md) and
+[Secrets Bridge - Brand](figma.md) and
 [`skills/ui/design/BRAND_VOICE.md`](https://github.com/secrets-bridge/skills/blob/main/ui/design/BRAND_VOICE.md).
 
-When writing for **any public surface** — README hero text, PR
+When writing for **any public surface** (README hero text, PR
 descriptions, social cards, error messages, blog posts, conference
-slides, docs pages — match these. Don't paraphrase the tagline;
+slides, docs pages), match these. Don't paraphrase the tagline;
 it's the brand.
 
 ## Wordmark
@@ -26,8 +26,8 @@ write "Secrets Bridge". **Don't mix.**
 
 This is the brand line. Use it verbatim including the trailing
 period when used as a sentence. Drop the period when used as a
-heading. Never paraphrase ("the brain for your secrets", "your
-secrets' brain", etc. — all wrong).
+heading. Never paraphrase; variants like "the brain for your
+secrets" or "your secrets' brain" are all wrong.
 
 ## Eyebrow / category label
 
@@ -43,7 +43,7 @@ Two interchangeable variants:
 
 - **Short:** "Unified secrets control plane for cloud-native teams."
 - **Long:** "A distributed secrets control plane that connects and
-  governs secrets across every provider — without replacing the
+  governs secrets across every provider, without replacing the
   tools your teams already use."
 
 Use the short one in PR descriptions, README intros, and
@@ -56,13 +56,13 @@ The brand metaphor is **"the brain"**. Reinforce it consistently.
 
 | Element | Phrasing |
 |---|---|
-| What the control plane is | "The brain — governance, approvals, RBAC, audit" |
+| What the control plane is | "The brain: governance, approvals, RBAC, audit" |
 | Cross-provider reach | "One brain, every provider" |
 | What providers are | "Where secret values actually live" |
 | What the control plane does **not** do | "Values stay inside your providers" |
 
 The brain metaphor is also why the mascot is named **Bridgey**
-(the brain itself, anthropomorphized). Use the mascot sparingly —
+(the brain itself, anthropomorphized). Use the mascot sparingly:
 for delight moments, error pages, blog posts, social cards. **Not**
 in production dashboard UI chrome.
 
@@ -88,7 +88,7 @@ in production dashboard UI chrome.
     Unified secrets control plane for cloud-native teams.
     Approvals, RBAC, audit, and least-privilege agent execution
     across Vault, AWS Secrets Manager, Azure Key Vault, GCP Secret
-    Manager, and Kubernetes / GitOps — without your developers
+    Manager, and Kubernetes / GitOps, without your developers
     ever holding raw provider credentials.
     ```
 
@@ -97,7 +97,7 @@ in production dashboard UI chrome.
     ```markdown
     ## Summary
 
-    Closes the workflow loop start in the UI — dev team no longer
+    Closes the workflow loop start in the UI. Dev team no longer
     has to curl `POST /requests` to begin the flow.
 
     ...
@@ -120,7 +120,7 @@ in production dashboard UI chrome.
 
     The error pages and 404s are one of the few places Bridgey gets
     to appear. Keep the tone helpful, never cute-to-the-point-of-
-    annoying. The brain mascot says "I couldn't find that page" —
+    annoying. The brain mascot says "I couldn't find that page",
     not "Oopsie!".
 
 ## What to avoid

@@ -1,6 +1,6 @@
 ---
 title: Components
-description: Eight repositories, one product — what each repo holds, what it deliberately doesn't, and the one-way dependency graph that keeps the agent infra-free.
+description: Eight repositories, one product. What each repo holds, what it deliberately doesn't, and the one-way dependency graph that keeps the agent infra-free.
 ---
 
 # Components

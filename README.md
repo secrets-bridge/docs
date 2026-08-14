@@ -1,12 +1,12 @@
 # secrets-bridge / docs
 
-Documentation site for [Secrets Bridge](https://github.com/secrets-bridge) — `mkdocs-material` + `mike` → [secrets-bridge.io](https://secrets-bridge.io).
+Documentation site for [Secrets Bridge](https://github.com/secrets-bridge), `mkdocs-material` + `mike` → [secrets-bridge.io](https://secrets-bridge.io).
 
 ## Recent additions
 
-- [Project environments](https://secrets-bridge.io/operations/project-environments/) — the `kind=non_prod/prod` model + why kind/name are immutable (Slice L6)
-- [Policy templates](https://secrets-bridge.io/operations/policy-templates/) — three copy-pasteable policy shapes for non-prod direct reveal + prod single/multi approver (Slice L6)
-- [Authentication](https://secrets-bridge.io/operations/authentication/) — extended with the Slice K login-time MFA gate + the Slice L4 `secret.reveal.direct` permission section
+- [Project environments](https://secrets-bridge.io/operations/project-environments/), the `kind=non_prod/prod` model + why kind/name are immutable (Slice L6)
+- [Policy templates](https://secrets-bridge.io/operations/policy-templates/), three copy-pasteable policy shapes for non-prod direct reveal + prod single/multi approver (Slice L6)
+- [Authentication](https://secrets-bridge.io/operations/authentication/), extended with the Slice K login-time MFA gate + the Slice L4 `secret.reveal.direct` permission section
 
 See [`secrets-bridge/skills/PROGRESS.md`](https://github.com/secrets-bridge/skills/blob/main/PROGRESS.md) for the slice-by-slice log.
 
@@ -20,7 +20,7 @@ The site is **versioned by `mike`**. Each GitHub release tag (`vMAJOR.MINOR.PATC
 | `secrets-bridge.io/latest/` | The most recent release tag | Aliased on every tag push |
 | `secrets-bridge.io/v0.2/` | The `v0.2.x` major.minor track | Aliased on every patch within `v0.2.x` |
 | `secrets-bridge.io/v0.1/` | The `v0.1.x` major.minor track | Frozen after `v0.2.x` releases |
-| `secrets-bridge.io/dev/` | Whatever's on `main` right now | Rolling — every push to main updates it |
+| `secrets-bridge.io/dev/` | Whatever's on `main` right now | Rolling, every push to main updates it |
 
 The **version selector** in the top-right of every page lets a visitor switch between any deployed version. Old versions stay live indefinitely (`mike` doesn't delete them).
 
@@ -35,7 +35,7 @@ pip install -r requirements.txt
 mkdocs serve
 ```
 
-Open http://localhost:8000. Local serve doesn't use `mike` — you get a single un-versioned preview, which is what you want while authoring.
+Open http://localhost:8000. Local serve doesn't use `mike`, you get a single un-versioned preview, which is what you want while authoring.
 
 ## Build
 
@@ -51,8 +51,8 @@ CI handles every deploy. You shouldn't need to run `mike` locally.
 
 | Trigger | What CI does |
 |---|---|
-| Push to `main` | `mike deploy --push dev` — updates the rolling `dev` version |
-| Push a `v*.*.*` tag | `mike deploy --push --update-aliases v<major>.<minor> latest` + `mike set-default latest` — promotes the new release to `latest` and updates the major.minor track |
+| Push to `main` | `mike deploy --push dev`, updates the rolling `dev` version |
+| Push a `v*.*.*` tag | `mike deploy --push --update-aliases v<major>.<minor> latest` + `mike set-default latest`, promotes the new release to `latest` and updates the major.minor track |
 | Manual workflow dispatch | You choose the version + alias from the Actions tab |
 
 ### Releasing
@@ -70,12 +70,12 @@ To redeploy an old version (e.g. backporting a typo fix):
 ```bash
 # From the Actions tab → Deploy docs → Run workflow:
 #   version: v0.1
-#   alias: (blank — don't change `latest` for an old version)
+#   alias: (blank, don't change `latest` for an old version)
 ```
 
 ## Contributing
 
-- Match the [brand voice](docs/design/brand-voice.md) — tagline, wordmark conventions, voice rules
+- Match the [brand voice](docs/design/brand-voice.md), tagline, wordmark conventions, voice rules
 - Tokens and theme come from the [Figma file](docs/design/figma.md); don't invent new colors
-- Every external surface — README, social card, blog post — should reference these docs as the source of truth
+- Every external surface, README, social card, blog post, should reference these docs as the source of truth
 - File issues at [`secrets-bridge/.github`](https://github.com/secrets-bridge/.github)
