@@ -5,7 +5,7 @@ title: Secrets Bridge
 # silently kills the whole frontmatter — page.meta becomes empty, the
 # nav config wins page.title, and SEO tags fall back to site defaults.
 seo_title: "Secrets Bridge — Unified Secrets Control Plane"
-description: "Unified secrets control plane: approvals, RBAC, audit, and least-privilege agent execution across Vault, AWS, Azure, GCP, and Kubernetes."
+description: "Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap."
 hide:
   - navigation
   - toc
@@ -106,7 +106,7 @@ in your provider.
 
 | | Secrets Bridge | Direct Vault | AWS Secrets Manager + IAM | Most "secrets SaaS" |
 |---|---|---|---|---|
-| Multi-provider | ✅ Vault + AWS + Azure + GCP | Vault only | AWS only | Varies |
+| Multi-provider | ✅ Vault + AWS today; Azure + GCP on roadmap | Vault only | AWS only | Varies |
 | Workflow approval per read | ✅ Built-in | Plugin / RFC | ❌ | Some |
 | Single-shot reveal-once UX | ✅ Built-in | ❌ | ❌ | Some |
 | Append-only audit at schema | ✅ Postgres triggers | ❌ application-layer | CloudTrail (not append-only) | Varies |
