@@ -16,7 +16,7 @@ key. The KMS backend is pluggable behind one env var.
 Selected via:
 
 ```bash
-SB_KMS_BACKEND=local         # default — dev only
+SB_KMS_BACKEND=local         # default - dev only
 SB_KMS_BACKEND=vault-transit
 SB_KMS_BACKEND=aws-kms
 ```
@@ -37,7 +37,7 @@ appearing.
     The master key lives in the same process env as the api. A
     process dump, a logged crash, or a misconfigured `env` command
     surfaces it. The whole point of a KMS is to move the master out
-    of the workload — `local` defeats that.
+    of the workload. `local` defeats that.
 
     A future PR will WARN at boot when `SB_KMS_BACKEND=local` is
     set outside a clearly-marked dev profile (tracked as
@@ -112,11 +112,11 @@ calls `kms.Decrypt`.
 | `SB_KMS_AWS_ENDPOINT` | no | LocalStack / VPC endpoint override |
 
 **No new credential env vars.** The standard AWS SDK chain
-applies — IRSA in EKS, instance role on EC2, profile in dev.
+applies: IRSA in EKS, instance role on EC2, profile in dev.
 
 ### Key resolution
 
-`KeyID` stored in `kms_key_id` is the **resolved ARN** — even when
+`KeyID` stored in `kms_key_id` is the **resolved ARN**, even when
 you pass an alias. So if you rotate `alias/sb-wrap` to point at a
 new CMK, the old rows still tell you which exact key wrapped them.
 Critical for forensic audit.

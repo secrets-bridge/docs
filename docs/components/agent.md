@@ -10,13 +10,13 @@ The execution tier. Runs inside the target account / cluster.
 Holds provider credentials for its own boundary only; the Control
 Plane never sees them.
 
-## Hard rules — enforced by CI
+## Hard rules enforced by CI
 
 | Rule | How |
 |---|---|
 | No database driver | CI greps `go.sum` for `pgx`, `lib/pq`, `mysql`, `mongo-driver`; fails on hit |
 | No Redis client | CI greps `go.sum` for `redis/go-redis`, `gomodule/redigo`; fails on hit |
-| No inbound public listener | `SB_LOCAL_ADDR` defaults to `127.0.0.1:8090` (loopback only — for probes) |
+| No inbound public listener | `SB_LOCAL_ADDR` defaults to `127.0.0.1:8090` (loopback only, for probes) |
 | Identity file mode 0600 | `TestSaveToFile_AtomicNoPartialOnFailure` asserts the perm bits |
 | TLS required to the CP | `validateEndpoint` refuses `http://` unless `SB_INSECURE_TRANSPORT=true` |
 | Plaintext zeroed after one use | `client.Zero([]byte)` is called via `defer` on every value-bearing slice |
@@ -46,7 +46,7 @@ sequenceDiagram
 ```
 
 !!! note "Heartbeat response shape"
-    A **bodyless** heartbeat returns an empty **204** — the shape existing
+    A **bodyless** heartbeat returns an empty **204**, the shape existing
     agents rely on. A heartbeat with an optional JSON body
     (`status` / `agent_version` / `capabilities`) returns **200**
     `{status, server_time, next_heartbeat_seconds}` and records the reported
@@ -59,17 +59,17 @@ sequenceDiagram
 
 | Env var | Required | Default | Notes |
 |---|---|---|---|
-| `SB_CP_ENDPOINT` | yes | — | `https://api.secrets-bridge.example` |
-| `SB_AGENT_ID` | yes | — | UUID from `POST /agents` |
-| `SB_AGENT_SECRET` | yes | — | Returned once at mint |
-| `SB_CLUSTER_NAME` | yes for discovery jobs | — | Stamped on every discovered secret |
+| `SB_CP_ENDPOINT` | yes | - | `https://api.secrets-bridge.example` |
+| `SB_AGENT_ID` | yes | - | UUID from `POST /agents` |
+| `SB_AGENT_SECRET` | yes | - | Returned once at mint |
+| `SB_CLUSTER_NAME` | yes for discovery jobs | - | Stamped on every discovered secret |
 | `SB_HEARTBEAT_INTERVAL` | no | `30s` | Bounded by api's stale-after window |
 | `SB_CLAIM_INTERVAL` | no | `5s` | Claim cadence |
 | `SB_CLAIM_CONCURRENCY` | no | `4` | Worker pool size; non-blocking semaphore |
 | `SB_INSECURE_TRANSPORT` | no | `false` | Set true ONLY for local-dev `http://` |
-| `SB_CP_CA_FILE` | no | — | Pin a private CA (replaces system roots) |
+| `SB_CP_CA_FILE` | no | - | Pin a private CA (replaces system roots) |
 | `SB_AGENT_PRIVATE_KEY_FILE` | no | ephemeral | X25519 keypair persistence |
-| **Provider creds** (per resolver) | yes | — | See [Providers supported](../reference/providers.md) |
+| **Provider creds** (per resolver) | yes | - | See [Providers supported](../reference/providers.md) |
 
 ## Executors that ship today
 

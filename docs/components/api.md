@@ -50,15 +50,15 @@ full surface.
 | Env var | Required | Default | Notes |
 |---|---|---|---|
 | `API_ADDR` | no | `:8080` | Listen address |
-| `DATABASE_URL` | yes | — | `postgres://...` |
-| `REDIS_URL` | yes | — | `redis://...` |
-| `SB_JWT_SECRET` | yes | — | 32+ bytes, base64 or raw. Fails boot if missing. |
+| `DATABASE_URL` | yes | - | `postgres://...` |
+| `REDIS_URL` | yes | - | `redis://...` |
+| `SB_JWT_SECRET` | yes | - | 32+ bytes, base64 or raw. Fails boot if missing. |
 | `SB_JWT_TOKEN_TTL` | no | `8h` | Login session lifetime |
-| `SB_WRAP_MASTER_KEY` | yes when `SB_KMS_BACKEND=local` | — | base64 32 bytes |
+| `SB_WRAP_MASTER_KEY` | yes when `SB_KMS_BACKEND=local` | - | base64 32 bytes |
 | `SB_KMS_BACKEND` | no | `local` | `local` / `vault-transit` / `aws-kms` |
-| `SB_KMS_VAULT_ADDR` / `SB_KMS_VAULT_TOKEN` / `SB_KMS_VAULT_KEY` | yes for `vault-transit` | — | |
-| `SB_KMS_AWS_REGION` / `SB_KMS_AWS_KEY_ID` | yes for `aws-kms` | — | Alias OK; ARN stored in audit |
-| `SB_BOOTSTRAP_ADMIN_EMAIL` / `SB_BOOTSTRAP_ADMIN_PASSWORD` | recommended on first boot | — | Seeds local-admin user; idempotent |
+| `SB_KMS_VAULT_ADDR` / `SB_KMS_VAULT_TOKEN` / `SB_KMS_VAULT_KEY` | yes for `vault-transit` | - | |
+| `SB_KMS_AWS_REGION` / `SB_KMS_AWS_KEY_ID` | yes for `aws-kms` | - | Alias OK; ARN stored in audit |
+| `SB_BOOTSTRAP_ADMIN_EMAIL` / `SB_BOOTSTRAP_ADMIN_PASSWORD` | recommended on first boot | - | Seeds local-admin user; idempotent |
 | `SB_GITOPS_ENABLED` | no | `false` | Mounts BRD §26 ArgoCD endpoints when true |
 
 See [Configuration reference](../operations/config.md) for the
@@ -72,7 +72,7 @@ exhaustive list.
 | Patch + read flows end-to-end against Vault + AWS SM | Stable |
 | Single-shot wrap consumption | Stable, race-tested (6 concurrent racers) |
 | JWT login + `auth.Require(perm)` gating on write endpoints | Stable since slice 7 |
-| OIDC | **Not shipped** — tracked at [api#26](https://github.com/secrets-bridge/api/issues/26) |
-| Per-tenant KMS scoping | **Not shipped** — tracked as Piece 8c |
-| Rate limiting on auth + heartbeat | **Not shipped** — tracked at [api#30](https://github.com/secrets-bridge/api/issues/30) |
-| Tested key-rotation runbook | **Not shipped** — tracked at [api#31](https://github.com/secrets-bridge/api/issues/31) |
+| OIDC | **Not shipped**, tracked at [api#26](https://github.com/secrets-bridge/api/issues/26) |
+| Per-tenant KMS scoping | **Not shipped**, tracked as Piece 8c |
+| Rate limiting on auth + heartbeat | **Not shipped**, tracked at [api#30](https://github.com/secrets-bridge/api/issues/30) |
+| Tested key-rotation runbook | **Not shipped**, tracked at [api#31](https://github.com/secrets-bridge/api/issues/31) |

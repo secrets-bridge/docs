@@ -32,7 +32,7 @@ if errors.Is(err, runtime.ErrLockHeld) { /* metric, return */ }
 
 So you can scale the worker deployment to N replicas; exactly one
 runs each sweeper per tick, the others record `worker_scheduler_lock_skipped_total`
-(a metric, not a warn-level log — N-1 of N replicas always skip).
+(a metric, not a warn-level log, because N-1 of N replicas always skip).
 
 ## Notification sinks
 
@@ -47,8 +47,8 @@ runs each sweeper per tick, the others record `worker_scheduler_lock_skipped_tot
 
 ## Hard rules
 
-- Stateless (NFR-08) — all state in Postgres + Redis
-- No secret values logged or notified — sweeper errors carry
+- Stateless (NFR-08): all state in Postgres + Redis
+- No secret values logged or notified. Sweeper errors carry
   counts + cutoffs + sweeper names, never row contents
 - No provider SDKs imported (worker doesn't fetch values; the
   agent does)
@@ -60,8 +60,8 @@ runs each sweeper per tick, the others record `worker_scheduler_lock_skipped_tot
 
 | Env var | Required | Default | Notes |
 |---|---|---|---|
-| `DATABASE_URL` | yes | — | Same Postgres as the api |
-| `REDIS_URL` | yes | — | Same Redis as the api |
+| `DATABASE_URL` | yes | - | Same Postgres as the api |
+| `REDIS_URL` | yes | - | Same Redis as the api |
 | `SB_WORKER_GITOPS_ENABLED` | no | `false` | Must match the api's `SB_GITOPS_ENABLED` for §26 to be active |
-| `SB_DISCOVER_TARGETS_JSON` | no | — | Array of `{agent_id, provider, config, scope}`; admin API replaces this |
+| `SB_DISCOVER_TARGETS_JSON` | no | - | Array of `{agent_id, provider, config, scope}`; admin API replaces this |
 | Sweeper interval overrides | no | per-sweeper defaults | `SB_SWEEP_WRAPS_INTERVAL`, etc. |

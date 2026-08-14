@@ -2,9 +2,9 @@
 title: Secrets Bridge
 # Quoted because the value contains a `:` (after "plane") which YAML
 # would otherwise interpret as a second mapping. An unquoted colon
-# silently kills the whole frontmatter — page.meta becomes empty, the
+# silently kills the whole frontmatter (page.meta becomes empty, the
 # nav config wins page.title, and SEO tags fall back to site defaults.
-seo_title: "Secrets Bridge — Unified Secrets Control Plane"
+seo_title: "Secrets Bridge: Unified Secrets Control Plane"
 description: "Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap."
 hide:
   - navigation
@@ -27,7 +27,7 @@ hide:
 <p class="sb-hero__subhead">
 Keep secrets in Vault, AWS Secrets Manager, Azure Key Vault, GCP
 Secret Manager, or Kubernetes. Secrets Bridge governs who can
-request, approve, reveal, patch, and audit access — without storing
+request, approve, reveal, patch, and audit access, without storing
 plaintext secrets in the control plane.
 </p>
 
@@ -47,7 +47,7 @@ plane**.
 
 It **does not replace** HashiCorp Vault, AWS Secrets Manager, Azure Key Vault,
 GCP Secret Manager, or Kubernetes External Secrets. It governs **access,
-workflows, approvals, audit, and agent execution** around them — the values stay
+workflows, approvals, audit, and agent execution** around them. The values stay
 in your provider.
 
 [:material-check-decagram: See what's live, QA-certified, and on the roadmap](overview/product-status.md){ .md-button .md-button--primary }
@@ -69,7 +69,7 @@ in your provider.
     ---
 
     The `audit_events` table is append-only at the schema
-    layer — `BEFORE UPDATE` / `BEFORE DELETE` triggers reject
+    layer: `BEFORE UPDATE` / `BEFORE DELETE` triggers reject
     mutations. Every action emits a correlation ID you can
     drill into.
 
@@ -120,14 +120,14 @@ Listed here because they are **not** shipped. See the
 [product status page](overview/product-status.md) for the exact
 Live / QA-certified / In-progress / Roadmap split.
 
-- **Azure Key Vault** and **GCP Secret Manager** providers — the agent's
+- **Azure Key Vault** and **GCP Secret Manager** providers. The agent's
   resolvers ship Vault + AWS Secrets Manager today; the others are next.
 - **HashiCorp Vault advanced flows** and deeper **Kubernetes External Secrets**
   integration.
 - **Flux** integration (read-only ArgoCD observation ships today).
-- **Per-tenant KMS scoping** — one CMK per deployment for now.
+- **Per-tenant KMS scoping**: one CMK per deployment for now.
 - **Agent connection-scoped job claim** and a **richer agent fleet dashboard**.
-- **Native Slack / PagerDuty** notification sinks — webhook is in; native
+- **Native Slack / PagerDuty** notification sinks: webhook is in; native
   sinks are next.
 
 <div class="sb-status" markdown>
@@ -142,9 +142,9 @@ limiting, key-rotation runbook. We're tracking them on the
 <a href="https://github.com/orgs/secrets-bridge/projects/1">org project board</a>.
 </p>
 <p>
-If you'd like to be a <strong>design partner</strong> —
+If you'd like to be a <strong>design partner</strong>,
 particularly if you're in financial services, healthcare, or
-government-adjacent — please open an issue at
+government-adjacent, please open an issue at
 <a href="https://github.com/secrets-bridge/.github">secrets-bridge/.github</a>.
 </p>
 </div>

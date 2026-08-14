@@ -1,11 +1,11 @@
 ---
 title: Overview
-description: How Secrets Bridge fits between developers, agents, and the actual secret providers — without ever holding raw values in the Control Plane.
+description: How Secrets Bridge fits between developers, agents, and the actual secret providers, without ever holding raw values in the Control Plane.
 ---
 
 # Overview
 
-Secrets Bridge is a **secrets control plane** — the thing that sits
+Secrets Bridge is a **secrets control plane**: the layer that sits
 between developers / operators and the actual secret stores. The
 mental model the project never violates:
 
@@ -17,7 +17,7 @@ Providers     = the actual secret values (source of truth)
 
 The Control Plane never holds raw secret values. The Agent holds
 them for the duration of one request and then drops them. The
-Providers are unchanged — Secrets Bridge augments them, it doesn't
+Providers are unchanged. Secrets Bridge augments them, it doesn't
 replace them.
 
 ## The flows the platform supports today
@@ -38,7 +38,7 @@ replace them.
 | [`agent`](../components/agent.md) | Shipped | Outbound-only, claim → wrap → execute → complete loop, X25519 wire envelope |
 | [`worker`](../components/worker.md) | Shipped | Sweepers, scheduler, notifications, GitOps poller |
 | [`controller`](../components/controller.md) | Shipped | Kubernetes CRD reconciler ported from v0.1.0 |
-| [`ui`](../components/ui.md) | Shipped | React SPA — dashboard, requests, agents, admin, audit, secrets |
+| [`ui`](../components/ui.md) | Shipped | React SPA: dashboard, requests, agents, admin, audit, secrets |
 | [`charts`](https://github.com/secrets-bridge/charts) | In progress | Helm bundle |
 | [`docs`](https://github.com/secrets-bridge/docs) | You're reading it | mkdocs-material |
 
@@ -54,7 +54,7 @@ replace them.
   GitOps-style sync; the CP itself never reaches into a cluster.
 - **Providing a "central admin password" for every provider.** The
   agent uses **only** the credentials configured inside its own
-  network boundary — the CP never holds provider master credentials.
+  network boundary. The CP never holds provider master credentials.
 
 ## Next steps
 

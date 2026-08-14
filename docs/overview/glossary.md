@@ -18,8 +18,8 @@ cluster identity (`SB_CLUSTER_NAME`).
 
 #### `audit_event`
 An append-only row in the `audit_events` table. Carries `actor`,
-`action`, `resource`, `status`, `correlation_id`, `metadata` (jsonb
-— never carries plaintext), `occurred_at`. Schema-level triggers
+`action`, `resource`, `status`, `correlation_id`, `metadata` (jsonb,
+never carries plaintext), `occurred_at`. Schema-level triggers
 reject UPDATE and DELETE.
 
 #### `correlation_id`
@@ -34,7 +34,7 @@ values.
 
 #### KMS backend
 The pluggable envelope-encryption layer. Three implementations ship:
-`local` (dev only — master key in `SB_WRAP_MASTER_KEY`),
+`local` (dev only, master key in `SB_WRAP_MASTER_KEY`),
 `vault-transit` (production with HashiCorp Vault), `aws-kms`
 (production on AWS with IRSA / instance role). Selected by
 `SB_KMS_BACKEND`.
@@ -42,7 +42,7 @@ The pluggable envelope-encryption layer. Three implementations ship:
 #### Provider
 A third-party secrets store: HashiCorp Vault, AWS Secrets Manager,
 GCP Secret Manager, Azure Key Vault, Kubernetes Secret. Secrets
-Bridge augments providers — it doesn't replace them.
+Bridge augments providers; it doesn't replace them.
 
 #### `policy_rule`
 Selector-based mapping from `(project, environment, secret_ref,

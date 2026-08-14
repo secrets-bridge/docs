@@ -1,6 +1,6 @@
 ---
 title: Agent onboarding
-description: How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked — no inbound ports, no cluster-API access.
+description: How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked, no inbound ports, no cluster-API access.
 ---
 
 # Agent onboarding
@@ -23,7 +23,7 @@ sequenceDiagram
     Admin->>Agent: deliver enrollment_token (via a Secret)
     Agent->>CP: POST /agents/enroll { enrollment_token, ... }
     CP-->>Agent: agent_token (returned ONCE) + agent_id
-    Note over Agent: persist {agent_id, agent_token} safely;<br/>token is spent — never reused
+    Note over Agent: persist {agent_id, agent_token} safely;<br/>token is spent, never reused
     loop heartbeat
         Agent->>CP: POST /agents/:id/heartbeat (X-Agent-Secret)
         CP-->>Agent: 200 { next_heartbeat_seconds }
@@ -38,10 +38,10 @@ sequenceDiagram
    connection. The token is short-lived, stored **hash-only**, and returned
    exactly once.
 2. **The agent calls `POST /agents/enroll`** with the token (the token travels in
-   the request body — never a header, never a log line).
+   the request body, never a header, never a log line).
 3. **The control plane returns a persistent `agent_token` once** and creates the
    agent, bound to that provider connection.
-4. **The agent stores its identity safely** and, on restart, reuses it — it never
+4. **The agent stores its identity safely** and, on restart, reuses it, it never
    spends a second enrollment token.
 5. **The agent heartbeats** using the `X-Agent-Secret` header; the control plane
    drives the cadence.
@@ -50,14 +50,14 @@ sequenceDiagram
 
 ## Safety properties
 
-- **One-time tokens** — hash-only at rest, short TTL, returned once, consumed
+- **One-time tokens**, hash-only at rest, short TTL, returned once, consumed
   once. Reuse is refused (`409`).
-- **Provider-bound** — an enrolled agent is tied to a single provider connection.
-- **Outbound-only** — no inbound ports; no Postgres / Redis / Kubernetes-API
+- **Provider-bound**, an enrolled agent is tied to a single provider connection.
+- **Outbound-only**, no inbound ports; no Postgres / Redis / Kubernetes-API
   dependency.
-- **Metadata-only audit** — enrollment, rejection, and revocation events record
+- **Metadata-only audit**, enrollment, rejection, and revocation events record
   IDs, reasons, and timestamps; never the token or the agent credential.
-- **Legacy direct mint is disabled by default** — the older direct
+- **Legacy direct mint is disabled by default**, the older direct
   agent-mint endpoint is off unless explicitly enabled as a break-glass admin
   action; enrollment is the standard path.
 

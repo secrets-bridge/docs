@@ -17,7 +17,7 @@ routing: `/` → ui, `/api/v1/*` → api).
 |---|---|---|
 | `/` | Dashboard | KPI cards, pending approvals (preview), recent audit activity (preview), providers health (preview), **agents** card (real), requests-this-week chart (preview) |
 | `/requests` | Requests | My-requests filter pills (All / Pending / Approved / Rejected / Executed × patch / read) + Approver queue with inline Approve / Reject (with-reason) |
-| `/requests/:id` | Request detail | Timeline, Approvals, **Wraps** (single-shot Reveal modal — read flow), GitOps observations (disabled banner when §26 is off), Details, Approver actions, Cancel-own |
+| `/requests/:id` | Request detail | Timeline, Approvals, **Wraps** (single-shot Reveal modal, read flow), GitOps observations (disabled banner when §26 is off), Details, Approver actions, Cancel-own |
 | `/agents` | Agents | Mint drawer with **reveal-once panel** for agent secret + bash env snippet, Revoke confirm |
 | `/secrets` | Discovered secrets | Filter strip (cluster / provider / ref prefix / status / label chips), two-pane (table + sticky details with provider_config JSON) |
 | `/audit` | Audit log | Filter strip + correlation drill-in chip on every row, sticky details with metadata JSON |
@@ -33,7 +33,7 @@ routing: `/` → ui, `/api/v1/*` → api).
 
 | Rule | Where |
 |---|---|
-| Token in memory only — never localStorage / sessionStorage / IndexedDB / cookies | `src/auth/AuthContext.tsx` keeps it in React state; reload signs out |
+| Token in memory only, never localStorage / sessionStorage / IndexedDB / cookies | `src/auth/AuthContext.tsx` keeps it in React state; reload signs out |
 | HTTPS required on non-localhost | `src/api/client.ts` throws at module-load if `VITE_API_BASE_URL` is `http://` for non-loopback |
 | No SSR | Vite SPA build; nginx serves static assets only |
 | Strict CSP | `default-src 'self'; frame-ancestors 'none'` |
@@ -44,8 +44,8 @@ routing: `/` → ui, `/api/v1/*` → api).
 
 ## Design system
 
-The SPA matches the Figma file `Secrets Bridge — Brand` byte-for-byte
-on the brand pages — fonts (Inter + JetBrains Mono), colors (Navy
+The SPA matches the Figma file `Secrets Bridge - Brand` byte-for-byte
+on the brand pages: fonts (Inter + JetBrains Mono), colors (Navy
 900 / Dark Navy / Cyan accent), brand-gradient primary CTAs,
 `StatusPill` variants, and the reveal-once UX pattern.
 

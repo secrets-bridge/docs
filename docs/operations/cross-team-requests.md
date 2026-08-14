@@ -9,7 +9,7 @@ into Team A's provider. The original Team B member never touches Team A's
 workload, and Team A never sees Team B's source of truth.
 
 Cross-team requests are the safe alternative to "share me your prod
-secret" Slack messages — every value handoff lands in the audit log
+secret" Slack messages. Every value handoff lands in the audit log
 with a justification, a workflow snapshot, and a separation-of-duties
 trail.
 
@@ -17,7 +17,7 @@ This page covers the operator-facing model: the state machine, the
 permission matrix, the workflow knobs you can tune, and the SQL +
 metrics you'll use to triage. The SPA flow is described from the user's
 point of view inline; the API contract is at
-[HTTP API endpoints — Cross-team requests](../reference/api-endpoints.md#cross-team-requests).
+[HTTP API endpoints, Cross-team requests](../reference/api-endpoints.md#cross-team-requests).
 
 ## Target vs destination
 
@@ -37,14 +37,14 @@ belong to the source project. This is the architectural fence that
 keeps Team B from accidentally writing into Team A's neighbours.
 
 Bindings are managed via the admin page documented at
-[Provider connections](provider-connections.md) — one connection per
+[Provider connections](provider-connections.md), one connection per
 external store, then a `(project, env)` binding row per project that
 needs to consume it. The cross-team submit drawer's destination
 dropdown calls the same `/provider-connections` URL with `project_id`
 + `environment_id` set so the api returns only the sanitized
 `{id, name, type}` projection scoped to the caller's source project +
 env. When the dropdown is empty, the drawer branches the empty-state
-CTA on `hasPermission('integration.edit')` — admins see a "Manage
+CTA on `hasPermission('integration.edit')`, admins see a "Manage
 provider connections" link, non-admins see "Ask your platform team to
 bind a provider connection." Cross-team submits against a
 **disabled** destination return 409 `connection_disabled`.
@@ -55,7 +55,7 @@ dropdown:
 | Binding shape | Created by | When it appears in the dropdown |
 |---|---|---|
 | Env-specific (`environment_id IS NOT NULL`) | Platform admins (`integration.edit`) OR scoped binders (`integration.bind`, EPIC Q) via the per-env [Provider Connections card](provider-connections.md#scoped-bindings-integrationbind) on `/projects/:id/env/:env_id` | When the cross-team source project + env match |
-| Project-wide (`environment_id IS NULL`) | Platform admins ONLY — scoped binders cannot create or delete project-wide bindings | When the cross-team source project matches, regardless of env |
+| Project-wide (`environment_id IS NULL`) | Platform admins ONLY. Scoped binders cannot create or delete project-wide bindings | When the cross-team source project matches, regardless of env |
 
 A project-wide binding implicitly covers every environment, including
 production, which is why the §2 lock keeps project-wide bindings as
@@ -82,8 +82,8 @@ platform-only.
 | `approved` | All required votes recorded; job enqueued | JobService transitions it on agent's `succeeded` (→ executed) or `failed` (→ failed) |
 | `executed` | Agent wrote the value to the destination provider | Terminal |
 | `failed` | Agent reported job failure | Terminal |
-| `refused` | Team B declined to provide the value | Terminal — requester sees the refuse reason |
-| `rejected` | Source or security approver rejected | Terminal — requester sees the rejection reason |
+| `refused` | Team B declined to provide the value | Terminal, requester sees the refuse reason |
+| `rejected` | Source or security approver rejected | Terminal, requester sees the rejection reason |
 | `cancelled` | Requester withdrew | Terminal |
 | `expired` | Fill window elapsed before Team B filled | Terminal |
 
@@ -94,7 +94,7 @@ observable state catches up even when no fill attempt arrives.
 ## Separation of duties
 
 The cross-team flow enforces a four-actor matrix. No single user can
-play more than one role on the same request — the API checks at every
+play more than one role on the same request. The API checks at every
 mutation:
 
 ```
@@ -109,13 +109,13 @@ requester  ≠  filler  ≠  source approver  ≠  security approver
 
 `secret.security.approve` is a **global** permission in v1, so a single
 user can carry both source and security capability. The SoD check
-catches the case where they try to cast both votes on the same request
-— the second attempt returns 403 with
+catches the case where they try to cast both votes on the same request.
+The second attempt returns 403 with
 `separation_of_duties_violated`.
 
 The SPA mirrors the API: the verify card hides the buttons the caller
 cannot use AND renders the reason ("You provided the values for this
-request.") so the operator knows they aren't broken — they're blocked
+request.") so the operator knows they aren't broken. They're blocked
 by design.
 
 ## Permissions and seed roles
@@ -132,10 +132,10 @@ Two system roles ship as seed:
 | Role | Permissions | Notes |
 |---|---|---|
 | `value_provider` | `secret.value.provide` | Assignment **must** carry a `team_id` in scope. The SPA's Assignments form enforces this with a "no team scope = global inbox access" type-to-confirm gate. |
-| `security_approver` | `secret.security.approve` | Used carefully — a holder can bypass the source-side workflow on cross-team requests. The Roles editor surfaces a type-to-confirm dialog the first time `secret.security.approve` is added to a role. |
+| `security_approver` | `secret.security.approve` | Used carefully, a holder can bypass the source-side workflow on cross-team requests. The Roles editor surfaces a type-to-confirm dialog the first time `secret.security.approve` is added to a role. |
 
 Both are `is_system=true`. The permission strings are editable, but the
-roles cannot be deleted — `DELETE` returns 409 `system_row`.
+roles cannot be deleted. `DELETE` returns 409 `system_row`.
 
 ## Workflow knobs
 
@@ -150,9 +150,9 @@ The full `min_approvers` table for cross-team:
 
 | `min_approvers` | Semantics | Supported in v1 |
 |---|---|---|
-| `0` | Auto-approve on fill — verify is a no-op | ✓ |
+| `0` | Auto-approve on fill, verify is a no-op | ✓ |
 | `1` | Single source approver required | ✓ |
-| `≥ 2` | Multi-approver source side | **No** — `SubmitCrossTeam` returns 412 `cross_team_min_approvers_unsupported` |
+| `≥ 2` | Multi-approver source side | **No**, `SubmitCrossTeam` returns 412 `cross_team_min_approvers_unsupported` |
 
 Multi-approver cross-team is deferred to v2 because it requires a
 distinct approvals counter on the request row vs the existing
@@ -174,16 +174,16 @@ gets the new behaviour, but every request **already in flight** still
 needs the security vote it was submitted under. The audit log records
 both the live workflow ID and the snapshotted bools.
 
-## Hard rules — what NEVER touches the value
+## Hard rules, what NEVER touches the value
 
 | Surface | Enforcement |
 |---|---|
 | PostgreSQL columns | `access_requests` carries no value columns; the agent's job consumes wraps via the same KMS-envelope path as the patch flow. The N1 schema CHECK constraints reject any cross-team row that's missing the target / destination / snapshot fields. |
-| Redis | Used only for the inbox-count cache + idempotency tokens — no value cache. |
+| Redis | Used only for the inbox-count cache + idempotency tokens, no value cache. |
 | Logs | The fill / refuse / verify handlers never log values, only key NAMES + actor identifiers. |
 | API responses | The verify card response is value-free (no `content_hash`, no `byte_length`, no preview). The reveal session response is single-shot through the existing M-slice path. |
 | Browser state | The SPA's fill page wipes the values from React state on submit success AND on component unmount. No localStorage / sessionStorage / IndexedDB writes anywhere in the flow. |
-| Audit metadata | The audit log captures actor + key NAMES + workflow snapshot + correlation_id — never the value or any derivable canary. |
+| Audit metadata | The audit log captures actor + key NAMES + workflow snapshot + correlation_id, never the value or any derivable canary. |
 
 ## Worker sweepers
 
@@ -200,14 +200,14 @@ observable state (the inbox list, the request detail page, the
 metrics) catches up within 30s even when no fill attempt arrives to
 trigger that rejection.
 
-Multi-replica safe — each worker takes a Redis lock on
+Multi-replica safe, each worker takes a Redis lock on
 `worker:sweeper:cross-team-fill-window-expired` per tick. Lock
 contention is a metric, not a warning log.
 
 ## Reveal handling
 
 Once a cross-team request lands in `executed`, the value is in the
-destination provider — but the requester typically wants to see the
+destination provider, but the requester typically wants to see the
 value once, in the SPA, to confirm the flow worked. That's exactly
 what the existing reveal session page handles (Slice M).
 
@@ -217,7 +217,7 @@ the request detail page; the SPA opens a single-shot bulk session;
 the page expires on TTL or on hide-now exactly like read flow.
 
 The reveal session is bound to the **requester**, not the filler. The
-filler never sees the value after submitting it — they handed it off
+filler never sees the value after submitting it, they handed it off
 and the next time it appears, it's in the requester's provider.
 
 ## SPA surfaces
@@ -225,7 +225,7 @@ and the next time it appears, it's in the requester's provider.
 | Surface | Route | Caller permission |
 |---|---|---|
 | Submit drawer | `/projects/:id/env/:env_id` (third CTA) | `secret.request` |
-| Inbox list | `/inbox` | `secret.value.provide` (any scope — fail-closed sidebar) |
+| Inbox list | `/inbox` | `secret.value.provide` (any scope, fail-closed sidebar) |
 | Fill / refuse | `/inbox/:request_id` | Same |
 | Verify card | `/requests/:id` | `secret.approve` (source) and/or `secret.security.approve` (security) |
 | Roles editor type-to-confirm | `/admin/roles` | `role.edit` |
@@ -272,7 +272,7 @@ WHERE type = 'cross_team'
 ORDER BY updated_at DESC;
 ```
 
-**Audit chain for one request** — every transition surfaces with the
+**Audit chain for one request**, every transition surfaces with the
 shared `correlation_id`:
 
 ```sql
@@ -314,25 +314,25 @@ added a project-scoped applicability filter to the resolver:
   same `project_id`.
 - Platform global rules (`project_id IS NULL`) still apply
   universally. Platform's reserved priority band (`>= 9000`) wins
-  over scoped overrides for the same selector — so a section head
+  over scoped overrides for the same selector, so a section head
   can't accidentally relax a cross-team approval requirement that
   platform pinned.
 
 If you're authoring cross-team workflow rules at the project level,
-the same hard rules apply — scoped rules cannot match prod
+the same hard rules apply, scoped rules cannot match prod
 environments by construction. See
 [Scoped policy authoring](policy-templates.md#scoped-policy-authoring-policyauthor)
 for the full operator model.
 
 ## Related
 
-- [Provider connections](provider-connections.md) — how the destination
+- [Provider connections](provider-connections.md), how the destination
   dropdown is populated and bound
-- [Project environments](project-environments.md) — project / env model
+- [Project environments](project-environments.md), project / env model
   the bindings reference
-- [Reveal sessions](reveal-sessions.md) — the alternative flow when the
+- [Reveal sessions](reveal-sessions.md), the alternative flow when the
   caller can self-serve the value
-- [Policy templates — Scoped policy authoring](policy-templates.md#scoped-policy-authoring-policyauthor) — EPIC R section-head model
-- [HTTP API endpoints — Provider connections](../reference/api-endpoints.md#provider-connections)
-- [HTTP API endpoints — Project-anchored scoped policy rules](../reference/api-endpoints.md#project-anchored-scoped-policy-rules-epic-r-api108)
+- [Policy templates, Scoped policy authoring](policy-templates.md#scoped-policy-authoring-policyauthor), EPIC R section-head model
+- [HTTP API endpoints, Provider connections](../reference/api-endpoints.md#provider-connections)
+- [HTTP API endpoints, Project-anchored scoped policy rules](../reference/api-endpoints.md#project-anchored-scoped-policy-rules-epic-r-api108)
 - [Permissions catalog](../reference/permissions.md)

@@ -2,7 +2,7 @@
 
 After the api starts for the first time, the platform has to be
 **bootstrapped** with a usable admin identity. Otherwise nothing
-can be done — every write endpoint is gated by
+can be done: every write endpoint is gated by
 `auth.Require(perm)` and there are no role assignments yet.
 
 ## What "bootstrapped" means
@@ -10,7 +10,7 @@ can be done — every write endpoint is gated by
 Two things happen on first boot when `local_users` is empty and
 the bootstrap env vars are set:
 
-1. **A local admin user is created** — bcrypt-hashed password
+1. **A local admin user is created**, bcrypt-hashed password
    stored in `local_users` (idempotent: a second boot with the
    same env vars is a no-op once any user exists).
 2. **The new user is bound to the seed `admin` role** with global
@@ -28,9 +28,9 @@ The api logs both actions at INFO so you can see them in
 
 | Env var | Required | Default | Notes |
 |---|---|---|---|
-| `SB_BOOTSTRAP_ADMIN_EMAIL` | recommended on first boot | — | Becomes the local-admin email |
-| `SB_BOOTSTRAP_ADMIN_PASSWORD` | recommended on first boot | — | **Rotate immediately after first sign-in** |
-| `SB_BOOTSTRAP_ADMIN_USER_ID` | optional | — | Pre-OIDC escape hatch: assigns the admin role to a specific opaque `user_id` (matches the future OIDC `sub` claim). Use this alongside `_EMAIL`/`_PASSWORD` if you want both the local-admin login and a pre-arranged OIDC identity to hold admin. |
+| `SB_BOOTSTRAP_ADMIN_EMAIL` | recommended on first boot |  | Becomes the local-admin email |
+| `SB_BOOTSTRAP_ADMIN_PASSWORD` | recommended on first boot |  | **Rotate immediately after first sign-in** |
+| `SB_BOOTSTRAP_ADMIN_USER_ID` | optional |  | Pre-OIDC escape hatch: assigns the admin role to a specific opaque `user_id` (matches the future OIDC `sub` claim). Use this alongside `_EMAIL`/`_PASSWORD` if you want both the local-admin login and a pre-arranged OIDC identity to hold admin. |
 
 ## First sign-in
 
@@ -40,7 +40,7 @@ The api logs both actions at INFO so you can see them in
 4. You land on the Dashboard with the `Agents Online` KPI showing
    `0 / 0`.
 
-The token is stored in React state only — **closing the tab
+The token is stored in React state only, **closing the tab
 signs you out** by design (BRD §15).
 
 ## Rotating the admin password
@@ -89,7 +89,7 @@ From the Dashboard:
    gone from React state forever.
 
 If you lose the secret before copying it, **revoke the agent** and
-mint a new one. There's no recovery path — that's the whole
+mint a new one. There's no recovery path. That's the whole
 point of reveal-once.
 
 ## Submitting your first read request
@@ -105,7 +105,7 @@ configured for it:
 5. **Secret reference**: e.g. `prod/db/password`
 6. **Keys**: e.g. `DB_PASSWORD` (or leave one empty row for "all
    keys in the bundle")
-7. **Justification**: required — typically an incident or ticket
+7. **Justification**: required, typically an incident or ticket
    number
 8. **Submit** → you're navigated to the request detail page
 
