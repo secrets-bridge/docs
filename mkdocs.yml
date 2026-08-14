@@ -8,9 +8,9 @@ site_url: https://secrets-bridge.io/
 # Trimmed to <= 155 chars so Google's SERP snippet doesn't truncate
 # our key terms (audit 2026-05-30 P1-4).
 site_description: >-
-  Unified secrets control plane: approvals, RBAC, audit, and
-  least-privilege agent execution across Vault, AWS, Azure, GCP, and
-  Kubernetes.
+  Unified secrets control plane for approvals, RBAC, audit, and
+  least-privilege agent execution across your secrets providers.
+  AWS/Vault live today; Azure/GCP roadmap.
 site_author: Secrets Bridge contributors
 repo_name: secrets-bridge
 repo_url: https://github.com/secrets-bridge
