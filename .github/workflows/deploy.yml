@@ -104,29 +104,28 @@ jobs:
           ALIAS="${{ steps.resolve.outputs.alias }}"
           if [[ -n "$ALIAS" ]]; then
             mike deploy --push --update-aliases "$VERSION" "$ALIAS"
+          elif [[ "$VERSION" == "dev" ]] && ! mike list 2>/dev/null | grep -qE 'v[0-9]'; then
+            # No tagged release exists yet — roll the public `latest` alias
+            # WITH `dev` so the site root (/latest/) always serves current
+            # content instead of exposing an unstable-looking /dev/ URL.
+            # A real `v*` tag later re-points `latest` at the release, after
+            # which a `dev` push no longer touches `latest` (the grep sees a
+            # `v*` version and takes the plain-deploy branch below).
+            mike deploy --push --update-aliases dev latest
           else
             mike deploy --push "$VERSION"
           fi
 
-      # On the first run there's no default set; subsequent runs
-      # leave the default alone (idempotent).
-      - name: Ensure `latest` is the default landing version
-        # Only when we actually deployed a `latest` alias (i.e. a release
-        # tag, or a manual dispatch that set alias=latest). A `dev` dispatch
-        # resolves alias="" and must NOT run this — `latest` doesn't exist
-        # until the first tag, so `mike set-default latest` would fail and
-        # break the (otherwise successful) dev redeploy.
-        if: steps.resolve.outputs.alias == 'latest'
-        run: mike set-default --push latest
-
-      # SEO P0-1 (2026-05-30): until we cut the first `latest` tag, the
-      # site root would otherwise serve the `dev` content without a
-      # redirect — Google indexes both `/` and `/dev/...` as duplicates
-      # AND the canonical inside each `dev` page conflicts with the
-      # sitemap's clean URLs. Setting `dev` as the default makes `/`
-      # → `/dev/` a real redirect so there's one canonical URL per
-      # page. The condition above (the `latest` step) takes precedence
-      # the moment we tag.
-      - name: Default to `dev` while no `latest` exists
-        if: github.ref == 'refs/heads/main'
-        run: mike set-default --push dev
+      # Landing version for `/`: prefer `latest` (a release, or the
+      # dev-rolling alias created above) so the root redirects to `/latest/`,
+      # not `/dev/`. Falls back to `dev` only before any `latest` exists.
+      # One canonical URL per page either way (SEO P0-1, 2026-05-30).
+      - name: Set default landing version
+        if: github.ref == 'refs/heads/main' || steps.resolve.outputs.alias == 'latest'
+        run: |
+          set -euo pipefail
+          if mike list 2>/dev/null | grep -qw latest; then
+            mike set-default --push latest
+          else
+            mike set-default --push dev
+          fi
