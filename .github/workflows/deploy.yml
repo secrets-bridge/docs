@@ -111,7 +111,12 @@ jobs:
       # On the first run there's no default set; subsequent runs
       # leave the default alone (idempotent).
       - name: Ensure `latest` is the default landing version
-        if: github.ref_type == 'tag' || github.event_name == 'workflow_dispatch'
+        # Only when we actually deployed a `latest` alias (i.e. a release
+        # tag, or a manual dispatch that set alias=latest). A `dev` dispatch
+        # resolves alias="" and must NOT run this — `latest` doesn't exist
+        # until the first tag, so `mike set-default latest` would fail and
+        # break the (otherwise successful) dev redeploy.
+        if: steps.resolve.outputs.alias == 'latest'
         run: mike set-default --push latest
 
       # SEO P0-1 (2026-05-30): until we cut the first `latest` tag, the
