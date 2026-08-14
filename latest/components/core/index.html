@@ -1648,7 +1648,7 @@
 <p>Repo: <a href="https://github.com/secrets-bridge/core"><code>secrets-bridge/core</code></a>
 · Stack: Go 1.24, <strong>infra-free</strong></p>
 <p>Shared types + the provider interface every other Go service
-depends on. Deliberately small — adding anything Postgres-shaped or
+depends on. Deliberately small: adding anything Postgres-shaped or
 Redis-shaped here is a CI failure on the dependent repos.</p>
 <h2 id="what-lives-in-core">What lives in <code>core</code><a class="headerlink" href="#what-lives-in-core" title="Permanent link">&para;</a></h2>
 <table>
@@ -1685,7 +1685,7 @@ Redis-shaped here is a CI failure on the dependent repos.</p>
 whole project. The CP only ever needs metadata; the agent only
 ever needs values. Different processes hold different trust.</p>
 <p><code>SecretValue.String()</code> and <code>.GoString()</code> both return <code>"&lt;redacted&gt;"</code>,
-verified across every default formatting verb in <code>core#3</code> — so a
+verified across every default formatting verb in <code>core#3</code>, so a
 casual <code>log.Printf("%+v", value)</code> can't leak.</p>
 <h2 id="what-core-deliberately-doesnt-have">What <code>core</code> deliberately doesn't have<a class="headerlink" href="#what-core-deliberately-doesnt-have" title="Permanent link">&para;</a></h2>
 <ul>

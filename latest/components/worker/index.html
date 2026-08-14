@@ -1742,7 +1742,7 @@ read-only ArgoCD observation poller (BRD §26).</p>
 </span></code></pre></div>
 <p>So you can scale the worker deployment to N replicas; exactly one
 runs each sweeper per tick, the others record <code>worker_scheduler_lock_skipped_total</code>
-(a metric, not a warn-level log — N-1 of N replicas always skip).</p>
+(a metric, not a warn-level log, because N-1 of N replicas always skip).</p>
 <h2 id="notification-sinks">Notification sinks<a class="headerlink" href="#notification-sinks" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1787,8 +1787,8 @@ runs each sweeper per tick, the others record <code>worker_scheduler_lock_skippe
 </table>
 <h2 id="hard-rules">Hard rules<a class="headerlink" href="#hard-rules" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Stateless (NFR-08) — all state in Postgres + Redis</li>
-<li>No secret values logged or notified — sweeper errors carry
+<li>Stateless (NFR-08): all state in Postgres + Redis</li>
+<li>No secret values logged or notified. Sweeper errors carry
   counts + cutoffs + sweeper names, never row contents</li>
 <li>No provider SDKs imported (worker doesn't fetch values; the
   agent does)</li>
@@ -1810,13 +1810,13 @@ runs each sweeper per tick, the others record <code>worker_scheduler_lock_skippe
 <tr>
 <td><code>DATABASE_URL</code></td>
 <td>yes</td>
-<td>—</td>
+<td>-</td>
 <td>Same Postgres as the api</td>
 </tr>
 <tr>
 <td><code>REDIS_URL</code></td>
 <td>yes</td>
-<td>—</td>
+<td>-</td>
 <td>Same Redis as the api</td>
 </tr>
 <tr>
@@ -1828,7 +1828,7 @@ runs each sweeper per tick, the others record <code>worker_scheduler_lock_skippe
 <tr>
 <td><code>SB_DISCOVER_TARGETS_JSON</code></td>
 <td>no</td>
-<td>—</td>
+<td>-</td>
 <td>Array of <code>{agent_id, provider, config, scope}</code>; admin API replaces this</td>
 </tr>
 <tr>

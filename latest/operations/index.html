@@ -1569,7 +1569,7 @@
 
 
 <h1 id="operations">Operations<a class="headerlink" href="#operations" title="Permanent link">&para;</a></h1>
-<p>Everything you need to actually run Secrets Bridge.</p>
+<p>Everything you need to run Secrets Bridge.</p>
 <table>
 <thead>
 <tr>
@@ -1584,7 +1584,7 @@
 </tr>
 <tr>
 <td><a href="bootstrap/">Bootstrap &amp; first sign-in</a></td>
-<td>After the stack is up — how to sign in, mint your first agent, run your first request</td>
+<td>After the stack is up, how to sign in, mint your first agent, run your first request</td>
 </tr>
 <tr>
 <td><a href="config/">Configuration reference</a></td>
@@ -1592,12 +1592,12 @@
 </tr>
 <tr>
 <td><a href="troubleshooting/">Troubleshooting</a></td>
-<td>When things go wrong — common pitfalls + how to read the audit log</td>
+<td>When things go wrong, common pitfalls + how to read the audit log</td>
 </tr>
 </tbody>
 </table>
 <h2 id="production-deployment">Production deployment<a class="headerlink" href="#production-deployment" title="Permanent link">&para;</a></h2>
-<p>The Helm chart bundle (<code>charts</code> repo) is <strong>in progress</strong> — see the
+<p>The Helm chart bundle (<code>charts</code> repo) is <strong>in progress</strong>. See the
 <a href="https://github.com/orgs/secrets-bridge/projects/1">org project board</a>.
 Until it ships, production deployments work via:</p>
 <ul>
@@ -1605,7 +1605,7 @@ Until it ships, production deployments work via:</p>
   publish to GHCR under <code>ghcr.io/secrets-bridge/</code>)</li>
 <li>A managed Postgres + Redis (we test against Postgres 17 +
   Redis 7)</li>
-<li>A real KMS backend (<code>vault-transit</code> or <code>aws-kms</code> — <strong>never</strong>
+<li>A real KMS backend (<code>vault-transit</code> or <code>aws-kms</code>, <strong>never</strong>
   <code>local</code> outside dev)</li>
 <li>A <code>Secret</code> per component holding the env-var triplet (JWT
   secret, KMS config, bootstrap admin)</li>
@@ -1626,14 +1626,14 @@ Until it ships, production deployments work via:</p>
   after first login</li>
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> The admin user has a real OIDC identity assigned (once
   api#26 ships) and the local admin is disabled</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Postgres is on a private network — the api is the only
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Postgres is on a private network: the api is the only
   client</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Redis is on a private network — the api + worker are the
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Redis is on a private network: the api + worker are the
   only clients</li>
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Audit-event shipping is configured (the schema-level
   append-only triggers are a defense, not a substitute for
   off-host log shipping)</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Backup the KMS master key / Vault Transit key / AWS CMK —
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Backup the KMS master key / Vault Transit key / AWS CMK:
   it's the only thing that can unwrap your envelopes</li>
 </ul>
 <p>See the <a href="../overview/threat-model/">Threat model</a> for the

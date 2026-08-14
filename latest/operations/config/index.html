@@ -1378,7 +1378,7 @@
         <li class="md-nav__item">
   <a href="#secret-material-naming-convention" class="md-nav__link">
     <span class="md-ellipsis">
-      Secret material — naming convention
+      Secret material, naming convention
     </span>
   </a>
   
@@ -1643,7 +1643,7 @@
         <li class="md-nav__item">
   <a href="#secret-material-naming-convention" class="md-nav__link">
     <span class="md-ellipsis">
-      Secret material — naming convention
+      Secret material, naming convention
     </span>
   </a>
   
@@ -1715,7 +1715,7 @@
 <tr>
 <td><code>DATABASE_URL</code></td>
 <td><strong>yes</strong></td>
-<td>—</td>
+<td></td>
 <td><code>postgres://user:pass@host:5432/db</code></td>
 </tr>
 <tr>
@@ -1733,7 +1733,7 @@
 <tr>
 <td><code>REDIS_URL</code></td>
 <td><strong>yes</strong></td>
-<td>—</td>
+<td></td>
 <td><code>redis://host:6379/0</code></td>
 </tr>
 <tr>
@@ -1757,7 +1757,7 @@
 <tr>
 <td><code>SB_JWT_SECRET</code></td>
 <td><strong>yes</strong></td>
-<td>—</td>
+<td></td>
 <td>32+ bytes, base64 or raw. Fails boot if too short.</td>
 </tr>
 <tr>
@@ -1769,7 +1769,7 @@
 <tr>
 <td><code>SB_WRAP_MASTER_KEY</code></td>
 <td>yes when <code>SB_KMS_BACKEND=local</code></td>
-<td>—</td>
+<td></td>
 <td>base64 32 bytes</td>
 </tr>
 <tr>
@@ -1781,19 +1781,19 @@
 <tr>
 <td><code>SB_KMS_VAULT_ADDR</code></td>
 <td>yes for <code>vault-transit</code></td>
-<td>—</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
 <td><code>SB_KMS_VAULT_TOKEN</code></td>
 <td>yes for <code>vault-transit</code></td>
-<td>—</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
 <td><code>SB_KMS_VAULT_KEY</code></td>
 <td>yes for <code>vault-transit</code></td>
-<td>—</td>
+<td></td>
 <td>Transit key name</td>
 </tr>
 <tr>
@@ -1805,37 +1805,37 @@
 <tr>
 <td><code>SB_KMS_AWS_REGION</code></td>
 <td>yes for <code>aws-kms</code></td>
-<td>—</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
 <td><code>SB_KMS_AWS_KEY_ID</code></td>
 <td>yes for <code>aws-kms</code></td>
-<td>—</td>
+<td></td>
 <td>Alias / ARN / key id</td>
 </tr>
 <tr>
 <td><code>SB_KMS_AWS_ENDPOINT</code></td>
 <td>no</td>
-<td>—</td>
+<td></td>
 <td>LocalStack / VPC endpoint override</td>
 </tr>
 <tr>
 <td><code>SB_BOOTSTRAP_ADMIN_EMAIL</code></td>
 <td>recommended on first boot</td>
-<td>—</td>
+<td></td>
 <td>See <a href="../bootstrap/">Bootstrap</a></td>
 </tr>
 <tr>
 <td><code>SB_BOOTSTRAP_ADMIN_PASSWORD</code></td>
 <td>recommended on first boot</td>
-<td>—</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
 <td><code>SB_BOOTSTRAP_ADMIN_USER_ID</code></td>
 <td>optional</td>
-<td>—</td>
+<td></td>
 <td>Opaque user_id for pre-OIDC role assignment</td>
 </tr>
 <tr>
@@ -1860,7 +1860,7 @@
 <tr>
 <td><code>SB_CP_ENDPOINT</code></td>
 <td><strong>yes</strong></td>
-<td>—</td>
+<td></td>
 <td><code>https://api.example.com</code></td>
 </tr>
 <tr>
@@ -1872,37 +1872,37 @@
 <tr>
 <td><code>SB_CP_CA_FILE</code></td>
 <td>no</td>
-<td>—</td>
+<td></td>
 <td>Pin a private CA (replaces system roots)</td>
 </tr>
 <tr>
 <td><code>SB_CP_TLS_SERVER_NAME</code></td>
 <td>no</td>
-<td>—</td>
+<td></td>
 <td>SNI override for private DNS</td>
 </tr>
 <tr>
 <td><code>SB_AGENT_ID</code></td>
 <td><strong>yes</strong></td>
-<td>—</td>
+<td></td>
 <td>UUID from <code>POST /agents</code></td>
 </tr>
 <tr>
 <td><code>SB_AGENT_SECRET</code></td>
 <td><strong>yes</strong></td>
-<td>—</td>
+<td></td>
 <td>Returned once at mint</td>
 </tr>
 <tr>
 <td><code>SB_BOOTSTRAP_FILE</code></td>
 <td>optional</td>
-<td>—</td>
+<td></td>
 <td>JSON <code>{agent_id, agent_secret}</code> alternative to env vars</td>
 </tr>
 <tr>
 <td><code>SB_CLUSTER_NAME</code></td>
 <td><strong>yes</strong> for discovery</td>
-<td>—</td>
+<td></td>
 <td>Stamped on every discovered secret</td>
 </tr>
 <tr>
@@ -1932,55 +1932,55 @@
 <tr>
 <td><code>SB_AGENT_PRIVATE_KEY</code></td>
 <td>no</td>
-<td>—</td>
+<td></td>
 <td>base64 X25519 private key (wire envelope)</td>
 </tr>
 <tr>
 <td><code>SB_AGENT_PRIVATE_KEY_FILE</code></td>
 <td>no</td>
-<td>—</td>
+<td></td>
 <td>File path alternative</td>
 </tr>
 <tr>
 <td><code>SB_VAULT_ADDR</code></td>
 <td>yes for Vault</td>
-<td>—</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
 <td><code>SB_VAULT_TOKEN</code></td>
 <td>yes for Vault token auth</td>
-<td>—</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
 <td><code>SB_VAULT_KUBERNETES_ROLE</code></td>
 <td>yes for Vault k8s auth</td>
-<td>—</td>
+<td></td>
 <td>Alternative to token</td>
 </tr>
 <tr>
 <td><code>SB_VAULT_NAMESPACE</code></td>
 <td>no</td>
-<td>—</td>
+<td></td>
 <td>Vault Enterprise namespace</td>
 </tr>
 <tr>
 <td><code>SB_AWS_REGION</code></td>
 <td>yes for AWS SM</td>
-<td>—</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
 <td><code>SB_AWS_ROLE_ARN</code></td>
 <td>no</td>
-<td>—</td>
+<td></td>
 <td>Cross-account AssumeRole</td>
 </tr>
 <tr>
 <td><code>SB_AWS_ENDPOINT</code></td>
 <td>no</td>
-<td>—</td>
+<td></td>
 <td>LocalStack / VPC endpoint override</td>
 </tr>
 </tbody>
@@ -1988,7 +1988,7 @@
 <p><strong>AWS credentials</strong> are read from the standard AWS SDK chain
 (IRSA, instance role, <code>AWS_ACCESS_KEY_ID</code> / <code>AWS_SECRET_ACCESS_KEY</code>,
 shared profile). The agent deliberately does <strong>not</strong> add new env
-vars for AWS credentials — that would invite operators to mix
+vars for AWS credentials, that would invite operators to mix
 sources.</p>
 <h2 id="worker">worker<a class="headerlink" href="#worker" title="Permanent link">&para;</a></h2>
 <table>
@@ -2004,13 +2004,13 @@ sources.</p>
 <tr>
 <td><code>DATABASE_URL</code></td>
 <td><strong>yes</strong></td>
-<td>—</td>
+<td></td>
 <td>Same Postgres as the api</td>
 </tr>
 <tr>
 <td><code>REDIS_URL</code></td>
 <td><strong>yes</strong></td>
-<td>—</td>
+<td></td>
 <td>Same Redis as the api</td>
 </tr>
 <tr>
@@ -2022,7 +2022,7 @@ sources.</p>
 <tr>
 <td><code>SB_DISCOVER_TARGETS_JSON</code></td>
 <td>no</td>
-<td>—</td>
+<td></td>
 <td>Periodic discovery targets (admin API tracked)</td>
 </tr>
 <tr>
@@ -2076,7 +2076,7 @@ sources.</p>
 <tr>
 <td><code>SB_NOTIFICATION_WEBHOOK_URL</code></td>
 <td>no</td>
-<td>—</td>
+<td></td>
 <td>Generic webhook</td>
 </tr>
 <tr>
@@ -2101,7 +2101,7 @@ sources.</p>
 <tr>
 <td><code>KUBECONFIG</code></td>
 <td>for out-of-cluster runs</td>
-<td>—</td>
+<td></td>
 <td>In-cluster uses the projected SA</td>
 </tr>
 <tr>
@@ -2124,7 +2124,7 @@ sources.</p>
 </tr>
 </tbody>
 </table>
-<h2 id="secret-material-naming-convention">Secret material — naming convention<a class="headerlink" href="#secret-material-naming-convention" title="Permanent link">&para;</a></h2>
+<h2 id="secret-material-naming-convention">Secret material, naming convention<a class="headerlink" href="#secret-material-naming-convention" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -2139,13 +2139,13 @@ sources.</p>
 <td><code>SB_JWT_SECRET</code></td>
 <td>HMAC key for HS256 login tokens</td>
 <td>api env / K8s Secret</td>
-<td>Operator-rotated (no rotation runbook yet — tracked)</td>
+<td>Operator-rotated (no rotation runbook yet, tracked)</td>
 </tr>
 <tr>
 <td><code>SB_WRAP_MASTER_KEY</code></td>
 <td>Master key for the <code>local</code> KMS backend</td>
 <td>api env / K8s Secret</td>
-<td><strong>Don't use in production</strong> — use Vault Transit or AWS KMS</td>
+<td><strong>Don't use in production</strong>, use Vault Transit or AWS KMS</td>
 </tr>
 <tr>
 <td><code>SB_KMS_VAULT_TOKEN</code></td>

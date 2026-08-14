@@ -7,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="What Secrets Bridge actually does today — implemented and QA-certified features, what's in progress, and what's on the roadmap. No overclaiming.">
+        <meta name="description" content="Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
@@ -78,7 +78,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Secrets Bridge" />
   <meta property="og:title" content="Product status" />
-  <meta property="og:description" content="What Secrets Bridge actually does today — implemented and QA-certified features, what's in progress, and what's on the roadmap. No overclaiming." />
+  <meta property="og:description" content="Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/overview/product-status/" />
   <meta property="og:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
@@ -89,7 +89,7 @@
   
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Product status" />
-  <meta name="twitter:description" content="What Secrets Bridge actually does today — implemented and QA-certified features, what's in progress, and what's on the roadmap. No overclaiming." />
+  <meta name="twitter:description" content="Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap." />
   <meta name="twitter:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge — The brain behind your secrets." />
   
@@ -110,7 +110,7 @@
     "@context": "https://schema.org",
     "@type": "TechArticle",
     "headline": "Product status",
-    "description": "What Secrets Bridge actually does today — implemented and QA-certified features, what's in progress, and what's on the roadmap. No overclaiming.",
+    "description": "Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap.",
     "url": "https://secrets-bridge.io/latest/overview/product-status/",
     "image": "https://secrets-bridge.io/assets/og-banner.png",
     "publisher": {
@@ -668,9 +668,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#credibility-the-guarantees-we-hold" class="md-nav__link">
+  <a href="#the-guarantees-we-hold" class="md-nav__link">
     <span class="md-ellipsis">
-      Credibility — the guarantees we hold
+      The guarantees we hold
     </span>
   </a>
   
@@ -1707,9 +1707,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#credibility-the-guarantees-we-hold" class="md-nav__link">
+  <a href="#the-guarantees-we-hold" class="md-nav__link">
     <span class="md-ellipsis">
-      Credibility — the guarantees we hold
+      The guarantees we hold
     </span>
   </a>
   
@@ -1746,11 +1746,14 @@
   
 
 
+<hr />
+<p>title: Product status
+description: What Secrets Bridge actually does today: implemented and QA-certified features, what's in progress, and what's on the roadmap. No overclaiming.</p>
+<hr />
 <h1 id="product-status">Product status<a class="headerlink" href="#product-status" title="Permanent link">&para;</a></h1>
-<p>Secrets Bridge is a working platform, not a slide deck. This page is the honest
-map of what exists today, what has been QA-certified, what's actively being
-built, and what's still on the roadmap. Nothing below is aspirational unless it
-sits under <strong>Roadmap</strong>.</p>
+<p>This page is the map of what exists today, what has been QA-certified, what's
+actively being built, and what's still on the roadmap. Nothing below is
+aspirational unless it sits under <strong>Roadmap</strong>.</p>
 <div class="admonition info">
 <p class="admonition-title">What Secrets Bridge is</p>
 <p>Secrets Bridge is a <strong>unified secrets control plane</strong> for governing secrets
@@ -1758,8 +1761,8 @@ across external providers <strong>without storing secret values in the control
 plane</strong>.</p>
 <p>It <strong>does not replace</strong> HashiCorp Vault, AWS Secrets Manager, Azure Key
 Vault, GCP Secret Manager, or Kubernetes External Secrets. It governs
-<strong>access, workflows, approvals, audit, and agent execution</strong> around them —
-the values stay in your provider.</p>
+<strong>access, workflows, approvals, audit, and agent execution</strong> around them.
+The values stay in your provider.</p>
 </div>
 <h2 id="implemented-features">Implemented features<a class="headerlink" href="#implemented-features" title="Permanent link">&para;</a></h2>
 <p>Everything in this section is built and running.</p>
@@ -1797,7 +1800,7 @@ the values stay in your provider.</p>
 </tr>
 <tr>
 <td><strong>Metadata-only audit trail</strong></td>
-<td>Records actions, IDs, statuses, reasons, and timestamps — <strong>never</strong> plaintext values, tokens, or wrap bodies.</td>
+<td>Records actions, IDs, statuses, reasons, and timestamps; <strong>never</strong> plaintext values, tokens, or wrap bodies.</td>
 </tr>
 <tr>
 <td><strong>Agent fleet visibility</strong></td>
@@ -1855,11 +1858,11 @@ release / demo candidate. "PASS" means verified end-to-end, not merely merged.</
 </tbody>
 </table>
 <h2 id="in-progress">In progress<a class="headerlink" href="#in-progress" title="Permanent link">&para;</a></h2>
-<p>Being built now; not yet live or certified — do not depend on these yet.</p>
+<p>Being built now; not yet live or certified. Do not depend on these yet.</p>
 <ul>
-<li><strong>Agent enrollment rollout</strong> — the enrollment flow and its Helm packaging are
+<li><strong>Agent enrollment rollout</strong>: the enrollment flow and its Helm packaging are
   built; rolling it onto a live agent is gated on a controlled rollout.</li>
-<li><strong>Richer agent fleet dashboard (UI)</strong> — the agent management API exists; the
+<li><strong>Richer agent fleet dashboard (UI)</strong>: the agent management API exists; the
   full fleet UI view is next.</li>
 </ul>
 <h2 id="live-vs-roadmap">Live vs Roadmap<a class="headerlink" href="#live-vs-roadmap" title="Permanent link">&para;</a></h2>
@@ -1876,7 +1879,7 @@ release / demo candidate. "PASS" means verified end-to-end, not merely merged.</
 <li>Prod reveal refusal (audited)</li>
 </ul>
 <h3 id="roadmap-coming-later">Roadmap / coming later<a class="headerlink" href="#roadmap-coming-later" title="Permanent link">&para;</a></h3>
-<p><em>Listed here because they are <strong>not</strong> live yet — do not read these as shipped.</em></p>
+<p><em>Listed here because they are <strong>not</strong> live yet. Do not read these as shipped.</em></p>
 <ul>
 <li>Azure Key Vault provider</li>
 <li>GCP Secret Manager provider</li>
@@ -1895,31 +1898,31 @@ release / demo candidate. "PASS" means verified end-to-end, not merely merged.</
     CP --&gt;|"outbound jobs only"| AG["Secrets Bridge Agent&lt;br/&gt;(inside your boundary)"]
     AG --&gt;|"read / write values"| P["External Provider&lt;br/&gt;AWS SM · Vault · Azure KV · GCP SM · Kubernetes"]</code></pre>
 <ul>
-<li>The <strong>agent is outbound-only</strong> — it opens connections to the control plane and
+<li>The <strong>agent is outbound-only</strong>: it opens connections to the control plane and
   to its local provider; it never accepts inbound connections.</li>
 <li>The agent <strong>exposes no inbound ports</strong> (health probes are loopback).</li>
 <li>The agent has <strong>no Postgres and no Redis</strong> dependency, and <strong>no Kubernetes API
   access</strong> to read or write Secrets.</li>
-<li>The <strong>control plane stores metadata only</strong> — never plaintext values.</li>
+<li>The <strong>control plane stores metadata only</strong>, never plaintext values.</li>
 <li><strong>Secrets remain in the provider.</strong> Secrets Bridge governs access around them.</li>
 <li>Values move only through <strong>controlled, wrapped, single-shot</strong> flows
   (KMS-wrapped envelopes, consumed exactly once, short TTL).</li>
-<li><strong>Audit is metadata-only</strong> — actions, IDs, statuses, reasons, timestamps; no
+<li><strong>Audit is metadata-only</strong>: actions, IDs, statuses, reasons, timestamps; no
   values, tokens, or wrap bodies.</li>
 </ul>
 <p>See the <a href="../architecture/">full architecture</a> and the
 <a href="../threat-model/">threat model</a> for how each boundary is enforced.</p>
-<h2 id="credibility-the-guarantees-we-hold">Credibility — the guarantees we hold<a class="headerlink" href="#credibility-the-guarantees-we-hold" title="Permanent link">&para;</a></h2>
+<h2 id="the-guarantees-we-hold">The guarantees we hold<a class="headerlink" href="#the-guarantees-we-hold" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Outbound-only agent</strong> — no inbound listener, no cluster-API dependency.</li>
-<li><strong>Metadata-only audit</strong> — append-only at the schema layer (Postgres triggers).</li>
-<li><strong>No plaintext persistence</strong> — not in Postgres, Redis, logs, or the browser.</li>
-<li><strong>MFA-gated reveal</strong> — non-prod reveals require an MFA step-up.</li>
-<li><strong>Prod reveal hard-block</strong> — refused and audited, not merely discouraged.</li>
-<li><strong>One-time enrollment tokens</strong> — hash-only, short-TTL, returned once, spent once.</li>
-<li><strong>Provider-bound agents</strong> — an enrolled agent is bound to a single provider
+<li><strong>Outbound-only agent</strong>: no inbound listener, no cluster-API dependency.</li>
+<li><strong>Metadata-only audit</strong>: append-only at the schema layer (Postgres triggers).</li>
+<li><strong>No plaintext persistence</strong>: not in Postgres, Redis, logs, or the browser.</li>
+<li><strong>MFA-gated reveal</strong>: non-prod reveals require an MFA step-up.</li>
+<li><strong>Prod reveal hard-block</strong>: refused and audited, not merely discouraged.</li>
+<li><strong>One-time enrollment tokens</strong>: hash-only, short-TTL, returned once, spent once.</li>
+<li><strong>Provider-bound agents</strong>: an enrolled agent is bound to a single provider
   connection.</li>
-<li><strong>Revocation</strong> — an agent can be revoked; its heartbeats and job polling stop
+<li><strong>Revocation</strong>: an agent can be revoked; its heartbeats and job polling stop
   being accepted immediately.</li>
 </ul>
 
@@ -1928,9 +1931,6 @@ release / demo candidate. "PASS" means verified end-to-end, not merely merged.</
 
 
 
-
-  
-  
 
 
 

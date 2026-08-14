@@ -1872,7 +1872,7 @@ key. The KMS backend is pluggable behind one env var.</p>
 </tbody>
 </table>
 <p>Selected via:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">SB_KMS_BACKEND</span><span class="o">=</span><span class="nb">local</span><span class="w">         </span><span class="c1"># default — dev only</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">SB_KMS_BACKEND</span><span class="o">=</span><span class="nb">local</span><span class="w">         </span><span class="c1"># default - dev only</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">SB_KMS_BACKEND</span><span class="o">=</span>vault-transit
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">SB_KMS_BACKEND</span><span class="o">=</span>aws-kms
 </span></code></pre></div>
@@ -1902,7 +1902,7 @@ appearing.</p>
 <p>The master key lives in the same process env as the api. A
 process dump, a logged crash, or a misconfigured <code>env</code> command
 surfaces it. The whole point of a KMS is to move the master out
-of the workload — <code>local</code> defeats that.</p>
+of the workload. <code>local</code> defeats that.</p>
 <p>A future PR will WARN at boot when <code>SB_KMS_BACKEND=local</code> is
 set outside a clearly-marked dev profile (tracked as
 <a href="https://github.com/secrets-bridge/api/issues/29">api#29</a>) and
@@ -2003,9 +2003,9 @@ calls <code>kms.Decrypt</code>.</p>
 </tbody>
 </table>
 <p><strong>No new credential env vars.</strong> The standard AWS SDK chain
-applies — IRSA in EKS, instance role on EC2, profile in dev.</p>
+applies: IRSA in EKS, instance role on EC2, profile in dev.</p>
 <h3 id="key-resolution">Key resolution<a class="headerlink" href="#key-resolution" title="Permanent link">&para;</a></h3>
-<p><code>KeyID</code> stored in <code>kms_key_id</code> is the <strong>resolved ARN</strong> — even when
+<p><code>KeyID</code> stored in <code>kms_key_id</code> is the <strong>resolved ARN</strong>, even when
 you pass an alias. So if you rotate <code>alias/sb-wrap</code> to point at a
 new CMK, the old rows still tell you which exact key wrapped them.
 Critical for forensic audit.</p>

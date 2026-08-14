@@ -1276,11 +1276,11 @@
         <li class="md-nav__item">
   <a href="#mfa-step-up-slices-h-i-current-model" class="md-nav__link">
     <span class="md-ellipsis">
-      MFA + step-up (Slices H + I — current model)
+      MFA + step-up (Slices H + I, current model)
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="MFA + step-up (Slices H + I — current model)">
+    <nav class="md-nav" aria-label="MFA + step-up (Slices H + I, current model)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1345,7 +1345,7 @@
         <li class="md-nav__item">
   <a href="#oidc-trust-mfa-slice-d-legacy-opt-in" class="md-nav__link">
     <span class="md-ellipsis">
-      OIDC-trust MFA (Slice D — legacy, opt-in)
+      OIDC-trust MFA (Slice D, legacy, opt-in)
     </span>
   </a>
   
@@ -1853,11 +1853,11 @@
         <li class="md-nav__item">
   <a href="#mfa-step-up-slices-h-i-current-model" class="md-nav__link">
     <span class="md-ellipsis">
-      MFA + step-up (Slices H + I — current model)
+      MFA + step-up (Slices H + I, current model)
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="MFA + step-up (Slices H + I — current model)">
+    <nav class="md-nav" aria-label="MFA + step-up (Slices H + I, current model)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1922,7 +1922,7 @@
         <li class="md-nav__item">
   <a href="#oidc-trust-mfa-slice-d-legacy-opt-in" class="md-nav__link">
     <span class="md-ellipsis">
-      OIDC-trust MFA (Slice D — legacy, opt-in)
+      OIDC-trust MFA (Slice D, legacy, opt-in)
     </span>
   </a>
   
@@ -2011,7 +2011,7 @@
 
 
 <h1 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h1>
-<p>Secrets Bridge ships <strong>two ways to sign in</strong> — OIDC for everyone, local-admin as break-glass — and gates Tier 2 operations (approve, reject, reveal) behind <strong>fresh MFA</strong>. This page explains the model end-to-end so an operator knows what's enforced where.</p>
+<p>Secrets Bridge ships <strong>two ways to sign in</strong> (OIDC for everyone, local-admin as break-glass) and gates Tier 2 operations (approve, reject, reveal) behind <strong>fresh MFA</strong>. This page explains the model end-to-end so an operator knows what's enforced where.</p>
 <h2 id="the-session-model-slices-a2-c">The session model (Slices A2 + C)<a class="headerlink" href="#the-session-model-slices-a2-c" title="Permanent link">&para;</a></h2>
 <p>Sessions are <strong>server-side</strong>, not stateless tokens.</p>
 <table>
@@ -2024,11 +2024,11 @@
 <tbody>
 <tr>
 <td>Identity proof</td>
-<td><code>sb_session</code> cookie — HttpOnly, Secure (prod), SameSite=Strict</td>
+<td><code>sb_session</code> cookie, HttpOnly, Secure (prod), SameSite=Strict</td>
 </tr>
 <tr>
 <td>Source of truth</td>
-<td><code>sessions</code> table in Postgres — <code>revoked_at</code>, <code>expires_at</code>, <code>idle_expires_at</code>, <code>last_mfa_at</code>, <code>ip</code>, <code>user_agent</code></td>
+<td><code>sessions</code> table in Postgres, <code>revoked_at</code>, <code>expires_at</code>, <code>idle_expires_at</code>, <code>last_mfa_at</code>, <code>ip</code>, <code>user_agent</code></td>
 </tr>
 <tr>
 <td>Cookie content</td>
@@ -2036,11 +2036,11 @@
 </tr>
 <tr>
 <td>Revocation</td>
-<td>Immediate — <code>UPDATE sessions SET revoked_at = NOW()</code>; next request fails validation</td>
+<td>Immediate, <code>UPDATE sessions SET revoked_at = NOW()</code>; next request fails validation</td>
 </tr>
 </tbody>
 </table>
-<p><strong>The SPA never holds a token.</strong> Closing the tab + reopening it re-uses the same cookie. Reload, navigate, refresh — all hit the server. There is no <code>localStorage</code> / <code>sessionStorage</code> keypair to steal.</p>
+<p><strong>The SPA never holds a token.</strong> Closing the tab + reopening it re-uses the same cookie. Reload, navigate, refresh, all hit the server. There is no <code>localStorage</code> / <code>sessionStorage</code> keypair to steal.</p>
 <h3 id="ttls-architect-q3">TTLs (architect Q3)<a class="headerlink" href="#ttls-architect-q3" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -2070,14 +2070,14 @@
 </table>
 <p>A user who hasn't acted in 30 minutes is logged out idle-side; a user who's been active for 8 straight hours is logged out absolute-side. Both require a fresh login.</p>
 <h2 id="account-lockout-slice-a1">Account lockout (Slice A1)<a class="headerlink" href="#account-lockout-slice-a1" title="Permanent link">&para;</a></h2>
-<p>Five consecutive wrong-password attempts pin the account out for 15 minutes. State lives in Postgres (<code>local_users.failed_login_count</code> + <code>locked_until</code>), not Redis — a cache flush must <strong>not</strong> silently re-enable a locked account.</p>
-<p>Even a <em>correct</em> password is rejected during the lock window. The 6<sup>th</sup> attempt with the right password fails just like the wrong ones — operators must wait out the timer or have a sibling admin clear the lock via psql.</p>
+<p>Five consecutive wrong-password attempts pin the account out for 15 minutes. State lives in Postgres (<code>local_users.failed_login_count</code> + <code>locked_until</code>), not Redis, a cache flush must <strong>not</strong> silently re-enable a locked account.</p>
+<p>Even a <em>correct</em> password is rejected during the lock window. The 6<sup>th</sup> attempt with the right password fails just like the wrong ones, operators must wait out the timer or have a sibling admin clear the lock via psql.</p>
 <p>The audit trail captures every state change:</p>
 <ul>
-<li><code>auth.login</code> with <code>status=denied</code> + <code>error_kind=wrong_password</code> + <code>failed_login_count=N</code> — every wrong attempt</li>
-<li><code>auth.lockout.applied</code> — written exactly once, when the threshold is crossed</li>
-<li><code>auth.login</code> with <code>status=denied</code> + <code>error_kind=account_locked</code> — every attempt against a locked account</li>
-<li><code>auth.login</code> with <code>status=success</code> + <code>BREAK_GLASS_LOGIN</code> (severity=CRITICAL) — successful sign-in, see below</li>
+<li><code>auth.login</code> with <code>status=denied</code> + <code>error_kind=wrong_password</code> + <code>failed_login_count=N</code>, every wrong attempt</li>
+<li><code>auth.lockout.applied</code>, written exactly once, when the threshold is crossed</li>
+<li><code>auth.login</code> with <code>status=denied</code> + <code>error_kind=account_locked</code>, every attempt against a locked account</li>
+<li><code>auth.login</code> with <code>status=success</code> + <code>BREAK_GLASS_LOGIN</code> (severity=CRITICAL), successful sign-in, see below</li>
 </ul>
 <h3 id="rate-limit-per-ip-anti-scan">Rate limit (per-IP, anti-scan)<a class="headerlink" href="#rate-limit-per-ip-anti-scan" title="Permanent link">&para;</a></h3>
 <table>
@@ -2116,7 +2116,7 @@
 </tr>
 </tbody>
 </table>
-<p>The login / callback caps are <strong>deliberately permissive</strong> so users behind shared CGNAT (an entire ISP or VPC behind one egress IP) aren't locked out by their neighbours. <strong>Brute-force defence lives in the per-account lockout above</strong>, not the per-IP rate limit — the lockout is IP-independent so rotating source IPs doesn't dodge it. Designed against Iraqi CGNAT and similar shared-egress environments.</p>
+<p>The login / callback caps are <strong>deliberately permissive</strong> so users behind shared CGNAT (an entire ISP or VPC behind one egress IP) aren't locked out by their neighbours. <strong>Brute-force defence lives in the per-account lockout above</strong>, not the per-IP rate limit, the lockout is IP-independent so rotating source IPs doesn't dodge it. Designed against Iraqi CGNAT and similar shared-egress environments.</p>
 <h2 id="oidc-sign-in-slices-b-c-e">OIDC sign-in (Slices B + C + E)<a class="headerlink" href="#oidc-sign-in-slices-b-c-e" title="Permanent link">&para;</a></h2>
 <p>Single Identity Provider (architect Q4). The api refuses to mount the OIDC routes unless <code>SB_OIDC_ISSUER</code> is set; until then, only <code>/auth/login</code> (local admin) accepts sign-ins.</p>
 <p>The flow:</p>
@@ -2150,7 +2150,7 @@
 <blockquote>
 <p>The reconciler <strong>only</strong> touches <code>user_roles</code> rows with <code>granted_by = 'system:oidc'</code>.</p>
 </blockquote>
-<p>Admin-assigned grants — the <code>SB_BOOTSTRAP_ADMIN_USER_ID</code> grant, every manually-curated team-scoped grant, every grant created via <code>POST /api/v1/user-roles</code> — carry a different <code>granted_by</code> value and are <strong>invisible</strong> to the reconciler. They survive every reconcile pass, including the "user belongs to no mapped groups" case.</p>
+<p>Admin-assigned grants, the <code>SB_BOOTSTRAP_ADMIN_USER_ID</code> grant, every manually-curated team-scoped grant, every grant created via <code>POST /api/v1/user-roles</code>, carry a different <code>granted_by</code> value and are <strong>invisible</strong> to the reconciler. They survive every reconcile pass, including the "user belongs to no mapped groups" case.</p>
 <p>This protects:</p>
 <ol>
 <li>The break-glass admin from getting locked out when the IdP returns no groups during an outage.</li>
@@ -2158,7 +2158,7 @@
 <li>Operator overrides during incident response.</li>
 </ol>
 <p>If you ever find yourself "cleaning up" this filter, <strong>stop</strong>. It is the security boundary, not an accident.</p>
-<h2 id="mfa-step-up-slices-h-i-current-model">MFA + step-up (Slices H + I — current model)<a class="headerlink" href="#mfa-step-up-slices-h-i-current-model" title="Permanent link">&para;</a></h2>
+<h2 id="mfa-step-up-slices-h-i-current-model">MFA + step-up (Slices H + I, current model)<a class="headerlink" href="#mfa-step-up-slices-h-i-current-model" title="Permanent link">&para;</a></h2>
 <p>Tier 2 operations (approve / reject / reveal-wrap; future: rotate, role-edit, provider-edit) require a session whose <code>last_mfa_at</code> is within the step-up TTL.</p>
 <p><strong>The Control Plane owns MFA enrollment + step-up directly.</strong> Identity stays with the IdP; MFA is an app-level concern. This is an architectural inversion of the original Slice D design (described as the legacy path further down). Every user enrolls one or more factors in the SPA at <code>/me/mfa</code>; step-up runs through the api's <code>/auth/mfa/{challenge,verify}</code> endpoints. Local-admin and OIDC users follow the same enrollment surface and the same step-up flow.</p>
 <h3 id="factor-types">Factor types<a class="headerlink" href="#factor-types" title="Permanent link">&para;</a></h3>
@@ -2188,9 +2188,9 @@
 <p>Both kinds follow the same two-step shape (Stripe / GitHub / AWS Console model):</p>
 <ol>
 <li><strong><code>POST /users/me/mfa/&lt;kind&gt;/.../start</code></strong> mints the challenge + envelope-encrypts the factor secret + parks the encrypted blob in Redis under a 10-minute challenge id. Nothing lands in Postgres yet.</li>
-<li><strong><code>POST /users/me/mfa/&lt;kind&gt;/.../confirm</code> (or <code>…/finish</code>)</strong> consumes the Redis blob (GETDEL — single-shot), verifies the user's response, and only then persists the factor row.</li>
+<li><strong><code>POST /users/me/mfa/&lt;kind&gt;/.../confirm</code> (or <code>…/finish</code>)</strong> consumes the Redis blob (GETDEL, single-shot), verifies the user's response, and only then persists the factor row.</li>
 </ol>
-<p>A wrong TOTP code or a failed WebAuthn attestation <strong>burns the challenge</strong> — the user restarts from step 1. This blocks an attacker from brute-forcing the 6-digit space against a single secret.</p>
+<p>A wrong TOTP code or a failed WebAuthn attestation <strong>burns the challenge</strong>, the user restarts from step 1. This blocks an attacker from brute-forcing the 6-digit space against a single secret.</p>
 <p>The SPA exposes the enrollment surfaces at <code>/me/mfa</code>. A user with zero factors sees an accent-coloured "Add MFA factor →" nudge in the sidebar; an enrolled user sees a quieter "Security" link.</p>
 <h3 id="step-up-ceremony">Step-up ceremony<a class="headerlink" href="#step-up-ceremony" title="Permanent link">&para;</a></h3>
 <p>When a Tier 2 op hits the api's <code>RequireFreshMFA</code> gate on a stale session:</p>
@@ -2199,11 +2199,11 @@
 </span></code></pre></div>
 <p>The SPA's global onError interceptor opens the step-up modal:</p>
 <ol>
-<li>Modal asks the user to pick a factor — filtered by what they have enrolled.</li>
+<li>Modal asks the user to pick a factor, filtered by what they have enrolled.</li>
 <li>SPA calls <code>POST /auth/mfa/challenge { kind }</code> for the chosen kind.</li>
-<li><strong>TOTP path</strong> — user types the 6-digit code; SPA calls <code>POST /auth/mfa/verify { challenge_id, factor_id, code }</code>.</li>
-<li><strong>WebAuthn path</strong> — SPA calls <code>navigator.credentials.get(...)</code> with the api-issued options; ships the assertion back via <code>POST /auth/mfa/verify { challenge_id, response }</code>.</li>
-<li>On <code>204 No Content</code> the session is MFA-fresh — the api stamped <code>last_mfa_at</code> on the <strong>same session row</strong> (no new cookie). The user re-clicks the original button.</li>
+<li><strong>TOTP path</strong>, user types the 6-digit code; SPA calls <code>POST /auth/mfa/verify { challenge_id, factor_id, code }</code>.</li>
+<li><strong>WebAuthn path</strong>, SPA calls <code>navigator.credentials.get(...)</code> with the api-issued options; ships the assertion back via <code>POST /auth/mfa/verify { challenge_id, response }</code>.</li>
+<li>On <code>204 No Content</code> the session is MFA-fresh, the api stamped <code>last_mfa_at</code> on the <strong>same session row</strong> (no new cookie). The user re-clicks the original button.</li>
 </ol>
 <h3 id="two-related-responses-the-interceptor-routes">Two related responses the interceptor routes<a class="headerlink" href="#two-related-responses-the-interceptor-routes" title="Permanent link">&para;</a></h3>
 <table>
@@ -2222,7 +2222,7 @@
 </tr>
 <tr>
 <td><code>401 factor_compromised</code></td>
-<td>WebAuthn sign-count regression — the api detected a possible cloned authenticator and revoked every session for the user.</td>
+<td>WebAuthn sign-count regression, the api detected a possible cloned authenticator and revoked every session for the user.</td>
 <td>Hard-navigate to <code>/login</code>.</td>
 </tr>
 </tbody>
@@ -2230,15 +2230,15 @@
 <h3 id="recommended-factor-priority">Recommended factor priority<a class="headerlink" href="#recommended-factor-priority" title="Permanent link">&para;</a></h3>
 <p>When you onboard users, encourage this enrollment order:</p>
 <ol>
-<li><strong>WebAuthn (hardware key — YubiKey, Solo, Titan)</strong> — phishing-resistant, no shared secret on the device, no battery.</li>
-<li><strong>WebAuthn (platform — Touch ID / Face ID / Windows Hello)</strong> — phishing-resistant, no extra device to carry, but tied to one machine.</li>
-<li><strong>TOTP via authenticator app (Aegis, 1Password, Authy)</strong> — universal fallback; vulnerable to phishing kits that proxy the code.</li>
-<li><strong>SMS / email OTP</strong> — Secrets Bridge does NOT support this. SIM swap and email-account takeover are well-documented bypasses.</li>
+<li><strong>WebAuthn (hardware key, YubiKey, Solo, Titan)</strong>, phishing-resistant, no shared secret on the device, no battery.</li>
+<li><strong>WebAuthn (platform, Touch ID / Face ID / Windows Hello)</strong>, phishing-resistant, no extra device to carry, but tied to one machine.</li>
+<li><strong>TOTP via authenticator app (Aegis, 1Password, Authy)</strong>, universal fallback; vulnerable to phishing kits that proxy the code.</li>
+<li><strong>SMS / email OTP</strong>, Secrets Bridge does NOT support this. SIM swap and email-account takeover are well-documented bypasses.</li>
 </ol>
-<p>Operators should enrol <strong>at least two factors</strong> per privileged user — one hardware key plus one TOTP backup — so a lost YubiKey doesn't lock them out of Tier 2 ops.</p>
+<p>Operators should enrol <strong>at least two factors</strong> per privileged user, one hardware key plus one TOTP backup, so a lost YubiKey doesn't lock them out of Tier 2 ops.</p>
 <h3 id="step-up-vs-login-time-mfa">Step-up vs login-time MFA<a class="headerlink" href="#step-up-vs-login-time-mfa" title="Permanent link">&para;</a></h3>
-<p>The default posture (Slices H + I) gates <strong>only Tier-2 ops</strong> (approve / reject / reveal-wrap). Sign-in itself + Tier-1 browsing (lists, dashboards) only need a session cookie. The argument: the session cookie is the high-value loot — step-up makes "I have your cookie" insufficient at the moment of a sensitive action without paying the ergonomic cost of a modal on every page load.</p>
-<p>The alternative posture — <strong>login-time MFA on every authenticated route</strong> — is available via the Slice K opt-in knob.</p>
+<p>The default posture (Slices H + I) gates <strong>only Tier-2 ops</strong> (approve / reject / reveal-wrap). Sign-in itself + Tier-1 browsing (lists, dashboards) only need a session cookie. The argument: the session cookie is the high-value loot, step-up makes "I have your cookie" insufficient at the moment of a sensitive action without paying the ergonomic cost of a modal on every page load.</p>
+<p>The alternative posture, <strong>login-time MFA on every authenticated route</strong>, is available via the Slice K opt-in knob.</p>
 <p>Set <code>api.config.mfa.requireMFAAtLogin: true</code> (renders <code>SB_REQUIRE_MFA_AT_LOGIN=true</code>) to enable. When the knob is on:</p>
 <ul>
 <li>A fresh session with no MFA stamp returns <code>401 step_up_required</code> on every Tier-1 route (lists, dashboards, project pages).</li>
@@ -2276,8 +2276,8 @@
 </tr>
 </tbody>
 </table>
-<p>The two postures share the same factor enrollment surface (<code>/me/mfa</code>) and the same verify endpoint (<code>/auth/mfa/verify</code>) — the gate position is the only difference. Switching between them is a single env-var change + pod roll; users keep their enrolled factors.</p>
-<h2 id="oidc-trust-mfa-slice-d-legacy-opt-in">OIDC-trust MFA (Slice D — legacy, opt-in)<a class="headerlink" href="#oidc-trust-mfa-slice-d-legacy-opt-in" title="Permanent link">&para;</a></h2>
+<p>The two postures share the same factor enrollment surface (<code>/me/mfa</code>) and the same verify endpoint (<code>/auth/mfa/verify</code>), the gate position is the only difference. Switching between them is a single env-var change + pod roll; users keep their enrolled factors.</p>
+<h2 id="oidc-trust-mfa-slice-d-legacy-opt-in">OIDC-trust MFA (Slice D, legacy, opt-in)<a class="headerlink" href="#oidc-trust-mfa-slice-d-legacy-opt-in" title="Permanent link">&para;</a></h2>
 <p>The api retains the original Slice D path for deployments whose IdP genuinely owns MFA (Microsoft Entra / Okta with strong-factor policy bound), so an operator can keep that posture during a transition window.</p>
 <p>Set <code>api.config.oidc.trustAmrForMFA: true</code> (renders <code>SB_OIDC_TRUSTED_AMR_MFA=true</code>) to opt in. When enabled, the OIDC callback stamps <code>last_mfa_at</code> on the session whenever the ID-token <code>amr</code> claim includes one of the RFC 8176 strong-factor identifiers:</p>
 <table>
@@ -2317,30 +2317,30 @@
 <td><code>pop</code></td>
 </tr>
 <tr>
-<td>Biometric — iris</td>
+<td>Biometric, iris</td>
 <td><code>eye</code></td>
 </tr>
 <tr>
-<td>Biometric — fingerprint</td>
+<td>Biometric, fingerprint</td>
 <td><code>fpt</code></td>
 </tr>
 <tr>
-<td>Biometric — retina</td>
+<td>Biometric, retina</td>
 <td><code>retina</code></td>
 </tr>
 </tbody>
 </table>
-<p><code>pwd</code> and <code>kba</code> are not strong. <strong>The app-MFA path (above) runs in parallel</strong> — a user can still satisfy step-up via <code>/auth/mfa/verify</code> even when the OIDC-trust knob is on. Operators flip this knob OFF (the default) once every user has enrolled an app-MFA factor; <code>amr</code> continues to be recorded in audit either way.</p>
+<p><code>pwd</code> and <code>kba</code> are not strong. <strong>The app-MFA path (above) runs in parallel</strong>, a user can still satisfy step-up via <code>/auth/mfa/verify</code> even when the OIDC-trust knob is on. Operators flip this knob OFF (the default) once every user has enrolled an app-MFA factor; <code>amr</code> continues to be recorded in audit either way.</p>
 <p><strong>Hard rule:</strong> <code>SessionService.MarkMFA</code> only fires from <code>MFAVerifyService.Verify</code> (the app path) OR from the OIDC callback when <code>TrustAMRForMFA=true</code>. The architectural invariant is that exactly one path writes <code>last_mfa_at</code>. New callers in the api codebase need explicit justification or the step-up gate's contract collapses.</p>
 <h2 id="break-glass-local-admin-policy-architect-q1">Break-glass (local-admin) policy (architect Q1)<a class="headerlink" href="#break-glass-local-admin-policy-architect-q1" title="Permanent link">&para;</a></h2>
-<p>Local-admin sign-in via <code>/auth/login</code> is the <strong>break-glass surface</strong> — the way operators sign in when the IdP is down, the OIDC client is misconfigured, or the network is partitioned. It is <strong>not</strong> the day-to-day sign-in path once OIDC is configured.</p>
+<p>Local-admin sign-in via <code>/auth/login</code> is the <strong>break-glass surface</strong>, the way operators sign in when the IdP is down, the OIDC client is misconfigured, or the network is partitioned. It is <strong>not</strong> the day-to-day sign-in path once OIDC is configured.</p>
 <p>Every successful local-admin sign-in emits a high-severity audit event:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>action:   BREAK_GLASS_LOGIN
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>status:   success
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>severity: CRITICAL    (in metadata)
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>actor:    user:&lt;uuid&gt;
 </span></code></pre></div>
-<p><strong>Route this audit action into your alert pipeline.</strong> Splunk / Datadog / Grafana Alertmanager — whichever you use, page the on-call when a <code>BREAK_GLASS_LOGIN</code> shows up outside of an open incident bridge. The Slack notification recipe:</p>
+<p><strong>Route this audit action into your alert pipeline.</strong> Splunk / Datadog / Grafana Alertmanager, whichever you use, page the on-call when a <code>BREAK_GLASS_LOGIN</code> shows up outside of an open incident bridge. The Slack notification recipe:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Example: worker notification sink (when configured) or external SIEM rule</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nt">when</span><span class="p">:</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BREAK_GLASS_LOGIN</span>
@@ -2356,17 +2356,17 @@
 </span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">      </span><span class="no">User-agent: ${metadata.user_agent}</span>
 </span></code></pre></div>
 <h3 id="local-admin-sessions-step-up">Local-admin sessions + step-up<a class="headerlink" href="#local-admin-sessions-step-up" title="Permanent link">&para;</a></h3>
-<p>Local-admin users go through the <strong>same app-MFA enrollment + step-up surfaces as OIDC users</strong>. The local-admin sign-in path does not stamp <code>last_mfa_at</code> directly — every Tier 2 op the operator runs is gated by a fresh <code>/auth/mfa/verify</code> against an enrolled factor.</p>
+<p>Local-admin users go through the <strong>same app-MFA enrollment + step-up surfaces as OIDC users</strong>. The local-admin sign-in path does not stamp <code>last_mfa_at</code> directly, every Tier 2 op the operator runs is gated by a fresh <code>/auth/mfa/verify</code> against an enrolled factor.</p>
 <p>Operationally this means:</p>
 <ul>
 <li>A local-admin user with no factor enrolled hits <code>412 mfa_enrollment_required</code> on the first Tier 2 op and is routed to <code>/me/mfa</code> to enrol.</li>
-<li>After enrolling, every Tier 2 op runs through the step-up modal — same flow as OIDC users.</li>
-<li>If the operator is in the middle of an IdP outage and <em>also</em> hasn't enrolled an MFA factor, they should enrol one immediately — the IdP outage doesn't block factor enrollment, and once enrolled they can satisfy step-up without the IdP.</li>
+<li>After enrolling, every Tier 2 op runs through the step-up modal, same flow as OIDC users.</li>
+<li>If the operator is in the middle of an IdP outage and <em>also</em> hasn't enrolled an MFA factor, they should enrol one immediately, the IdP outage doesn't block factor enrollment, and once enrolled they can satisfy step-up without the IdP.</li>
 </ul>
 <p>This is a tighter posture than the pre-H4 architecture, where local-admin users were forced through <code>/auth/oidc/start?step_up=mfa</code> for every Tier 2 op and effectively couldn't approve anything during an IdP outage. App-MFA closes that gap.</p>
-<p>If you're routinely approving as the break-glass user, your operating model is still wrong — that account should be reserved for "the IdP is broken and I need to fix it." But during a real IdP outage the break-glass user can now approve cleanly without an additional dependency.</p>
+<p>If you're routinely approving as the break-glass user, your operating model is still wrong, that account should be reserved for "the IdP is broken and I need to fix it." But during a real IdP outage the break-glass user can now approve cleanly without an additional dependency.</p>
 <h3 id="disabling-break-glass-entirely">Disabling break-glass entirely<a class="headerlink" href="#disabling-break-glass-entirely" title="Permanent link">&para;</a></h3>
-<p>For deployments that want to refuse local-admin sign-in once OIDC is configured, the chart will gain a <code>SB_LOCAL_ADMIN_ENABLED=false</code> flag in a follow-up. Today the flag is implicit — leave <code>SB_BOOTSTRAP_ADMIN_EMAIL</code> unset and no local-admin account exists, so <code>/auth/login</code> always fails with <code>invalid credentials</code>.</p>
+<p>For deployments that want to refuse local-admin sign-in once OIDC is configured, the chart will gain a <code>SB_LOCAL_ADMIN_ENABLED=false</code> flag in a follow-up. Today the flag is implicit, leave <code>SB_BOOTSTRAP_ADMIN_EMAIL</code> unset and no local-admin account exists, so <code>/auth/login</code> always fails with <code>invalid credentials</code>.</p>
 <h2 id="direct-reveal-permission-slice-l4">Direct reveal permission (Slice L4)<a class="headerlink" href="#direct-reveal-permission-slice-l4" title="Permanent link">&para;</a></h2>
 <p>Slice L4 added <code>secret.reveal.direct</code> to the permission catalog and seeded it onto the bootstrap <code>developer</code> role.</p>
 <p>The permission is a NECESSARY but NOT SUFFICIENT gate. Three conditions must all hold for a direct-reveal request to auto-execute:</p>
@@ -2375,8 +2375,8 @@
 <li>The matched <code>policy_rules</code> row has <code>direct_reveal_allowed=true</code>.</li>
 <li>The matched environment's <code>kind</code> is <code>non_prod</code>.</li>
 </ol>
-<p>If any one of these fails, the API returns 403 and the SPA shows an inline error. The dev endpoint never bypasses approval against a <code>prod</code>-classified env — the PolicyEngine zeroes <code>direct_reveal_allowed=true</code> server-side regardless of operator misconfig. See <a href="../project-environments/#kind-vs-type-why-both">Project environments</a> for the <code>kind</code> model and <a href="../policy-templates/#template-1-non-prod-direct-reveal">Policy templates</a> for ready-to-paste rules.</p>
-<p>Operators who want a stricter baseline can strip <code>secret.reveal.direct</code> from the developer role via the existing Roles admin endpoint — the rest of the developer surface (<code>secret.request</code>, <code>audit.read</code>) is unaffected.</p>
+<p>If any one of these fails, the API returns 403 and the SPA shows an inline error. The dev endpoint never bypasses approval against a <code>prod</code>-classified env, the PolicyEngine zeroes <code>direct_reveal_allowed=true</code> server-side regardless of operator misconfig. See <a href="../project-environments/#kind-vs-type-why-both">Project environments</a> for the <code>kind</code> model and <a href="../policy-templates/#template-1-non-prod-direct-reveal">Policy templates</a> for ready-to-paste rules.</p>
+<p>Operators who want a stricter baseline can strip <code>secret.reveal.direct</code> from the developer role via the existing Roles admin endpoint, the rest of the developer surface (<code>secret.request</code>, <code>audit.read</code>) is unaffected.</p>
 <h2 id="what-this-page-does-not-cover">What this page does NOT cover<a class="headerlink" href="#what-this-page-does-not-cover" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>RBAC enforcement</strong> at the route level. Sidebar nav already hides admin pages without <code>team.edit</code> / <code>role.edit</code>; route-level enforcement on the api lands in a follow-up.</li>

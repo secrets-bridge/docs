@@ -1267,7 +1267,7 @@
         <li class="md-nav__item">
   <a href="#template-1-non-prod-direct-reveal" class="md-nav__link">
     <span class="md-ellipsis">
-      Template 1 — Non-prod direct reveal
+      Template 1, Non-prod direct reveal
     </span>
   </a>
   
@@ -1276,7 +1276,7 @@
         <li class="md-nav__item">
   <a href="#template-2-production-single-approver" class="md-nav__link">
     <span class="md-ellipsis">
-      Template 2 — Production single-approver
+      Template 2, Production single-approver
     </span>
   </a>
   
@@ -1285,7 +1285,7 @@
         <li class="md-nav__item">
   <a href="#template-3-production-multi-approver-chain" class="md-nav__link">
     <span class="md-ellipsis">
-      Template 3 — Production multi-approver chain
+      Template 3, Production multi-approver chain
     </span>
   </a>
   
@@ -1294,11 +1294,11 @@
         <li class="md-nav__item">
   <a href="#template-4-cross-team-workflows" class="md-nav__link">
     <span class="md-ellipsis">
-      Template 4 — Cross-team workflows
+      Template 4, Cross-team workflows
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Template 4 — Cross-team workflows">
+    <nav class="md-nav" aria-label="Template 4, Cross-team workflows">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1337,7 +1337,7 @@
           <li class="md-nav__item">
   <a href="#policy_rulesproject_id-the-scoping-column" class="md-nav__link">
     <span class="md-ellipsis">
-      policy_rules.project_id — the scoping column
+      policy_rules.project_id, the scoping column
     </span>
   </a>
   
@@ -1754,7 +1754,7 @@
         <li class="md-nav__item">
   <a href="#template-1-non-prod-direct-reveal" class="md-nav__link">
     <span class="md-ellipsis">
-      Template 1 — Non-prod direct reveal
+      Template 1, Non-prod direct reveal
     </span>
   </a>
   
@@ -1763,7 +1763,7 @@
         <li class="md-nav__item">
   <a href="#template-2-production-single-approver" class="md-nav__link">
     <span class="md-ellipsis">
-      Template 2 — Production single-approver
+      Template 2, Production single-approver
     </span>
   </a>
   
@@ -1772,7 +1772,7 @@
         <li class="md-nav__item">
   <a href="#template-3-production-multi-approver-chain" class="md-nav__link">
     <span class="md-ellipsis">
-      Template 3 — Production multi-approver chain
+      Template 3, Production multi-approver chain
     </span>
   </a>
   
@@ -1781,11 +1781,11 @@
         <li class="md-nav__item">
   <a href="#template-4-cross-team-workflows" class="md-nav__link">
     <span class="md-ellipsis">
-      Template 4 — Cross-team workflows
+      Template 4, Cross-team workflows
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Template 4 — Cross-team workflows">
+    <nav class="md-nav" aria-label="Template 4, Cross-team workflows">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1824,7 +1824,7 @@
           <li class="md-nav__item">
   <a href="#policy_rulesproject_id-the-scoping-column" class="md-nav__link">
     <span class="md-ellipsis">
-      policy_rules.project_id — the scoping column
+      policy_rules.project_id, the scoping column
     </span>
   </a>
   
@@ -2000,7 +2000,7 @@ shapes.</p>
 </tr>
 <tr>
 <td><code>direct_reveal_allowed</code></td>
-<td><strong>Access decision</strong> — when true AND the env is <code>non_prod</code>, the dev endpoint can bypass <code>access_requests</code> and auto-execute. The PolicyEngine zeroes this against <code>prod</code> envs regardless.</td>
+<td><strong>Access decision</strong>, when true AND the env is <code>non_prod</code>, the dev endpoint can bypass <code>access_requests</code> and auto-execute. The PolicyEngine zeroes this against <code>prod</code> envs regardless.</td>
 </tr>
 <tr>
 <td><code>requires_mfa</code></td>
@@ -2012,7 +2012,7 @@ shapes.</p>
 </tr>
 </tbody>
 </table>
-<h2 id="template-1-non-prod-direct-reveal">Template 1 — Non-prod direct reveal<a class="headerlink" href="#template-1-non-prod-direct-reveal" title="Permanent link">&para;</a></h2>
+<h2 id="template-1-non-prod-direct-reveal">Template 1, Non-prod direct reveal<a class="headerlink" href="#template-1-non-prod-direct-reveal" title="Permanent link">&para;</a></h2>
 <p>For a <code>uat</code> environment where authorized developers can click
 "Reveal" and skip approval:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
@@ -2054,7 +2054,7 @@ shapes.</p>
 <li><code>reveal_ttl_seconds</code> is the upper bound for the wrap's lifetime
   on disk. Tighter is safer; PRD §15 recommends 120 s for non-prod.</li>
 </ul>
-<h2 id="template-2-production-single-approver">Template 2 — Production single-approver<a class="headerlink" href="#template-2-production-single-approver" title="Permanent link">&para;</a></h2>
+<h2 id="template-2-production-single-approver">Template 2, Production single-approver<a class="headerlink" href="#template-2-production-single-approver" title="Permanent link">&para;</a></h2>
 <p>For a <code>prod</code> environment where any one approver can sign off:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;prod-single-approver&quot;</span><span class="p">,</span>
@@ -2086,11 +2086,11 @@ shapes.</p>
 <ul>
 <li><code>requires_mfa: true</code> means the api attaches the
   <code>RequireFreshMFA</code> middleware (Slice H5/K) to the submit + reveal
-  routes — the SPA's step-up modal opens automatically when the
+  routes, the SPA's step-up modal opens automatically when the
   user's MFA stamp is stale.</li>
 <li><code>reveal_ttl_seconds: 60</code> matches the PRD default for production.</li>
 </ul>
-<h2 id="template-3-production-multi-approver-chain">Template 3 — Production multi-approver chain<a class="headerlink" href="#template-3-production-multi-approver-chain" title="Permanent link">&para;</a></h2>
+<h2 id="template-3-production-multi-approver-chain">Template 3, Production multi-approver chain<a class="headerlink" href="#template-3-production-multi-approver-chain" title="Permanent link">&para;</a></h2>
 <p>For a high-risk env that needs source-team head + security:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;prod-multi-approver&quot;</span><span class="p">,</span>
@@ -2119,14 +2119,14 @@ shapes.</p>
 </span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
 </span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>The <code>secret_ref_prefix</code> selector key is a <strong>prefix match</strong> — every
+<p>The <code>secret_ref_prefix</code> selector key is a <strong>prefix match</strong>, every
 ref starting with <code>billing/</code> falls into this rule. Combine with
 <code>environment: "prod"</code> to scope it tightly.</p>
 <p>Slice N (cross-team integration workflow) adds an explicit
 "Security approval" step as the third approver in this chain via the
-new <code>workflow_definitions.requires_security_approval</code> knob — see
+new <code>workflow_definitions.requires_security_approval</code> knob, see
 <a href="#template-4-cross-team-workflows">Cross-team workflows</a> below.</p>
-<h2 id="template-4-cross-team-workflows">Template 4 — Cross-team workflows<a class="headerlink" href="#template-4-cross-team-workflows" title="Permanent link">&para;</a></h2>
+<h2 id="template-4-cross-team-workflows">Template 4, Cross-team workflows<a class="headerlink" href="#template-4-cross-team-workflows" title="Permanent link">&para;</a></h2>
 <p>Cross-team requests carry their own workflow shape: Team B fills, an
 optional security approver verifies, then the agent writes. Two new
 <code>workflow_definitions</code> knobs configure this:</p>
@@ -2188,10 +2188,10 @@ the existing <code>policy.edit</code> permission + the <code>/admin/policies</co
 family. Section heads grant their teams scoped authority to write
 <strong>non-prod</strong> policy rules for their <strong>own projects</strong> without ever
 holding <code>policy.edit</code>.</p>
-<p>The two permissions are deliberately disjoint — neither auto-covers
+<p>The two permissions are deliberately disjoint, neither auto-covers
 the other, server-side or in the SPA. Operators grant <code>policy.author</code>
 explicitly via the seeded <code>policy_author</code> role.</p>
-<h3 id="policy_rulesproject_id-the-scoping-column"><code>policy_rules.project_id</code> — the scoping column<a class="headerlink" href="#policy_rulesproject_id-the-scoping-column" title="Permanent link">&para;</a></h3>
+<h3 id="policy_rulesproject_id-the-scoping-column"><code>policy_rules.project_id</code>, the scoping column<a class="headerlink" href="#policy_rulesproject_id-the-scoping-column" title="Permanent link">&para;</a></h3>
 <p>Migration 0033 adds a nullable scoping column:</p>
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">policy_rules</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">project_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">projects</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">;</span>
@@ -2225,7 +2225,7 @@ can't express.</p>
 </thead>
 <tbody>
 <tr>
-<td>Coverage — <code>EffectiveProjectAccess(policy.author, projectID)</code> must succeed</td>
+<td>Coverage, <code>EffectiveProjectAccess(policy.author, projectID)</code> must succeed</td>
 <td>Service gate 1 → <code>out_of_scope_policy</code> (403)</td>
 </tr>
 <tr>
@@ -2279,7 +2279,7 @@ can't express.</p>
 set the backend owns (api#139). The canonical list lives in
 <code>pkg/storage/provider_connections.go</code>
 (<code>storage.IsPolicySelectorProviderType</code>); the SPA mirrors it in
-<code>src/api/policySelectorEnums.ts</code>. Both move together — there is no
+<code>src/api/policySelectorEnums.ts</code>. Both move together, there is no
 runtime <code>GET</code> endpoint for these values (five stable strings, rare
 changes, code review catches drift).</p>
 <p>Allowed <code>provider_type</code> values today:</p>
@@ -2287,18 +2287,18 @@ changes, code review catches drift).</p>
 <p>Rules:</p>
 <ul>
 <li><strong>Absent is wildcard.</strong> Omitting <code>provider_type</code> matches any
-  provider. The SPA dropdowns offer a blank "— any —" option that
-  omits the key entirely — they never submit <code>provider_type: ""</code>.</li>
+  provider. The SPA dropdowns offer a blank "any" option that
+  omits the key entirely, they never submit <code>provider_type: ""</code>.</li>
 <li><strong>Present must be a known value.</strong> An empty string, a non-string,
   or an unknown provider type is rejected at write time on ALL three
   authoring paths (project-scoped, team-scoped, admin) with
   <code>policy_scope_too_broad</code> / <code>provider_type_invalid</code>. Admins are not
-  exempt — the <code>/admin/policies</code> form is gated by the same validator.</li>
+  exempt, the <code>/admin/policies</code> form is gated by the same validator.</li>
 <li><strong>UI must not invent values.</strong> New provider types ship as a
   coordinated pair: the storage enum + the SPA mirror in the same
   change. The SPA never adds an option the backend doesn't accept.</li>
 </ul>
-<p>The allowed values are product metadata, not sensitive data — it is
+<p>The allowed values are product metadata, not sensitive data, it is
 safe to surface them in error envelopes, dropdowns, and these docs.</p>
 <h4 id="the-operation-dimension">The <code>operation</code> dimension<a class="headerlink" href="#the-operation-dimension" title="Permanent link">&para;</a></h4>
 <p>The <code>selector.operation</code> key follows the exact same backend-owned
@@ -2346,7 +2346,7 @@ site stamps the operation onto the request scope:</p>
 <ul>
 <li><strong>Absent is wildcard.</strong> A rule that omits <code>operation</code> matches every
   request regardless of operation. The SPA dropdowns offer a blank
-  "— any operation —" option that omits the key — they never submit
+  "any operation" option that omits the key, they never submit
   <code>operation: ""</code>.</li>
 <li><strong>Present must be a known value.</strong> Empty string, non-string, or an
   unknown operation is rejected on ALL three authoring paths with
@@ -2355,7 +2355,7 @@ site stamps the operation onto the request scope:</p>
   every value flow stamps its operation, a rule with <code>operation=read</code>
   applies exactly to read requests and is wildcard-skipped by none of
   them. (If a future request path forgets to stamp its operation, a rule
-  pinning that operation would silently never match — the api carries a
+  pinning that operation would silently never match, the api carries a
   resolver-level test guarding this.)</li>
 </ul>
 <div class="admonition note">
@@ -2363,14 +2363,14 @@ site stamps the operation onto the request scope:</p>
 <p>Cross-team value provision resolves as <code>operation=patch</code> in v1, not
 a distinct <code>cross_team</code> operation. Routing flavor
 (<code>standard</code> vs <code>cross_team</code>) is a separate axis deferred to a future
-<code>request_flavor</code> dimension — <code>operation</code> is deliberately not
+<code>request_flavor</code> dimension, <code>operation</code> is deliberately not
 overloaded with routing semantics (EPIC api#141, D6).</p>
 </div>
 <h3 id="policyedit-does-not-auto-cover-policyauthor"><code>policy.edit</code> does NOT auto-cover <code>policy.author</code><a class="headerlink" href="#policyedit-does-not-auto-cover-policyauthor" title="Permanent link">&para;</a></h3>
 <p>A deliberate design choice. Operators must explicitly grant the
 <code>policy_author</code> role (or a custom role carrying <code>policy.author</code>) to
 section heads. Platform admins holding <code>policy.edit</code> keep using
-<code>/admin/policies</code> for global rules — they do NOT auto-trip into the
+<code>/admin/policies</code> for global rules, they do NOT auto-trip into the
 scoped URL family.</p>
 <p>The SPA enforces the same split:</p>
 <ul>
@@ -2394,29 +2394,29 @@ distinct UIs. Testing or operating one as the wrong actor reads as a
 </thead>
 <tbody>
 <tr>
-<td>Platform admin — <code>policy.edit</code></td>
+<td>Platform admin, <code>policy.edit</code></td>
 <td><code>/admin/policies</code></td>
 <td>Platform, project- and team-<em>anchored</em> rules, any priority (incl. the reserved band)</td>
 </tr>
 <tr>
-<td>Scoped author — <code>policy.author</code> (scoped to a project/team)</td>
+<td>Scoped author, <code>policy.author</code> (scoped to a project/team)</td>
 <td><code>/projects/:id/policies</code>, <code>/teams/:id/policies</code></td>
 <td>Non-prod rules for that project/team, priority <code>&lt; cap</code></td>
 </tr>
 <tr>
-<td>Developer — <code>secret.request</code></td>
+<td>Developer, <code>secret.request</code></td>
 <td>request forms</td>
 <td>read / patch / reveal requests (consumes policy, does not author it)</td>
 </tr>
 <tr>
-<td>Approver — <code>secret.approve</code></td>
+<td>Approver, <code>secret.approve</code></td>
 <td>approval queue</td>
 <td>Approves/rejects requests</td>
 </tr>
 </tbody>
 </table>
 <p>A <code>policy.edit</code> admin viewing <code>/teams/:id/policies</code> gets a permission
-panel, not a rule list — the scoped list endpoint is <code>policy.author</code>-only.
+panel, not a rule list, the scoped list endpoint is <code>policy.author</code>-only.
 That is expected; the admin manages those rules from <code>/admin/policies</code>.
 To exercise the scoped author drawer, use an identity granted the
 <code>policy_author</code> role scoped to the project/team (below).</p>
@@ -2431,11 +2431,11 @@ To exercise the scoped author drawer, use an identity granted the
 </span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>Assign it scoped to a project or team:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Per-project — section head covers exactly one project</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Per-project, section head covers exactly one project</span>
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>/api/v1/user-roles<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;user_id&quot;:&quot;alice&quot;,&quot;role_id&quot;:&quot;&lt;policy_author&gt;&quot;,&quot;scope&quot;:{&quot;project_id&quot;:&quot;&lt;billing-prod&gt;&quot;}}&#39;</span>
 </span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1"># Per-team — section head covers the entire descendant team subtree</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1"># Per-team, section head covers the entire descendant team subtree</span>
 </span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>/api/v1/user-roles<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;user_id&quot;:&quot;alice&quot;,&quot;role_id&quot;:&quot;&lt;policy_author&gt;&quot;,&quot;scope&quot;:{&quot;team_id&quot;:&quot;&lt;billing-team&gt;&quot;}}&#39;</span>
 </span></code></pre></div>
@@ -2464,7 +2464,7 @@ endpoint family:</p>
 <tr>
 <td><code>canEditPolicyRule(perms, rule)</code></td>
 <td><code>{allowed, via, reason}</code></td>
-<td>Delete action visibility on a per-row basis. Returns <code>{allowed: false, reason: 'platform_owned'}</code> for inherited platform rules (<code>is_platform_inherited=true</code>) regardless of perms — even admins use <code>/admin/policies</code> for them.</td>
+<td>Delete action visibility on a per-row basis. Returns <code>{allowed: false, reason: 'platform_owned'}</code> for inherited platform rules (<code>is_platform_inherited=true</code>) regardless of perms, even admins use <code>/admin/policies</code> for them.</td>
 </tr>
 <tr>
 <td><code>canManagePlatformPolicy(perms)</code></td>
@@ -2474,8 +2474,8 @@ endpoint family:</p>
 </tbody>
 </table>
 <p>Generic <code>hasPermission('policy.author')</code> keeps its strict semantic
-everywhere else. The capability helpers do NOT call <code>useAuth</code> —
-they're pure functions taking the actor's <code>permissions</code> array, which
+everywhere else. The capability helpers do NOT call <code>useAuth</code>.
+They're pure functions taking the actor's <code>permissions</code> array, which
 keeps them testable.</p>
 <h3 id="triage-sql">Triage SQL<a class="headerlink" href="#triage-sql" title="Permanent link">&para;</a></h3>
 <p><strong>1. Active scoped rules per project (inventory)</strong></p>
@@ -2495,8 +2495,8 @@ keeps them testable.</p>
 </span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="k">DESC</span>
 </span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
 </span></code></pre></div>
-<p><strong>Note</strong> the deliberate absence of <code>policy_rule_id</code> from the metadata
-— this is the §6 gate-order enumeration-leak protection. The denied
+<p><strong>Note</strong> the deliberate absence of <code>policy_rule_id</code> from the metadata:
+this is the §6 gate-order enumeration-leak protection. The denied
 event fires BEFORE the rule is loaded; including the id would defeat
 the protection. (Same lesson EPIC Q's <code>binding.denied_out_of_scope</code>
 learned.)</p>
@@ -2521,7 +2521,7 @@ learned.)</p>
 </span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="k">DESC</span>
 </span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">200</span><span class="p">;</span>
 </span></code></pre></div>
-<p><code>selector_keys</code> carries only the KEY names — the §6 lock keeps
+<p><code>selector_keys</code> carries only the KEY names, the §6 lock keeps
 selector VALUES out of the audit log entirely. If you need to know
 what <code>secret_ref_prefix</code> a scoped author pinned, look at the rule
 row directly (it's not exfiltrated through audit).</p>
@@ -2543,14 +2543,14 @@ row directly (it's not exfiltrated through audit).</p>
   triage and isn't a leak.</li>
 <li><code>policy_rule_id</code> is DELIBERATELY absent. The gate fires BEFORE
   the rule is INSERTed (Create path) or BEFORE the UPDATE runs
-  (Update path) — including the id would defeat the same gate-order
+  (Update path), including the id would defeat the same gate-order
   protection EPIC Q's <code>binding.denied_out_of_scope</code> and EPIC R's
   <code>policy.denied_out_of_scope</code> apply.</li>
 </ul>
 <p>Use this query to spot a scoped author repeatedly trying to use a
 workflow platform has deliberately walled off. If <code>attempted_workflow_
 id</code> is the same across many rows for one actor, it's worth a
-conversation — they probably need that workflow opted in, or they
+conversation, they probably need that workflow opted in, or they
 need pointed at the alternatives.</p>
 <h3 id="operator-playbook">Operator playbook<a class="headerlink" href="#operator-playbook" title="Permanent link">&para;</a></h3>
 <p><strong>Grant a section head policy authoring capability</strong></p>
@@ -2564,7 +2564,7 @@ need pointed at the alternatives.</p>
 </ol>
 <p><strong>Audit recent self-service activity</strong></p>
 <p>Run triage SQL #3 weekly. A sudden spike in <code>policy.author</code> events
-on a project with no recent app changes is worth a check-in — could
+on a project with no recent app changes is worth a check-in, could
 be experimentation, could be an attacker who phished a section head.
 The <code>policy.denied_out_of_scope</code> events (triage SQL #2) are the
 canary for someone probing without coverage.</p>
@@ -2575,7 +2575,7 @@ canary for someone probing without coverage.</p>
 </span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="c1"># Revoke</span>
 </span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>curl<span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span>/api/v1/user-roles/&lt;assignment_id&gt;
 </span></code></pre></div>
-<p>The rules they authored stay in <code>policy_rules</code> — they're still owned
+<p>The rules they authored stay in <code>policy_rules</code>, they're still owned
 by the project, not the actor. New rules require a fresh grant; existing
 rules can be edited/deleted by another covered actor or by
 <code>policy.edit</code> admin via <code>/admin/policies</code>.</p>
@@ -2618,14 +2618,14 @@ to the <strong>"Scoped author access"</strong> section at the bottom of the form
 → tick <strong>"Available for scoped policy authoring"</strong> → Save. A small
 <code>[scoped]</code> chip appears on the workflow's row in the admin list.</p>
 <p>Any open author drawer on <code>/projects/:id/policies</code> sees the new
-workflow within ~30 seconds without a page reload — both the admin
+workflow within ~30 seconds without a page reload, both the admin
 workflow list cache key AND the scoped author dropdown cache key are
 invalidated on every workflow mutation.</p>
 <h4 id="opting-a-workflow-in-api">Opting a workflow in (API)<a class="headerlink" href="#opting-a-workflow-in-api" title="Permanent link">&para;</a></h4>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Get the workflow id</span>
 </span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>gh<span class="w"> </span>api<span class="w"> </span>.../api/v1/workflows<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.[] | select(.name==&quot;standard&quot;) | .id&#39;</span>
 </span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># Flip the flag — Get-then-merge in the api preserves all other fields</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># Flip the flag, Get-then-merge in the api preserves all other fields</span>
 </span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span>/api/v1/workflows/&lt;id&gt;<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Authorization: Bearer &lt;jwt&gt;&#39;</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="w"> </span><span class="se">\</span>
@@ -2634,7 +2634,7 @@ invalidated on every workflow mutation.</p>
 <p>The api's <code>UpdateWorkflow</code> does a Get-then-merge when fields are
 omitted, so a partial PUT body only touches what it carries. Send
 <code>false</code> to opt out; OMIT to preserve. <strong>Never send the literal value
-<code>false</code> to a workflow you don't want to change</strong> — that's a
+<code>false</code> to a workflow you don't want to change</strong>, that's a
 no-op-looking write that flips the flag off.</p>
 <h4 id="grandfathering-existing-rules-on-opt-out">Grandfathering existing rules on opt-out<a class="headerlink" href="#grandfathering-existing-rules-on-opt-out" title="Permanent link">&para;</a></h4>
 <p>When platform admin opts a workflow OUT after scoped authors have
@@ -2644,10 +2644,10 @@ working. The §1 Q4 grandfather rule on the api side enforces this:</p>
 <li>A scoped author can still UPDATE priority / selector / name /
   enabled state on rules attached to the now-opted-out workflow.</li>
 <li>A scoped author CAN'T attach the rule to a different workflow that
-  ISN'T also opted in — <code>UpdateForScopedAuthor</code> runs the authorable
+  ISN'T also opted in, <code>UpdateForScopedAuthor</code> runs the authorable
   check whenever <code>workflow_id</code> changes.</li>
 <li>A scoped author CAN'T CREATE a NEW rule on the now-opted-out
-  workflow — <code>CreateForScopedAuthor</code> runs the check unconditionally.</li>
+  workflow, <code>CreateForScopedAuthor</code> runs the check unconditionally.</li>
 </ul>
 <p>This means an admin opting a workflow out doesn't break any pending
 policy work; new authoring on that workflow simply stops until it's
@@ -2657,7 +2657,7 @@ opted back in.</p>
 know about the field (older SPA build during rolling deploy) keep
 working: the api's UpdateWorkflow preserves the flag on PUT bodies
 that omit it (Get-then-merge), and the SPA's new WorkflowForm tracks
-both the loaded value AND whether the admin TOUCHED the checkbox —
+both the loaded value AND whether the admin TOUCHED the checkbox.
 PUT body only includes the field when one of those is true. Either
 side acting alone is safe.</p>
 <h3 id="adjusting-the-reserved-priority-band">Adjusting the reserved priority band<a class="headerlink" href="#adjusting-the-reserved-priority-band" title="Permanent link">&para;</a></h3>
@@ -2681,11 +2681,11 @@ that used to live as the hardcoded constant <code>PlatformReservedPriority
 </tr>
 <tr>
 <td><code>policy_rules</code> envelope (SPA Author drawer)</td>
-<td>Reads <code>priority_cap</code> from <code>GET /api/v1/projects/:id/policy-rules</code> so the drawer's "Priority (&lt; N — platform reserved)" label reflects the live value at page load.</td>
+<td>Reads <code>priority_cap</code> from <code>GET /api/v1/projects/:id/policy-rules</code> so the drawer's "Priority (&lt; N, platform reserved)" label reflects the live value at page load.</td>
 </tr>
 <tr>
 <td>Author drawer Zod schema</td>
-<td>Built from the live cap at mount — the <code>&lt; cap</code> validation rejects values at or above whatever admin has flipped to right now.</td>
+<td>Built from the live cap at mount, the <code>&lt; cap</code> validation rejects values at or above whatever admin has flipped to right now.</td>
 </tr>
 </tbody>
 </table>
@@ -2698,13 +2698,13 @@ anchors to</strong>:</p>
   <code>/projects/:id/policy-rules</code> + <code>/teams/:id/policy-rules</code>) are
   rejected with <code>policy_priority_reserved</code> when <code>priority &gt;= cap</code>.</li>
 <li><strong>Platform admins</strong> (<code>policy.edit</code>, via <code>/admin/policies</code>) <strong>may</strong>
-  author rules — including project- and team-<em>anchored</em> ones — at any
+  author rules, including project- and team-<em>anchored</em> ones, at any
   priority, <strong>including inside the reserved band</strong>. That is the band's
   purpose: a space only platform admins can occupy, so platform rules
   win over scoped overrides.</li>
 </ul>
 <p>So an admin creating a <em>team-anchored</em> rule at priority <code>50000</code>
-succeeds — that is <strong>working as designed</strong>, not a missing check. The
+succeeds, that is <strong>working as designed</strong>, not a missing check. The
 band protects against scoped authors escalating into the platform
 tier; it does not stop admins from intentionally placing high-priority
 anchored rules there. The admin Author form surfaces an informational
@@ -2718,10 +2718,10 @@ or above the live cap, so the choice is explicit.</p>
 <p>The confirm modal carries a grandfathering warning + an inline triage
 SQL block that previews which scoped rules would land in the
 grandfathered band BEFORE you confirm. <strong>Lowering the cap is
-grandfathered</strong> — see the next subsection.</p>
+grandfathered</strong>, see the next subsection.</p>
 <p>The change propagates to every api pod within seconds via the Redis
 pub/sub channel <code>secrets-bridge:platform_settings:platform_reserved_priority</code>.
-Subscribers do NOT trust the published payload — they re-fetch the
+Subscribers do NOT trust the published payload, they re-fetch the
 row from the database on every notification, so a malicious or
 malformed publish can't poison the cache. A 5-minute TTL backstop
 catches dropped notifications.</p>
@@ -2742,16 +2742,16 @@ they continue to apply.</strong> What changes is:</p>
 <ul>
 <li>New scoped Create requests with <code>priority &gt;= new_cap</code> are rejected.</li>
 <li>Scoped Update requests are revalidated against the new cap on every
-  call (NOT just when priority is changing) — bumping any other field
+  call (NOT just when priority is changing), bumping any other field
   on a rule whose priority sits in the grandfathered band is rejected
   with <code>policy_priority_reserved</code>.</li>
 <li>Platform admins editing through <code>/admin/policies</code> are unaffected;
   their permission is <code>policy.edit</code>, not the scoped path.</li>
 </ul>
 <p>This means admin can lower the cap to close off a band without
-breaking pending authoring work — existing rules continue to apply
+breaking pending authoring work, existing rules continue to apply
 while authors migrate to lower priorities.</p>
-<h4 id="triage-sql-list-scoped-rules-in-the-grandfathered-band">Triage SQL — list scoped rules in the grandfathered band<a class="headerlink" href="#triage-sql-list-scoped-rules-in-the-grandfathered-band" title="Permanent link">&para;</a></h4>
+<h4 id="triage-sql-list-scoped-rules-in-the-grandfathered-band">Triage SQL, list scoped rules in the grandfathered band<a class="headerlink" href="#triage-sql-list-scoped-rules-in-the-grandfathered-band" title="Permanent link">&para;</a></h4>
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">priority</span><span class="p">,</span><span class="w"> </span><span class="n">project_id</span>
 </span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="n">policy_rules</span>
 </span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">is_platform_inherited</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">false</span>
@@ -2766,14 +2766,14 @@ before saving.</p>
 unavailability cascading through), service gates fall closed: scoped
 Create and Update return <code>platform_setting_unavailable</code> (503). The
 Author drawer renders a disabled form with a red banner explaining
-that authoring stays disabled until the cap is readable — falling
+that authoring stays disabled until the cap is readable, falling
 back to a stale value would let scoped rules into the
 platform-reserved band.</p>
 <h4 id="observability">Observability<a class="headerlink" href="#observability" title="Permanent link">&para;</a></h4>
 <ul>
-<li><code>platform_setting_updates_total{key, result}</code> — counter for admin
+<li><code>platform_setting_updates_total{key, result}</code>, counter for admin
   edit attempts. <code>result</code> ∈ <code>{ok, invalid, unavailable, conflict}</code>.</li>
-<li><code>platform_setting_cache_reloads_total{key, trigger}</code> — counter for
+<li><code>platform_setting_cache_reloads_total{key, trigger}</code>, counter for
   cache reloads. <code>trigger</code> ∈ <code>{boot, pubsub, on_demand}</code>.</li>
 </ul>
 <p>LOW-CARDINALITY LOCK: counters NEVER carry actor identity. The audit
@@ -2781,7 +2781,7 @@ events <code>platform_setting.updated</code> carry the actor + old/new values.</
 <h3 id="team-scoped-policy-authoring-r-follow-up-3-api114">Team-scoped policy authoring (R-follow-up #3, api#114)<a class="headerlink" href="#team-scoped-policy-authoring-r-follow-up-3-api114" title="Permanent link">&para;</a></h3>
 <p>A scoped author covering one project authors per-project rules via
 <code>/projects/:projectID/policy-rules</code>. A section head covering an entire
-team — multiple sibling projects under the same <code>team_id</code> — would
+team, multiple sibling projects under the same <code>team_id</code>, would
 otherwise have to author N identical rules, one per project. R-follow-up</p>
 <h1 id="3-lifts-that-ceiling-the-third-anchor-team_id-lets-one-rule">3 lifts that ceiling: the third anchor <code>team_id</code> lets one rule<a class="headerlink" href="#3-lifts-that-ceiling-the-third-anchor-team_id-lets-one-rule" title="Permanent link">&para;</a></h1>
 <p>cascade down to every descendant project of the team subtree.</p>
@@ -2818,22 +2818,22 @@ otherwise have to author N identical rules, one per project. R-follow-up</p>
 <td>NOT NULL</td>
 <td>NOT NULL</td>
 <td>INVALID (DB CHECK)</td>
-<td>—</td>
+<td></td>
 </tr>
 </tbody>
 </table>
 <p>The DB CHECK <code>policy_rules_one_anchor</code> enforces mutual exclusion at
 the schema level. Mixed-anchor rows can't exist even via direct SQL.</p>
-<h4 id="cascade-semantics-subtree-down-only">Cascade semantics — subtree-down only<a class="headerlink" href="#cascade-semantics-subtree-down-only" title="Permanent link">&para;</a></h4>
+<h4 id="cascade-semantics-subtree-down-only">Cascade semantics, subtree-down only<a class="headerlink" href="#cascade-semantics-subtree-down-only" title="Permanent link">&para;</a></h4>
 <p>A team rule cascades to every descendant project of the team subtree
 at resolution time. A rule attached to <code>parent-team</code> applies to
 projects under <code>parent-team</code>, <code>child-team-a</code>, <code>grandchild-team-X</code>, etc.
 A rule attached to <code>child-team-a</code> does NOT apply to a sibling
-<code>child-team-b</code>'s projects — the cascade is subtree-down only.</p>
+<code>child-team-b</code>'s projects, the cascade is subtree-down only.</p>
 <p>The resolver query (<code>pkg/storage/policies.ListEnabledOrderedByPriority</code>)
 walks ancestors of the project's owning team via an inline recursive
 CTE in a single round trip. No separate <code>AncestorIDs</code> helper.</p>
-<h4 id="deterministic-tie-break-5-clause-order-by">Deterministic tie-break — 5-clause ORDER BY<a class="headerlink" href="#deterministic-tie-break-5-clause-order-by" title="Permanent link">&para;</a></h4>
+<h4 id="deterministic-tie-break-5-clause-order-by">Deterministic tie-break, 5-clause ORDER BY<a class="headerlink" href="#deterministic-tie-break-5-clause-order-by" title="Permanent link">&para;</a></h4>
 <p>When multiple rules match the same scope, the resolver picks the
 winner with a deterministic 5-clause chain:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>ORDER BY
@@ -2904,7 +2904,7 @@ constraints from migration 0037 + the service layer enforce:</p>
 <tbody>
 <tr>
 <td><code>environment_kind = "non_prod"</code> (REQUIRED)</td>
-<td>Team rules cascade to descendant projects; the environment selector must be subtree-applicable. <code>environment_id</code> resolves to ONE project's env — forbidden.</td>
+<td>Team rules cascade to descendant projects; the environment selector must be subtree-applicable. <code>environment_id</code> resolves to ONE project's env, forbidden.</td>
 </tr>
 <tr>
 <td><code>selector.project_id</code> MUST be absent</td>
@@ -2912,7 +2912,7 @@ constraints from migration 0037 + the service layer enforce:</p>
 </tr>
 <tr>
 <td><code>selector.environment_id</code> MUST be absent</td>
-<td>Same — pins to one project's env.</td>
+<td>Same, pins to one project's env.</td>
 </tr>
 <tr>
 <td><code>selector.team_id</code> MUST be absent (v1 lock)</td>
@@ -2922,9 +2922,9 @@ constraints from migration 0037 + the service layer enforce:</p>
 </table>
 <p>Safe-list optional selector keys: <code>secret_ref_prefix</code>, <code>provider_type</code>,
 and <code>operation</code> (the latter two locked to backend-owned enums per
-api#139 / api#141 — see
+api#139 / api#141, see
 <a href="#selector-enum-values-are-backend-owned">Selector enum values are backend-owned</a>).</p>
-<h4 id="authoring-urls-policyauthor-scoped-to-teamid">Authoring URLs — <code>policy.author</code> scoped to teamID<a class="headerlink" href="#authoring-urls-policyauthor-scoped-to-teamid" title="Permanent link">&para;</a></h4>
+<h4 id="authoring-urls-policyauthor-scoped-to-teamid">Authoring URLs, <code>policy.author</code> scoped to teamID<a class="headerlink" href="#authoring-urls-policyauthor-scoped-to-teamid" title="Permanent link">&para;</a></h4>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>POST   /api/v1/teams/:teamID/policy-rules
 </span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>GET    /api/v1/teams/:teamID/policy-rules
 </span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>GET    /api/v1/teams/:teamID/policy-rules/:ruleID
@@ -2938,17 +2938,17 @@ audit + counter signal as the rest of the gate chain. Same posture
 EPIC R + EPIC Q established for <code>policy.author</code> / <code>integration.bind</code>.</p>
 <h4 id="the-policyedit-boundary">The <code>policy.edit</code> boundary<a class="headerlink" href="#the-policyedit-boundary" title="Permanent link">&para;</a></h4>
 <p><code>policy.edit</code> does NOT auto-allow on <code>/teams/:id/policies</code> or
-<code>/projects/:id/policies</code> — both scoped surfaces are <code>policy.author</code>
+<code>/projects/:id/policies</code>, both scoped surfaces are <code>policy.author</code>
 only. Platform admins manage team-scoped rules via <code>/admin/policies</code>
 (which accepts the <code>team_id</code> anchor with the same server-side
 selector safety rules).</p>
 <p>The SPA mirrors this: <code>canEditPolicyRule</code> on the scoped pages reads
 <code>is_platform_inherited</code> / <code>is_team_inherited</code> / <code>is_ancestor_inherited</code>
 to mark inherited rows as read-only regardless of perms.</p>
-<h4 id="team-lineage-change-dynamic-resolution-summary-audit">Team lineage change — dynamic resolution + summary audit<a class="headerlink" href="#team-lineage-change-dynamic-resolution-summary-audit" title="Permanent link">&para;</a></h4>
+<h4 id="team-lineage-change-dynamic-resolution-summary-audit">Team lineage change, dynamic resolution + summary audit<a class="headerlink" href="#team-lineage-change-dynamic-resolution-summary-audit" title="Permanent link">&para;</a></h4>
 <p>Team coverage is resolved dynamically based on the current team
 lineage. Moving a team (changing its <code>parent_team_id</code>) immediately
-affects future Resolve calls — no retroactive rewrite of existing
+affects future Resolve calls, no retroactive rewrite of existing
 rules.</p>
 <p>The <code>teams.UpdateWithLineageAudit</code> path wraps the parent-change
 UPDATE in a transaction with <code>policy.team_lineage_changed</code> audit
@@ -2971,8 +2971,8 @@ emission. When parent changes:</p>
   atomicity).</li>
 </ul>
 <p>When the parent doesn't actually change → no audit event
-(idempotent — name-only updates don't emit lineage events).</p>
-<h4 id="triage-sql-team-scoped-path">Triage SQL — team-scoped path<a class="headerlink" href="#triage-sql-team-scoped-path" title="Permanent link">&para;</a></h4>
+(idempotent, name-only updates don't emit lineage events).</p>
+<h4 id="triage-sql-team-scoped-path">Triage SQL, team-scoped path<a class="headerlink" href="#triage-sql-team-scoped-path" title="Permanent link">&para;</a></h4>
 <p><strong>1. List all team-scoped rules across the platform</strong></p>
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">SELECT</span>
 </span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">    </span><span class="n">t</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">team</span><span class="p">,</span>
@@ -3042,7 +3042,7 @@ endpoint for the resolved set the SPA sees.</p>
 <p>The R-follow-up #3 slice 1c normalized admin audit emission to
 <code>policy.create</code> / <code>policy.update</code> / <code>policy.delete</code> matching the
 scoped paths' shape. Old EPIC R + R-follow-up #1 events kept their
-original action names (audit is append-only — we don't rewrite
+original action names (audit is append-only, we don't rewrite
 history). To triage policy mutations across the cutover:</p>
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">occurred_at</span><span class="p">,</span>
 </span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">       </span><span class="n">action</span><span class="p">,</span>
@@ -3130,7 +3130,7 @@ the bold fields):</p>
 <tr>
 <td><strong><code>selector</code> VALUES</strong></td>
 <td>❌</td>
-<td><strong>§6 lock — never exposed</strong></td>
+<td><strong>§6 lock, never exposed</strong></td>
 </tr>
 </tbody>
 </table>
@@ -3142,20 +3142,20 @@ needing to see the values at the time of a mutation correlate
 out-of-band: the <code>correlation_id</code> on each entry can be cross-
 referenced with the actor's session / change-ticket / pairing
 partner.</p>
-<p>This rule applies on the wire too — the SPA renders selector_keys
+<p>This rule applies on the wire too, the SPA renders selector_keys
 as set-diff chips (kept / removed / added) but never the values.</p>
 <h4 id="legacy-event-caveat">Legacy event caveat<a class="headerlink" href="#legacy-event-caveat" title="Permanent link">&para;</a></h4>
 <p>R-follow-up #5 slice 1b extended the metadata. Events from BEFORE
 slice 1b shipped do NOT carry <code>name</code> or <code>enabled</code> in their snapshot.
-The audit table is append-only — those rows are NEVER rewritten.
+The audit table is append-only, those rows are NEVER rewritten.
 The SPA renders missing fields as <code>(unknown)</code> placeholders; the
 chain still works because the diff algorithm consults only the
 snapshots' presence of each key (a missing field on event N is
-"absent" — flagged as a change when event N+1 carries it).</p>
+"absent", flagged as a change when event N+1 carries it).</p>
 <h4 id="chain-head-initial-snapshot-observed-caveat">Chain head "Initial snapshot observed" caveat<a class="headerlink" href="#chain-head-initial-snapshot-observed-caveat" title="Permanent link">&para;</a></h4>
-<p>When the audit chain's first event isn't a <code>policy.create</code> — for
+<p>When the audit chain's first event isn't a <code>policy.create</code>, for
 rules created before EPIC R's audit emit shipped, or rules whose
-oldest event was rotated out of retention — the timeline renders
+oldest event was rotated out of retention, the timeline renders
 that first row with:</p>
 <blockquote>
 <p>Initial snapshot observed.</p>
@@ -3187,7 +3187,7 @@ misleading "from nothing" deltas.</p>
 </tbody>
 </table>
 <p>The SPA's <code>canViewPolicyRuleHistory</code> helper gates the History tab
-on the SAME perm as the parent list page — there is NO separate
+on the SAME perm as the parent list page, there is NO separate
 "view-only" permission in v1. Future <code>policy.list</code> is a noted
 design follow-up; not blocking.</p>
 <h4 id="post-delete-admin-only-forensic-visibility">Post-delete admin-only forensic visibility<a class="headerlink" href="#post-delete-admin-only-forensic-visibility" title="Permanent link">&para;</a></h4>
@@ -3203,11 +3203,11 @@ deleted:</p>
 <tbody>
 <tr>
 <td><code>/projects/.../policy-rules/:ruleID/history</code> (scoped)</td>
-<td>404 <code>policy_not_found</code> — scoped access lost at delete</td>
+<td>404 <code>policy_not_found</code>, scoped access lost at delete</td>
 </tr>
 <tr>
 <td><code>/teams/.../policy-rules/:ruleID/history</code> (scoped)</td>
-<td>404 <code>policy_not_found</code> — same</td>
+<td>404 <code>policy_not_found</code>, same</td>
 </tr>
 <tr>
 <td><code>/policies/:ruleID/history</code> (admin)</td>
@@ -3226,8 +3226,8 @@ retain it via the audit-chain path.</p>
 rule's <code>Get</code> returns 404: "Rule has been deleted. History below
 loads from the audit chain (admin post-delete forensic visibility)."</p>
 <h4 id="raw-audit-triage-sql">Raw audit triage SQL<a class="headerlink" href="#raw-audit-triage-sql" title="Permanent link">&para;</a></h4>
-<p>When the SPA timeline isn't enough — or when the operator wants
-to query a span of multiple rules — the <code>audit.read</code> permission
+<p>When the SPA timeline isn't enough, or when the operator wants
+to query a span of multiple rules, the <code>audit.read</code> permission
 gives direct access to the raw events:</p>
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="c1">-- All mutations on a single rule (ASC for chain order, mirroring</span>
 </span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="c1">-- the SPA&#39;s render order):</span>
@@ -3250,7 +3250,7 @@ gives direct access to the raw events:</p>
 </span><span id="__span-30-19"><a id="__codelineno-30-19" name="__codelineno-30-19" href="#__codelineno-30-19"></a><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="k">ASC</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">ASC</span><span class="p">;</span>
 </span></code></pre></div>
 <p>The <code>WHERE action IN (...)</code> clause reads both the normalized names
-AND the R-follow-up #3 pre-cutover names — same compatibility set
+AND the R-follow-up #3 pre-cutover names, same compatibility set
 the api's <code>AuditEvents.ListPolicyRuleHistory</code> uses. Operators on a
 clean cutover can drop the legacy names from the IN list.</p>
 <p>The tie-break <code>ORDER BY occurred_at ASC, id ASC</code> is deterministic
@@ -3292,10 +3292,10 @@ posture as R-follow-up #3 §1 C2's policy resolution tie-break.</p>
 </span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="w">   </span><span class="k">AND</span><span class="w"> </span><span class="n">resource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;policy_rule:&lt;RULE_UUID&gt;&#39;</span>
 </span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
 </span></code></pre></div>
-<h3 id="observability-prometheus-counters">Observability — Prometheus counters<a class="headerlink" href="#observability-prometheus-counters" title="Permanent link">&para;</a></h3>
+<h3 id="observability-prometheus-counters">Observability, Prometheus counters<a class="headerlink" href="#observability-prometheus-counters" title="Permanent link">&para;</a></h3>
 <p>Four counters, all locked to LOW-CARDINALITY labels. Operator
-shouldn't try to derive per-actor or per-rule rates from these —
-those live in the audit log.</p>
+shouldn't try to derive per-actor or per-rule rates from these.
+Those live in the audit log.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>policy_rules_created_total{permission_used, scope}
 </span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>policy_rules_updated_total{permission_used, scope}
 </span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>policy_rules_deleted_total{permission_used, scope}
@@ -3303,9 +3303,9 @@ those live in the audit log.</p>
 </span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>policy_rule_history_views_total{scope}
 </span></code></pre></div>
 <ul>
-<li><code>permission_used</code> ∈ <code>{policy.author, policy.edit}</code> — tracks which
+<li><code>permission_used</code> ∈ <code>{policy.author, policy.edit}</code>, tracks which
   surface ran the mutation.</li>
-<li><code>scope</code> ∈ <code>{platform, project, team}</code> — <code>project</code> for project-scoped
+<li><code>scope</code> ∈ <code>{platform, project, team}</code>, <code>project</code> for project-scoped
   rules, <code>team</code> for team-scoped rules (R-follow-up #3), <code>platform</code> for
   global rules. R-follow-up #3 slice 1d enabled audit + counter
   emission on the admin path so the <code>{policy.edit, *}</code> cardinality
@@ -3317,7 +3317,7 @@ those live in the audit log.</p>
   <code>out_of_team_scope</code>, <code>team_not_found</code> (R-follow-up #3, api#114).</li>
 <li><code>policy_rule_history_views_total{scope}</code> (R-follow-up #5, api#132)
   increments once per successful history read. <code>scope</code> values are
-  the same <code>{platform, project, team}</code> set — <code>team</code>/<code>project</code> for
+  the same <code>{platform, project, team}</code> set, <code>team</code>/<code>project</code> for
   the scoped URL family, <code>platform</code> for any rule reached via the
   admin endpoint (the scope label there is derived from the rule's
   anchor, not the URL family).</li>
@@ -3340,26 +3340,26 @@ those up.</p>
 <tr>
 <td><code>policy_not_found</code></td>
 <td>404</td>
-<td>Rule doesn't exist OR exists under a different project (the §4 mismatch protection — never leak existence under another parent)</td>
-<td>—</td>
+<td>Rule doesn't exist OR exists under a different project (the §4 mismatch protection, never leak existence under another parent)</td>
+<td></td>
 </tr>
 <tr>
 <td><code>platform_policy_not_editable</code></td>
 <td>403</td>
 <td>Scoped caller tried to edit a NULL <code>project_id</code> row OR an <code>is_system</code> row via the scoped URL family</td>
-<td>—</td>
+<td></td>
 </tr>
 <tr>
 <td><code>out_of_scope_policy</code></td>
 <td>403</td>
 <td>Caller's <code>policy.author</code> grant doesn't cover the target project per the team-aware resolver</td>
-<td>—</td>
+<td></td>
 </tr>
 <tr>
 <td><code>policy_selector_mismatch</code></td>
 <td>400</td>
 <td><code>selector.project_id</code> was set but doesn't equal URL projectID</td>
-<td>—</td>
+<td></td>
 </tr>
 <tr>
 <td><code>prod_policy_not_allowed_for_scope</code></td>
@@ -3383,7 +3383,7 @@ those up.</p>
 <td><code>policy_environment_not_in_project</code></td>
 <td>400</td>
 <td><code>selector.environment_id</code> doesn't belong to URL projectID</td>
-<td>—</td>
+<td></td>
 </tr>
 <tr>
 <td><code>workflow_not_authorable_for_scope</code></td>
@@ -3394,21 +3394,21 @@ those up.</p>
 <tr>
 <td><code>team_not_found</code></td>
 <td>404</td>
-<td>Team-scoped Create gate 2 — the URL teamID doesn't exist or is archived. Race-only path (coverage passed at gate 1). R-follow-up #3 (api#114).</td>
-<td>—</td>
+<td>Team-scoped Create gate 2, the URL teamID doesn't exist or is archived. Race-only path (coverage passed at gate 1). R-follow-up #3 (api#114).</td>
+<td></td>
 </tr>
 <tr>
 <td><code>out_of_scope_team_policy</code></td>
 <td>403</td>
 <td>Caller's <code>policy.author</code> grant doesn't cover the URL teamID per the team-aware resolver. Mirrors <code>out_of_scope_policy</code> for the team URL family. R-follow-up #3.</td>
-<td>—</td>
+<td></td>
 </tr>
 </tbody>
 </table>
 <p>The SPA's <code>src/api/policyErrors.ts</code> ships <code>toPolicyRuleErrorToast(err)</code>
 which surfaces the <code>policy_scope_too_broad.reason</code> variants + the
 <code>policy_priority_reserved.cap</code> value with concrete user-facing
-strings. Per EPIC R §5 correction 1 this lives in its own module —
+strings. Per EPIC R §5 correction 1 this lives in its own module,
 deliberately separate from <code>providerConnections.ts</code>'s
 <code>providerConnectionErrorMessage</code>.</p>
 <h2 id="hard-rules">Hard rules<a class="headerlink" href="#hard-rules" title="Permanent link">&para;</a></h2>
@@ -3440,15 +3440,15 @@ deliberately separate from <code>providerConnections.ts</code>'s
 </table>
 <h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../project-environments/">Project environments</a> — the
+<li><a href="../project-environments/">Project environments</a>, the
   <code>kind</code>/<code>risk_level</code>/<code>description</code> model these policies key off.</li>
-<li><a href="../authentication/">Authentication</a> — <code>secret.reveal.direct</code>
+<li><a href="../authentication/">Authentication</a>, <code>secret.reveal.direct</code>
   permission and the dev endpoints that consume policy decisions.</li>
-<li><a href="../cross-team-requests/">Cross-team requests</a> — the Slice N flow
+<li><a href="../cross-team-requests/">Cross-team requests</a>, the Slice N flow
   the cross-team templates above target, and how scoped policy
   authoring participates in cross-team workflow resolution.</li>
-<li><a href="../../reference/permissions/#workflows">Permissions catalog — <code>policy.author</code></a></li>
-<li><a href="../../reference/api-endpoints/#project-anchored-scoped-policy-rules-epic-r-api108">HTTP API endpoints — Project-anchored scoped policy rules</a></li>
+<li><a href="../../reference/permissions/#workflows">Permissions catalog, <code>policy.author</code></a></li>
+<li><a href="../../reference/api-endpoints/#project-anchored-scoped-policy-rules-epic-r-api108">HTTP API endpoints, Project-anchored scoped policy rules</a></li>
 </ul>
 
 

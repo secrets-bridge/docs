@@ -1695,7 +1695,7 @@ routing: <code>/</code> → ui, <code>/api/v1/*</code> → api).</p>
 <tr>
 <td><code>/requests/:id</code></td>
 <td>Request detail</td>
-<td>Timeline, Approvals, <strong>Wraps</strong> (single-shot Reveal modal — read flow), GitOps observations (disabled banner when §26 is off), Details, Approver actions, Cancel-own</td>
+<td>Timeline, Approvals, <strong>Wraps</strong> (single-shot Reveal modal, read flow), GitOps observations (disabled banner when §26 is off), Details, Approver actions, Cancel-own</td>
 </tr>
 <tr>
 <td><code>/agents</code></td>
@@ -1759,7 +1759,7 @@ routing: <code>/</code> → ui, <code>/api/v1/*</code> → api).</p>
 </thead>
 <tbody>
 <tr>
-<td>Token in memory only — never localStorage / sessionStorage / IndexedDB / cookies</td>
+<td>Token in memory only, never localStorage / sessionStorage / IndexedDB / cookies</td>
 <td><code>src/auth/AuthContext.tsx</code> keeps it in React state; reload signs out</td>
 </tr>
 <tr>
@@ -1793,8 +1793,8 @@ routing: <code>/</code> → ui, <code>/api/v1/*</code> → api).</p>
 </tbody>
 </table>
 <h2 id="design-system">Design system<a class="headerlink" href="#design-system" title="Permanent link">&para;</a></h2>
-<p>The SPA matches the Figma file <code>Secrets Bridge — Brand</code> byte-for-byte
-on the brand pages — fonts (Inter + JetBrains Mono), colors (Navy
+<p>The SPA matches the Figma file <code>Secrets Bridge - Brand</code> byte-for-byte
+on the brand pages: fonts (Inter + JetBrains Mono), colors (Navy
 900 / Dark Navy / Cyan accent), brand-gradient primary CTAs,
 <code>StatusPill</code> variants, and the reveal-once UX pattern.</p>
 <p>See <a href="../../design/">Design system</a> for the brand voice,

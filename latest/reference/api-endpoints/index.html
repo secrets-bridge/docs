@@ -1586,7 +1586,7 @@
         <li class="md-nav__item">
   <a href="#integrations-brd-26-gated-by-sb_gitops_enabled" class="md-nav__link">
     <span class="md-ellipsis">
-      Integrations (BRD §26 — gated by SB_GITOPS_ENABLED)
+      Integrations (BRD §26, gated by SB_GITOPS_ENABLED)
     </span>
   </a>
   
@@ -1973,7 +1973,7 @@
         <li class="md-nav__item">
   <a href="#integrations-brd-26-gated-by-sb_gitops_enabled" class="md-nav__link">
     <span class="md-ellipsis">
-      Integrations (BRD §26 — gated by SB_GITOPS_ENABLED)
+      Integrations (BRD §26, gated by SB_GITOPS_ENABLED)
     </span>
   </a>
   
@@ -2167,7 +2167,7 @@ required to call it.</p>
 <tbody>
 <tr>
 <td><code>public</code></td>
-<td>No auth — open route (probes, login)</td>
+<td>No auth, open route (probes, login)</td>
 </tr>
 <tr>
 <td><code>bearer</code></td>
@@ -2269,7 +2269,7 @@ enabled as a break-glass admin action.</p>
 <td><code>POST</code></td>
 <td><code>/api/v1/agents</code></td>
 <td><code>bearer + agent.mint</code></td>
-<td><strong>Legacy direct mint — disabled by default</strong> → <code>403 direct_agent_mint_disabled</code>. Break-glass only via <code>SB_ALLOW_DIRECT_AGENT_MINT=true</code></td>
+<td><strong>Legacy direct mint, disabled by default</strong> → <code>403 direct_agent_mint_disabled</code>. Break-glass only via <code>SB_ALLOW_DIRECT_AGENT_MINT=true</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
@@ -2371,10 +2371,10 @@ enabled as a break-glass admin action.</p>
 </tbody>
 </table>
 <div class="admonition note">
-<p class="admonition-title">Release notes — agent management</p>
+<p class="admonition-title">Release notes: agent management</p>
 <ul>
-<li><strong>Heartbeat response shape.</strong> A heartbeat <em>with a body</em> now returns <strong>200</strong> <code>{status, server_time, next_heartbeat_seconds}</code>. A <strong>bodyless</strong> heartbeat keeps the original empty <strong>204</strong> — existing agents are unaffected.</li>
-<li><strong>Revoke audit action.</strong> New revocations emit <code>agent.revoked</code> (metadata: <code>agent_id</code>, <code>provider_connection_id</code>, <code>reason</code>). Legacy audit rows may still carry the older <code>agent.revoke</code> action — dashboards should alias both.</li>
+<li><strong>Heartbeat response shape.</strong> A heartbeat <em>with a body</em> now returns <strong>200</strong> <code>{status, server_time, next_heartbeat_seconds}</code>. A <strong>bodyless</strong> heartbeat keeps the original empty <strong>204</strong>. Existing agents are unaffected.</li>
+<li><strong>Revoke audit action.</strong> New revocations emit <code>agent.revoked</code> (metadata: <code>agent_id</code>, <code>provider_connection_id</code>, <code>reason</code>). Legacy audit rows may still carry the older <code>agent.revoke</code> action, so dashboards should alias both.</li>
 <li><strong>Prefer the admin/provider projections.</strong> <code>GET /api/v1/agents</code> remains a thin list. New integrations should use <code>GET /api/v1/admin/agents</code>, <code>GET /api/v1/admin/agents/:id</code>, or <code>GET /api/v1/provider-connections/:id/agents</code> (richer projection incl. <code>provider_connection_id</code>).</li>
 </ul>
 </div>
@@ -2429,7 +2429,7 @@ enabled as a break-glass admin action.</p>
 <td><code>POST</code></td>
 <td><code>/api/v1/requests/:id/cancel</code></td>
 <td>bearer</td>
-<td><code>{actor_id}</code> — only the requester</td>
+<td><code>{actor_id}</code> (only the requester)</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
@@ -2452,7 +2452,7 @@ enabled as a break-glass admin action.</p>
 </tbody>
 </table>
 <h2 id="cross-team-requests">Cross-team requests<a class="headerlink" href="#cross-team-requests" title="Permanent link">&para;</a></h2>
-<p>Slice N — Team A → Team B value handoff. See
+<p>Slice N: Team A → Team B value handoff. See
 <a href="../../operations/cross-team-requests/">Cross-team requests</a> for the
 operator model, state machine, and SoD matrix.</p>
 <table>
@@ -2469,7 +2469,7 @@ operator model, state machine, and SoD matrix.</p>
 <td><code>POST</code></td>
 <td><code>/api/v1/requests/cross-team</code></td>
 <td><code>bearer + secret.request</code></td>
-<td><code>{target_team_id, target_project_id, target_environment_id, destination_provider_connection_id, destination_secret_ref, destination_keys[], justification}</code> → <code>AccessRequest</code>. Refuses <code>min_approvers ≥ 2</code> with <code>cross_team_min_approvers_unsupported</code>. NO values in body — destination_keys is the NAME list.</td>
+<td><code>{target_team_id, target_project_id, target_environment_id, destination_provider_connection_id, destination_secret_ref, destination_keys[], justification}</code> → <code>AccessRequest</code>. Refuses <code>min_approvers ≥ 2</code> with <code>cross_team_min_approvers_unsupported</code>. NO values in body. destination_keys is the NAME list.</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
@@ -2499,7 +2499,7 @@ operator model, state machine, and SoD matrix.</p>
 <td><code>GET</code></td>
 <td><code>/api/v1/requests/inbox/count</code></td>
 <td><code>bearer + secret.value.provide</code></td>
-<td><code>{total, per_team: [{team_id, team_name?, count}]}</code> — drives the sidebar badge.</td>
+<td><code>{total, per_team: [{team_id, team_name?, count}]}</code>. Drives the sidebar badge.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
@@ -2528,21 +2528,21 @@ toast without a second round trip:</p>
 <td><code>source</code></td>
 <td><code>false</code></td>
 <td><code>false</code></td>
-<td><code>[]</code> — transitions to <code>approved</code></td>
+<td><code>[]</code> (transitions to <code>approved</code>)</td>
 </tr>
 <tr>
 <td>Source vote, security required, not yet voted</td>
 <td><code>source</code></td>
 <td><code>true</code></td>
 <td><code>false</code></td>
-<td><code>["security_approval"]</code> — SPA toast "your source vote was recorded; security approval still pending"</td>
+<td><code>["security_approval"]</code>: SPA toast "your source vote was recorded; security approval still pending"</td>
 </tr>
 <tr>
 <td>Security vote, source already voted</td>
 <td><code>security</code></td>
 <td><code>true</code></td>
 <td><code>true</code></td>
-<td><code>[]</code> — transitions to <code>approved</code></td>
+<td><code>[]</code> (transitions to <code>approved</code>)</td>
 </tr>
 </tbody>
 </table>
@@ -2550,7 +2550,7 @@ toast without a second round trip:</p>
 friendly strings; see the table at the bottom of
 <a href="../../operations/cross-team-requests/#error-code-reference">Cross-team requests</a>.</p>
 <h2 id="reveal-sessions">Reveal sessions<a class="headerlink" href="#reveal-sessions" title="Permanent link">&para;</a></h2>
-<p>Slice M — bulk reveal page surface. Open returns wrap_id + key_name
+<p>Slice M: bulk reveal page surface. Open returns wrap_id + key_name
 handles; the SPA loops over them calling the single-shot
 <code>/requests/:id/wraps/:wrap_id</code> retrieve for each plaintext. See
 <a href="../../operations/reveal-sessions/">Reveal sessions</a> for the operator
@@ -2798,7 +2798,7 @@ guide.</p>
 </tr>
 </tbody>
 </table>
-<h2 id="integrations-brd-26-gated-by-sb_gitops_enabled">Integrations (BRD §26 — gated by <code>SB_GITOPS_ENABLED</code>)<a class="headerlink" href="#integrations-brd-26-gated-by-sb_gitops_enabled" title="Permanent link">&para;</a></h2>
+<h2 id="integrations-brd-26-gated-by-sb_gitops_enabled">Integrations (BRD §26, gated by <code>SB_GITOPS_ENABLED</code>)<a class="headerlink" href="#integrations-brd-26-gated-by-sb_gitops_enabled" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -2853,7 +2853,7 @@ guide.</p>
 <h2 id="provider-connections">Provider connections<a class="headerlink" href="#provider-connections" title="Permanent link">&para;</a></h2>
 <p>EPIC P (api#92) admin surface + developer dropdown. The same
 <code>GET /provider-connections</code> URL branches on whether <code>project_id</code> is
-present — see <a href="../../operations/provider-connections/#permissions">Provider connections — Permissions</a>
+present. See <a href="../../operations/provider-connections/#permissions">Provider connections: Permissions</a>
 for the full branching matrix. All errors land in the EPIC P envelope:
 <code>{"error_code":"…","message":"…", …}</code>.</p>
 <table>
@@ -2926,7 +2926,7 @@ for the full branching matrix. All errors land in the EPIC P envelope:
 <p><code>integration.bind</code> callers (typically section heads granted the
 <code>provider_connection_binder</code> seed role) use a separate URL family
 that's gated on the binding's project + env. The URL hierarchy
-expresses the §3 mental model split — scoped binding is
+expresses the §3 mental model split: scoped binding is
 project-ownership work, not platform registry administration. The
 <code>integration.edit</code> URLs above are unchanged; admins keep using them.</p>
 <table>
@@ -2943,19 +2943,19 @@ project-ownership work, not platform registry administration. The
 <td><code>POST</code></td>
 <td><code>/api/v1/projects/:projectID/provider-connection-bindings</code></td>
 <td><code>bearer + integration.bind</code> scoped to (project, env)</td>
-<td>Bind a self-service-bindable connection to a (project, env). Body: <code>{provider_connection_id, environment_id}</code>. <code>environment_id</code> is REQUIRED — scoped binders never create project-wide bindings. 403 <code>connection_not_self_service_bindable</code> if the platform admin hasn't flipped the flag. 403 <code>prod_binding_not_allowed_for_scope</code> for prod envs. 409 <code>binding_exists</code>/<code>connection_disabled</code> per the locked chain.</td>
+<td>Bind a self-service-bindable connection to a (project, env). Body: <code>{provider_connection_id, environment_id}</code>. <code>environment_id</code> is REQUIRED. Scoped binders never create project-wide bindings. 403 <code>connection_not_self_service_bindable</code> if the platform admin hasn't flipped the flag. 403 <code>prod_binding_not_allowed_for_scope</code> for prod envs. 409 <code>binding_exists</code>/<code>connection_disabled</code> per the locked chain.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/projects/:projectID/provider-connection-bindings[?environment_id=:id]</code></td>
 <td><code>bearer</code></td>
-<td>Joined project bindings — server-side join adds <code>environment_name</code>, <code>environment_kind</code>, <code>connection_name</code>, <code>connection_type</code>. Optional <code>environment_id</code> narrows to env-specific + project-wide for that env. Sanitized projection (no scope / auth_method / discovery fields).</td>
+<td>Joined project bindings. Server-side join adds <code>environment_name</code>, <code>environment_kind</code>, <code>connection_name</code>, <code>connection_type</code>. Optional <code>environment_id</code> narrows to env-specific + project-wide for that env. Sanitized projection (no scope / auth_method / discovery fields).</td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/projects/:projectID/provider-connection-bindings/:bindingID</code></td>
 <td><code>bearer + integration.bind</code> scoped to (project, binding env)</td>
-<td>Unbind. 204 on success. <strong>§4 correction pinned</strong>: if <code>bindingID</code> exists under a DIFFERENT project, returns 404 <code>binding_not_found</code> — never 403 <code>out_of_scope_binding</code> (which would leak existence under another project). 403 <code>prod_binding_not_allowed_for_scope</code> for prod env bindings (admin path required).</td>
+<td>Unbind. 204 on success. <strong>§4 correction pinned</strong>: if <code>bindingID</code> exists under a DIFFERENT project, returns 404 <code>binding_not_found</code>, never 403 <code>out_of_scope_binding</code> (which would leak existence under another project). 403 <code>prod_binding_not_allowed_for_scope</code> for prod env bindings (admin path required).</td>
 </tr>
 </tbody>
 </table>
@@ -2998,15 +2998,15 @@ project-ownership work, not platform registry administration. The
 </span></code></pre></div>
 <p><code>reason</code> is a fixed low-cardinality set; the counters NEVER carry
 <code>actor_id</code>, <code>project_id</code>, <code>connection_id</code>, or <code>environment_id</code> as
-labels. See <a href="../../operations/provider-connections/#observability-prometheus-counters">Provider connections — Observability</a> for the operator-facing
+labels. See <a href="../../operations/provider-connections/#observability-prometheus-counters">Provider connections: Observability</a> for the operator-facing
 discussion + the audit-event triage SQL that pairs with these.</p>
-<p><strong>Error codes</strong> — the full reference lives in
-<a href="../../operations/provider-connections/#error-code-reference">Provider connections — Error code reference</a>.</p>
+<p><strong>Error codes</strong>: the full reference lives in
+<a href="../../operations/provider-connections/#error-code-reference">Provider connections: Error code reference</a>.</p>
 <h2 id="project-anchored-scoped-policy-rules-epic-r-api108">Project-anchored scoped policy rules (EPIC R, api#108)<a class="headerlink" href="#project-anchored-scoped-policy-rules-epic-r-api108" title="Permanent link">&para;</a></h2>
 <p><code>policy.author</code> callers (typically section heads granted the
 <code>policy_author</code> seed role) use a separate URL family that's gated
 on the rule's project. The URL hierarchy expresses the same §3
-mental model split EPIC Q established for bindings — scoped policy
+mental model split EPIC Q established for bindings: scoped policy
 authoring is project-ownership work, not platform policy
 administration. The <code>policy.edit</code> URLs above are unchanged; admins
 keep using them.</p>
@@ -3030,7 +3030,7 @@ keep using them.</p>
 <td><code>GET</code></td>
 <td><code>/api/v1/projects/:projectID/policy-rules</code></td>
 <td><code>bearer</code></td>
-<td>List scoped rules + inherited platform rules. <strong>§4 correction 1 sanitization</strong>: inherited platform rows carry <code>selector_keys</code> ONLY; the <code>selector</code> field is OMITTED server-side. Scoped rows carry the full selector. Route-pinned not perm-pinned — admins acting via this URL also get the sanitized view.</td>
+<td>List scoped rules + inherited platform rules. <strong>§4 correction 1 sanitization</strong>: inherited platform rows carry <code>selector_keys</code> ONLY; the <code>selector</code> field is OMITTED server-side. Scoped rows carry the full selector. Route-pinned not perm-pinned; admins acting via this URL also get the sanitized view.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
@@ -3065,7 +3065,7 @@ keep using them.</p>
 <tr>
 <td><code>policy_not_found</code></td>
 <td>404</td>
-<td>Rule doesn't exist OR exists under a different project. The §4 mismatch protection — never leak existence under another parent.</td>
+<td>Rule doesn't exist OR exists under a different project. The §4 mismatch protection: never leak existence under another parent.</td>
 </tr>
 <tr>
 <td><code>platform_policy_not_editable</code></td>
@@ -3090,7 +3090,7 @@ keep using them.</p>
 <tr>
 <td><code>policy_scope_too_broad</code></td>
 <td>400</td>
-<td>Selector doesn't satisfy the non-prod-by-construction invariant, OR carries an unknown <code>provider_type</code> / <code>operation</code>. Envelope includes <code>{"reason": "..."}</code> — base variants: <code>env_constraint_missing</code>, <code>env_kind_invalid</code>, <code>selector_empty</code>, <code>env_kind_id_inconsistent</code>, <code>provider_type_invalid</code> (api#139), <code>operation_invalid</code> (api#141).</td>
+<td>Selector doesn't satisfy the non-prod-by-construction invariant, OR carries an unknown <code>provider_type</code> / <code>operation</code>. Envelope includes <code>{"reason": "..."}</code>. Base variants: <code>env_constraint_missing</code>, <code>env_kind_invalid</code>, <code>selector_empty</code>, <code>env_kind_id_inconsistent</code>, <code>provider_type_invalid</code> (api#139), <code>operation_invalid</code> (api#141).</td>
 </tr>
 <tr>
 <td><code>policy_priority_reserved</code></td>
@@ -3105,7 +3105,7 @@ keep using them.</p>
 <tr>
 <td><code>workflow_not_authorable_for_scope</code></td>
 <td>403</td>
-<td>R-follow-up #1 (api#112). Scoped caller picked a workflow that platform admin hasn't opted into the scoped author surface. Envelope carries <code>{"workflow_id": "&lt;uuid&gt;"}</code> — the actor selected the workflow from a dropdown, so logging it isn't a leak. Distinct from <code>platform_policy_not_editable</code>: the workflow exists and is reachable by admin; it just hasn't been exposed to scoped authors yet.</td>
+<td>R-follow-up #1 (api#112). Scoped caller picked a workflow that platform admin hasn't opted into the scoped author surface. Envelope carries <code>{"workflow_id": "&lt;uuid&gt;"}</code>. The actor selected the workflow from a dropdown, so logging it isn't a leak. Distinct from <code>platform_policy_not_editable</code>: the workflow exists and is reachable by admin; it just hasn't been exposed to scoped authors yet.</td>
 </tr>
 </tbody>
 </table>
@@ -3119,11 +3119,11 @@ keep using them.</p>
 added by R-follow-up #1, api#112); the counters NEVER carry
 <code>actor_id</code>, <code>project_id</code>, <code>policy_rule_id</code>, or <code>workflow_id</code> as
 labels. See
-<a href="../../operations/policy-templates/#observability-prometheus-counters">Policy templates — Observability</a>
+<a href="../../operations/policy-templates/#observability-prometheus-counters">Policy templates: Observability</a>
 for the operator-facing discussion + the audit-event triage SQL
 that pairs with these.</p>
-<p><strong>Error codes</strong> — the full reference table lives in
-<a href="../../operations/policy-templates/#error-code-reference">Policy templates — Error code reference</a>.</p>
+<p><strong>Error codes</strong>: the full reference table lives in
+<a href="../../operations/policy-templates/#error-code-reference">Policy templates: Error code reference</a>.</p>
 <h2 id="team-anchored-scoped-policy-rules-r-follow-up-3-api114">Team-anchored scoped policy rules (R-follow-up #3, api#114)<a class="headerlink" href="#team-anchored-scoped-policy-rules-r-follow-up-3-api114" title="Permanent link">&para;</a></h2>
 <p><code>policy.author</code> callers granted scoped to a <code>team_id</code> use this URL
 family to author rules that cascade down to every descendant project
@@ -3132,7 +3132,7 @@ model split: team-anchored authoring is its own surface, parallel to
 the project-anchored EPIC R family above. Platform admins still use
 <code>/admin/policies</code> for global rules; the team URL family stays
 <code>policy.author</code>-only per §4 C3.</p>
-<p>URL is the source of truth for the row's anchor — the <code>team_id</code> is
+<p>URL is the source of truth for the row's anchor: the <code>team_id</code> is
 never on the wire body (defense against URL/body confusion, same
 posture R-follow-up #2 established for URL-key-wins).</p>
 <table>
@@ -3149,7 +3149,7 @@ posture R-follow-up #2 established for URL-key-wins).</p>
 <td><code>POST</code></td>
 <td><code>/api/v1/teams/:teamID/policy-rules</code></td>
 <td><code>bearer + policy.author</code> scoped to teamID</td>
-<td>Author a team-scoped rule. Body: <code>{name, selector, priority, workflow_id, enabled}</code>. §1 C1 strict — selector MUST carry <code>environment_kind="non_prod"</code> and MUST NOT carry <code>project_id</code>, <code>environment_id</code>, or <code>team_id</code>. The 6-gate chain (coverage → team exists+active → priority &lt; live cap → selector consistency → workflow authorable → INSERT) runs server-side. Live <code>priority_cap</code> echoed in the envelope.</td>
+<td>Author a team-scoped rule. Body: <code>{name, selector, priority, workflow_id, enabled}</code>. §1 C1 strict: selector MUST carry <code>environment_kind="non_prod"</code> and MUST NOT carry <code>project_id</code>, <code>environment_id</code>, or <code>team_id</code>. The 6-gate chain (coverage → team exists+active → priority &lt; live cap → selector consistency → workflow authorable → INSERT) runs server-side. Live <code>priority_cap</code> echoed in the envelope.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
@@ -3201,7 +3201,7 @@ posture R-follow-up #2 established for URL-key-wins).</p>
 </span></code></pre></div>
 <p>For inherited rows (<code>is_platform_inherited = true</code> OR
 <code>is_ancestor_inherited = true</code>), the <code>selector</code> field is OMITTED
-server-side — only <code>selector_keys</code> is exposed. Defense against
+server-side. Only <code>selector_keys</code> is exposed. Defense against
 selector leakage across siblings under the same parent team.</p>
 <p><strong>New stable error codes</strong> (R-follow-up #3):</p>
 <table>
@@ -3217,22 +3217,22 @@ selector leakage across siblings under the same parent team.</p>
 <tr>
 <td><code>team_not_found</code></td>
 <td>404</td>
-<td>Team-scoped Create gate 2 — the URL teamID doesn't exist or is archived. Race-only path (coverage passed at gate 1).</td>
-<td>—</td>
+<td>Team-scoped Create gate 2: the URL teamID doesn't exist or is archived. Race-only path (coverage passed at gate 1).</td>
+<td>-</td>
 </tr>
 <tr>
 <td><code>out_of_scope_team_policy</code></td>
 <td>403</td>
 <td>Caller's <code>policy.author</code> grant doesn't cover the URL teamID per the team-aware resolver. Mirrors <code>out_of_scope_policy</code> for the team URL family.</td>
-<td>—</td>
+<td>-</td>
 </tr>
 </tbody>
 </table>
 <p><strong>3 new <code>policy_scope_too_broad.reason</code> variants</strong> (R-follow-up #3):</p>
 <ul>
-<li><code>team_selector_pins_project</code> — team rule selector pinned <code>project_id</code></li>
-<li><code>team_selector_pins_environment_id</code> — team rule selector pinned <code>environment_id</code></li>
-<li><code>team_selector_pins_team_id</code> — team rule selector pinned <code>team_id</code> (v1 lock)</li>
+<li><code>team_selector_pins_project</code>: team rule selector pinned <code>project_id</code></li>
+<li><code>team_selector_pins_environment_id</code>: team rule selector pinned <code>environment_id</code></li>
+<li><code>team_selector_pins_team_id</code>: team rule selector pinned <code>team_id</code> (v1 lock)</li>
 </ul>
 <p>A later slice (api#139) added an eighth variant, <code>provider_type_invalid</code>,
 fired when <code>selector.provider_type</code> is present but not in the
@@ -3240,7 +3240,7 @@ backend-owned enum (<code>aws-sm</code>, <code>vault</code>, <code>gcp-sm</code>
 <code>kubernetes</code>). A sibling slice (api#141) added a ninth,
 <code>operation_invalid</code>, fired when <code>selector.operation</code> is present but not
 in the backend-owned enum (<code>read</code>, <code>patch</code>, <code>reveal</code>). Both apply on ALL
-three authoring paths — project, team, and admin. See the operator
+three authoring paths: project, team, and admin. See the operator
 guide's
 <a href="../../operations/policy-templates/#selector-enum-values-are-backend-owned">Selector enum values are backend-owned</a>.</p>
 <p>The full reason set on <code>policy_scope_too_broad</code> is now 9 variants.</p>
@@ -3253,9 +3253,9 @@ separate envelopes; the api collapses them into one for cleaner UX.</p>
 <p><code>GET /api/v1/projects/:projectID/policy-rules</code> (the existing EPIC R
 surface) now also carries team-inherited rows. The projection adds:</p>
 <ul>
-<li><code>is_team_inherited</code> — <code>true</code> when the rule's <code>team_id</code> is set</li>
-<li><code>team_name</code> — populated for team-inherited rows via server-side JOIN</li>
-<li><code>workflow_name</code> — populated for ALL rows via server-side JOIN
+<li><code>is_team_inherited</code>: <code>true</code> when the rule's <code>team_id</code> is set</li>
+<li><code>team_name</code>: populated for team-inherited rows via server-side JOIN</li>
+<li><code>workflow_name</code>: populated for ALL rows via server-side JOIN
   (eliminates the SPA's N+1 lookup against <code>/workflows</code>)</li>
 </ul>
 <p>Inherited team rows are sanitized identically to inherited platform
@@ -3263,7 +3263,7 @@ rows: <code>selector_keys</code> only, no <code>selector</code>. Read-only on th
 URL; manage on the team's own page or via <code>/admin/policies</code>.</p>
 <h3 id="get-apiv1usersmepolicy-author-team-coverage"><code>GET /api/v1/users/me/policy-author-team-coverage</code><a class="headerlink" href="#get-apiv1usersmepolicy-author-team-coverage" title="Permanent link">&para;</a></h3>
 <p>NEW (R-follow-up #3, api#126). Returns the resolved team set from the
-api's <code>EffectiveTeamAccess(actor, policy.author)</code> helper — every team
+api's <code>EffectiveTeamAccess(actor, policy.author)</code> helper: every team
 the actor's grants cover, subtree-expanded.</p>
 <p>Permission: bearer only. Exposes ONLY the caller's own coverage; not
 enumerable across other users.</p>
@@ -3293,15 +3293,15 @@ the <code>parent_team_id</code> UPDATE when the parent actually changes. Metadat
 carries the new + old parent IDs + <code>team_policy_rule_count</code> +
 <code>affected_project_count</code> (subtree size). When parent doesn't change
 (name-only update) → no audit event (idempotent).</p>
-<p>If audit append fails, the parent UPDATE rolls back — transactional
-atomicity preserved.</p>
+<p>If audit append fails, the parent UPDATE rolls back, so transactional
+atomicity is preserved.</p>
 <h2 id="policy-rule-change-history-r-follow-up-5-api132">Policy rule change history (R-follow-up #5, api#132)<a class="headerlink" href="#policy-rule-change-history-r-follow-up-5-api132" title="Permanent link">&para;</a></h2>
 <p>Three read endpoints expose the audit chain for a single policy
 rule. The api walks the chain in time order, computes a diff
 between consecutive snapshots, normalizes legacy action names, and
 returns a rendered timeline. UI consumes this via the per-anchor
 Detail pages.</p>
-<p>Hard rule — the §6 selector lock from EPIC R is unwavering. The
+<p>Hard rule: the §6 selector lock from EPIC R is unwavering. The
 wire response carries <code>selector_keys</code> (set-based, sorted) and
 <strong>NEVER</strong> selector VALUES, on every entry of the chain.</p>
 <table>
@@ -3318,7 +3318,7 @@ wire response carries <code>selector_keys</code> (set-based, sorted) and
 <td><code>GET</code></td>
 <td><code>/api/v1/projects/:projectID/policy-rules/:ruleID/history</code></td>
 <td><code>bearer + policy.author</code> covering projectID</td>
-<td>Scoped (project). 404 <code>policy_not_found</code> on missing rule OR anchor mismatch (silent — gate-order enumeration protection). After delete: 404.</td>
+<td>Scoped (project). 404 <code>policy_not_found</code> on missing rule OR anchor mismatch (silent, gate-order enumeration protection). After delete: 404.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
@@ -3330,13 +3330,13 @@ wire response carries <code>selector_keys</code> (set-based, sorted) and
 <td><code>GET</code></td>
 <td><code>/api/v1/policies/:ruleID/history</code></td>
 <td><code>bearer + policy.edit</code></td>
-<td>Admin. <strong>Existence check via the audit chain, NOT <code>policyRepo.Get</code></strong> — admin retains forensic visibility after delete if at least one event exists. NO anchor routing — admin sees regardless of anchor.</td>
+<td>Admin. <strong>Existence check via the audit chain, NOT <code>policyRepo.Get</code></strong>. Admin retains forensic visibility after delete if at least one event exists. NO anchor routing; admin sees regardless of anchor.</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Query params</strong> — all 3 endpoints support:</p>
+<p><strong>Query params</strong> that all 3 endpoints support:</p>
 <ul>
-<li><code>limit=&lt;int&gt;</code> — default 50; cap 500 (<code>storage.MaxPolicyHistoryLimit</code>). Server-side cap defends against operator typos.</li>
+<li><code>limit=&lt;int&gt;</code>: default 50; cap 500 (<code>storage.MaxPolicyHistoryLimit</code>). Server-side cap defends against operator typos.</li>
 </ul>
 <p><strong>Response envelope shape</strong> (200):</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
@@ -3353,7 +3353,7 @@ recent event's metadata; falls back to <code>"platform"</code> for pre-§4 C2
 legacy events with no scope key.</p>
 <p><code>has_more=true</code> indicates an older event was capped by <code>limit</code>. The
 SPA grows <code>limit</code> per "Load more" click (50 → 100 → 200 …) per
-OQ3-A — cursor pagination is deferred.</p>
+OQ3-A; cursor pagination is deferred.</p>
 <p><strong><code>HistoryEntry</code> shape</strong>:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&quot;event_id&quot;</span><span class="p">:</span><span class="w">             </span><span class="s2">&quot;&lt;uuid&gt;&quot;</span><span class="p">,</span>
@@ -3385,7 +3385,7 @@ OQ3-A — cursor pagination is deferred.</p>
 <ul>
 <li><code>action</code> is always the <strong>normalized</strong> name. Legacy events from
   before R-follow-up #3 §4 C2 (action names <code>policy.created_for_scope</code>
-  etc.) are mapped server-side before return — the SPA sees one
+  etc.) are mapped server-side before return. The SPA sees one
   stable enum.</li>
 <li><code>changes</code> is empty on <code>policy.create</code> (chain head) and on
   <code>policy.delete</code> (terminal event; <code>snapshot_after</code> carries the
@@ -3397,18 +3397,18 @@ OQ3-A — cursor pagination is deferred.</p>
   (<code>workflows.ListByIDs</code>). When the workflow has been deleted, the
   field is omitted; SPA renders <code>(deleted)</code>.</li>
 </ul>
-<p><strong>Anchor mismatch — silent 404, no audit emit</strong></p>
+<p><strong>Anchor mismatch: silent 404, no audit emit</strong></p>
 <p>Scoped endpoints route through the same enumeration-protection
 pattern as the per-anchor <code>Get</code> handlers: if the rule's
 <code>project_id</code> (or <code>team_id</code>) doesn't match the URL's, the response
-is <code>404 policy_not_found</code> — same envelope as a truly missing rule.
+is <code>404 policy_not_found</code>, the same envelope as a truly missing rule.
 NO <code>policy.denied_anchor_mismatch</code> audit event; that would defeat
 the very enumeration protection it claims to enhance. Slice 1c §4
 OQ4-1 lock.</p>
 <h3 id="counter">Counter<a class="headerlink" href="#counter" title="Permanent link">&para;</a></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>policy_rule_history_views_total{scope}
 </span></code></pre></div>
-<p>LOW-CARDINALITY LOCK preserved: <code>scope ∈ {platform, project, team}</code> —
+<p>LOW-CARDINALITY LOCK preserved: <code>scope ∈ {platform, project, team}</code>,
 3 values total. NEVER carries <code>actor_id</code>, <code>rule_id</code>, <code>project_id</code>,
 or <code>team_id</code> labels. Per-rule reads live in the audit log via
 <code>audit.read.policy_history</code> (see below).</p>
@@ -3425,7 +3425,7 @@ or <code>team_id</code> labels. Per-rule reads live in the audit log via
 </span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Provides forensic traceability for "who read whose history" — a
+<p>Provides forensic traceability for "who read whose history": a
 post-incident query for <code>action='audit.read.policy_history'</code>
 returns every history view across the entire span. Operators
 investigating leaked screenshots / "who saw the old version"
@@ -3441,15 +3441,15 @@ events carry:</p>
   <code>team_id: null</code> for cross-cohort consistency (was missing from the
   R-follow-up #3 §4 C2 normalization; slice 1b closes the gap).</li>
 </ul>
-<p>No data backfill — append-only audit. Legacy events render gracefully
+<p>No data backfill; append-only audit. Legacy events render gracefully
 in the SPA as <code>(unknown)</code> for the missing keys.</p>
 <h2 id="platform-settings-r-follow-up-2-api113">Platform settings (R-follow-up #2, api#113)<a class="headerlink" href="#platform-settings-r-follow-up-2-api113" title="Permanent link">&para;</a></h2>
 <p>Admin surface for cross-cutting platform configuration. v1 ships
-exactly one whitelisted key — <code>platform_reserved_priority</code> — that
+exactly one whitelisted key (<code>platform_reserved_priority</code>) that
 controls the priority band scoped policy authors are bounded below.
 Future admin-configurable knobs slot in as new rows in the same table
 without per-knob migrations.</p>
-<p><strong>Hard rule</strong> — <code>platform_settings</code> must NEVER store secrets,
+<p><strong>Hard rule</strong>: <code>platform_settings</code> must NEVER store secrets,
 credentials, tokens, or provider auth material. The service-layer
 whitelist + reviewers + the DB CHECK constraint all enforce this.</p>
 <p>All three routes are gated by <code>policy.edit</code> (the platform policy
@@ -3496,7 +3496,7 @@ a 5-minute TTL backstop for missed messages.</p>
 </span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">&quot;updated_by&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;alice&quot;</span>
 </span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>value</code> is generic JSON — callers narrow per-key. For
+<p><code>value</code> is generic JSON. Callers narrow per-key. For
 <code>platform_reserved_priority</code> it's an integer between <code>100</code> and
 <code>1,000,000</code>.</p>
 <p><strong>Stable error codes</strong> (R-follow-up #2):</p>
@@ -3514,7 +3514,7 @@ a 5-minute TTL backstop for missed messages.</p>
 <td><code>unknown_platform_setting</code></td>
 <td>404</td>
 <td>Key is not in the v1 whitelist OR the row doesn't exist.</td>
-<td>—</td>
+<td>-</td>
 </tr>
 <tr>
 <td><code>invalid_platform_setting</code></td>
@@ -3526,7 +3526,7 @@ a 5-minute TTL backstop for missed messages.</p>
 <td><code>platform_setting_unavailable</code></td>
 <td>503</td>
 <td>The SettingsService cache reload failed (Postgres unreachable, KMS cascading failure, etc.). Service gates that depend on the setting fail closed and return this code; admins and Author drawers can't proceed until the cache is readable again.</td>
-<td>—</td>
+<td>-</td>
 </tr>
 </tbody>
 </table>
@@ -3535,11 +3535,11 @@ a 5-minute TTL backstop for missed messages.</p>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>platform_setting_cache_reloads_total{key, trigger}
 </span></code></pre></div>
 <ul>
-<li><code>key</code> is the whitelisted key string (low-cardinality — v1 has one).</li>
+<li><code>key</code> is the whitelisted key string (low-cardinality, v1 has one).</li>
 <li><code>result</code> ∈ <code>{ok, invalid, unavailable, conflict}</code>.</li>
 <li><code>trigger</code> ∈ <code>{boot, pubsub, on_demand}</code>.</li>
 </ul>
-<p>LOW-CARDINALITY LOCK — counters NEVER carry <code>actor_id</code>. The
+<p>LOW-CARDINALITY LOCK: counters NEVER carry <code>actor_id</code>. The
 <code>platform_setting.updated</code> audit event carries the actor + old/new
 value for forensic lookup.</p>
 <p>See

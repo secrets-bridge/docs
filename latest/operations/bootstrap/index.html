@@ -1719,13 +1719,13 @@
 <h1 id="bootstrap-first-sign-in">Bootstrap &amp; first sign-in<a class="headerlink" href="#bootstrap-first-sign-in" title="Permanent link">&para;</a></h1>
 <p>After the api starts for the first time, the platform has to be
 <strong>bootstrapped</strong> with a usable admin identity. Otherwise nothing
-can be done — every write endpoint is gated by
+can be done: every write endpoint is gated by
 <code>auth.Require(perm)</code> and there are no role assignments yet.</p>
 <h2 id="what-bootstrapped-means">What "bootstrapped" means<a class="headerlink" href="#what-bootstrapped-means" title="Permanent link">&para;</a></h2>
 <p>Two things happen on first boot when <code>local_users</code> is empty and
 the bootstrap env vars are set:</p>
 <ol>
-<li><strong>A local admin user is created</strong> — bcrypt-hashed password
+<li><strong>A local admin user is created</strong>, bcrypt-hashed password
    stored in <code>local_users</code> (idempotent: a second boot with the
    same env vars is a no-op once any user exists).</li>
 <li><strong>The new user is bound to the seed <code>admin</code> role</strong> with global
@@ -1750,19 +1750,19 @@ the bootstrap env vars are set:</p>
 <tr>
 <td><code>SB_BOOTSTRAP_ADMIN_EMAIL</code></td>
 <td>recommended on first boot</td>
-<td>—</td>
+<td></td>
 <td>Becomes the local-admin email</td>
 </tr>
 <tr>
 <td><code>SB_BOOTSTRAP_ADMIN_PASSWORD</code></td>
 <td>recommended on first boot</td>
-<td>—</td>
+<td></td>
 <td><strong>Rotate immediately after first sign-in</strong></td>
 </tr>
 <tr>
 <td><code>SB_BOOTSTRAP_ADMIN_USER_ID</code></td>
 <td>optional</td>
-<td>—</td>
+<td></td>
 <td>Pre-OIDC escape hatch: assigns the admin role to a specific opaque <code>user_id</code> (matches the future OIDC <code>sub</code> claim). Use this alongside <code>_EMAIL</code>/<code>_PASSWORD</code> if you want both the local-admin login and a pre-arranged OIDC identity to hold admin.</td>
 </tr>
 </tbody>
@@ -1775,7 +1775,7 @@ the bootstrap env vars are set:</p>
 <li>You land on the Dashboard with the <code>Agents Online</code> KPI showing
    <code>0 / 0</code>.</li>
 </ol>
-<p>The token is stored in React state only — <strong>closing the tab
+<p>The token is stored in React state only, <strong>closing the tab
 signs you out</strong> by design (BRD §15).</p>
 <h2 id="rotating-the-admin-password">Rotating the admin password<a class="headerlink" href="#rotating-the-admin-password" title="Permanent link">&para;</a></h2>
 <p>There's no UI surface for this in the current slice. For now, use
@@ -1812,7 +1812,7 @@ its bcrypt hash are pointless:</p>
    gone from React state forever.</li>
 </ol>
 <p>If you lose the secret before copying it, <strong>revoke the agent</strong> and
-mint a new one. There's no recovery path — that's the whole
+mint a new one. There's no recovery path. That's the whole
 point of reveal-once.</p>
 <h2 id="submitting-your-first-read-request">Submitting your first read request<a class="headerlink" href="#submitting-your-first-read-request" title="Permanent link">&para;</a></h2>
 <p>Once you have an agent running and <code>provider creds</code>
@@ -1826,7 +1826,7 @@ configured for it:</p>
 <li><strong>Secret reference</strong>: e.g. <code>prod/db/password</code></li>
 <li><strong>Keys</strong>: e.g. <code>DB_PASSWORD</code> (or leave one empty row for "all
    keys in the bundle")</li>
-<li><strong>Justification</strong>: required — typically an incident or ticket
+<li><strong>Justification</strong>: required, typically an incident or ticket
    number</li>
 <li><strong>Submit</strong> → you're navigated to the request detail page</li>
 </ol>

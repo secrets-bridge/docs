@@ -1656,7 +1656,7 @@ the GitOps consumer for cluster-internal sync.</p>
   from v0.1.0; only the module-path import changed)</li>
 <li>The reconciler validates the CR by calling
   <code>Providers.Build()</code> for both refs and reports <code>Ready=Validated</code>
-  / <code>Ready=ProviderError</code> — it does <strong>not</strong> run the sync loop
+  / <code>Ready=ProviderError</code>. It does <strong>not</strong> run the sync loop
   itself</li>
 <li>Provider registry injected on the Reconciler struct (matches the
   <code>Register(r)</code> pattern in <code>core/providers/*</code>)</li>
@@ -1694,8 +1694,8 @@ architecture moves execution to the <strong>agent</strong> (BRD §12.4):</p>
 </tr>
 </tbody>
 </table>
-<p>The sync work is dispatched to the agent via the CP's job queue —
-the controller is a <strong>GitOps gate</strong> for the cluster, not the
+<p>The sync work is dispatched to the agent via the CP's job queue.
+The controller is a <strong>GitOps gate</strong> for the cluster, not the
 executor.</p>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <table>
@@ -1711,7 +1711,7 @@ executor.</p>
 <tr>
 <td><code>KUBECONFIG</code></td>
 <td>for out-of-cluster runs</td>
-<td>—</td>
+<td>-</td>
 <td>In-cluster uses the projected SA token</td>
 </tr>
 <tr>

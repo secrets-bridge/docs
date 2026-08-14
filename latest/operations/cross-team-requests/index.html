@@ -1360,7 +1360,7 @@
         <li class="md-nav__item">
   <a href="#hard-rules-what-never-touches-the-value" class="md-nav__link">
     <span class="md-ellipsis">
-      Hard rules — what NEVER touches the value
+      Hard rules, what NEVER touches the value
     </span>
   </a>
   
@@ -1754,7 +1754,7 @@
         <li class="md-nav__item">
   <a href="#hard-rules-what-never-touches-the-value" class="md-nav__link">
     <span class="md-ellipsis">
-      Hard rules — what NEVER touches the value
+      Hard rules, what NEVER touches the value
     </span>
   </a>
   
@@ -1863,14 +1863,14 @@ requires it, a security approver) verifies; the agent writes the value
 into Team A's provider. The original Team B member never touches Team A's
 workload, and Team A never sees Team B's source of truth.</p>
 <p>Cross-team requests are the safe alternative to "share me your prod
-secret" Slack messages — every value handoff lands in the audit log
+secret" Slack messages. Every value handoff lands in the audit log
 with a justification, a workflow snapshot, and a separation-of-duties
 trail.</p>
 <p>This page covers the operator-facing model: the state machine, the
 permission matrix, the workflow knobs you can tune, and the SQL +
 metrics you'll use to triage. The SPA flow is described from the user's
 point of view inline; the API contract is at
-<a href="../../reference/api-endpoints/#cross-team-requests">HTTP API endpoints — Cross-team requests</a>.</p>
+<a href="../../reference/api-endpoints/#cross-team-requests">HTTP API endpoints, Cross-team requests</a>.</p>
 <h2 id="target-vs-destination">Target vs destination<a class="headerlink" href="#target-vs-destination" title="Permanent link">&para;</a></h2>
 <p>Every cross-team request carries two scopes. They look similar but
 mean opposite things, and operator queries get them confused often
@@ -1902,14 +1902,14 @@ project (Team A's project). The submit endpoint rejects
 belong to the source project. This is the architectural fence that
 keeps Team B from accidentally writing into Team A's neighbours.</p>
 <p>Bindings are managed via the admin page documented at
-<a href="../provider-connections/">Provider connections</a> — one connection per
+<a href="../provider-connections/">Provider connections</a>, one connection per
 external store, then a <code>(project, env)</code> binding row per project that
 needs to consume it. The cross-team submit drawer's destination
 dropdown calls the same <code>/provider-connections</code> URL with <code>project_id</code>
 + <code>environment_id</code> set so the api returns only the sanitized
 <code>{id, name, type}</code> projection scoped to the caller's source project +
 env. When the dropdown is empty, the drawer branches the empty-state
-CTA on <code>hasPermission('integration.edit')</code> — admins see a "Manage
+CTA on <code>hasPermission('integration.edit')</code>, admins see a "Manage
 provider connections" link, non-admins see "Ask your platform team to
 bind a provider connection." Cross-team submits against a
 <strong>disabled</strong> destination return 409 <code>connection_disabled</code>.</p>
@@ -1931,7 +1931,7 @@ dropdown:</p>
 </tr>
 <tr>
 <td>Project-wide (<code>environment_id IS NULL</code>)</td>
-<td>Platform admins ONLY — scoped binders cannot create or delete project-wide bindings</td>
+<td>Platform admins ONLY. Scoped binders cannot create or delete project-wide bindings</td>
 <td>When the cross-team source project matches, regardless of env</td>
 </tr>
 </tbody>
@@ -1987,12 +1987,12 @@ platform-only.</p>
 <tr>
 <td><code>refused</code></td>
 <td>Team B declined to provide the value</td>
-<td>Terminal — requester sees the refuse reason</td>
+<td>Terminal, requester sees the refuse reason</td>
 </tr>
 <tr>
 <td><code>rejected</code></td>
 <td>Source or security approver rejected</td>
-<td>Terminal — requester sees the rejection reason</td>
+<td>Terminal, requester sees the rejection reason</td>
 </tr>
 <tr>
 <td><code>cancelled</code></td>
@@ -2011,7 +2011,7 @@ platform-only.</p>
 observable state catches up even when no fill attempt arrives.</p>
 <h2 id="separation-of-duties">Separation of duties<a class="headerlink" href="#separation-of-duties" title="Permanent link">&para;</a></h2>
 <p>The cross-team flow enforces a four-actor matrix. No single user can
-play more than one role on the same request — the API checks at every
+play more than one role on the same request. The API checks at every
 mutation:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>requester  ≠  filler  ≠  source approver  ≠  security approver
 </span></code></pre></div>
@@ -2039,12 +2039,12 @@ mutation:</p>
 </table>
 <p><code>secret.security.approve</code> is a <strong>global</strong> permission in v1, so a single
 user can carry both source and security capability. The SoD check
-catches the case where they try to cast both votes on the same request
-— the second attempt returns 403 with
+catches the case where they try to cast both votes on the same request.
+The second attempt returns 403 with
 <code>separation_of_duties_violated</code>.</p>
 <p>The SPA mirrors the API: the verify card hides the buttons the caller
 cannot use AND renders the reason ("You provided the values for this
-request.") so the operator knows they aren't broken — they're blocked
+request.") so the operator knows they aren't broken. They're blocked
 by design.</p>
 <h2 id="permissions-and-seed-roles">Permissions and seed roles<a class="headerlink" href="#permissions-and-seed-roles" title="Permanent link">&para;</a></h2>
 <p>Two new permissions land with Slice N:</p>
@@ -2087,12 +2087,12 @@ by design.</p>
 <tr>
 <td><code>security_approver</code></td>
 <td><code>secret.security.approve</code></td>
-<td>Used carefully — a holder can bypass the source-side workflow on cross-team requests. The Roles editor surfaces a type-to-confirm dialog the first time <code>secret.security.approve</code> is added to a role.</td>
+<td>Used carefully, a holder can bypass the source-side workflow on cross-team requests. The Roles editor surfaces a type-to-confirm dialog the first time <code>secret.security.approve</code> is added to a role.</td>
 </tr>
 </tbody>
 </table>
 <p>Both are <code>is_system=true</code>. The permission strings are editable, but the
-roles cannot be deleted — <code>DELETE</code> returns 409 <code>system_row</code>.</p>
+roles cannot be deleted. <code>DELETE</code> returns 409 <code>system_row</code>.</p>
 <h2 id="workflow-knobs">Workflow knobs<a class="headerlink" href="#workflow-knobs" title="Permanent link">&para;</a></h2>
 <p><code>workflow_definitions</code> gets two new columns for cross-team semantics:</p>
 <table>
@@ -2128,7 +2128,7 @@ roles cannot be deleted — <code>DELETE</code> returns 409 <code>system_row</co
 <tbody>
 <tr>
 <td><code>0</code></td>
-<td>Auto-approve on fill — verify is a no-op</td>
+<td>Auto-approve on fill, verify is a no-op</td>
 <td>✓</td>
 </tr>
 <tr>
@@ -2139,7 +2139,7 @@ roles cannot be deleted — <code>DELETE</code> returns 409 <code>system_row</co
 <tr>
 <td><code>≥ 2</code></td>
 <td>Multi-approver source side</td>
-<td><strong>No</strong> — <code>SubmitCrossTeam</code> returns 412 <code>cross_team_min_approvers_unsupported</code></td>
+<td><strong>No</strong>, <code>SubmitCrossTeam</code> returns 412 <code>cross_team_min_approvers_unsupported</code></td>
 </tr>
 </tbody>
 </table>
@@ -2159,7 +2159,7 @@ to unblock an emergency, every request <strong>submitted after that change</stro
 gets the new behaviour, but every request <strong>already in flight</strong> still
 needs the security vote it was submitted under. The audit log records
 both the live workflow ID and the snapshotted bools.</p>
-<h2 id="hard-rules-what-never-touches-the-value">Hard rules — what NEVER touches the value<a class="headerlink" href="#hard-rules-what-never-touches-the-value" title="Permanent link">&para;</a></h2>
+<h2 id="hard-rules-what-never-touches-the-value">Hard rules, what NEVER touches the value<a class="headerlink" href="#hard-rules-what-never-touches-the-value" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -2174,7 +2174,7 @@ both the live workflow ID and the snapshotted bools.</p>
 </tr>
 <tr>
 <td>Redis</td>
-<td>Used only for the inbox-count cache + idempotency tokens — no value cache.</td>
+<td>Used only for the inbox-count cache + idempotency tokens, no value cache.</td>
 </tr>
 <tr>
 <td>Logs</td>
@@ -2190,7 +2190,7 @@ both the live workflow ID and the snapshotted bools.</p>
 </tr>
 <tr>
 <td>Audit metadata</td>
-<td>The audit log captures actor + key NAMES + workflow snapshot + correlation_id — never the value or any derivable canary.</td>
+<td>The audit log captures actor + key NAMES + workflow snapshot + correlation_id, never the value or any derivable canary.</td>
 </tr>
 </tbody>
 </table>
@@ -2218,12 +2218,12 @@ rejects late writers with <code>fill_window_expired</code>. The sweeper ensures
 observable state (the inbox list, the request detail page, the
 metrics) catches up within 30s even when no fill attempt arrives to
 trigger that rejection.</p>
-<p>Multi-replica safe — each worker takes a Redis lock on
+<p>Multi-replica safe, each worker takes a Redis lock on
 <code>worker:sweeper:cross-team-fill-window-expired</code> per tick. Lock
 contention is a metric, not a warning log.</p>
 <h2 id="reveal-handling">Reveal handling<a class="headerlink" href="#reveal-handling" title="Permanent link">&para;</a></h2>
 <p>Once a cross-team request lands in <code>executed</code>, the value is in the
-destination provider — but the requester typically wants to see the
+destination provider, but the requester typically wants to see the
 value once, in the SPA, to confirm the flow worked. That's exactly
 what the existing reveal session page handles (Slice M).</p>
 <p>The Slice M4 page accepts both <code>type='read'</code> and (after Slice N3)
@@ -2231,7 +2231,7 @@ what the existing reveal session page handles (Slice M).</p>
 the request detail page; the SPA opens a single-shot bulk session;
 the page expires on TTL or on hide-now exactly like read flow.</p>
 <p>The reveal session is bound to the <strong>requester</strong>, not the filler. The
-filler never sees the value after submitting it — they handed it off
+filler never sees the value after submitting it, they handed it off
 and the next time it appears, it's in the requester's provider.</p>
 <h2 id="spa-surfaces">SPA surfaces<a class="headerlink" href="#spa-surfaces" title="Permanent link">&para;</a></h2>
 <table>
@@ -2251,7 +2251,7 @@ and the next time it appears, it's in the requester's provider.</p>
 <tr>
 <td>Inbox list</td>
 <td><code>/inbox</code></td>
-<td><code>secret.value.provide</code> (any scope — fail-closed sidebar)</td>
+<td><code>secret.value.provide</code> (any scope, fail-closed sidebar)</td>
 </tr>
 <tr>
 <td>Fill / refuse</td>
@@ -2304,7 +2304,7 @@ the same tick the request transitions.</p>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">updated_at</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">now</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">interval</span><span class="w"> </span><span class="s1">&#39;24 hours&#39;</span>
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">updated_at</span><span class="w"> </span><span class="k">DESC</span><span class="p">;</span>
 </span></code></pre></div>
-<p><strong>Audit chain for one request</strong> — every transition surfaces with the
+<p><strong>Audit chain for one request</strong>, every transition surfaces with the
 shared <code>correlation_id</code>:</p>
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">created_at</span><span class="p">,</span><span class="w"> </span><span class="n">action</span><span class="p">,</span><span class="w"> </span><span class="n">actor</span><span class="p">,</span><span class="w"> </span><span class="n">metadata</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">audit_events</span>
@@ -2392,26 +2392,26 @@ added a project-scoped applicability filter to the resolver:</p>
   same <code>project_id</code>.</li>
 <li>Platform global rules (<code>project_id IS NULL</code>) still apply
   universally. Platform's reserved priority band (<code>&gt;= 9000</code>) wins
-  over scoped overrides for the same selector — so a section head
+  over scoped overrides for the same selector, so a section head
   can't accidentally relax a cross-team approval requirement that
   platform pinned.</li>
 </ul>
 <p>If you're authoring cross-team workflow rules at the project level,
-the same hard rules apply — scoped rules cannot match prod
+the same hard rules apply, scoped rules cannot match prod
 environments by construction. See
 <a href="../policy-templates/#scoped-policy-authoring-policyauthor">Scoped policy authoring</a>
 for the full operator model.</p>
 <h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../provider-connections/">Provider connections</a> — how the destination
+<li><a href="../provider-connections/">Provider connections</a>, how the destination
   dropdown is populated and bound</li>
-<li><a href="../project-environments/">Project environments</a> — project / env model
+<li><a href="../project-environments/">Project environments</a>, project / env model
   the bindings reference</li>
-<li><a href="../reveal-sessions/">Reveal sessions</a> — the alternative flow when the
+<li><a href="../reveal-sessions/">Reveal sessions</a>, the alternative flow when the
   caller can self-serve the value</li>
-<li><a href="../policy-templates/#scoped-policy-authoring-policyauthor">Policy templates — Scoped policy authoring</a> — EPIC R section-head model</li>
-<li><a href="../../reference/api-endpoints/#provider-connections">HTTP API endpoints — Provider connections</a></li>
-<li><a href="../../reference/api-endpoints/#project-anchored-scoped-policy-rules-epic-r-api108">HTTP API endpoints — Project-anchored scoped policy rules</a></li>
+<li><a href="../policy-templates/#scoped-policy-authoring-policyauthor">Policy templates, Scoped policy authoring</a>, EPIC R section-head model</li>
+<li><a href="../../reference/api-endpoints/#provider-connections">HTTP API endpoints, Provider connections</a></li>
+<li><a href="../../reference/api-endpoints/#project-anchored-scoped-policy-rules-epic-r-api108">HTTP API endpoints, Project-anchored scoped policy rules</a></li>
 <li><a href="../../reference/permissions/">Permissions catalog</a></li>
 </ul>
 

@@ -622,7 +622,7 @@
         <li class="md-nav__item">
   <a href="#trust-boundaries-what-holds-what" class="md-nav__link">
     <span class="md-ellipsis">
-      Trust boundaries — what holds what
+      Trust boundaries: what holds what
     </span>
   </a>
   
@@ -1598,7 +1598,7 @@
         <li class="md-nav__item">
   <a href="#trust-boundaries-what-holds-what" class="md-nav__link">
     <span class="md-ellipsis">
-      Trust boundaries — what holds what
+      Trust boundaries: what holds what
     </span>
   </a>
   
@@ -1676,7 +1676,7 @@ Plane decides; the Agent executes; the Providers own the values.</p>
     end
 
     subgraph control_plane ["Control Plane (Secrets Bridge)"]
-        API["api — Fiber v3"]
+        API["api (Fiber v3)"]
         Postgres[("Postgres&lt;br/&gt;append-only audit")]
         Redis[("Redis&lt;br/&gt;locks, cache,&lt;br/&gt;rate limit")]
         Worker["worker&lt;br/&gt;sweepers + gitops"]
@@ -1702,7 +1702,7 @@ Plane decides; the Agent executes; the Providers own the values.</p>
     Agent --&gt; AWSSM
     Agent --&gt; AzureKV
     Agent --&gt; GCPSM</code></pre>
-<h2 id="trust-boundaries-what-holds-what">Trust boundaries — what holds what<a class="headerlink" href="#trust-boundaries-what-holds-what" title="Permanent link">&para;</a></h2>
+<h2 id="trust-boundaries-what-holds-what">Trust boundaries: what holds what<a class="headerlink" href="#trust-boundaries-what-holds-what" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1725,7 +1725,7 @@ Plane decides; the Agent executes; the Providers own the values.</p>
 <tr>
 <td><strong>Postgres</strong></td>
 <td>Hashes + envelopes + metadata + append-only audit</td>
-<td>The decryption key — that lives in the KMS backend, <em>outside</em> Postgres</td>
+<td>The decryption key, which lives in the KMS backend, <em>outside</em> Postgres</td>
 </tr>
 <tr>
 <td><strong>Redis</strong></td>
@@ -1745,7 +1745,7 @@ Plane decides; the Agent executes; the Providers own the values.</p>
 <tr>
 <td><strong>Providers</strong></td>
 <td>The actual secret values</td>
-<td>n/a — these are unchanged systems</td>
+<td>n/a (these are unchanged systems)</td>
 </tr>
 </tbody>
 </table>
@@ -1857,11 +1857,11 @@ AND <code>SB_WORKER_GITOPS_ENABLED=true</code> on the worker.</p>
 </div>
 <h2 id="defense-in-depth-on-the-wire">Defense-in-depth on the wire<a class="headerlink" href="#defense-in-depth-on-the-wire" title="Permanent link">&para;</a></h2>
 <p>Three layers of encryption protect every value-bearing flow:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>TLS (mandatory)              — passive sniffers, compromised system CA
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>TLS (mandatory)              - passive sniffers, compromised system CA
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  ↓
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Wire envelope (Piece 8b)     — TLS-terminating proxies, CP-side log leaks
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Wire envelope (Piece 8b)     - TLS-terminating proxies, CP-side log leaks
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  ↓
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Storage envelope (Piece 8a)  — DB exfiltration, offline backup theft
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Storage envelope (Piece 8a)  - DB exfiltration, offline backup theft
 </span></code></pre></div>
 <table>
 <thead>
@@ -1886,14 +1886,14 @@ AND <code>SB_WORKER_GITOPS_ENABLED=true</code> on the worker.</p>
 </tbody>
 </table>
 <h2 id="why-polyrepo">Why polyrepo<a class="headerlink" href="#why-polyrepo" title="Permanent link">&para;</a></h2>
-<p>Eight repositories, one product. The <code>core</code> library is infra-free —
-no Postgres driver, no Redis client, no Fiber import — so the
+<p>Eight repositories, one product. The <code>core</code> library is infra-free
+(no Postgres driver, no Redis client, no Fiber import), so the
 <code>agent</code> and <code>controller</code> can depend on it without pulling in
 storage. The <code>api</code> and <code>worker</code> share Postgres/Redis but the worker
 imports <code>api/pkg/*</code> only (never <code>internal/*</code>), so the dependency
 direction is one-way and reviewable.</p>
-<p>CI in every repo greps <code>go.sum</code> to enforce these boundaries — for
-example the agent's CI fails the build if it ever picks up
+<p>CI in every repo greps <code>go.sum</code> to enforce these boundaries. For
+example, the agent's CI fails the build if it ever picks up
 <code>jackc/pgx</code>, <code>lib/pq</code>, <code>redis/go-redis</code>, or similar drivers.</p>
 <p>Read more: <a href="https://github.com/secrets-bridge/.github/blob/main/REFACTOR_PLAN.md">REFACTOR_PLAN.md §4 polyrepo dependency graph</a>.</p>
 

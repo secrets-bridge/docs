@@ -7,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked — no inbound ports, no cluster-API access.">
+        <meta name="description" content="How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked, no inbound ports, no cluster-API access.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
@@ -78,7 +78,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Secrets Bridge" />
   <meta property="og:title" content="Agent onboarding" />
-  <meta property="og:description" content="How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked — no inbound ports, no cluster-API access." />
+  <meta property="og:description" content="How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked, no inbound ports, no cluster-API access." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/operations/agent-onboarding/" />
   <meta property="og:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
@@ -89,7 +89,7 @@
   
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Agent onboarding" />
-  <meta name="twitter:description" content="How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked — no inbound ports, no cluster-API access." />
+  <meta name="twitter:description" content="How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked, no inbound ports, no cluster-API access." />
   <meta name="twitter:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge — The brain behind your secrets." />
   
@@ -110,7 +110,7 @@
     "@context": "https://schema.org",
     "@type": "TechArticle",
     "headline": "Agent onboarding",
-    "description": "How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked — no inbound ports, no cluster-API access.",
+    "description": "How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked, no inbound ports, no cluster-API access.",
     "url": "https://secrets-bridge.io/latest/operations/agent-onboarding/",
     "image": "https://secrets-bridge.io/assets/og-banner.png",
     "publisher": {
@@ -1660,7 +1660,7 @@ exchanges it for a persistent credential exactly once.</p>
     Admin-&gt;&gt;Agent: deliver enrollment_token (via a Secret)
     Agent-&gt;&gt;CP: POST /agents/enroll { enrollment_token, ... }
     CP--&gt;&gt;Agent: agent_token (returned ONCE) + agent_id
-    Note over Agent: persist {agent_id, agent_token} safely;&lt;br/&gt;token is spent — never reused
+    Note over Agent: persist {agent_id, agent_token} safely;&lt;br/&gt;token is spent, never reused
     loop heartbeat
         Agent-&gt;&gt;CP: POST /agents/:id/heartbeat (X-Agent-Secret)
         CP--&gt;&gt;Agent: 200 { next_heartbeat_seconds }
@@ -1673,10 +1673,10 @@ exchanges it for a persistent credential exactly once.</p>
    connection. The token is short-lived, stored <strong>hash-only</strong>, and returned
    exactly once.</li>
 <li><strong>The agent calls <code>POST /agents/enroll</code></strong> with the token (the token travels in
-   the request body — never a header, never a log line).</li>
+   the request body, never a header, never a log line).</li>
 <li><strong>The control plane returns a persistent <code>agent_token</code> once</strong> and creates the
    agent, bound to that provider connection.</li>
-<li><strong>The agent stores its identity safely</strong> and, on restart, reuses it — it never
+<li><strong>The agent stores its identity safely</strong> and, on restart, reuses it, it never
    spends a second enrollment token.</li>
 <li><strong>The agent heartbeats</strong> using the <code>X-Agent-Secret</code> header; the control plane
    drives the cadence.</li>
@@ -1685,14 +1685,14 @@ exchanges it for a persistent credential exactly once.</p>
 </ol>
 <h2 id="safety-properties">Safety properties<a class="headerlink" href="#safety-properties" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>One-time tokens</strong> — hash-only at rest, short TTL, returned once, consumed
+<li><strong>One-time tokens</strong>, hash-only at rest, short TTL, returned once, consumed
   once. Reuse is refused (<code>409</code>).</li>
-<li><strong>Provider-bound</strong> — an enrolled agent is tied to a single provider connection.</li>
-<li><strong>Outbound-only</strong> — no inbound ports; no Postgres / Redis / Kubernetes-API
+<li><strong>Provider-bound</strong>, an enrolled agent is tied to a single provider connection.</li>
+<li><strong>Outbound-only</strong>, no inbound ports; no Postgres / Redis / Kubernetes-API
   dependency.</li>
-<li><strong>Metadata-only audit</strong> — enrollment, rejection, and revocation events record
+<li><strong>Metadata-only audit</strong>, enrollment, rejection, and revocation events record
   IDs, reasons, and timestamps; never the token or the agent credential.</li>
-<li><strong>Legacy direct mint is disabled by default</strong> — the older direct
+<li><strong>Legacy direct mint is disabled by default</strong>, the older direct
   agent-mint endpoint is off unless explicitly enabled as a break-glass admin
   action; enrollment is the standard path.</li>
 </ul>

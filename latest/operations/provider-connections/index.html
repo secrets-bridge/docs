@@ -1442,7 +1442,7 @@
           <li class="md-nav__item">
   <a href="#possibly-stale-ui-only-derivation" class="md-nav__link">
     <span class="md-ellipsis">
-      "Possibly stale" — UI-only derivation
+      "Possibly stale", UI-only derivation
     </span>
   </a>
   
@@ -1475,7 +1475,7 @@
           <li class="md-nav__item">
   <a href="#self_service_bindable-the-platform-opt-in-flag" class="md-nav__link">
     <span class="md-ellipsis">
-      self_service_bindable — the platform opt-in flag
+      self_service_bindable, the platform opt-in flag
     </span>
   </a>
   
@@ -1520,7 +1520,7 @@
           <li class="md-nav__item">
   <a href="#triage-sql-scoped-bindings" class="md-nav__link">
     <span class="md-ellipsis">
-      Triage SQL — scoped bindings
+      Triage SQL, scoped bindings
     </span>
   </a>
   
@@ -1538,7 +1538,7 @@
           <li class="md-nav__item">
   <a href="#observability-prometheus-counters" class="md-nav__link">
     <span class="md-ellipsis">
-      Observability — Prometheus counters
+      Observability, Prometheus counters
     </span>
   </a>
   
@@ -1977,7 +1977,7 @@
           <li class="md-nav__item">
   <a href="#possibly-stale-ui-only-derivation" class="md-nav__link">
     <span class="md-ellipsis">
-      "Possibly stale" — UI-only derivation
+      "Possibly stale", UI-only derivation
     </span>
   </a>
   
@@ -2010,7 +2010,7 @@
           <li class="md-nav__item">
   <a href="#self_service_bindable-the-platform-opt-in-flag" class="md-nav__link">
     <span class="md-ellipsis">
-      self_service_bindable — the platform opt-in flag
+      self_service_bindable, the platform opt-in flag
     </span>
   </a>
   
@@ -2055,7 +2055,7 @@
           <li class="md-nav__item">
   <a href="#triage-sql-scoped-bindings" class="md-nav__link">
     <span class="md-ellipsis">
-      Triage SQL — scoped bindings
+      Triage SQL, scoped bindings
     </span>
   </a>
   
@@ -2073,7 +2073,7 @@
           <li class="md-nav__item">
   <a href="#observability-prometheus-counters" class="md-nav__link">
     <span class="md-ellipsis">
-      Observability — Prometheus counters
+      Observability, Prometheus counters
     </span>
   </a>
   
@@ -2180,7 +2180,7 @@
 
 <h1 id="provider-connections">Provider connections<a class="headerlink" href="#provider-connections" title="Permanent link">&para;</a></h1>
 <p>A <strong>provider connection</strong> is the Control Plane's metadata registry for an
-external secret store — its URL, region, KV mount, role hint, and the
+external secret store, its URL, region, KV mount, role hint, and the
 project / environment scopes it can be consumed from. It is <strong>not</strong> a
 credential. The agent authenticates with its own workload identity
 (IRSA / Kubernetes auth / instance role); the Control Plane never holds
@@ -2222,7 +2222,7 @@ via this page.</p>
 </tr>
 <tr>
 <td><code>type</code></td>
-<td><code>vault</code> / <code>aws-sm</code> / <code>azure-kv</code> / <code>gcp-sm</code> / <code>kubernetes</code> — <strong>immutable</strong> after create (the SPA disables the select on edit)</td>
+<td><code>vault</code> / <code>aws-sm</code> / <code>azure-kv</code> / <code>gcp-sm</code> / <code>kubernetes</code>, <strong>immutable</strong> after create (the SPA disables the select on edit)</td>
 </tr>
 <tr>
 <td><code>cluster_name</code></td>
@@ -2238,7 +2238,7 @@ via this page.</p>
 </tr>
 <tr>
 <td><code>scope</code></td>
-<td>JSON object — provider-specific connection metadata. <strong>No credentials.</strong></td>
+<td>JSON object, provider-specific connection metadata. <strong>No credentials.</strong></td>
 </tr>
 <tr>
 <td><code>auth_method</code></td>
@@ -2254,7 +2254,7 @@ via this page.</p>
 </tr>
 <tr>
 <td><code>last_discover_*</code></td>
-<td><code>at</code> / <code>status</code> / <code>started_at</code> / <code>error</code> — written by the worker after each discover job</td>
+<td><code>at</code> / <code>status</code> / <code>started_at</code> / <code>error</code>, written by the worker after each discover job</td>
 </tr>
 </tbody>
 </table>
@@ -2272,11 +2272,11 @@ different environments. The rules:</p>
 <tbody>
 <tr>
 <td><code>(connection_id, project_id, environment_id=NULL)</code></td>
-<td>Project-wide binding — every environment in the project sees this connection in the dropdown</td>
+<td>Project-wide binding, every environment in the project sees this connection in the dropdown</td>
 </tr>
 <tr>
 <td><code>(connection_id, project_id, environment_id=&lt;env&gt;)</code></td>
-<td>Env-specific binding — only that environment sees it</td>
+<td>Env-specific binding, only that environment sees it</td>
 </tr>
 </tbody>
 </table>
@@ -2287,7 +2287,7 @@ bindings per Postgres NULL semantics. A connection can be bound to both
 developer dropdown returns the union with no deduplication needed (the
 api projects <code>{id, name, type}</code> and ignores duplicate ids).</p>
 <h2 id="scope-json-shape-per-provider">Scope JSON shape per provider<a class="headerlink" href="#scope-json-shape-per-provider" title="Permanent link">&para;</a></h2>
-<p>The <code>scope</code> JSON is <strong>metadata only</strong> — the agent reads it to know
+<p>The <code>scope</code> JSON is <strong>metadata only</strong>, the agent reads it to know
 <em>where</em> to connect, never <em>what credential</em> to use. The keys below are
 the minimum the api validates; provider connectors may accept more.</p>
 <h3 id="vault">Vault<a class="headerlink" href="#vault" title="Permanent link">&para;</a></h3>
@@ -2428,7 +2428,7 @@ violate them returns a stable 4xx with a structured envelope:</p>
 <tbody>
 <tr>
 <td><strong>No credentials in <code>scope</code></strong></td>
-<td>Service-layer refuses 14 credential-shaped keys (case-insensitive) — <code>aws_access_key_id</code>, <code>awsAccessKey</code>, <code>password</code>, <code>token</code>, <code>clientSecret</code>, <code>privateKey</code>, etc. Returns 400 <code>credential_in_scope</code> with the banned key.</td>
+<td>Service-layer refuses 14 credential-shaped keys (case-insensitive), <code>aws_access_key_id</code>, <code>awsAccessKey</code>, <code>password</code>, <code>token</code>, <code>clientSecret</code>, <code>privateKey</code>, etc. Returns 400 <code>credential_in_scope</code> with the banned key.</td>
 </tr>
 <tr>
 <td><strong>No secret-shaped values in <code>scope</code></strong></td>
@@ -2448,11 +2448,11 @@ violate them returns a stable 4xx with a structured envelope:</p>
 </tr>
 <tr>
 <td><strong><code>last_discover_error</code> is sanitized</strong></td>
-<td>Pre-persist pipeline: credential redaction → JSON blob strip → 280-char truncate (order is load-bearing — see <a href="#api-scope-hard-rules">API + scope hard rules</a> below).</td>
+<td>Pre-persist pipeline: credential redaction → JSON blob strip → 280-char truncate (order is load-bearing, see <a href="#api-scope-hard-rules">API + scope hard rules</a> below).</td>
 </tr>
 </tbody>
 </table>
-<p>The same sanitizer runs in two places — the api side (P2,
+<p>The same sanitizer runs in two places, the api side (P2,
 <code>api/pkg/sanitize.DiscoverError</code>) and the worker side (P4, defense in
 depth before <code>MarkDiscoverFinished</code>). Belt + braces.</p>
 <h2 id="permissions">Permissions<a class="headerlink" href="#permissions" title="Permanent link">&para;</a></h2>
@@ -2470,7 +2470,7 @@ depth before <code>MarkDiscoverFinished</code>). Belt + braces.</p>
 </tr>
 <tr>
 <td><code>secret.request</code> (scoped to project, env)</td>
-<td>Developer dropdown — <code>GET /provider-connections?project_id=…&amp;environment_id=…</code> returns only the bound connections, sanitized to <code>{id, name, type}</code></td>
+<td>Developer dropdown, <code>GET /provider-connections?project_id=…&amp;environment_id=…</code> returns only the bound connections, sanitized to <code>{id, name, type}</code></td>
 </tr>
 </tbody>
 </table>
@@ -2481,13 +2481,13 @@ shape:</p>
   projection (scope, auth_method, discovery status).</li>
 <li><code>project_id</code> + (optional <code>environment_id</code>) → developer dropdown
   (<code>secret.request</code> scoped). Sanitized projection: id + name + type
-  only — never scope, auth_method, or discovery fields.</li>
+  only, never scope, auth_method, or discovery fields.</li>
 <li><code>environment_id</code> <strong>without</strong> <code>project_id</code> → 400 <code>project_id_required</code>
   <strong>before</strong> any permission check (no enumeration leak).</li>
 </ul>
 <h2 id="discovery-model">Discovery model<a class="headerlink" href="#discovery-model" title="Permanent link">&para;</a></h2>
 <p>A discover job runs <code>ListMetadata</code> against the external store and upserts
-the result into the <code>secrets</code> table — the discovery feed the UI's
+the result into the <code>secrets</code> table, the discovery feed the UI's
 <a href="../../components/ui/">Secrets</a> page reads from.</p>
 <table>
 <thead>
@@ -2518,17 +2518,17 @@ machine:</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                       ╰── failure ──▶ failure
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                       ╰── 2× interval elapsed (worker sweeper) ──▶ failure
 </span></code></pre></div>
-<p><code>MarkDiscoverFinished</code> rejects <code>running</code> as a terminal status —
-terminal-only is <code>success</code> / <code>failure</code>. The worker's
+<p><code>MarkDiscoverFinished</code> rejects <code>running</code> as a terminal status.
+Terminal-only is <code>success</code> / <code>failure</code>. The worker's
 <code>PostDiscoverScheduler</code> long-stale sweeper (worker#13, P-follow-up)
 will flip rows stuck in <code>running</code> past <code>2 × discover_interval_seconds</code>.</p>
-<h3 id="possibly-stale-ui-only-derivation">"Possibly stale" — UI-only derivation<a class="headerlink" href="#possibly-stale-ui-only-derivation" title="Permanent link">&para;</a></h3>
+<h3 id="possibly-stale-ui-only-derivation">"Possibly stale", UI-only derivation<a class="headerlink" href="#possibly-stale-ui-only-derivation" title="Permanent link">&para;</a></h3>
 <p>The admin SPA's discover column renders a <code>warning</code> pill labelled
 "possibly stale" when:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>last_discover_status === &#39;running&#39; AND
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>last_discover_started_at + 2 * discover_interval_seconds * 1000 &lt; now
 </span></code></pre></div>
-<p>This is <strong>pure client-side derivation</strong> — no backend mutation. The pill
+<p>This is <strong>pure client-side derivation</strong>, no backend mutation. The pill
 is a visual nudge that something needs operator attention; the connection
 is still safe to use. The worker sweeper is the system-of-record for
 reconciliation.</p>
@@ -2545,7 +2545,7 @@ reconciliation.</p>
 <code>discover.start</code>; the previous stuck row's history stays in
 <code>audit_events</code>.</p>
 <h2 id="disable-semantics">Disable semantics<a class="headerlink" href="#disable-semantics" title="Permanent link">&para;</a></h2>
-<p>Flipping <code>status</code> from <code>active</code> to <code>disabled</code> is <strong>graceful</strong> — it
+<p>Flipping <code>status</code> from <code>active</code> to <code>disabled</code> is <strong>graceful</strong>, it
 doesn't blow up in-flight requests, but it stops every new dependency:</p>
 <table>
 <thead>
@@ -2569,7 +2569,7 @@ doesn't blow up in-flight requests, but it stops every new dependency:</p>
 </tr>
 <tr>
 <td>Cross-team submit with a disabled destination returns 409 <code>connection_disabled</code></td>
-<td>In-flight requests that <em>already</em> enqueued an agent job complete normally — the agent fails at provider resolve time and the request transitions to <code>failed</code></td>
+<td>In-flight requests that <em>already</em> enqueued an agent job complete normally, the agent fails at provider resolve time and the request transitions to <code>failed</code></td>
 </tr>
 <tr>
 <td>New requests can't pick the row</td>
@@ -2588,7 +2588,7 @@ self-serve binds on their own projects without holding the global
 lifecycle (create, update, delete, discover-now); scoped users can only
 bind / unbind, and only on connections platform has explicitly enabled
 for self-service.</p>
-<h3 id="self_service_bindable-the-platform-opt-in-flag"><code>self_service_bindable</code> — the platform opt-in flag<a class="headerlink" href="#self_service_bindable-the-platform-opt-in-flag" title="Permanent link">&para;</a></h3>
+<h3 id="self_service_bindable-the-platform-opt-in-flag"><code>self_service_bindable</code>, the platform opt-in flag<a class="headerlink" href="#self_service_bindable-the-platform-opt-in-flag" title="Permanent link">&para;</a></h3>
 <p>Migration 0031 added a <code>BOOLEAN NOT NULL DEFAULT false</code> flag on
 <code>provider_connections</code>. Default-deny: every existing row stays
 invisible to <code>integration.bind</code> callers until platform flips the flag
@@ -2597,7 +2597,7 @@ via the admin SPA's connection edit drawer.</p>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="n">self_service_bindable</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">false</span><span class="p">;</span>
 </span></code></pre></div>
 <p>A connection that is <code>self_service_bindable=false</code> behaves exactly as
-before EPIC Q — only <code>integration.edit</code> callers see and bind it.</p>
+before EPIC Q, only <code>integration.edit</code> callers see and bind it.</p>
 <h3 id="hard-rules-for-scoped-binders">Hard rules for scoped binders<a class="headerlink" href="#hard-rules-for-scoped-binders" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -2613,7 +2613,7 @@ before EPIC Q — only <code>integration.edit</code> callers see and bind it.</p
 </tr>
 <tr>
 <td>Bind</td>
-<td>Refused on <code>env.kind='prod'</code> — production bindings are platform-team territory.</td>
+<td>Refused on <code>env.kind='prod'</code>, production bindings are platform-team territory.</td>
 </tr>
 <tr>
 <td>Bind</td>
@@ -2625,15 +2625,15 @@ before EPIC Q — only <code>integration.edit</code> callers see and bind it.</p
 </tr>
 <tr>
 <td>Unbind</td>
-<td>Allowed regardless of current <code>self_service_bindable</code> — cleanup is always allowed for bindings the user could have created.</td>
+<td>Allowed regardless of current <code>self_service_bindable</code>, cleanup is always allowed for bindings the user could have created.</td>
 </tr>
 <tr>
 <td>Unbind</td>
-<td>Refused on <code>env.kind='prod'</code> — admin path required.</td>
+<td>Refused on <code>env.kind='prod'</code>, admin path required.</td>
 </tr>
 <tr>
 <td>Unbind</td>
-<td>Refused on project-wide bindings (<code>environment_id IS NULL</code>) — platform-only.</td>
+<td>Refused on project-wide bindings (<code>environment_id IS NULL</code>), platform-only.</td>
 </tr>
 <tr>
 <td>Both</td>
@@ -2644,7 +2644,7 @@ before EPIC Q — only <code>integration.edit</code> callers see and bind it.</p
 <h3 id="integrationedit-does-not-auto-cover-integrationbind-server-side"><code>integration.edit</code> does NOT auto-cover <code>integration.bind</code> server-side<a class="headerlink" href="#integrationedit-does-not-auto-cover-integrationbind-server-side" title="Permanent link">&para;</a></h3>
 <p>This is a deliberate decision per the §2 Q6 sign-off. Granting an
 operator <code>integration.edit</code> does <strong>not</strong> automatically grant them
-<code>integration.bind</code> at the API layer — the api treats the two
+<code>integration.bind</code> at the API layer, the api treats the two
 permissions as distinct. The SPA's capability helper unifies them in
 the UI (admins get the binder CTA on every env page for ergonomics),
 but the api still gates each endpoint strictly.</p>
@@ -2658,7 +2658,7 @@ carrying <code>integration.bind</code>) scoped to their team or project. Grantin
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>Permission:   integration.bind
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>Scope at:     user_roles.scope = {project_id: &quot;...&quot;} OR {team_id: &quot;...&quot;}
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>is_system:    true (editable, not deletable)
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>Auto-granted: no — operators grant explicitly
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>Auto-granted: no, operators grant explicitly
 </span></code></pre></div>
 <p>Team-scoped grants automatically cover the team's descendant project
 subtree via the team-aware resolver (the same expansion EPIC L Slice 2
@@ -2686,23 +2686,23 @@ the action:</p>
 </tr>
 <tr>
 <td><code>null</code></td>
-<td>UI hides the action — server still enforces a stable 403 if anyone tries</td>
+<td>UI hides the action, server still enforces a stable 403 if anyone tries</td>
 </tr>
 </tbody>
 </table>
 <p>The generic <code>hasPermission('integration.bind')</code> keeps its strict
-semantic everywhere else in the SPA — it returns <code>true</code> only for
+semantic everywhere else in the SPA, it returns <code>true</code> only for
 explicit <code>integration.bind</code> grants. The capability helpers are the
 ONLY place that knows "admin can act on every env including prod via
 the admin URLs."</p>
-<h3 id="triage-sql-scoped-bindings">Triage SQL — scoped bindings<a class="headerlink" href="#triage-sql-scoped-bindings" title="Permanent link">&para;</a></h3>
+<h3 id="triage-sql-scoped-bindings">Triage SQL, scoped bindings<a class="headerlink" href="#triage-sql-scoped-bindings" title="Permanent link">&para;</a></h3>
 <p><strong>What connections are currently bindable for self-service:</strong></p>
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="k">type</span><span class="p">,</span><span class="w"> </span><span class="n">cluster_name</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">FROM</span><span class="w"> </span><span class="n">provider_connections</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">self_service_bindable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">true</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
 </span></code></pre></div>
-<p><strong>Recent out-of-scope binding probes (security signal — operators
+<p><strong>Recent out-of-scope binding probes (security signal, operators
 should know when section heads are reaching outside their subtree):</strong></p>
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">occurred_at</span><span class="p">,</span><span class="w"> </span><span class="n">actor</span><span class="p">,</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;attempted_project_id&#39;</span><span class="w">      </span><span class="k">AS</span><span class="w"> </span><span class="n">attempted_project</span><span class="p">,</span>
@@ -2713,11 +2713,11 @@ should know when section heads are reaching outside their subtree):</strong></p>
 </span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="k">DESC</span>
 </span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
 </span></code></pre></div>
-<p>Note: this audit event deliberately omits <code>provider_connection_id</code> —
-the gate-order protection means the actor failed coverage BEFORE the
+<p>Note: this audit event deliberately omits <code>provider_connection_id</code>.
+The gate-order protection means the actor failed coverage BEFORE the
 connection was loaded, and including it would defeat the whole
 enumeration-leak protection.</p>
-<p><strong>Bind-path breakdown (last 7 days — who's using scoped vs admin?):</strong></p>
+<p><strong>Bind-path breakdown (last 7 days, who's using scoped vs admin?):</strong></p>
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">SELECT</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">FILTER</span><span class="w"> </span><span class="p">(</span><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;actor_permission_used&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;integration.bind&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">scoped_binds</span><span class="p">,</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="n">FILTER</span><span class="w"> </span><span class="p">(</span><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;actor_permission_used&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;integration.edit&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">admin_binds</span>
@@ -2725,7 +2725,7 @@ enumeration-leak protection.</p>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;binding.create&#39;</span>
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">INTERVAL</span><span class="w"> </span><span class="s1">&#39;7 days&#39;</span><span class="p">;</span>
 </span></code></pre></div>
-<p><strong>Bindings owned by a specific actor (incident response — when a
+<p><strong>Bindings owned by a specific actor (incident response, when a
 section head's account is compromised):</strong></p>
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">occurred_at</span><span class="p">,</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">       </span><span class="n">metadata</span><span class="o">-&gt;&gt;</span><span class="s1">&#39;provider_connection_id&#39;</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">connection_id</span><span class="p">,</span>
@@ -2749,7 +2749,7 @@ section head's account is compromised):</strong></p>
 <ol>
 <li>Identify the team or project subtree the section head should cover.</li>
 <li>Assign the <code>provider_connection_binder</code> system role scoped to that
-   team_id (preferred — covers the descendant project subtree
+   team_id (preferred, covers the descendant project subtree
    automatically) or project_id (one project only).</li>
 <li>The section head can now bind any <code>self_service_bindable=true</code>
    connection to non-prod envs in their subtree via the per-env card
@@ -2764,11 +2764,11 @@ existing bindings:</strong></p>
 <ol>
 <li>Revoke the <code>provider_connection_binder</code> role assignment (via
    <code>/admin/assignments</code> or <code>DELETE /user-roles/:id</code>).</li>
-<li>Their existing bindings remain in place — revoking the role does
+<li>Their existing bindings remain in place, revoking the role does
    NOT cascade-unbind. If you need to remove specific bindings, the
    platform admin uses the admin URL family.</li>
 </ol>
-<h3 id="observability-prometheus-counters">Observability — Prometheus counters<a class="headerlink" href="#observability-prometheus-counters" title="Permanent link">&para;</a></h3>
+<h3 id="observability-prometheus-counters">Observability, Prometheus counters<a class="headerlink" href="#observability-prometheus-counters" title="Permanent link">&para;</a></h3>
 <p>EPIC Q added three counters scraped from <code>/metrics</code>:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>provider_connection_bindings_created_total{permission_used, env_kind}
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>provider_connection_bindings_deleted_total{permission_used, env_kind}
@@ -2779,7 +2779,7 @@ existing bindings:</strong></p>
 <code>connection_disabled</code>, <code>connection_not_found</code>, <code>env_not_in_project</code>,
 <code>binding_exists</code>, <code>binding_not_found</code>.</p>
 <p><strong>LOW-CARDINALITY LOCK:</strong> the counters never carry <code>actor_id</code>,
-<code>project_id</code>, <code>connection_id</code>, or <code>environment_id</code> as labels — those
+<code>project_id</code>, <code>connection_id</code>, or <code>environment_id</code> as labels, those
 go to the audit trail, not Prometheus. A <code>denied_total{reason="prod_blocked"}</code>
 spike on the dashboard means "scoped binders are running into the
 prod wall a lot," not "any specific row is misconfigured." Pair with
@@ -2829,8 +2829,8 @@ the audit triage SQL above to find the actor + project + env.</p>
 </span></code></pre></div>
 <h2 id="api-scope-hard-rules">API + scope hard rules<a class="headerlink" href="#api-scope-hard-rules" title="Permanent link">&para;</a></h2>
 <p>The 9 endpoints are documented at
-<a href="../../reference/api-endpoints/#provider-connections">HTTP API endpoints — Provider connections</a>.</p>
-<p>Every endpoint returns errors in the <strong>EPIC P envelope</strong> — distinct from
+<a href="../../reference/api-endpoints/#provider-connections">HTTP API endpoints, Provider connections</a>.</p>
+<p>Every endpoint returns errors in the <strong>EPIC P envelope</strong>, distinct from
 the legacy <code>{code, error}</code> shape some older endpoints still use:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="p">{</span>
 </span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nt">&quot;error_code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;credential_in_scope&quot;</span><span class="p">,</span>
@@ -2838,19 +2838,19 @@ the legacy <code>{code, error}</code> shape some older endpoints still use:</p>
 </span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="nt">&quot;banned_key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;awsAccessKeyID&quot;</span>
 </span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>19 stable error codes — see the
+<p>19 stable error codes, see the
 <a href="#error-code-reference">Error code reference</a> below.</p>
 <p>The sanitizer pipeline ordering for <code>last_discover_error</code> is
 <strong>load-bearing</strong>:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>credential redaction (AKIA…, hvs.…, JWT, OAuth) → JSON blob strip → truncate to 280 chars
 </span></code></pre></div>
-<p>Truncating first would lose credentials that span the cut point — a
+<p>Truncating first would lose credentials that span the cut point, a
 provider error like <code>"failed: token=hvs.AAAA…"</code> truncated to 280 chars
 might cut the token mid-string but still leak its prefix. Redacting
 first guarantees no credential-shaped substring survives the truncate.</p>
 <h2 id="cross-team-destination-wiring">Cross-team destination wiring<a class="headerlink" href="#cross-team-destination-wiring" title="Permanent link">&para;</a></h2>
 <p>The cross-team submit drawer (Slice N5) reads its destination dropdown
-from <code>GET /provider-connections?project_id=…&amp;environment_id=…</code> — the
+from <code>GET /provider-connections?project_id=…&amp;environment_id=…</code>, the
 sanitized projection. The connection must be <strong>bound to the source
 project + env</strong> for it to appear. If the dropdown is empty, the drawer
 branches:</p>
@@ -2862,8 +2862,8 @@ branches:</p>
 </ul>
 <p>This is the same dropdown that powers any future "destination picker"
 flows; the developer never sees the connection's scope, auth method, or
-discovery state — just its name and provider type.</p>
-<p>See also: <a href="../cross-team-requests/#target-vs-destination">Cross-team requests — Target vs destination</a>.</p>
+discovery state, just its name and provider type.</p>
+<p>See also: <a href="../cross-team-requests/#target-vs-destination">Cross-team requests, Target vs destination</a>.</p>
 <h2 id="sb_discover_targets_json-deprecation">SB_DISCOVER_TARGETS_JSON deprecation<a class="headerlink" href="#sb_discover_targets_json-deprecation" title="Permanent link">&para;</a></h2>
 <p>P4 (worker#14) replaced the env-var-driven scheduler with the DB-backed
 one this page documents. The env var is kept as a <strong>fallback only</strong>:</p>
@@ -2890,22 +2890,22 @@ worker#13 (P-follow-up) tracks the final removal.</p>
 <p>The full P loop against the docker-compose stack from
 <a href="../docker-compose/">Deploying with docker-compose</a>:</p>
 <ol>
-<li><strong>Admin creates <code>vault-prod</code></strong> —
+<li><strong>Admin creates <code>vault-prod</code></strong>:
    <code>POST /provider-connections</code> with <code>type=vault</code>, <code>cluster_name=cluster-a</code>,
    <code>scope={"address":"https://vault.example.com", "kvMount":"secret"}</code>,
    <code>discover_enabled=true</code>, <code>discover_interval_seconds=3600</code>. Returns 201
    with the new row.</li>
-<li><strong>Admin binds to <code>tenant-a/prod</code> + <code>tenant-a</code> (project-wide)</strong> —
+<li><strong>Admin binds to <code>tenant-a/prod</code> + <code>tenant-a</code> (project-wide)</strong>:
    two <code>POST /provider-connections/:id/bindings</code> calls. Both 201.</li>
-<li><strong>Developer in <code>tenant-a/prod</code> opens cross-team submit</strong> — drawer's
+<li><strong>Developer in <code>tenant-a/prod</code> opens cross-team submit</strong>, drawer's
    destination dropdown shows <code>vault-prod (vault)</code> and nothing else.
-   Sanitized projection — no scope, no auth method, no discovery state.</li>
-<li><strong>Admin disables <code>vault-prod</code></strong> — <code>PUT /provider-connections/:id</code>
+   Sanitized projection, no scope, no auth method, no discovery state.</li>
+<li><strong>Admin disables <code>vault-prod</code></strong>, <code>PUT /provider-connections/:id</code>
    with <code>status=disabled</code>. Drawer dropdown is empty on next render.
    Caller has <code>integration.edit</code> → "Manage provider connections" link
    surfaces. Caller doesn't → "Ask your platform team" text surfaces.</li>
-<li><strong>Admin re-enables</strong> — drawer dropdown shows <code>vault-prod</code> again.</li>
-<li><strong>Admin clicks "Discover now"</strong> —
+<li><strong>Admin re-enables</strong>, drawer dropdown shows <code>vault-prod</code> again.</li>
+<li><strong>Admin clicks "Discover now"</strong>:
    <code>POST /provider-connections/:id/discover-now</code> returns 202 with
    <code>job_id</code> + <code>correlation_id</code>. SPA row flips to <code>running</code> pill.
    Worker claims + executes the job; api <code>OnDiscoverJobCompleted</code>
@@ -2913,7 +2913,7 @@ worker#13 (P-follow-up) tracks the final removal.</p>
 <li><strong>Developer submits a cross-team request</strong> picking <code>vault-prod</code>
    as the destination. Request lands in the source-team approver's
    inbox; agent eventually writes values to <code>secret/data/&lt;ref&gt;</code>.</li>
-<li><strong>Admin tries to delete <code>vault-prod</code></strong> — returns 409
+<li><strong>Admin tries to delete <code>vault-prod</code></strong>, returns 409
    <code>connection_in_use</code> with the count envelope:
    <div class="language-json highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="p">{</span><span class="nt">&quot;error_code&quot;</span><span class="p">:</span><span class="s2">&quot;connection_in_use&quot;</span><span class="p">,</span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="s2">&quot;…&quot;</span><span class="p">,</span><span class="nt">&quot;bindings_count&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span><span class="nt">&quot;open_requests_count&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">}</span>
 </span></code></pre></div>
@@ -2925,7 +2925,7 @@ worker#13 (P-follow-up) tracks the final removal.</p>
    via <code>DELETE /provider-connection-bindings/:bid</code> ×2. Counts drop to</li>
 <li>Delete succeeds (204).</li>
 <li>
-<p><strong>Worker sweep with <code>SB_DISCOVER_TARGETS_JSON</code> ALSO set</strong> — start
+<p><strong>Worker sweep with <code>SB_DISCOVER_TARGETS_JSON</code> ALSO set</strong>, start
     the worker with the env var pointed at a separate fake target
     AND with a DB row due for discovery. The WARN log fires; only the
     DB target is enqueued. Then a canary scan confirms no plaintext
@@ -2945,7 +2945,7 @@ redacts before persistence.</p>
 </li>
 </ol>
 <h2 id="error-code-reference">Error code reference<a class="headerlink" href="#error-code-reference" title="Permanent link">&para;</a></h2>
-<p>23 stable codes — 19 from the EPIC P §6.A locked spec, plus 4 added
+<p>23 stable codes, 19 from the EPIC P §6.A locked spec, plus 4 added
 by EPIC Q (api#99). Returned in the <code>{error_code, message, …}</code>
 envelope. The SPA maps every code to a friendly toast string via
 <code>providerConnectionErrorMessage</code>; operators running raw <code>curl</code> see
@@ -3032,7 +3032,7 @@ the code in the body.</p>
 <tr>
 <td><code>binding_not_found</code></td>
 <td>404</td>
-<td>Unbind on a missing binding id, OR scoped DELETE where the URL <code>projectID</code> doesn't match the binding's stored <code>project_id</code> (§4 correction — NEVER <code>out_of_scope_binding</code> on mismatch, which would leak existence)</td>
+<td>Unbind on a missing binding id, OR scoped DELETE where the URL <code>projectID</code> doesn't match the binding's stored <code>project_id</code> (§4 correction, NEVER <code>out_of_scope_binding</code> on mismatch, which would leak existence)</td>
 </tr>
 <tr>
 <td><code>environment_not_in_project</code></td>
@@ -3047,7 +3047,7 @@ the code in the body.</p>
 <tr>
 <td><code>discovery_already_running</code></td>
 <td>409</td>
-<td>Per-target Redis lock held — another Discover now is in flight</td>
+<td>Per-target Redis lock held, another Discover now is in flight</td>
 </tr>
 <tr>
 <td><code>out_of_scope_project</code></td>
@@ -3057,36 +3057,36 @@ the code in the body.</p>
 <tr>
 <td><code>connection_not_self_service_bindable</code></td>
 <td>403</td>
-<td>EPIC Q — scoped caller tried to bind a connection where <code>self_service_bindable=false</code>. Platform must opt the connection in via the admin SPA.</td>
+<td>EPIC Q, scoped caller tried to bind a connection where <code>self_service_bindable=false</code>. Platform must opt the connection in via the admin SPA.</td>
 </tr>
 <tr>
 <td><code>prod_binding_not_allowed_for_scope</code></td>
 <td>403</td>
-<td>EPIC Q — scoped caller tried to bind / unbind on <code>env.kind='prod'</code>. Envelope includes <code>{"env_kind": "prod"}</code>. Admin path (<code>integration.edit</code>) required for prod bindings.</td>
+<td>EPIC Q, scoped caller tried to bind / unbind on <code>env.kind='prod'</code>. Envelope includes <code>{"env_kind": "prod"}</code>. Admin path (<code>integration.edit</code>) required for prod bindings.</td>
 </tr>
 <tr>
 <td><code>out_of_scope_binding</code></td>
 <td>403</td>
-<td>EPIC Q — caller's <code>integration.bind</code> grant doesn't cover the target (project, env) per the team-aware resolver. Audit emits <code>binding.denied_out_of_scope</code> (security signal).</td>
+<td>EPIC Q, caller's <code>integration.bind</code> grant doesn't cover the target (project, env) per the team-aware resolver. Audit emits <code>binding.denied_out_of_scope</code> (security signal).</td>
 </tr>
 <tr>
 <td><code>environment_id_required</code></td>
 <td>400</td>
-<td>EPIC Q — the binder picker (<code>for_binding=true</code>) or scoped bind body lacks <code>environment_id</code>. Scoped binders never create project-wide bindings.</td>
+<td>EPIC Q, the binder picker (<code>for_binding=true</code>) or scoped bind body lacks <code>environment_id</code>. Scoped binders never create project-wide bindings.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../cross-team-requests/">Cross-team requests</a> — the destination
+<li><a href="../cross-team-requests/">Cross-team requests</a>, the destination
   dropdown's primary consumer</li>
-<li><a href="../project-environments/">Project environments</a> — connections bind at
+<li><a href="../project-environments/">Project environments</a>, connections bind at
   project ± env granularity</li>
-<li><a href="../../reference/api-endpoints/#provider-connections">HTTP API endpoints</a>
-  — full request/response shapes</li>
-<li><a href="../../reference/permissions/">Permissions catalog</a> — <code>integration.edit</code>
+<li><a href="../../reference/api-endpoints/#provider-connections">HTTP API endpoints</a>,
+  full request/response shapes</li>
+<li><a href="../../reference/permissions/">Permissions catalog</a>, <code>integration.edit</code>
   reused (no new permission)</li>
-<li><a href="../../components/worker/">Worker — discover scheduler</a> — implementation
+<li><a href="../../components/worker/">Worker, discover scheduler</a>, implementation
   of the DB-backed scheduler</li>
 </ul>
 

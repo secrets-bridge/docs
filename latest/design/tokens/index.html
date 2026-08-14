@@ -1796,7 +1796,7 @@ tokens. The Figma file is the source; the SPA's
 <tr>
 <td><code>accent</code></td>
 <td><code>#06B6D4</code></td>
-<td><strong>Primary accent</strong> — Cyan</td>
+<td><strong>Primary accent</strong> (Cyan)</td>
 </tr>
 <tr>
 <td><code>accent-bright</code></td>
@@ -1841,35 +1841,35 @@ tokens. The Figma file is the source; the SPA's
 <tbody>
 <tr>
 <td><code>success</code></td>
-<td>Green outline / fill — agent active, request approved, audit success, secret present</td>
+<td>Green outline / fill: agent active, request approved, audit success, secret present</td>
 </tr>
 <tr>
 <td><code>warning</code></td>
-<td>Yellow outline / fill — agent stale, audit denied, env uat, archived project, applied_unverified</td>
+<td>Yellow outline / fill: agent stale, audit denied, env uat, archived project, applied_unverified</td>
 </tr>
 <tr>
 <td><code>error</code></td>
-<td>Red outline / fill — request rejected/failed, env prod, audit failure</td>
+<td>Red outline / fill: request rejected/failed, env prod, audit failure</td>
 </tr>
 <tr>
 <td><code>pending</code></td>
-<td>Yellow — request pending</td>
+<td>Yellow: request pending</td>
 </tr>
 <tr>
 <td><code>accent</code></td>
-<td>Cyan — role badges, env staging</td>
+<td>Cyan: role badges, env staging</td>
 </tr>
 <tr>
 <td><code>system</code></td>
-<td>Cyan outline — system-seed row marker</td>
+<td>Cyan outline: system-seed row marker</td>
 </tr>
 <tr>
 <td><code>neutral</code></td>
-<td>Muted — env other, preview chips</td>
+<td>Muted: env other, preview chips</td>
 </tr>
 <tr>
 <td><code>cancelled</code></td>
-<td>Muted strikethrough — consumed wraps</td>
+<td>Muted strikethrough: consumed wraps</td>
 </tr>
 </tbody>
 </table>
@@ -1971,7 +1971,7 @@ border-l-4 callout, not a new gradient.</p>
 <tbody>
 <tr>
 <td><a href="https://github.com/secrets-bridge/ui/blob/main/tailwind.config.js"><code>ui/tailwind.config.js</code></a></td>
-<td>The canonical Tailwind config — every token above</td>
+<td>The canonical Tailwind config: every token above</td>
 </tr>
 <tr>
 <td><a href="https://github.com/secrets-bridge/ui/tree/main/src/ui"><code>ui/src/ui/</code></a></td>
@@ -1993,12 +1993,12 @@ border-l-4 callout, not a new gradient.</p>
 <li>Make the change in the Figma file (versions 02 Foundations).</li>
 <li>Re-run <code>skills/ui/design/tokens/sync.sh</code> to pull the latest
    token definitions into <code>design-tokens.json</code>.</li>
-<li>Update <code>ui/tailwind.config.js</code> to match — same Tailwind names,
+<li>Update <code>ui/tailwind.config.js</code> to match: same Tailwind names,
    new hex values.</li>
 <li>Rebuild the SPA; visual diff against the Figma frames in
    <code>skills/ui/design/frames/</code> (six PNG renders cached at last
    sync).</li>
-<li>Open a PR against both <code>ui</code> and <code>skills</code> — they ship together.</li>
+<li>Open a PR against both <code>ui</code> and <code>skills</code>; they ship together.</li>
 </ol>
 <p>The reverse direction (code → Figma) is not supported. Figma is
 upstream; the SPA is downstream.</p>

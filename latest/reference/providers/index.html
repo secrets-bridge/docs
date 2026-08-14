@@ -1797,7 +1797,7 @@
 <h1 id="providers-supported">Providers supported<a class="headerlink" href="#providers-supported" title="Permanent link">&para;</a></h1>
 <p>The agent's <code>ResolverByType</code> dispatches to one resolver per
 <code>target_provider_type</code> string. The CP's metadata layer is provider-
-agnostic — every provider implements the same <code>core.Provider</code>
+agnostic; every provider implements the same <code>core.Provider</code>
 interface.</p>
 <table>
 <thead>
@@ -1824,20 +1824,20 @@ interface.</p>
 <tr>
 <td><code>gcp-sm</code></td>
 <td>placeholder</td>
-<td>—</td>
-<td>—</td>
+<td>-</td>
+<td>-</td>
 </tr>
 <tr>
 <td><code>azure-kv</code></td>
 <td>placeholder</td>
-<td>—</td>
-<td>—</td>
+<td>-</td>
+<td>-</td>
 </tr>
 <tr>
 <td><code>kubernetes</code></td>
 <td>placeholder</td>
-<td>—</td>
-<td>—</td>
+<td>-</td>
+<td>-</td>
 </tr>
 </tbody>
 </table>
@@ -1863,7 +1863,7 @@ KV v2 <code>{"data": {...}}</code> envelope.</p>
 <tr>
 <td>Kubernetes</td>
 <td><code>SB_VAULT_KUBERNETES_ROLE</code></td>
-<td>Production on K8s — uses the projected SA token, lease-tracked + refresh</td>
+<td>Production on K8s. Uses the projected SA token, lease-tracked + refresh</td>
 </tr>
 </tbody>
 </table>
@@ -1880,11 +1880,11 @@ accidentally tries to ship credentials):</p>
 <p>A future PR will refuse more.</p>
 <h3 id="tag-preservation">Tag preservation<a class="headerlink" href="#tag-preservation" title="Permanent link">&para;</a></h3>
 <p>Vault <code>custom_metadata</code> is surfaced verbatim into the CP's
-<code>secrets.labels</code> jsonb on discovery — so a <code>Team: billing</code> tag in
+<code>secrets.labels</code> jsonb on discovery, so a <code>Team: billing</code> tag in
 Vault becomes a filterable label in the UI's Secrets page.</p>
 <h2 id="aws-secrets-manager">AWS Secrets Manager<a class="headerlink" href="#aws-secrets-manager" title="Permanent link">&para;</a></h2>
 <p>The agent uses the AWS SDK Go v2 client. All credential resolution
-goes through the standard SDK chain — <strong>no new credential env vars
+goes through the standard SDK chain: <strong>no new credential env vars
 are introduced</strong>. This is deliberate: adding <code>SB_AWS_*_KEY</code> would
 duplicate the chain and invite operators to mix sources.</p>
 <h3 id="authentication_1">Authentication<a class="headerlink" href="#authentication_1" title="Permanent link">&para;</a></h3>
@@ -1928,7 +1928,7 @@ the request's <code>target_provider_config</code> (table-driven check):</p>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>credentials
 </span></code></pre></div>
 <h3 id="tag-preservation_1">Tag preservation<a class="headerlink" href="#tag-preservation_1" title="Permanent link">&para;</a></h3>
-<p>AWS Tags are surfaced as labels on discovery — same pattern as
+<p>AWS Tags are surfaced as labels on discovery, same pattern as
 Vault <code>custom_metadata</code>.</p>
 <h2 id="what-supported-actually-means">What "supported" actually means<a class="headerlink" href="#what-supported-actually-means" title="Permanent link">&para;</a></h2>
 <p>A provider ships when <strong>three things</strong> are true:</p>
@@ -1936,11 +1936,11 @@ Vault <code>custom_metadata</code>.</p>
 <li>The <code>core.Provider</code> interface is implemented in <code>core/providers/&lt;kind&gt;</code></li>
 <li>The agent's <code>ResolverByType</code> registers the kind</li>
 <li>There's a live e2e against a real instance of the provider (or
-   LocalStack) — verified plaintext round-trip end-to-end, canary
+   LocalStack), verified plaintext round-trip end-to-end, canary
    scan returns zero matches</li>
 </ol>
 <p>GCP SM, Azure Key Vault, and Kubernetes Secret are at step (1)
-partially — the metadata interface stubs are written; the
+partially: the metadata interface stubs are written; the
 resolver + e2e land per design partner request.</p>
 <h2 id="adding-a-new-provider">Adding a new provider<a class="headerlink" href="#adding-a-new-provider" title="Permanent link">&para;</a></h2>
 <p>The pattern is established. The next provider lands as:</p>
@@ -1948,7 +1948,7 @@ resolver + e2e land per design partner request.</p>
 <li>New package <code>core/providers/&lt;kind&gt;/&lt;kind&gt;.go</code> implementing
    <code>Provider</code>. Take the SDK client as an interface (subset
    interface so unit tests inject a fake).</li>
-<li><code>Register(*providers.Registry)</code> function — no <code>init()</code>.</li>
+<li><code>Register(*providers.Registry)</code> function, no <code>init()</code>.</li>
 <li>Unit tests in <code>&lt;kind&gt;_test.go</code> covering: registration,
    pagination if applicable, <code>NotFound</code> mapping to
    <code>providers.ErrNotFound</code>, no-leak assertion on error messages.</li>

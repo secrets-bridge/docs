@@ -1306,7 +1306,7 @@
         <li class="md-nav__item">
   <a href="#ttl-reveal_ttl_seconds" class="md-nav__link">
     <span class="md-ellipsis">
-      TTL — reveal_ttl_seconds
+      TTL, reveal_ttl_seconds
     </span>
   </a>
   
@@ -1703,7 +1703,7 @@
         <li class="md-nav__item">
   <a href="#ttl-reveal_ttl_seconds" class="md-nav__link">
     <span class="md-ellipsis">
-      TTL — reveal_ttl_seconds
+      TTL, reveal_ttl_seconds
     </span>
   </a>
   
@@ -1819,7 +1819,7 @@
 
 
 <h1 id="reveal-sessions">Reveal sessions<a class="headerlink" href="#reveal-sessions" title="Permanent link">&para;</a></h1>
-<p>Slice M introduced <strong>reveal sessions</strong> — the time-limited bulk-reveal
+<p>Slice M introduced <strong>reveal sessions</strong>, the time-limited bulk-reveal
 surface that replaces the per-row "click, see one secret, modal
 closes" flow from earlier slices. This page is the operator-facing
 reference: what a session is, what knobs control it, what
@@ -1828,7 +1828,7 @@ happens when the window closes.</p>
 <p>If you came here from
 <a href="../policy-templates/#anatomy-of-a-policy-rule">Policy templates</a>
 looking for <code>reveal_ttl_seconds</code>, the section
-<a href="#ttl-reveal_ttl_seconds"><strong>TTL — <code>reveal_ttl_seconds</code></strong></a> is the
+<a href="#ttl-reveal_ttl_seconds"><strong>TTL, <code>reveal_ttl_seconds</code></strong></a> is the
 short answer.</p>
 <h2 id="what-a-reveal-session-is">What a reveal session is<a class="headerlink" href="#what-a-reveal-session-is" title="Permanent link">&para;</a></h2>
 <p>A reveal session is a <strong>server-side breadcrumb</strong> that pairs the
@@ -1870,7 +1870,7 @@ read request. The row lives in <code>reveal_sessions</code> and carries:</p>
 </tr>
 <tr>
 <td><code>expired_at</code> + <code>expired_reason</code></td>
-<td>Set when the session ends — <code>ttl</code> (sweeper), <code>user_hide</code> (Hide Now), or <code>unmount</code> (SPA navigated away).</td>
+<td>Set when the session ends, <code>ttl</code> (sweeper), <code>user_hide</code> (Hide Now), or <code>unmount</code> (SPA navigated away).</td>
 </tr>
 </tbody>
 </table>
@@ -1882,7 +1882,7 @@ or earlier on Hide Now / unmount.</p>
 single-shot endpoint
 (<a href="../../reference/api-endpoints/"><code>GET /api/v1/requests/:id/wraps/:wrap_id</code></a>).
 Each click consumed exactly one wrap; the user typed in the SPA's
-modal, copied, closed — and to view another key they clicked again
+modal, copied, closed, and to view another key they clicked again
 on another wrap.</p>
 <p>The reveal session is <strong>bulk + time-bound</strong> instead:</p>
 <table>
@@ -1921,7 +1921,7 @@ on another wrap.</p>
 </tr>
 </tbody>
 </table>
-<p>The single-shot flow still exists — <code>RevealModal</code> in the request
+<p>The single-shot flow still exists, <code>RevealModal</code> in the request
 detail page uses it for legacy flows. The reveal session is the new
 default for the direct-reveal path; approval-flow reads still pass
 through the modal until Slice N migrates them.</p>
@@ -1945,7 +1945,7 @@ through the modal until Slice N migrates them.</p>
 </span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>       └── tab navigates away  ─→ POST /api/v1/reveal-sessions/:id/expire { reason: &#39;unmount&#39; }
 </span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>                                  (fire-and-forget; sweeper is the safety net)
 </span></code></pre></div>
-<h2 id="ttl-reveal_ttl_seconds">TTL — <code>reveal_ttl_seconds</code><a class="headerlink" href="#ttl-reveal_ttl_seconds" title="Permanent link">&para;</a></h2>
+<h2 id="ttl-reveal_ttl_seconds">TTL, <code>reveal_ttl_seconds</code><a class="headerlink" href="#ttl-reveal_ttl_seconds" title="Permanent link">&para;</a></h2>
 <p>TTL is <strong>policy-driven</strong>, not caller-driven. The matched
 <a href="../policy-templates/#anatomy-of-a-policy-rule">policy rule's</a>
 <code>reveal_ttl_seconds</code> column anchors how long the session lives.</p>
@@ -1992,11 +1992,11 @@ through the modal until Slice N migrates them.</p>
 <p>The api <strong>clamps</strong> out-of-range values defensively (the schema CHECK
 also rejects them, but the service-layer clamp guards legacy /
 imported rules); a value of 0 falls back to 60.</p>
-<p>The TTL is <strong>not</strong> the wrap's TTL — that comes from the workflow's
+<p>The TTL is <strong>not</strong> the wrap's TTL, that comes from the workflow's
 <code>wrap_ttl_*</code> columns. <code>reveal_ttl_seconds</code> only bounds the session
 window. When the window expires (or on Hide Now), the underlying
 wraps' <code>expires_at</code> is advanced to "now" so a leaked wrap_id is
-unusable after the window — see
+unusable after the window, see
 <a href="#the-server-side-guarantee">The server-side guarantee</a> below.</p>
 <h2 id="hard-rules">Hard rules<a class="headerlink" href="#hard-rules" title="Permanent link">&para;</a></h2>
 <p>The platform holds these invariants by construction (schema, code,
@@ -2056,12 +2056,12 @@ issued become unreachable</strong>. The worker sweeper
 <p>This holds even when the SPA has already cleared its plaintext: a
 leaked wrap_id is <strong>server-side unusable</strong> after the session ends.</p>
 <p>The sweeper runs at <code>SB_WORKER_REVEAL_SESSIONS_EXPIRED_INTERVAL</code>
-(default <code>5s</code>) — fast enough that a leaked wrap_id stays unusable
+(default <code>5s</code>), fast enough that a leaked wrap_id stays unusable
 within a few seconds of TTL elapse. See
 <a href="../config/">Configuration reference</a> for the full env var.</p>
 <h2 id="copy-all-policy">Copy All policy<a class="headerlink" href="#copy-all-policy" title="Permanent link">&para;</a></h2>
 <p>PRD §15 calls out a Copy-All button on the bulk reveal page. Today
-the UI ships a per-row Copy CTA only — Copy-All is a future PRD §15
+the UI ships a per-row Copy CTA only, Copy-All is a future PRD §15
 follow-up that will be <strong>disabled by default in PROD</strong> via a policy
 knob (the exact column is TBD; the contract is: PROD environments
 must opt in explicitly, non-PROD environments default opt-out unless
@@ -2087,7 +2087,7 @@ columns as if the set is stable.</p>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">expires_at</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">now</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">INTERVAL</span><span class="w"> </span><span class="s1">&#39;30 seconds&#39;</span><span class="p">;</span>
 </span></code></pre></div>
 <p>A non-zero count means the sweeper has not run since the row aged
-past TTL — investigate the worker. The <code>worker_scheduler_runs_total
+past TTL, investigate the worker. The <code>worker_scheduler_runs_total
 {task="reveal-sessions-expired"}</code> Prometheus counter is the
 authoritative liveness signal.</p>
 <h3 id="trace-one-users-reveal-history">"Trace one user's reveal history"<a class="headerlink" href="#trace-one-users-reveal-history" title="Permanent link">&para;</a></h3>
@@ -2102,14 +2102,14 @@ authoritative liveness signal.</p>
 see <strong>which keys</strong> were exposed without ever holding the values.</p>
 <h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../policy-templates/">Policy templates</a> — how to wire
+<li><a href="../policy-templates/">Policy templates</a>, how to wire
   <code>reveal_ttl_seconds</code> per (project, env) scope</li>
-<li><a href="../project-environments/">Project environments</a> — the <code>kind=prod</code>
+<li><a href="../project-environments/">Project environments</a>, the <code>kind=prod</code>
   hard boundary the PolicyEngine enforces alongside reveal sessions</li>
-<li><a href="../../reference/api-endpoints/#reveal-sessions">API endpoints</a> — the
+<li><a href="../../reference/api-endpoints/#reveal-sessions">API endpoints</a>, the
   three HTTP routes this surface exposes</li>
-<li><a href="../config/">Configuration reference</a> — the worker sweeper interval</li>
-<li><a href="../cross-team-requests/">Cross-team requests</a> — reveal sessions also
+<li><a href="../config/">Configuration reference</a>, the worker sweeper interval</li>
+<li><a href="../cross-team-requests/">Cross-team requests</a>, reveal sessions also
   work for <code>type='cross_team'</code> requests after Slice N; the SPA flow
   is the same as for read requests.</li>
 </ul>

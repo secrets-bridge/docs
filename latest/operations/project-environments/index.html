@@ -1246,7 +1246,7 @@
         <li class="md-nav__item">
   <a href="#kind-vs-type-why-both" class="md-nav__link">
     <span class="md-ellipsis">
-      kind vs type — why both
+      kind vs type, why both
     </span>
   </a>
   
@@ -1640,7 +1640,7 @@
         <li class="md-nav__item">
   <a href="#kind-vs-type-why-both" class="md-nav__link">
     <span class="md-ellipsis">
-      kind vs type — why both
+      kind vs type, why both
     </span>
   </a>
   
@@ -1734,7 +1734,7 @@ model. This page explains what they are, the <code>non_prod</code> / <code>prod<
 distinction that gates direct reveal, and how to wire them up
 operationally.</p>
 <h2 id="what-an-environment-is">What an environment is<a class="headerlink" href="#what-an-environment-is" title="Permanent link">&para;</a></h2>
-<p>An <strong>environment</strong> is a lifecycle boundary inside a project — <code>dev</code>,
+<p>An <strong>environment</strong> is a lifecycle boundary inside a project: <code>dev</code>,
 <code>staging</code>, <code>uat</code>, <code>prod</code>, or any other name your team uses. The
 schema (<code>api/pkg/storage/migrations/0001_initial_schema.up.sql</code>) has
 carried environments since v0.1; Slice L1 added three classifying
@@ -1761,15 +1761,15 @@ fields:</p>
 </tr>
 </tbody>
 </table>
-<p>The existing <code>type</code> column (dev / staging / uat / prod / other) stays —
-operators use it as a free lifecycle label that doesn't have to
+<p>The existing <code>type</code> column (dev / staging / uat / prod / other) stays.
+Operators use it as a free lifecycle label that doesn't have to
 agree with <code>kind</code>. The two are independently mutable for the case
 where a staging-labelled env actually carries prod data: set
 <code>type='staging'</code> but <code>kind='prod'</code> and the PROD invariant fires.</p>
-<h2 id="kind-vs-type-why-both">kind vs type — why both<a class="headerlink" href="#kind-vs-type-why-both" title="Permanent link">&para;</a></h2>
+<h2 id="kind-vs-type-why-both">kind vs type, why both<a class="headerlink" href="#kind-vs-type-why-both" title="Permanent link">&para;</a></h2>
 <p>The free-string <code>type</code> was useful as a lifecycle label, but it was
 also doing double duty as the implicit risk signal. Operators
-naturally write <code>type='uat'</code> for non-production environments — and a
+naturally write <code>type='uat'</code> for non-production environments, and a
 single typo or rename can silently un-gate a sensitive flow. <code>kind</code>
 is the hard, two-value classifier that the engine actually consults.</p>
 <p>A reasonable mental model:</p>
@@ -1865,7 +1865,7 @@ ensures no orphaned bindings survive.</p>
 <li>Bind the secrets the env should expose via
    <code>POST /projects/:project_id/secrets</code> with the new
    <code>environment_id</code> field set (Slice L3). The legacy
-   <code>secrets.labels.Env</code> label is no longer the authorization key —
+   <code>secrets.labels.Env</code> label is no longer the authorization key.
    <code>project_secrets.environment_id</code> is.</li>
 <li>Add a <code>policy_rules</code> row scoped to this env that picks the right
    workflow. See <a href="../policy-templates/">Policy templates</a> for the
@@ -1873,22 +1873,22 @@ ensures no orphaned bindings survive.</p>
 <li>(Optional) Grant the <code>secret.reveal.direct</code> permission to the
    <code>developer</code> role (it's seeded by default; revoke if you want a
    stricter baseline). See
-   <a href="../authentication/#direct-reveal-permission-slice-l4">Authentication — direct reveal permission</a>.</li>
+   <a href="../authentication/#direct-reveal-permission-slice-l4">Authentication, direct reveal permission</a>.</li>
 </ol>
 <h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../policy-templates/">Policy templates</a> — non_prod / prod policy
+<li><a href="../policy-templates/">Policy templates</a>, non_prod / prod policy
   rule examples.</li>
-<li><a href="../authentication/">Authentication</a> — <code>secret.reveal.direct</code>
+<li><a href="../authentication/">Authentication</a>, <code>secret.reveal.direct</code>
   permission + the L4 dev endpoints.</li>
 <li>API reference: <code>GET /users/me/projects</code> returns each project with
   its environments inline (Slice L4).</li>
-<li><a href="../cross-team-requests/">Cross-team requests</a> — Slice N split between
+<li><a href="../cross-team-requests/">Cross-team requests</a>, Slice N split between
   the <strong>target</strong> (team / project / environment that provides the value)
   and the <strong>destination</strong> (provider connection + secret_ref where the
   value lands). Both reference the project / environment model defined
   here.</li>
-<li><a href="../provider-connections/">Provider connections</a> — connection metadata
+<li><a href="../provider-connections/">Provider connections</a>, connection metadata
   binds at project ± environment granularity via the
   <code>project_provider_connections</code> join table. Project-wide bindings have
   <code>environment_id IS NULL</code>; env-specific bindings narrow to one row.</li>

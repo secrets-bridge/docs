@@ -1803,7 +1803,7 @@
 <p>Source: <a href="https://github.com/secrets-bridge/api/blob/main/internal/auth/permissions.go"><code>api/internal/auth/permissions.go</code></a>.
 The api also serves the live catalog at
 <code>GET /api/v1/permissions</code> (with descriptions), cached for 5
-minutes — the UI's Roles admin page hydrates from there so the
+minutes. The UI's Roles admin page hydrates from there so the
 chip picker stays in sync with what the api actually understands.</p>
 <h2 id="seed-roles">Seed roles<a class="headerlink" href="#seed-roles" title="Permanent link">&para;</a></h2>
 <p>Three roles ship as system seeds (migration 0005). Operators can
@@ -1835,22 +1835,22 @@ edit their permission lists but can't delete the rows.</p>
 <tr>
 <td><code>value_provider</code></td>
 <td><code>secret.value.provide</code></td>
-<td>Slice N seed — used for the <a href="../../operations/cross-team-requests/">cross-team flow</a>. Assignment <strong>must</strong> carry a <code>team_id</code> scope; the Assignments form gates global grants behind a type-to-confirm.</td>
+<td>Slice N seed, used for the <a href="../../operations/cross-team-requests/">cross-team flow</a>. Assignment <strong>must</strong> carry a <code>team_id</code> scope; the Assignments form gates global grants behind a type-to-confirm.</td>
 </tr>
 <tr>
 <td><code>security_approver</code></td>
 <td><code>secret.security.approve</code></td>
-<td>Slice N seed — holder can cast the security vote on cross-team requests where the bound workflow has <code>requires_security_approval=true</code>.</td>
+<td>Slice N seed. Holder can cast the security vote on cross-team requests where the bound workflow has <code>requires_security_approval=true</code>.</td>
 </tr>
 <tr>
 <td><code>provider_connection_binder</code></td>
 <td><code>integration.bind</code></td>
-<td>EPIC Q seed — section-head capability for <a href="../../operations/provider-connections/#scoped-bindings-integrationbind">self-service provider connection binding</a>. Assignment carries a <code>team_id</code> (covers descendant project subtree) or <code>project_id</code> (one project) scope. <strong>Not</strong> auto-granted to <code>integration.edit</code> holders — operators grant explicitly.</td>
+<td>EPIC Q seed: section-head capability for <a href="../../operations/provider-connections/#scoped-bindings-integrationbind">self-service provider connection binding</a>. Assignment carries a <code>team_id</code> (covers descendant project subtree) or <code>project_id</code> (one project) scope. <strong>Not</strong> auto-granted to <code>integration.edit</code> holders; operators grant explicitly.</td>
 </tr>
 <tr>
 <td><code>policy_author</code></td>
 <td><code>policy.author</code></td>
-<td>EPIC R seed (api#108) — section-head capability for <a href="../../operations/policy-templates/#scoped-policy-authoring-policyauthor">scoped non-prod policy authoring</a>. Assignment carries <code>team_id</code> or <code>project_id</code> scope. <strong>Not</strong> auto-granted to <code>policy.edit</code> holders — operators grant explicitly. Scoped rules are bounded <code>priority &lt; platform_reserved_priority</code> (default <code>9000</code>, admin-configurable per <a href="../../operations/policy-templates/#adjusting-the-reserved-priority-band">R-follow-up #2 / api#113</a>) and rejected against any selector that resolves to a prod environment. R-follow-up #3 (api#114) added the team-anchored authoring surface — a <code>team_id</code>-scoped grant lets the holder author rules at <code>/teams/:teamID/policy-rules</code> that cascade down to every descendant project.</td>
+<td>EPIC R seed (api#108): section-head capability for <a href="../../operations/policy-templates/#scoped-policy-authoring-policyauthor">scoped non-prod policy authoring</a>. Assignment carries <code>team_id</code> or <code>project_id</code> scope. <strong>Not</strong> auto-granted to <code>policy.edit</code> holders; operators grant explicitly. Scoped rules are bounded <code>priority &lt; platform_reserved_priority</code> (default <code>9000</code>, admin-configurable per <a href="../../operations/policy-templates/#adjusting-the-reserved-priority-band">R-follow-up #2 / api#113</a>) and rejected against any selector that resolves to a prod environment. R-follow-up #3 (api#114) added the team-anchored authoring surface: a <code>team_id</code>-scoped grant lets the holder author rules at <code>/teams/:teamID/policy-rules</code> that cascade down to every descendant project.</td>
 </tr>
 </tbody>
 </table>
@@ -1885,15 +1885,15 @@ edit their permission lists but can't delete the rows.</p>
 <tbody>
 <tr>
 <td><code>workflow.edit</code></td>
-<td>Create / update / delete workflow definitions. R-follow-up #1 (api#112) added the <code>scoped_policy_authorable</code> flag — this permission also gates the toggle that exposes a workflow to the scoped policy author surface (<code>/projects/:id/policies</code>). Default-deny; admin curates explicitly.</td>
+<td>Create / update / delete workflow definitions. R-follow-up #1 (api#112) added the <code>scoped_policy_authorable</code> flag. This permission also gates the toggle that exposes a workflow to the scoped policy author surface (<code>/projects/:id/policies</code>). Default-deny; admin curates explicitly.</td>
 </tr>
 <tr>
 <td><code>policy.edit</code></td>
-<td>Create / update / delete policy rules. Global scope — affects every project's resolution. Does NOT auto-cover <code>policy.author</code> server-side (EPIC R, api#108) — operators grant scoped authoring explicitly via the <code>policy_author</code> system role. R-follow-up #2 (api#113) extended this permission to also gate the <a href="../api-endpoints/#platform-settings-r-follow-up-2-api113">Platform settings</a> admin surface. R-follow-up #3 (api#114) extended the <code>/admin/policies</code> surface with team-anchored rule support; platform admins retain full lifecycle control over team rules via the admin path while the team URL family stays <code>policy.author</code>-only. <code>policy.edit</code> does NOT auto-allow on <code>/teams/:id/policies</code> or <code>/projects/:id/policies</code> — both scoped surfaces are <code>policy.author</code> only by design. R-follow-up #5 (api#132) added the admin <a href="../api-endpoints/#policy-rule-change-history-r-follow-up-5-api132">policy rule history</a> endpoint at <code>/policies/:ruleID/history</code> — gated by this permission. Post-delete forensic visibility is admin-only: the admin history endpoint checks the audit chain for existence (not <code>policyRepo.Get</code>), so admins retain visibility into deleted rules. Scoped paths return 404 after delete.</td>
+<td>Create / update / delete policy rules. Global scope: affects every project's resolution. Does NOT auto-cover <code>policy.author</code> server-side (EPIC R, api#108). Operators grant scoped authoring explicitly via the <code>policy_author</code> system role. R-follow-up #2 (api#113) extended this permission to also gate the <a href="../api-endpoints/#platform-settings-r-follow-up-2-api113">Platform settings</a> admin surface. R-follow-up #3 (api#114) extended the <code>/admin/policies</code> surface with team-anchored rule support; platform admins retain full lifecycle control over team rules via the admin path while the team URL family stays <code>policy.author</code>-only. <code>policy.edit</code> does NOT auto-allow on <code>/teams/:id/policies</code> or <code>/projects/:id/policies</code>; both scoped surfaces are <code>policy.author</code> only by design. R-follow-up #5 (api#132) added the admin <a href="../api-endpoints/#policy-rule-change-history-r-follow-up-5-api132">policy rule history</a> endpoint at <code>/policies/:ruleID/history</code>, gated by this permission. Post-delete forensic visibility is admin-only: the admin history endpoint checks the audit chain for existence (not <code>policyRepo.Get</code>), so admins retain visibility into deleted rules. Scoped paths return 404 after delete.</td>
 </tr>
 <tr>
 <td><code>policy.author</code></td>
-<td>Author scoped policy rules for non-prod environments. Two scope flavors: <strong>project-scoped</strong> (EPIC R, api#108) via <code>/projects/:projectID/policy-rules</code>, and <strong>team-scoped</strong> (R-follow-up #3, api#114) via <code>/teams/:teamID/policy-rules</code> — the latter cascades the rule down to every descendant project of the team subtree. Grants scoped to a <code>team_id</code> expand through the subtree via the existing team-aware resolver. Refuses prod env selectors, priority at or above the platform-reserved band (cap admin-configurable via R-follow-up #2 / api#113; default <code>9000</code>), and edits to platform global rules. Granted via the <code>policy_author</code> system seed role. R-follow-up #5 (api#132) added the scoped <a href="../api-endpoints/#policy-rule-change-history-r-follow-up-5-api132">policy rule history</a> endpoints — <code>policy.author</code> covering the URL anchor gates the View. Scoped authors lose history visibility at delete time (the rule itself is checked, not the audit chain).</td>
+<td>Author scoped policy rules for non-prod environments. Two scope flavors: <strong>project-scoped</strong> (EPIC R, api#108) via <code>/projects/:projectID/policy-rules</code>, and <strong>team-scoped</strong> (R-follow-up #3, api#114) via <code>/teams/:teamID/policy-rules</code>; the latter cascades the rule down to every descendant project of the team subtree. Grants scoped to a <code>team_id</code> expand through the subtree via the existing team-aware resolver. Refuses prod env selectors, priority at or above the platform-reserved band (cap admin-configurable via R-follow-up #2 / api#113; default <code>9000</code>), and edits to platform global rules. Granted via the <code>policy_author</code> system seed role. R-follow-up #5 (api#132) added the scoped <a href="../api-endpoints/#policy-rule-change-history-r-follow-up-5-api132">policy rule history</a> endpoints; <code>policy.author</code> covering the URL anchor gates the View. Scoped authors lose history visibility at delete time (the rule itself is checked, not the audit chain).</td>
 </tr>
 </tbody>
 </table>
@@ -1912,11 +1912,11 @@ edit their permission lists but can't delete the rows.</p>
 </tr>
 <tr>
 <td><code>agent.revoke</code></td>
-<td>Revoke an agent — heartbeats stop being accepted.</td>
+<td>Revoke an agent. Heartbeats stop being accepted.</td>
 </tr>
 <tr>
 <td><code>agent.list</code></td>
-<td>(Reserved) List agents in the projection — today this is open to any signed-in user.</td>
+<td>(Reserved) List agents in the projection. Today this is open to any signed-in user.</td>
 </tr>
 </tbody>
 </table>
@@ -1977,23 +1977,23 @@ edit their permission lists but can't delete the rows.</p>
 <tbody>
 <tr>
 <td><code>integration.edit</code></td>
-<td>Create / update / delete ArgoCD endpoints + GitOps app mappings + Provider connections (EPIC P, api#92). One permission, three surfaces — does <strong>not</strong> auto-cover <code>integration.bind</code> server-side; the SPA's capability helper unifies them in the UI but the api treats each endpoint family strictly.</td>
+<td>Create / update / delete ArgoCD endpoints + GitOps app mappings + Provider connections (EPIC P, api#92). One permission, three surfaces. It does <strong>not</strong> auto-cover <code>integration.bind</code> server-side; the SPA's capability helper unifies them in the UI but the api treats each endpoint family strictly.</td>
 </tr>
 <tr>
 <td><code>integration.bind</code></td>
-<td>Bind / unbind self-service-bindable provider connections on projects + environments you cover (EPIC Q, api#99). Scoped via the existing team-aware resolver. Never auto-covered by <code>integration.edit</code> — grant explicitly via the <code>provider_connection_binder</code> system role (or any custom role carrying this permission). Refuses prod envs, disabled connections, and connections without <code>self_service_bindable=true</code>.</td>
+<td>Bind / unbind self-service-bindable provider connections on projects + environments you cover (EPIC Q, api#99). Scoped via the existing team-aware resolver. Never auto-covered by <code>integration.edit</code>; grant explicitly via the <code>provider_connection_binder</code> system role (or any custom role carrying this permission). Refuses prod envs, disabled connections, and connections without <code>self_service_bindable=true</code>.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="scoped-permissions-today">Scoped permissions (today)<a class="headerlink" href="#scoped-permissions-today" title="Permanent link">&para;</a></h2>
-<p>Most permissions today gate via <code>auth.Require(perm)</code> — the user
+<p>Most permissions today gate via <code>auth.Require(perm)</code>: the user
 holds the permission or they don't. A few are intended to gate
 via <code>auth.RequireScoped(perm, scopeFn)</code> so a grant can be narrowed
 to a single project / environment / secret-ref prefix / provider:</p>
 <ul>
 <li><code>secret.request</code> (typical scope: <code>{project_id, environment}</code>)</li>
 <li><code>secret.approve</code> (typical scope: <code>{secret_ref_prefix, environment}</code>)</li>
-<li><code>secret.value.provide</code> (typical scope: <code>{team_id}</code> — required for the seed <code>value_provider</code> role)</li>
+<li><code>secret.value.provide</code> (typical scope: <code>{team_id}</code>, required for the seed <code>value_provider</code> role)</li>
 <li><code>agent.mint</code> (typical scope: <code>{cluster}</code>)</li>
 <li><code>agent.revoke</code> (typical scope: <code>{cluster}</code>)</li>
 </ul>
@@ -2009,7 +2009,7 @@ Agents / Secrets / Observability / Integrations groupings.</p>
 about (e.g. a legacy custom permission from before
 <a href="https://github.com/secrets-bridge/api/issues/32">api#32</a> shipped
 the catalog), the UI renders it in a separate <strong>Custom / unknown</strong>
-group at the bottom — so old roles stay editable.</p>
+group at the bottom, so old roles stay editable.</p>
 <h2 id="how-to-add-a-permission">How to add a permission<a class="headerlink" href="#how-to-add-a-permission" title="Permanent link">&para;</a></h2>
 <div class="language-go highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// In api/internal/auth/permissions.go:</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
@@ -2023,12 +2023,12 @@ group at the bottom — so old roles stay editable.</p>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="p">{</span><span class="nx">PermSomethingNew</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Group Name&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;What this permission gates.&quot;</span><span class="p">},</span>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>That's it — <code>Catalog</code> is the source of truth; the <code>Keys()</code> /
+<p>That's it: <code>Catalog</code> is the source of truth; the <code>Keys()</code> /
 <code>IsKnown()</code> helpers + the HTTP endpoint + the drift-guard test all
 pick it up automatically.</p>
 <p>A drift-guard test asserts that <strong>every permission string
-referenced in seed migrations is present in the Catalog</strong> —
-otherwise the seed roles would request unknown permissions on
+referenced in seed migrations is present in the Catalog</strong>.
+Otherwise the seed roles would request unknown permissions on
 first boot.</p>
 
 

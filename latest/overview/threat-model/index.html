@@ -664,11 +664,11 @@
         <li class="md-nav__item">
   <a href="#hard-rules-never-violated" class="md-nav__link">
     <span class="md-ellipsis">
-      Hard rules — never violated
+      Hard rules: never violated
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Hard rules — never violated">
+    <nav class="md-nav" aria-label="Hard rules: never violated">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -724,7 +724,7 @@
         <li class="md-nav__item">
   <a href="#threat-model-what-we-defend-against" class="md-nav__link">
     <span class="md-ellipsis">
-      Threat model — what we defend against
+      Threat model: what we defend against
     </span>
   </a>
   
@@ -733,7 +733,7 @@
         <li class="md-nav__item">
   <a href="#threat-model-what-we-dont-yet-defend-against-open-p0-work" class="md-nav__link">
     <span class="md-ellipsis">
-      Threat model — what we don't yet defend against (open P0 work)
+      Threat model: what we don't yet defend against (open P0 work)
     </span>
   </a>
   
@@ -742,7 +742,7 @@
         <li class="md-nav__item">
   <a href="#what-we-dont-do-by-design" class="md-nav__link">
     <span class="md-ellipsis">
-      What we don't do — by design
+      What we don't do: by design
     </span>
   </a>
   
@@ -1649,11 +1649,11 @@
         <li class="md-nav__item">
   <a href="#hard-rules-never-violated" class="md-nav__link">
     <span class="md-ellipsis">
-      Hard rules — never violated
+      Hard rules: never violated
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Hard rules — never violated">
+    <nav class="md-nav" aria-label="Hard rules: never violated">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1709,7 +1709,7 @@
         <li class="md-nav__item">
   <a href="#threat-model-what-we-defend-against" class="md-nav__link">
     <span class="md-ellipsis">
-      Threat model — what we defend against
+      Threat model: what we defend against
     </span>
   </a>
   
@@ -1718,7 +1718,7 @@
         <li class="md-nav__item">
   <a href="#threat-model-what-we-dont-yet-defend-against-open-p0-work" class="md-nav__link">
     <span class="md-ellipsis">
-      Threat model — what we don't yet defend against (open P0 work)
+      Threat model: what we don't yet defend against (open P0 work)
     </span>
   </a>
   
@@ -1727,7 +1727,7 @@
         <li class="md-nav__item">
   <a href="#what-we-dont-do-by-design" class="md-nav__link">
     <span class="md-ellipsis">
-      What we don't do — by design
+      What we don't do: by design
     </span>
   </a>
   
@@ -1768,7 +1768,7 @@
 <p>These are the rules the project never breaks. They're enforced
 where possible by tests, schema constraints, and CI greps; where
 that isn't possible, code review is the gate.</p>
-<h2 id="hard-rules-never-violated">Hard rules — never violated<a class="headerlink" href="#hard-rules-never-violated" title="Permanent link">&para;</a></h2>
+<h2 id="hard-rules-never-violated">Hard rules: never violated<a class="headerlink" href="#hard-rules-never-violated" title="Permanent link">&para;</a></h2>
 <h3 id="value-bearing-data">Value-bearing data<a class="headerlink" href="#value-bearing-data" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -1784,7 +1784,7 @@ that isn't possible, code review is the gate.</p>
 </tr>
 <tr>
 <td>Secret values <strong>never</strong> appear in Redis</td>
-<td>The <code>pkg/runtime</code> package doesn't expose a generic <code>Set(key, value)</code> — only idempotency tokens, locks, rate-limit windows, pub/sub messages</td>
+<td>The <code>pkg/runtime</code> package doesn't expose a generic <code>Set(key, value)</code>: only idempotency tokens, locks, rate-limit windows, pub/sub messages</td>
 </tr>
 <tr>
 <td>Secret values <strong>never</strong> appear in audit metadata</td>
@@ -1815,7 +1815,7 @@ that isn't possible, code review is the gate.</p>
 </tr>
 <tr>
 <td>Provider credentials <strong>never</strong> in frontend code</td>
-<td>The UI talks <strong>only</strong> to the Control Plane API — there's no provider SDK in the SPA's dependency tree</td>
+<td>The UI talks <strong>only</strong> to the Control Plane API; there's no provider SDK in the SPA's dependency tree</td>
 </tr>
 <tr>
 <td>ArgoCD tokens (for §26 observation) are KMS-wrapped at rest</td>
@@ -1838,7 +1838,7 @@ that isn't possible, code review is the gate.</p>
 </tr>
 <tr>
 <td>The repository interface for audit events has no <code>Update</code> / <code>Delete</code> methods</td>
-<td>A typo in a SQL string can't surface through the interface — review would catch it</td>
+<td>A typo in a SQL string can't surface through the interface; review would catch it</td>
 </tr>
 </tbody>
 </table>
@@ -1853,7 +1853,7 @@ that isn't possible, code review is the gate.</p>
 <tbody>
 <tr>
 <td>The agent has no inbound public listener</td>
-<td><code>SB_LOCAL_ADDR</code> defaults to <code>127.0.0.1:8090</code> — loopback only</td>
+<td><code>SB_LOCAL_ADDR</code> defaults to <code>127.0.0.1:8090</code> (loopback only)</td>
 </tr>
 <tr>
 <td>The agent never imports any DB or Redis driver</td>
@@ -1892,15 +1892,15 @@ that isn't possible, code review is the gate.</p>
 </tr>
 <tr>
 <td>Generic 401 / 410 / 409 on every failure shape; the audit log carries the specifics</td>
-<td>Login failures audit <code>actor=anonymous</code>, <code>error_kind=wrong_password</code> and <code>email_length</code> (never the email body — defends against audit-table spam)</td>
+<td>Login failures audit <code>actor=anonymous</code>, <code>error_kind=wrong_password</code> and <code>email_length</code> (never the email body; defends against audit-table spam)</td>
 </tr>
 <tr>
 <td><code>alg=none</code> JWT downgrade is <strong>impossible</strong></td>
-<td>The JWT verifier compares the header byte-for-byte against the exact base64 of <code>{"alg":"HS256","typ":"JWT"}</code> — no parsing surface</td>
+<td>The JWT verifier compares the header byte-for-byte against the exact base64 of <code>{"alg":"HS256","typ":"JWT"}</code>: no parsing surface</td>
 </tr>
 </tbody>
 </table>
-<h2 id="threat-model-what-we-defend-against">Threat model — what we defend against<a class="headerlink" href="#threat-model-what-we-defend-against" title="Permanent link">&para;</a></h2>
+<h2 id="threat-model-what-we-defend-against">Threat model: what we defend against<a class="headerlink" href="#threat-model-what-we-defend-against" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1923,12 +1923,12 @@ that isn't possible, code review is the gate.</p>
 <tr>
 <td>TLS-terminating proxy in a service mesh</td>
 <td>Read plaintext between TLS termination and the api process</td>
-<td><strong>Wire envelope</strong> — X25519 sealing CP→Agent, KMS-DEK envelope Agent→CP; proxy sees only ciphertext</td>
+<td><strong>Wire envelope</strong>: X25519 sealing CP→Agent, KMS-DEK envelope Agent→CP; proxy sees only ciphertext</td>
 </tr>
 <tr>
 <td>Database exfiltration / stolen backup</td>
 <td>Read every secret wrap</td>
-<td><strong>Storage envelope</strong> — per-row KMS-wrapped data key; without the KMS the dump is noise</td>
+<td><strong>Storage envelope</strong>: per-row KMS-wrapped data key; without the KMS the dump is noise</td>
 </tr>
 <tr>
 <td>Misbehaving CP process logging payloads before encryption</td>
@@ -1958,11 +1958,11 @@ that isn't possible, code review is the gate.</p>
 <tr>
 <td>Stale agent claiming after lease expired</td>
 <td>Double-execution of a job</td>
-<td><code>WHERE claimed_by = $4 AND status = 'claimed'</code> on the complete UPDATE — owner mismatch returns 409</td>
+<td><code>WHERE claimed_by = $4 AND status = 'claimed'</code> on the complete UPDATE; owner mismatch returns 409</td>
 </tr>
 </tbody>
 </table>
-<h2 id="threat-model-what-we-dont-yet-defend-against-open-p0-work">Threat model — what we don't yet defend against (open P0 work)<a class="headerlink" href="#threat-model-what-we-dont-yet-defend-against-open-p0-work" title="Permanent link">&para;</a></h2>
+<h2 id="threat-model-what-we-dont-yet-defend-against-open-p0-work">Threat model: what we don't yet defend against (open P0 work)<a class="headerlink" href="#threat-model-what-we-dont-yet-defend-against-open-p0-work" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1975,36 +1975,36 @@ that isn't possible, code review is the gate.</p>
 <tr>
 <td>Compromised host running the agent</td>
 <td>Steal <code>SB_AGENT_SECRET</code></td>
-<td><strong>Open</strong> — workload identity (SPIFFE / IRSA) is <a href="https://github.com/secrets-bridge/agent/issues/12">agent#12</a> + <a href="https://github.com/secrets-bridge/api/issues/28">api#28</a></td>
+<td><strong>Open</strong>: workload identity (SPIFFE / IRSA) is <a href="https://github.com/secrets-bridge/agent/issues/12">agent#12</a> + <a href="https://github.com/secrets-bridge/api/issues/28">api#28</a></td>
 </tr>
 <tr>
 <td>Brute force / credential stuffing on <code>/auth/login</code></td>
 <td>Guess admin password</td>
-<td><strong>Open</strong> — rate limiting is <a href="https://github.com/secrets-bridge/api/issues/30">api#30</a></td>
+<td><strong>Open</strong>: rate limiting is <a href="https://github.com/secrets-bridge/api/issues/30">api#30</a></td>
 </tr>
 <tr>
 <td>Operator deploys with <code>SB_KMS_BACKEND=local</code> in production</td>
 <td>Storage envelope uses a key that lives in the same env var</td>
-<td><strong>Open</strong> — Helm default switch is <a href="https://github.com/secrets-bridge/charts/issues/2">charts#2</a>; api startup WARN is <a href="https://github.com/secrets-bridge/api/issues/29">api#29</a></td>
+<td><strong>Open</strong>: Helm default switch is <a href="https://github.com/secrets-bridge/charts/issues/2">charts#2</a>; api startup WARN is <a href="https://github.com/secrets-bridge/api/issues/29">api#29</a></td>
 </tr>
 <tr>
 <td>KMS master key rotation breaks the platform</td>
 <td>Operator can't rotate without downtime</td>
-<td><strong>Open</strong> — tested runbook is <a href="https://github.com/secrets-bridge/api/issues/31">api#31</a></td>
+<td><strong>Open</strong>: tested runbook is <a href="https://github.com/secrets-bridge/api/issues/31">api#31</a></td>
 </tr>
 <tr>
 <td>DBA with direct Postgres access</td>
 <td>Drop the audit triggers</td>
-<td><strong>Acknowledged</strong> — the schema is a defense; database-level RBAC and audit-log shipping to a separate system are deployment-side responsibilities</td>
+<td><strong>Acknowledged</strong>: the schema is a defense; database-level RBAC and audit-log shipping to a separate system are deployment-side responsibilities</td>
 </tr>
 <tr>
 <td>External OIDC SSO required by enterprise</td>
 <td>Local-admin login is too coarse</td>
-<td><strong>Open</strong> — real OIDC is <a href="https://github.com/secrets-bridge/api/issues/26">api#26</a></td>
+<td><strong>Open</strong>: real OIDC is <a href="https://github.com/secrets-bridge/api/issues/26">api#26</a></td>
 </tr>
 </tbody>
 </table>
-<h2 id="what-we-dont-do-by-design">What we don't do — by design<a class="headerlink" href="#what-we-dont-do-by-design" title="Permanent link">&para;</a></h2>
+<h2 id="what-we-dont-do-by-design">What we don't do: by design<a class="headerlink" href="#what-we-dont-do-by-design" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>We don't store secret values long-term.</strong> Wraps have a TTL
   measured in minutes / hours. The platform is not a secrets

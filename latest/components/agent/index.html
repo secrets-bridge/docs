@@ -804,7 +804,7 @@
         <li class="md-nav__item">
   <a href="#hard-rules-enforced-by-ci" class="md-nav__link">
     <span class="md-ellipsis">
-      Hard rules — enforced by CI
+      Hard rules enforced by CI
     </span>
   </a>
   
@@ -1607,7 +1607,7 @@
         <li class="md-nav__item">
   <a href="#hard-rules-enforced-by-ci" class="md-nav__link">
     <span class="md-ellipsis">
-      Hard rules — enforced by CI
+      Hard rules enforced by CI
     </span>
   </a>
   
@@ -1689,7 +1689,7 @@
 <p>The execution tier. Runs inside the target account / cluster.
 Holds provider credentials for its own boundary only; the Control
 Plane never sees them.</p>
-<h2 id="hard-rules-enforced-by-ci">Hard rules — enforced by CI<a class="headerlink" href="#hard-rules-enforced-by-ci" title="Permanent link">&para;</a></h2>
+<h2 id="hard-rules-enforced-by-ci">Hard rules enforced by CI<a class="headerlink" href="#hard-rules-enforced-by-ci" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1708,7 +1708,7 @@ Plane never sees them.</p>
 </tr>
 <tr>
 <td>No inbound public listener</td>
-<td><code>SB_LOCAL_ADDR</code> defaults to <code>127.0.0.1:8090</code> (loopback only — for probes)</td>
+<td><code>SB_LOCAL_ADDR</code> defaults to <code>127.0.0.1:8090</code> (loopback only, for probes)</td>
 </tr>
 <tr>
 <td>Identity file mode 0600</td>
@@ -1746,7 +1746,7 @@ Plane never sees them.</p>
     end</code></pre>
 <div class="admonition note">
 <p class="admonition-title">Heartbeat response shape</p>
-<p>A <strong>bodyless</strong> heartbeat returns an empty <strong>204</strong> — the shape existing
+<p>A <strong>bodyless</strong> heartbeat returns an empty <strong>204</strong>, the shape existing
 agents rely on. A heartbeat with an optional JSON body
 (<code>status</code> / <code>agent_version</code> / <code>capabilities</code>) returns <strong>200</strong>
 <code>{status, server_time, next_heartbeat_seconds}</code> and records the reported
@@ -1769,25 +1769,25 @@ fields; the first heartbeat also transitions an <code>enrolled</code> agent to
 <tr>
 <td><code>SB_CP_ENDPOINT</code></td>
 <td>yes</td>
-<td>—</td>
+<td>-</td>
 <td><code>https://api.secrets-bridge.example</code></td>
 </tr>
 <tr>
 <td><code>SB_AGENT_ID</code></td>
 <td>yes</td>
-<td>—</td>
+<td>-</td>
 <td>UUID from <code>POST /agents</code></td>
 </tr>
 <tr>
 <td><code>SB_AGENT_SECRET</code></td>
 <td>yes</td>
-<td>—</td>
+<td>-</td>
 <td>Returned once at mint</td>
 </tr>
 <tr>
 <td><code>SB_CLUSTER_NAME</code></td>
 <td>yes for discovery jobs</td>
-<td>—</td>
+<td>-</td>
 <td>Stamped on every discovered secret</td>
 </tr>
 <tr>
@@ -1817,7 +1817,7 @@ fields; the first heartbeat also transitions an <code>enrolled</code> agent to
 <tr>
 <td><code>SB_CP_CA_FILE</code></td>
 <td>no</td>
-<td>—</td>
+<td>-</td>
 <td>Pin a private CA (replaces system roots)</td>
 </tr>
 <tr>
@@ -1829,7 +1829,7 @@ fields; the first heartbeat also transitions an <code>enrolled</code> agent to
 <tr>
 <td><strong>Provider creds</strong> (per resolver)</td>
 <td>yes</td>
-<td>—</td>
+<td>-</td>
 <td>See <a href="../../reference/providers/">Providers supported</a></td>
 </tr>
 </tbody>

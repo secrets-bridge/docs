@@ -653,7 +653,7 @@
           <li class="md-nav__item">
   <a href="#teams-the-tree" class="md-nav__link">
     <span class="md-ellipsis">
-      teams — the tree
+      teams: the tree
     </span>
   </a>
   
@@ -662,7 +662,7 @@
           <li class="md-nav__item">
   <a href="#team_members-who-belongs" class="md-nav__link">
     <span class="md-ellipsis">
-      team_members — who belongs
+      team_members: who belongs
     </span>
   </a>
   
@@ -1650,7 +1650,7 @@
           <li class="md-nav__item">
   <a href="#teams-the-tree" class="md-nav__link">
     <span class="md-ellipsis">
-      teams — the tree
+      teams: the tree
     </span>
   </a>
   
@@ -1659,7 +1659,7 @@
           <li class="md-nav__item">
   <a href="#team_members-who-belongs" class="md-nav__link">
     <span class="md-ellipsis">
-      team_members — who belongs
+      team_members: who belongs
     </span>
   </a>
   
@@ -1749,16 +1749,16 @@
 <h1 id="teams-and-section-heads">Teams and section heads<a class="headerlink" href="#teams-and-section-heads" title="Permanent link">&para;</a></h1>
 <p>Most organisations don't fit cleanly into a flat list of projects. A
 real engineering org has sections, sub-teams, leads, and members, and
-the people at each level need access to <em>their part of the world</em> —
-no more, no less. The platform models this with a first-class <strong>team
+the people at each level need access to <em>their part of the world</em>, no
+more and no less. The platform models this with a first-class <strong>team
 tree</strong>: an N-level hierarchy where role grants scoped to a team
 automatically fan out through that team's entire subtree.</p>
 <h2 id="the-model">The model<a class="headerlink" href="#the-model" title="Permanent link">&para;</a></h2>
 <p>Three entities, one rule.</p>
-<h3 id="teams-the-tree"><code>teams</code> — the tree<a class="headerlink" href="#teams-the-tree" title="Permanent link">&para;</a></h3>
+<h3 id="teams-the-tree"><code>teams</code>: the tree<a class="headerlink" href="#teams-the-tree" title="Permanent link">&para;</a></h3>
 <p>Each team carries a name, optional description, status (<code>active</code> /
 <code>archived</code>), and a nullable <code>parent_team_id</code>. Root teams have no
-parent; everything else is a descendant. The depth is N — the schema
+parent; everything else is a descendant. The depth is N. The schema
 doesn't impose a limit.</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>acme
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── platform
@@ -1767,15 +1767,15 @@ doesn't impose a limit.</p>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>└── security
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    └── security-compliance
 </span></code></pre></div>
-<p>Sibling names must be unique under the same parent — <code>acme/platform/ops</code>
-and <code>acme/security/ops</code> are both fine, two <code>ops</code> under <code>acme/platform</code>
+<p>Sibling names must be unique under the same parent. <code>acme/platform/ops</code>
+and <code>acme/security/ops</code> are both fine; two <code>ops</code> under <code>acme/platform</code>
 are not. The constraint is per-parent, so renaming or re-parenting
 never breaks cousins.</p>
-<p>A team cannot be deleted while it has children — unparent or delete
+<p>A team cannot be deleted while it has children; unparent or delete
 those first. <code>team_members</code> rows cascade-delete with the team they
 belong to (the user account stays; only the membership row goes).</p>
-<h3 id="team_members-who-belongs"><code>team_members</code> — who belongs<a class="headerlink" href="#team_members-who-belongs" title="Permanent link">&para;</a></h3>
-<p>A simple <code>(team_id, user_id)</code> join. <strong>Structural only</strong> — membership
+<h3 id="team_members-who-belongs"><code>team_members</code>: who belongs<a class="headerlink" href="#team_members-who-belongs" title="Permanent link">&para;</a></h3>
+<p>A simple <code>(team_id, user_id)</code> join. <strong>Structural only</strong>: membership
 does NOT grant any permission on its own. The platform deliberately
 keeps "who you are" and "what you can do" in two tables so you can
 reorganise teams without rewriting RBAC.</p>
@@ -1790,13 +1790,13 @@ object; setting <code>scope.team_id = &lt;team&gt;</code> tells the access resol
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Alice is now an approver for everything inside <code>platform</code> and every
-descendant team. She can approve <code>platform-east</code> requests, approve
-<code>platform-west</code> requests, and approve requests for a new sub-team
-created under <code>platform</code> tomorrow — no follow-up grant needed.</p>
+descendant team. She can approve <code>platform-east</code> and <code>platform-west</code>
+requests, and requests for a new sub-team created under <code>platform</code>
+tomorrow, with no follow-up grant needed.</p>
 <h2 id="the-section-head-pattern">The "section head" pattern<a class="headerlink" href="#the-section-head-pattern" title="Permanent link">&para;</a></h2>
-<p>The most useful shape this model unlocks:</p>
+<p>A common shape this model unlocks:</p>
 <ol>
-<li><strong>Build the tree</strong> under <code>/admin/teams</code>. Reflect your org chart —
+<li><strong>Build the tree</strong> under <code>/admin/teams</code>. Reflect your org chart:
    a top-level team per section, child teams per squad, grandchild
    teams if you have feature pods.</li>
 <li><strong>Assign projects to teams</strong> by setting <code>project.team_id</code> on
@@ -1806,7 +1806,7 @@ created under <code>platform</code> tomorrow — no follow-up grant needed.</p>
 <li><strong>Grant the section head</strong> on <code>/admin/assignments</code>: pick the user,
    pick the role (<code>secret.approve</code> for an approver, <code>secret.list +
    secret.request</code> for a developer-style lead), and pick the section
-   team in the Team dropdown. Leave Project unset — the team scope
+   team in the Team dropdown. Leave Project unset; the team scope
    makes it implicit.</li>
 </ol>
 <p>That single grant produces this behaviour:</p>
@@ -1836,11 +1836,11 @@ created under <code>platform</code> tomorrow — no follow-up grant needed.</p>
 </tr>
 <tr>
 <td>New sub-team added later under their section</td>
-<td>Auto-covered — no follow-up grant</td>
+<td>Auto-covered, no follow-up grant</td>
 </tr>
 <tr>
 <td>Project re-assigned to a different team</td>
-<td>Auto-shifts in/out of scope — no manual cleanup</td>
+<td>Auto-shifts in/out of scope, no manual cleanup</td>
 </tr>
 </tbody>
 </table>
@@ -1849,12 +1849,12 @@ created under <code>platform</code> tomorrow — no follow-up grant needed.</p>
 normal <code>secret.list</code> / <code>secret.request</code> / <code>secret.approve</code> permission
 check:</p>
 <ul>
-<li><strong>Submit gate</strong> — <code>Requests.WithTenancyGate</code> validates the caller's
+<li><strong>Submit gate</strong>: <code>Requests.WithTenancyGate</code> validates the caller's
   <code>secret.request</code> grants cover the request's <code>project_id</code>, op is in
   the binding's <code>allowed_ops</code>, and every requested key is in
   <code>allowed_keys</code> (when non-null). Stable errors:
   <code>out_of_scope_project</code>, <code>out_of_scope_op</code>, <code>out_of_scope_key</code>.</li>
-<li><strong>Approve gate</strong> — <code>checkApproverScope</code> validates the voter's
+<li><strong>Approve gate</strong>: <code>checkApproverScope</code> validates the voter's
   <code>secret.approve</code> grants cover the request's <code>project_id</code>. Same
   team-subtree expansion as the submit gate.</li>
 </ul>
@@ -1883,14 +1883,14 @@ installs without scoped projects keep working byte-for-byte).</p>
   secrets, the form auto-fills provider type + ref + the allowed-ops
   / allowed-keys constraints. Admins (holders of <code>team.edit</code>) start
   on the free-form mode for onboarding new bindings.</li>
-<li><strong><code>/me</code></strong> profile page renders the full payload — identity, the
+<li><strong><code>/me</code></strong> profile page renders the full payload: identity, the
   permission set, direct team memberships, and the accessible
   projects, all read from the same <code>AuthContext</code>.</li>
 </ul>
 <p>Permission gating is strictly <strong>fail-closed</strong>: until <code>/users/me</code>
 returns, <code>hasPermission(...)</code> is <code>false</code> for every key. A session
 restored from <code>sessionStorage</code> shows the Dashboard + a <em>"Loading
-permissions…"</em> line while the request is in flight — there is no
+permissions…"</em> line while the request is in flight; there is no
 flash of admin nav for non-admins on rehydration.</p>
 <h2 id="practical-advice">Practical advice<a class="headerlink" href="#practical-advice" title="Permanent link">&para;</a></h2>
 <ul>
@@ -1901,7 +1901,7 @@ flash of admin nav for non-admins on rehydration.</p>
   is structural metadata. Always grant capabilities via a role +
   scope.</li>
 <li><strong>Archive instead of delete</strong> when a team is being wound down. The
-  status flag preserves audit trails — requests filed against
+  status flag preserves audit trails: requests filed against
   projects in an archived team subtree still resolve. Delete only
   when the team is truly empty and the historical references are no
   longer interesting.</li>
@@ -1913,7 +1913,7 @@ flash of admin nav for non-admins on rehydration.</p>
 <li><strong>Free-form mode in the submit drawer still works.</strong> It's the
   default for admins, who are usually the ones submitting the first
   request against a brand-new binding. The api-side gate is the same
-  in both modes — bound mode is a UX overlay that keeps scoped users
+  in both modes; bound mode is a UX overlay that keeps scoped users
   from constructing requests that would 403.</li>
 </ul>
 

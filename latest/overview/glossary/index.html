@@ -1568,8 +1568,8 @@ probes; never imports a database or Redis driver. One agent per
 cluster identity (<code>SB_CLUSTER_NAME</code>).</p>
 <h4 id="audit_event"><code>audit_event</code><a class="headerlink" href="#audit_event" title="Permanent link">&para;</a></h4>
 <p>An append-only row in the <code>audit_events</code> table. Carries <code>actor</code>,
-<code>action</code>, <code>resource</code>, <code>status</code>, <code>correlation_id</code>, <code>metadata</code> (jsonb
-— never carries plaintext), <code>occurred_at</code>. Schema-level triggers
+<code>action</code>, <code>resource</code>, <code>status</code>, <code>correlation_id</code>, <code>metadata</code> (jsonb,
+never carries plaintext), <code>occurred_at</code>. Schema-level triggers
 reject UPDATE and DELETE.</p>
 <h4 id="correlation_id"><code>correlation_id</code><a class="headerlink" href="#correlation_id" title="Permanent link">&para;</a></h4>
 <p>The chain identifier propagated through every audit event for one
@@ -1581,14 +1581,14 @@ backend. Makes decisions, holds metadata, never holds plaintext
 values.</p>
 <h4 id="kms-backend">KMS backend<a class="headerlink" href="#kms-backend" title="Permanent link">&para;</a></h4>
 <p>The pluggable envelope-encryption layer. Three implementations ship:
-<code>local</code> (dev only — master key in <code>SB_WRAP_MASTER_KEY</code>),
+<code>local</code> (dev only, master key in <code>SB_WRAP_MASTER_KEY</code>),
 <code>vault-transit</code> (production with HashiCorp Vault), <code>aws-kms</code>
 (production on AWS with IRSA / instance role). Selected by
 <code>SB_KMS_BACKEND</code>.</p>
 <h4 id="provider">Provider<a class="headerlink" href="#provider" title="Permanent link">&para;</a></h4>
 <p>A third-party secrets store: HashiCorp Vault, AWS Secrets Manager,
 GCP Secret Manager, Azure Key Vault, Kubernetes Secret. Secrets
-Bridge augments providers — it doesn't replace them.</p>
+Bridge augments providers; it doesn't replace them.</p>
 <h4 id="policy_rule"><code>policy_rule</code><a class="headerlink" href="#policy_rule" title="Permanent link">&para;</a></h4>
 <p>Selector-based mapping from <code>(project, environment, secret_ref,
 provider)</code> to a workflow. Walked in priority order; first match

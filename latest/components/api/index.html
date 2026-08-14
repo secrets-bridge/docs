@@ -1739,19 +1739,19 @@ full surface.</p>
 <tr>
 <td><code>DATABASE_URL</code></td>
 <td>yes</td>
-<td>—</td>
+<td>-</td>
 <td><code>postgres://...</code></td>
 </tr>
 <tr>
 <td><code>REDIS_URL</code></td>
 <td>yes</td>
-<td>—</td>
+<td>-</td>
 <td><code>redis://...</code></td>
 </tr>
 <tr>
 <td><code>SB_JWT_SECRET</code></td>
 <td>yes</td>
-<td>—</td>
+<td>-</td>
 <td>32+ bytes, base64 or raw. Fails boot if missing.</td>
 </tr>
 <tr>
@@ -1763,7 +1763,7 @@ full surface.</p>
 <tr>
 <td><code>SB_WRAP_MASTER_KEY</code></td>
 <td>yes when <code>SB_KMS_BACKEND=local</code></td>
-<td>—</td>
+<td>-</td>
 <td>base64 32 bytes</td>
 </tr>
 <tr>
@@ -1775,19 +1775,19 @@ full surface.</p>
 <tr>
 <td><code>SB_KMS_VAULT_ADDR</code> / <code>SB_KMS_VAULT_TOKEN</code> / <code>SB_KMS_VAULT_KEY</code></td>
 <td>yes for <code>vault-transit</code></td>
-<td>—</td>
+<td>-</td>
 <td></td>
 </tr>
 <tr>
 <td><code>SB_KMS_AWS_REGION</code> / <code>SB_KMS_AWS_KEY_ID</code></td>
 <td>yes for <code>aws-kms</code></td>
-<td>—</td>
+<td>-</td>
 <td>Alias OK; ARN stored in audit</td>
 </tr>
 <tr>
 <td><code>SB_BOOTSTRAP_ADMIN_EMAIL</code> / <code>SB_BOOTSTRAP_ADMIN_PASSWORD</code></td>
 <td>recommended on first boot</td>
-<td>—</td>
+<td>-</td>
 <td>Seeds local-admin user; idempotent</td>
 </tr>
 <tr>
@@ -1827,19 +1827,19 @@ exhaustive list.</p>
 </tr>
 <tr>
 <td>OIDC</td>
-<td><strong>Not shipped</strong> — tracked at <a href="https://github.com/secrets-bridge/api/issues/26">api#26</a></td>
+<td><strong>Not shipped</strong>, tracked at <a href="https://github.com/secrets-bridge/api/issues/26">api#26</a></td>
 </tr>
 <tr>
 <td>Per-tenant KMS scoping</td>
-<td><strong>Not shipped</strong> — tracked as Piece 8c</td>
+<td><strong>Not shipped</strong>, tracked as Piece 8c</td>
 </tr>
 <tr>
 <td>Rate limiting on auth + heartbeat</td>
-<td><strong>Not shipped</strong> — tracked at <a href="https://github.com/secrets-bridge/api/issues/30">api#30</a></td>
+<td><strong>Not shipped</strong>, tracked at <a href="https://github.com/secrets-bridge/api/issues/30">api#30</a></td>
 </tr>
 <tr>
 <td>Tested key-rotation runbook</td>
-<td><strong>Not shipped</strong> — tracked at <a href="https://github.com/secrets-bridge/api/issues/31">api#31</a></td>
+<td><strong>Not shipped</strong>, tracked at <a href="https://github.com/secrets-bridge/api/issues/31">api#31</a></td>
 </tr>
 </tbody>
 </table>

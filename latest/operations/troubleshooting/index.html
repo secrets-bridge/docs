@@ -1873,7 +1873,7 @@
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>http://localhost:18080/readyz
 </span></code></pre></div>
 <p>If 503, the api can see Postgres or Redis but one of them isn't
-ready — the response body lists which:</p>
+ready, the response body lists which:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="s2">&quot;unready&quot;</span><span class="p">,</span><span class="nt">&quot;checks&quot;</span><span class="p">:{</span><span class="nt">&quot;postgres&quot;</span><span class="p">:</span><span class="s2">&quot;ping failed: dial tcp ...&quot;</span><span class="p">}}</span>
 </span></code></pre></div>
 <h3 id="login-returns-401-with-a-valid-password">Login returns 401 with a valid password<a class="headerlink" href="#login-returns-401-with-a-valid-password" title="Permanent link">&para;</a></h3>
@@ -1929,7 +1929,7 @@ defaults to <code>kvMount=secret</code>). For AWS Secrets Manager: the
    who submitted the request.</li>
 <li><strong>The agent failed before posting the wrap.</strong> Check
    <code>GET /audit-events?correlation_id=&lt;request-uuid&gt;</code> for the full
-   chain — you should see <code>wrap.create</code> events on success.</li>
+   chain, you should see <code>wrap.create</code> events on success.</li>
 </ol>
 <h3 id="failed-to-load-audit-events">"Failed to load audit events"<a class="headerlink" href="#failed-to-load-audit-events" title="Permanent link">&para;</a></h3>
 <p>Likely <code>audit.read</code> permission missing. The seed admin role has
@@ -1978,7 +1978,7 @@ scope than the dev token. Adjust the policy in Vault.</p>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">&#39;.[] | {time:.occurred_at, actor, resource, status}&#39;</span>
 </span></code></pre></div>
-<p>This is the SOC2-friendly query — every plaintext reveal across
+<p>This is the SOC2-friendly query, every plaintext reveal across
 the platform, append-only, with the actor and timestamp.</p>
 <h2 id="reading-the-metrics">Reading the metrics<a class="headerlink" href="#reading-the-metrics" title="Permanent link">&para;</a></h2>
 <p>The api and worker both expose Prometheus metrics at <code>/metrics</code>.

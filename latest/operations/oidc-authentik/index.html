@@ -7,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Step-by-step Authentik setup for Secrets Bridge — application, scopes, group claim, WebAuthn enrolment.">
+        <meta name="description" content="Step-by-step Authentik setup for Secrets Bridge, application, scopes, group claim, WebAuthn enrolment.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
@@ -78,7 +78,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Secrets Bridge" />
   <meta property="og:title" content="OIDC with Authentik" />
-  <meta property="og:description" content="Step-by-step Authentik setup for Secrets Bridge — application, scopes, group claim, WebAuthn enrolment." />
+  <meta property="og:description" content="Step-by-step Authentik setup for Secrets Bridge, application, scopes, group claim, WebAuthn enrolment." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/operations/oidc-authentik/" />
   <meta property="og:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
@@ -89,7 +89,7 @@
   
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="OIDC with Authentik" />
-  <meta name="twitter:description" content="Step-by-step Authentik setup for Secrets Bridge — application, scopes, group claim, WebAuthn enrolment." />
+  <meta name="twitter:description" content="Step-by-step Authentik setup for Secrets Bridge, application, scopes, group claim, WebAuthn enrolment." />
   <meta name="twitter:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge — The brain behind your secrets." />
   
@@ -110,7 +110,7 @@
     "@context": "https://schema.org",
     "@type": "TechArticle",
     "headline": "OIDC with Authentik",
-    "description": "Step-by-step Authentik setup for Secrets Bridge — application, scopes, group claim, WebAuthn enrolment.",
+    "description": "Step-by-step Authentik setup for Secrets Bridge, application, scopes, group claim, WebAuthn enrolment.",
     "url": "https://secrets-bridge.io/latest/operations/oidc-authentik/",
     "image": "https://secrets-bridge.io/assets/og-banner.png",
     "publisher": {
@@ -1267,11 +1267,11 @@
         <li class="md-nav__item">
   <a href="#5-mfa-authentik-vs-the-control-plane" class="md-nav__link">
     <span class="md-ellipsis">
-      5. MFA — Authentik vs the Control Plane
+      5. MFA, Authentik vs the Control Plane
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. MFA — Authentik vs the Control Plane">
+    <nav class="md-nav" aria-label="5. MFA, Authentik vs the Control Plane">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1733,11 +1733,11 @@
         <li class="md-nav__item">
   <a href="#5-mfa-authentik-vs-the-control-plane" class="md-nav__link">
     <span class="md-ellipsis">
-      5. MFA — Authentik vs the Control Plane
+      5. MFA, Authentik vs the Control Plane
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="5. MFA — Authentik vs the Control Plane">
+    <nav class="md-nav" aria-label="5. MFA, Authentik vs the Control Plane">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1831,7 +1831,7 @@
 
 
 <h1 id="oidc-with-authentik">OIDC with Authentik<a class="headerlink" href="#oidc-with-authentik" title="Permanent link">&para;</a></h1>
-<p>This guide configures <a href="https://goauthentik.io/">Authentik</a> as the IdP for Secrets Bridge. Authentik is the <strong>worked example</strong> — Keycloak, Okta, Auth0, and Entra ID work the same way; the screens are different but the contract (issuer URL, client id / secret, redirect URL, scopes, group claim) is identical.</p>
+<p>This guide configures <a href="https://goauthentik.io/">Authentik</a> as the IdP for Secrets Bridge. Authentik is the <strong>worked example</strong>, Keycloak, Okta, Auth0, and Entra ID work the same way; the screens are different but the contract (issuer URL, client id / secret, redirect URL, scopes, group claim) is identical.</p>
 <p>Prerequisites:</p>
 <ul>
 <li>A running Authentik instance with admin access.</li>
@@ -1844,13 +1844,13 @@
 <li><strong>Applications → Applications → Create</strong></li>
 <li>Name: <code>Secrets Bridge</code></li>
 <li>Slug: <code>secrets-bridge</code></li>
-<li>Group: (your choice — controls who can see it in the user library)</li>
+<li>Group: (your choice, controls who can see it in the user library)</li>
 <li><strong>Applications → Providers → Create → OAuth2/OpenID Provider</strong></li>
 <li>Name: <code>secrets-bridge</code></li>
 <li>Authorization flow: <code>default-provider-authorization-explicit-consent</code> (or implicit, your call)</li>
 <li>Client type: <strong>Confidential</strong></li>
-<li>Client ID: <code>secrets-bridge</code> (or whatever — note it down)</li>
-<li>Client Secret: Authentik generates one — note it down, store it in the env Secret</li>
+<li>Client ID: <code>secrets-bridge</code> (or whatever, note it down)</li>
+<li>Client Secret: Authentik generates one, note it down, store it in the env Secret</li>
 <li>Redirect URIs: <code>https://secrets-bridge.example.com/api/v1/auth/oidc/callback</code></li>
 <li>Signing key: the same key your other apps use, or <code>authentik Self-signed Certificate</code></li>
 <li>Scopes: leave the default OpenID + profile + email scopes selected; <strong>also enable the <code>groups</code> scope</strong> (Authentik exposes group memberships via this scope)</li>
@@ -1859,10 +1859,10 @@
 <p>The <strong>issuer URL</strong> you'll need for Secrets Bridge is:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>https://authentik.example.com/application/o/secrets-bridge/
 </span></code></pre></div>
-<p>(Note the <strong>trailing slash</strong> — Authentik's discovery endpoint is <code>&lt;issuer&gt;/.well-known/openid-configuration</code> and that resolves only with the slash present.)</p>
+<p>(Note the <strong>trailing slash</strong>, Authentik's discovery endpoint is <code>&lt;issuer&gt;/.well-known/openid-configuration</code> and that resolves only with the slash present.)</p>
 <h2 id="2-configure-the-group-claim">2. Configure the group claim<a class="headerlink" href="#2-configure-the-group-claim" title="Permanent link">&para;</a></h2>
 <p>Group-claim → role mapping is the architect Q5 deferral that Slice E delivered. The reconciler reads the <code>groups</code> claim by default and maps each IdP group to a Secrets Bridge role.</p>
-<p>Authentik emits the <code>groups</code> claim automatically when the <code>groups</code> scope is granted on the provider — no scope mapper to configure.</p>
+<p>Authentik emits the <code>groups</code> claim automatically when the <code>groups</code> scope is granted on the provider, no scope mapper to configure.</p>
 <p>If your Authentik install has groups named differently from your Secrets Bridge roles, set the map in <code>values.yaml</code>:</p>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">api</span><span class="p">:</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">config</span><span class="p">:</span>
@@ -1873,7 +1873,7 @@
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">        </span><span class="nt">sb-approvers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">approver</span>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">        </span><span class="nt">sb-devs</span><span class="p">:</span><span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">developer</span>
 </span></code></pre></div>
-<p>The chart serializes this map to JSON and exposes it as <code>SB_OIDC_GROUP_MAP</code>. The api binary's <code>ValidateOIDCGroupMap</code> fails the boot if the JSON is malformed or has empty keys/values — operators get the signal up front, not as a 401 in production.</p>
+<p>The chart serializes this map to JSON and exposes it as <code>SB_OIDC_GROUP_MAP</code>. The api binary's <code>ValidateOIDCGroupMap</code> fails the boot if the JSON is malformed or has empty keys/values, operators get the signal up front, not as a 401 in production.</p>
 <h3 id="the-reconciler-invariant-you-cannot-disable-this">The reconciler invariant (you cannot disable this)<a class="headerlink" href="#the-reconciler-invariant-you-cannot-disable-this" title="Permanent link">&para;</a></h3>
 <p>The reconciler <strong>only</strong> touches <code>user_roles</code> rows with <code>granted_by = 'system:oidc'</code>. Admin-assigned grants are invisible to it. See <a href="../authentication/#the-reconciler-invariant-dont-break-this">Authentication → The reconciler invariant</a> for what this protects. Repeat in your runbook so the next on-call doesn't relax the filter as "cleanup."</p>
 <h2 id="3-configure-secrets-bridge">3. Configure Secrets Bridge<a class="headerlink" href="#3-configure-secrets-bridge" title="Permanent link">&para;</a></h2>
@@ -1900,28 +1900,28 @@
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>-n<span class="w"> </span>secrets-bridge<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span>-f<span class="w"> </span>my-values.yaml
 </span></code></pre></div>
-<p>The api pod rolls automatically — the chart's <code>checksum/config</code> annotation includes the OIDC issuer + groupMap, so a Helm upgrade that flips OIDC on/off or rewrites the mapping triggers a fresh pod.</p>
+<p>The api pod rolls automatically, the chart's <code>checksum/config</code> annotation includes the OIDC issuer + groupMap, so a Helm upgrade that flips OIDC on/off or rewrites the mapping triggers a fresh pod.</p>
 <h2 id="4-sign-in">4. Sign in<a class="headerlink" href="#4-sign-in" title="Permanent link">&para;</a></h2>
 <p>Browse to <code>https://secrets-bridge.example.com/login</code>. The SPA probes the api for OIDC availability via <code>/api/v1/auth/oidc/start</code> and renders the <strong>"Sign in with SSO"</strong> button above the local-admin form when OIDC is mounted.</p>
 <p>Click it. The redirect chain runs:</p>
 <ol>
 <li>SPA → api <code>/auth/oidc/start</code> → Authentik authorize endpoint</li>
-<li>Authentik prompts for credentials (and MFA — see below)</li>
+<li>Authentik prompts for credentials (and MFA, see below)</li>
 <li>Authentik → api <code>/auth/oidc/callback?code=...&amp;state=...</code></li>
 <li>api verifies + JIT-creates the user + reconciles roles + Set-Cookie</li>
 <li>api → 302 to the SPA's original page</li>
 </ol>
 <p>If your user's <code>groups</code> claim contained <code>sb-admins</code>, the reconciler grants the <code>admin</code> role on the way through. Your first sign-in lands you on the Dashboard with full permissions.</p>
 <p>If your <code>groups</code> claim contained none of the mapped groups, the user is provisioned with <strong>no role grants</strong>. An admin must assign one from <code>/admin/assignments</code> before the user can do anything beyond <code>/users/me</code>.</p>
-<h2 id="5-mfa-authentik-vs-the-control-plane">5. MFA — Authentik vs the Control Plane<a class="headerlink" href="#5-mfa-authentik-vs-the-control-plane" title="Permanent link">&para;</a></h2>
+<h2 id="5-mfa-authentik-vs-the-control-plane">5. MFA, Authentik vs the Control Plane<a class="headerlink" href="#5-mfa-authentik-vs-the-control-plane" title="Permanent link">&para;</a></h2>
 <p><strong>The current model has the Control Plane own MFA enrollment + step-up directly.</strong> Identity stays with Authentik; users enrol a TOTP factor or a WebAuthn credential in the Secrets Bridge SPA at <code>/me/mfa</code>; step-up runs through the api's <code>/auth/mfa/{challenge,verify}</code> endpoints. See <a href="../authentication/#mfa-step-up-slices-h-i-current-model">Authentication → MFA + step-up</a> for the full model. You do <strong>not</strong> need to configure MFA inside Authentik for Secrets Bridge to enforce it.</p>
-<p>If you want Authentik to handle MFA on the IdP side instead (so the same MFA stage protects every app behind Authentik, not just Secrets Bridge), set <code>api.config.oidc.trustAmrForMFA: true</code> in the chart. The api will then stamp <code>last_mfa_at</code> when the ID-token <code>amr</code> claim carries an RFC 8176 strong factor — see <a href="../authentication/#oidc-trust-mfa-slice-d-legacy-opt-in">Authentication → OIDC-trust MFA (Slice D — legacy)</a>. The two paths run in parallel; users on a <code>trustAmrForMFA: true</code> deployment can still satisfy step-up via the app-MFA path if they prefer.</p>
+<p>If you want Authentik to handle MFA on the IdP side instead (so the same MFA stage protects every app behind Authentik, not just Secrets Bridge), set <code>api.config.oidc.trustAmrForMFA: true</code> in the chart. The api will then stamp <code>last_mfa_at</code> when the ID-token <code>amr</code> claim carries an RFC 8176 strong factor, see <a href="../authentication/#oidc-trust-mfa-slice-d-legacy-opt-in">Authentication → OIDC-trust MFA (Slice D, legacy)</a>. The two paths run in parallel; users on a <code>trustAmrForMFA: true</code> deployment can still satisfy step-up via the app-MFA path if they prefer.</p>
 <p>The IdP-trust path remains useful when you have a uniform MFA policy across many apps (Entra / Okta with org-wide WebAuthn enforcement). Most Secrets Bridge deployments are simpler with the app-MFA default.</p>
 <h3 id="enabling-mfa-in-authentik-only-if-you-flip-trustamrformfa-true">Enabling MFA in Authentik (only if you flip <code>trustAmrForMFA: true</code>)<a class="headerlink" href="#enabling-mfa-in-authentik-only-if-you-flip-trustamrformfa-true" title="Permanent link">&para;</a></h3>
 <ol>
 <li><strong>Flows &amp; Stages → Stages → Create → WebAuthn Authenticator Setup</strong></li>
 <li>Add the stage to your default authentication flow (or a user-self-enrolment flow).</li>
-<li>Mark the stage as <strong>required</strong> for users with any of your <code>sb-admins</code> / <code>sb-approvers</code> groups — those are the people who'll need step-up MFA on every approve.</li>
+<li>Mark the stage as <strong>required</strong> for users with any of your <code>sb-admins</code> / <code>sb-approvers</code> groups, those are the people who'll need step-up MFA on every approve.</li>
 </ol>
 <h3 id="verifying-amr-is-correct-idp-trust-path-only">Verifying <code>amr</code> is correct (IdP-trust path only)<a class="headerlink" href="#verifying-amr-is-correct-idp-trust-path-only" title="Permanent link">&para;</a></h3>
 <p>After a user signs in with WebAuthn through Authentik, check the audit row on the Secrets Bridge side:</p>
@@ -1931,18 +1931,18 @@
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">occurred_at</span><span class="w"> </span><span class="k">DESC</span>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
 </span></code></pre></div>
-<p>You should see <code>amr</code> as <code>["mfa"]</code> (or <code>["pwd","mfa"]</code> for a password-then-WebAuthn flow). If you only see <code>["pwd"]</code>, the IdP did not assert MFA — Tier 2 ops will demand step-up via the app-MFA path (a fine outcome if you've enrolled the factor there) OR fail closed (if you haven't). That's a sign your Authentik flow isn't enforcing the WebAuthn stage; users with an app-MFA factor stay unaffected.</p>
+<p>You should see <code>amr</code> as <code>["mfa"]</code> (or <code>["pwd","mfa"]</code> for a password-then-WebAuthn flow). If you only see <code>["pwd"]</code>, the IdP did not assert MFA, Tier 2 ops will demand step-up via the app-MFA path (a fine outcome if you've enrolled the factor there) OR fail closed (if you haven't). That's a sign your Authentik flow isn't enforcing the WebAuthn stage; users with an app-MFA factor stay unaffected.</p>
 <h2 id="6-step-up-flow-in-action">6. Step-up flow in action<a class="headerlink" href="#6-step-up-flow-in-action" title="Permanent link">&para;</a></h2>
 <p>The first time the user tries to approve a request, they'll see:</p>
 <ol>
 <li>SPA opens the request detail → clicks <strong>Approve</strong></li>
 <li>SPA <code>POST /requests/:id/approve</code> → api returns <code>401 step_up_required</code> (session is MFA-stale)</li>
 <li>SPA's global step-up interceptor opens the step-up modal</li>
-<li>User picks their factor — TOTP code or tap their security key</li>
+<li>User picks their factor, TOTP code or tap their security key</li>
 <li>SPA <code>POST /auth/mfa/verify</code> → api stamps <code>last_mfa_at</code> on the <strong>same session row</strong> (cookie unchanged) → <code>204 No Content</code></li>
 <li>Modal closes → user re-clicks <strong>Approve</strong> → 200</li>
 </ol>
-<p>The "cookie unchanged" invariant is critical — see <a href="../authentication/#step-up-ceremony">Authentication → Step-up ceremony</a>. Your audit chain stays continuous; the session ID never changes.</p>
+<p>The "cookie unchanged" invariant is critical, see <a href="../authentication/#step-up-ceremony">Authentication → Step-up ceremony</a>. Your audit chain stays continuous; the session ID never changes.</p>
 <h2 id="7-back-channel-logout">7. Back-channel logout<a class="headerlink" href="#7-back-channel-logout" title="Permanent link">&para;</a></h2>
 <p>Authentik supports RFC 8417 back-channel logout. To wire it:</p>
 <ol>
@@ -1967,7 +1967,7 @@
 </tr>
 <tr>
 <td>"Login succeeds but I have no permissions"</td>
-<td>The user's <code>groups</code> claim doesn't include any mapped group, OR the role name in <code>groupMap</code> doesn't exist in the role catalog. Check the <code>auth.oidc.role_reconcile</code> audit row — <code>metadata.added</code> will be empty.</td>
+<td>The user's <code>groups</code> claim doesn't include any mapped group, OR the role name in <code>groupMap</code> doesn't exist in the role catalog. Check the <code>auth.oidc.role_reconcile</code> audit row, <code>metadata.added</code> will be empty.</td>
 </tr>
 <tr>
 <td>"User has admin BUT shouldn't"</td>
@@ -1985,9 +1985,9 @@
 </table>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../authentication/">Authentication overview</a> — full auth model</li>
-<li><a href="../bootstrap/">Bootstrap &amp; first sign-in</a> — local-admin setup before OIDC lands</li>
-<li><a href="../config/">Configuration reference</a> — every env var, including the <code>SB_OIDC_*</code> set</li>
+<li><a href="../authentication/">Authentication overview</a>, full auth model</li>
+<li><a href="../bootstrap/">Bootstrap &amp; first sign-in</a>, local-admin setup before OIDC lands</li>
+<li><a href="../config/">Configuration reference</a>, every env var, including the <code>SB_OIDC_*</code> set</li>
 </ul>
 
 
