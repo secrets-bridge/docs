@@ -166,8 +166,9 @@ configured for it:
 1. **Sidebar → Requests → + New request**
 2. **Read** type
 3. **Provider**: Vault (or AWS Secrets Manager)
-4. **Provider config**: leave blank for Vault (defaults to
-   `kvMount=secret`)
+4. **Project** and **Environment**: the project and environment the
+   secret is bound to. Environment is required when the binding is
+   scoped to one
 5. **Secret reference**: e.g. `prod/db/password`
 6. **Keys**: e.g. `DB_PASSWORD` (or leave one empty row for "all
    keys in the bundle")

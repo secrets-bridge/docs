@@ -7,7 +7,7 @@ interface.
 
 | `target_provider_type` | Resolver status | Auth options | Config keys |
 |---|---|---|---|
-| `vault` | ✅ ships | Token (`SB_VAULT_TOKEN`) or Kubernetes (`SB_VAULT_KUBERNETES_ROLE`) | `address`, `kvMount` (default `secret`), `kvPrefix`, `namespace` |
+| `vault` | ✅ ships | Token (`SB_VAULT_TOKEN`) or Kubernetes (`SB_VAULT_KUBERNETES_ROLE`) | `address`, `kvMount` (default `kv`), `kvPrefix`, `namespace` |
 | `aws-sm` | ✅ ships | Standard AWS SDK chain (IRSA / instance role / `AWS_*` env / shared profile) | `region` (required), `roleArn` (cross-account), `endpoint` (LocalStack) |
 | `gcp-sm` | placeholder | - | - |
 | `azure-kv` | placeholder | - | - |
@@ -16,7 +16,9 @@ interface.
 ## HashiCorp Vault
 
 **KV v2 only.** Path layout depends on the `kvMount` config (default
-`secret`). The agent reads via `{mount}/data/{ref}` and writes the
+`kv`). The agent pins its mount from `SB_VAULT_KV_MOUNT` and refuses a
+job that names a different one, so set it to the provider connection's
+`mount`. The agent reads via `{mount}/data/{ref}` and writes the
 KV v2 `{"data": {...}}` envelope.
 
 ### Authentication
