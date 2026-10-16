@@ -73,8 +73,8 @@ the minimum the api validates; provider connectors may accept more.
 | Key | Required | Notes |
 |---|---|---|
 | `address` | yes | `https://` URL; `http://` refused unless `SB_ALLOW_INSECURE_VAULT_ADDR=true` on the api |
-| `mount` | yes | KV v2 mount path (e.g. `secret`) |
-| `kvPrefix` | no | optional path prefix scoping discovery |
+| `mount` | yes | KV v2 mount path (e.g. `secret`). Run the agent for this connection with the same `SB_VAULT_KV_MOUNT` (default `kv`). It refuses jobs that name another mount, and jobs that name none use its own, so a mismatch fails discovery and sends reads/patches to the wrong mount |
+| `kvPrefix` | no | optional path prefix scoping discovery. Must equal the agent's `SB_VAULT_KV_PREFIX` when set |
 | `namespace` | no | Vault Enterprise namespace |
 
 ### AWS Secrets Manager
