@@ -112,7 +112,7 @@ in your provider.
 | Append-only audit at schema | ✅ Postgres triggers | ❌ application-layer | CloudTrail (not append-only) | Varies |
 | Self-hostable | ✅ OSS, no SaaS dependency | ✅ | n/a | ❌ |
 | KMS choice | ✅ Vault Transit / AWS KMS / local | n/a | AWS KMS only | Provider-controlled |
-| Agent uses **only** outbound traffic | ✅ Loopback probes; no inbound | n/a | n/a | Varies |
+| Agent uses **only** outbound traffic | ✅ No inbound except health probes | n/a | n/a | Varies |
 
 <h2 class="sb-section-heading">On the roadmap (not live yet)</h2>
 

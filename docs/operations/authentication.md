@@ -53,7 +53,7 @@ The audit trail captures every state change:
 | `POST /agents/:id/heartbeat` | 6 per-agent | 60s |
 | `GET /requests/:id/wraps/:wrap_id` | 20 per-user | 60s |
 
-The login / callback caps are **deliberately permissive** so users behind shared CGNAT (an entire ISP or VPC behind one egress IP) aren't locked out by their neighbours. **Brute-force defence lives in the per-account lockout above**, not the per-IP rate limit, the lockout is IP-independent so rotating source IPs doesn't dodge it. Designed against Iraqi CGNAT and similar shared-egress environments.
+The login / callback caps are **deliberately permissive** so users behind shared CGNAT (an entire ISP or VPC behind one egress IP) aren't locked out by their neighbours. **Brute-force defence lives in the per-account lockout above**, not the per-IP rate limit, the lockout is IP-independent so rotating source IPs doesn't dodge it. Tuned for carrier-grade NAT and other shared-egress networks.
 
 ## OIDC sign-in (Slices B + C + E)
 

@@ -44,7 +44,7 @@ edit their permission lists but can't delete the rows.
 
 | Permission | Description |
 |---|---|
-| `agent.mint` | Mint a new agent identity and return its credentials. |
+| `agent.mint` | Create one-time agent enrollment tokens for a provider connection, and revoke unused ones. Also gates the legacy direct mint (`POST /api/v1/agents`), which stays disabled unless the dev-only `SB_ALLOW_DIRECT_AGENT_MINT` is on. |
 | `agent.revoke` | Revoke an agent. Heartbeats stop being accepted. |
 | `agent.list` | (Reserved) List agents in the projection. Today this is open to any signed-in user. |
 

@@ -100,7 +100,10 @@ flowchart TD
 
 - The **agent is outbound-only**: it opens connections to the control plane and
   to its local provider; it never accepts inbound connections.
-- The agent **exposes no inbound ports** (health probes are loopback).
+- The agent **accepts no inbound connections** for control-plane or user
+  traffic. Its only listener serves health probes and metrics; the Helm
+  chart binds it on the pod IP for kubelet and its NetworkPolicy denies all
+  ingress.
 - The agent has **no Postgres and no Redis** dependency, and **no Kubernetes API
   access** to read or write Secrets.
 - The **control plane stores metadata only**, never plaintext values.
@@ -115,7 +118,8 @@ See the [full architecture](architecture.md) and the
 
 ## The guarantees we hold
 
-- **Outbound-only agent**: no inbound listener, no cluster-API dependency.
+- **Outbound-only agent**: no inbound listener apart from the probe and
+  metrics port, no cluster-API dependency.
 - **Metadata-only audit**: append-only at the schema layer (Postgres triggers).
 - **No plaintext persistence**: not in Postgres, Redis, logs, or the browser.
 - **MFA-gated reveal**: non-prod reveals require an MFA step-up.

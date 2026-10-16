@@ -39,7 +39,7 @@ replace them.
 | [`worker`](../components/worker.md) | Shipped | Sweepers, scheduler, notifications, GitOps poller |
 | [`controller`](../components/controller.md) | Shipped | Kubernetes CRD reconciler ported from v0.1.0 |
 | [`ui`](../components/ui.md) | Shipped | React SPA: dashboard, requests, agents, admin, audit, secrets |
-| [`charts`](https://github.com/secrets-bridge/charts) | In progress | Helm bundle |
+| [`charts`](https://github.com/secrets-bridge/charts) | Shipped | Hardened Helm charts for the control plane and the agent, published to GHCR |
 | [`docs`](https://github.com/secrets-bridge/docs) | You're reading it | mkdocs-material |
 
 ## What's intentionally out of scope

@@ -5,3 +5,7 @@
 /.venv/
 __pycache__/
 *.py[cod]
+
+# Download cache of the material `privacy` plugin (self-hosted fonts,
+# Mermaid). Rebuilt on demand.
+/.cache/

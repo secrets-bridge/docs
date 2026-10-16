@@ -35,7 +35,7 @@ that isn't possible, code review is the gate.
 
 | Rule | How it's enforced |
 |---|---|
-| The agent has no inbound public listener | `SB_LOCAL_ADDR` defaults to `127.0.0.1:8090` (loopback only) |
+| The agent accepts no inbound connections for control-plane or user traffic | Its only listener serves `/healthz`, `/readyz` and `/metrics` on `SB_LOCAL_ADDR`. The binary binds `127.0.0.1:8090` by default. The `agent` Helm chart binds `0.0.0.0:8090` because kubelet probes come from the node, creates no Service, and its default NetworkPolicy denies all ingress (`ingress: []`). Where the CNI doesn't enforce NetworkPolicy, that probe port is reachable on the pod IP from inside the cluster network. |
 | The agent never imports any DB or Redis driver | The agent's CI greps `go.sum` for `pgx`, `lib/pq`, `redis/go-redis`, `mongo-driver`, etc., and fails the build if any appear |
 | `core` stays infra-free | Same `go.sum` audit on the `core` repo; no `database/sql`, no `redis/go-redis` |
 | Plain `http://` to the Control Plane is refused by default | Agent's `validateEndpoint` rejects non-https schemes unless `SB_INSECURE_TRANSPORT=true` is set; loud WARN log at startup if the flag is on |
@@ -64,17 +64,21 @@ that isn't possible, code review is the gate.
 | Timing oracle on login | Enumerate emails by response time | Dummy bcrypt on unknown-email path |
 | `alg=none` JWT | Forge a token with no signature | Header compared as exact base64 string; signer never accepts anything but HS256 |
 | Stale agent claiming after lease expired | Double-execution of a job | `WHERE claimed_by = $4 AND status = 'claimed'` on the complete UPDATE; owner mismatch returns 409 |
+| Brute force / credential stuffing on `/auth/login` | Guess a local user's password | Per-account lockout after 5 consecutive wrong passwords (15 minutes, independent of source IP, kept in Postgres) plus a per-IP limit of 30 attempts per 60s as anti-scan. The per-IP limiter fails open when Redis is unavailable; the lockout does not. See [Authentication](../operations/authentication.md). |
+| Operator deploys with `SB_KMS_BACKEND=local` in production | Storage envelope uses a key that lives in the api's own env | The api refuses to boot with `local` unless `SB_ENV=dev`, and `SB_ENV` defaults to `production`. The `secrets-bridge` chart refuses `kms.backend=local` with `env=production` at render time. |
+| Weak or shared local-admin credentials | Local password login as the only way in | OIDC sign-in (PKCE, group-claim to role mapping, back-channel logout). Local login stays as break-glass, and every successful local sign-in emits a `BREAK_GLASS_LOGIN` audit event with `severity=CRITICAL`. |
+| Long-lived agent credentials passing through people | Copy an `agent_secret` from a browser, a chat message or a ticket | Direct mint (`POST /api/v1/agents`), which returns the long-lived secret to the admin, answers `403` unless the dev-only `SB_ALLOW_DIRECT_AGENT_MINT=true` is set. Agents enroll with one-time, hash-only, short-TTL tokens bound to one provider connection; the long-lived credential goes straight to the agent and is never shown to a person. |
 
 ## Threat model: what we don't yet defend against (open P0 work)
 
 | Attacker | Attack | Mitigation status |
 |---|---|---|
-| Compromised host running the agent | Steal `SB_AGENT_SECRET` | **Open**: workload identity (SPIFFE / IRSA) is [agent#12](https://github.com/secrets-bridge/agent/issues/12) + [api#28](https://github.com/secrets-bridge/api/issues/28) |
-| Brute force / credential stuffing on `/auth/login` | Guess admin password | **Open**: rate limiting is [api#30](https://github.com/secrets-bridge/api/issues/30) |
-| Operator deploys with `SB_KMS_BACKEND=local` in production | Storage envelope uses a key that lives in the same env var | **Open**: Helm default switch is [charts#2](https://github.com/secrets-bridge/charts/issues/2); api startup WARN is [api#29](https://github.com/secrets-bridge/api/issues/29) |
+| Compromised host running the agent | Steal the agent credential (the identity file or `SB_AGENT_SECRET`) | **Open**: the credential is a long-lived bearer secret. Workload identity (SPIFFE / IRSA) and rotation are [agent#12](https://github.com/secrets-bridge/agent/issues/12) + [api#28](https://github.com/secrets-bridge/api/issues/28) |
 | KMS master key rotation breaks the platform | Operator can't rotate without downtime | **Open**: tested runbook is [api#31](https://github.com/secrets-bridge/api/issues/31) |
 | DBA with direct Postgres access | Drop the audit triggers | **Acknowledged**: the schema is a defense; database-level RBAC and audit-log shipping to a separate system are deployment-side responsibilities |
-| External OIDC SSO required by enterprise | Local-admin login is too coarse | **Open**: real OIDC is [api#26](https://github.com/secrets-bridge/api/issues/26) |
+
+Remaining findings from the 2026-09 security assessment are tracked in
+[api#192](https://github.com/secrets-bridge/api/issues/192).
 
 ## What we don't do: by design
 

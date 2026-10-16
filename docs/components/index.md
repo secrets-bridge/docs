@@ -18,7 +18,7 @@ direction is one-way and reviewable.
 | [`agent`](agent.md) | Go | Outbound-only execution agent. **No Postgres / Redis dependency.** |
 | [`controller`](controller.md) | Go (kubebuilder) | Kubernetes CRD reconciler. Receives the v0.1.0 operator. |
 | [`ui`](ui.md) | React + TS + Vite | SPA dashboard. No SSR. |
-| `charts` | Helm / YAML | Deploy manifests for all components (in progress). |
+| [`charts`](https://github.com/secrets-bridge/charts) | Helm / YAML | Helm charts for the control plane and the agent ([production deployment](../operations/index.md#production-deployment)). |
 | `docs` | mkdocs-material | This site. |
 
 ## Dependency graph

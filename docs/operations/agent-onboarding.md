@@ -23,7 +23,7 @@ sequenceDiagram
     Admin->>Agent: deliver enrollment_token (via a Secret)
     Agent->>CP: POST /agents/enroll { enrollment_token, ... }
     CP-->>Agent: agent_token (returned ONCE) + agent_id
-    Note over Agent: persist {agent_id, agent_token} safely;<br/>token is spent, never reused
+    Note over Agent: persist {agent_id, agent_token} safely<br/>(the token is spent, never reused)
     loop heartbeat
         Agent->>CP: POST /agents/:id/heartbeat (X-Agent-Secret)
         CP-->>Agent: 200 { next_heartbeat_seconds }
@@ -66,5 +66,8 @@ sequenceDiagram
     Kubernetes Secret (or your secret-distribution mechanism), never as a
     plaintext value in configuration, a log line, a screenshot, or a commit.
 
+For the exact commands (token creation, Helm install in enrollment mode), see
+[Enrolling your first agent](bootstrap.md#enrolling-your-first-agent); for a
+local run, see [Running locally with docker compose](docker-compose.md#wiring-an-agent-end-to-end-vault-example).
 See the [agent component reference](../components/agent.md) and the
 [HTTP API endpoints](../reference/api-endpoints.md#agents) for the exact contract.

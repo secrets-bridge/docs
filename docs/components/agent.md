@@ -16,7 +16,7 @@ Plane never sees them.
 |---|---|
 | No database driver | CI greps `go.sum` for `pgx`, `lib/pq`, `mysql`, `mongo-driver`; fails on hit |
 | No Redis client | CI greps `go.sum` for `redis/go-redis`, `gomodule/redigo`; fails on hit |
-| No inbound public listener | `SB_LOCAL_ADDR` defaults to `127.0.0.1:8090` (loopback only, for probes) |
+| No inbound listener except probes | The only listener serves `/healthz`, `/readyz` and `/metrics` on `SB_LOCAL_ADDR`. The binary defaults to `127.0.0.1:8090`. The `agent` Helm chart binds `0.0.0.0:8090` because kubelet probes come from the node, creates no Service for it, and its default NetworkPolicy denies all ingress to the pod. |
 | Identity file mode 0600 | `TestSaveToFile_AtomicNoPartialOnFailure` asserts the perm bits |
 | TLS required to the CP | `validateEndpoint` refuses `http://` unless `SB_INSECURE_TRANSPORT=true` |
 | Plaintext zeroed after one use | `client.Zero([]byte)` is called via `defer` on every value-bearing slice |
@@ -28,9 +28,15 @@ sequenceDiagram
     participant Env
     participant Agent
     participant CP
-    Env->>Agent: SB_AGENT_ID + SB_AGENT_SECRET (env vars or file)
+    Agent->>Agent: validateEndpoint (https or fail)
     Agent->>Agent: load X25519 keypair<br/>(env / file / ephemeral)
-    Agent->>CP: validateEndpoint (https or fail)
+    Env->>Agent: stored identity?<br/>(SB_IDENTITY_FILE, or SB_AGENT_ID + SB_AGENT_SECRET)
+    alt no stored identity
+        Env->>Agent: SB_ENROLLMENT_TOKEN (one-time)
+        Agent->>CP: POST /agents/enroll
+        CP-->>Agent: agent_id + agent_token (returned once)
+        Agent->>Agent: write identity to SB_IDENTITY_FILE (0600)
+    end
     Agent->>CP: PUT /agents/:id/public-key<br/>(register wire-envelope pubkey)
     CP-->>Agent: 204
     par Heartbeat loop
@@ -60,16 +66,29 @@ sequenceDiagram
 | Env var | Required | Default | Notes |
 |---|---|---|---|
 | `SB_CP_ENDPOINT` | yes | - | `https://api.secrets-bridge.example` |
-| `SB_AGENT_ID` | yes | - | UUID from `POST /agents` |
-| `SB_AGENT_SECRET` | yes | - | Returned once at mint |
+| `SB_ENROLLMENT_TOKEN` | first boot | - | One-time token from `POST /provider-connections/:id/agent-enrollment-token`; spent once at `POST /agents/enroll` |
+| `SB_ENROLLMENT_ENABLED` | no | `true` | Enroll on first boot when no identity is stored and a token is set |
+| `SB_IDENTITY_FILE` | no | `/etc/secrets-bridge/identity.json` | Written after enrollment, read on every restart; must be writable and persistent |
+| `SB_PROVIDER_TYPE` | no | `aws-sm` | Reported at enrollment; must match the provider connection's `type` |
 | `SB_CLUSTER_NAME` | yes for discovery jobs | - | Stamped on every discovered secret |
+| `SB_AGENT_ID` / `SB_AGENT_SECRET` | no | - | Pre-provisioned credential; overrides the identity file and skips enrollment |
 | `SB_HEARTBEAT_INTERVAL` | no | `30s` | Bounded by api's stale-after window |
 | `SB_CLAIM_INTERVAL` | no | `5s` | Claim cadence |
 | `SB_CLAIM_CONCURRENCY` | no | `4` | Worker pool size; non-blocking semaphore |
-| `SB_INSECURE_TRANSPORT` | no | `false` | Set true ONLY for local-dev `http://` |
+| `SB_INSECURE_TRANSPORT` | no | `false` | Dev only: allows `http://` to the CP ([insecure switches](../operations/config.md#insecure-switches-dev-only)) |
 | `SB_CP_CA_FILE` | no | - | Pin a private CA (replaces system roots) |
 | `SB_AGENT_PRIVATE_KEY_FILE` | no | ephemeral | X25519 keypair persistence |
 | **Provider creds** (per resolver) | yes | - | See [Providers supported](../reference/providers.md) |
+
+The full list, including `SB_AGENT_NAME`, `SB_REGION` and the provider
+settings, is in the [configuration reference](../operations/config.md#agent).
+
+!!! warning "Direct mint is a dev-only break-glass"
+    `SB_AGENT_ID` / `SB_AGENT_SECRET` only come from the legacy direct mint
+    (`POST /api/v1/agents`), which the api refuses with
+    `403 direct_agent_mint_disabled` unless `SB_ALLOW_DIRECT_AGENT_MINT=true`.
+    Onboard agents with an enrollment token instead; see
+    [Agent onboarding](../operations/agent-onboarding.md).
 
 ## Executors that ship today
 

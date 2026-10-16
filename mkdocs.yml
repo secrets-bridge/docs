@@ -98,9 +98,10 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/secrets-bridge
       name: GitHub organisation
+    # Images and Helm charts publish to GHCR under ghcr.io/secrets-bridge.
     - icon: fontawesome/brands/docker
-      link: https://hub.docker.com/u/secretsbridge
-      name: Docker images
+      link: https://github.com/orgs/secrets-bridge/packages
+      name: Container images and Helm charts (ghcr.io/secrets-bridge)
 
 markdown_extensions:
   - abbr
@@ -142,6 +143,21 @@ markdown_extensions:
 plugins:
   - search
   - tags
+  # Self-host third-party assets at build time so the published site
+  # loads no scripts, styles or fonts from other origins. GitHub Pages
+  # can't set a CSP, so this is the control we have. It downloads the
+  # Google Fonts CSS + woff2 files and the Mermaid build that Material
+  # lazy-loads on diagram pages, then rewrites the references to
+  # assets/external/. A failed download is a warning, which fails
+  # `mkdocs build --strict` instead of shipping an external reference.
+  # (The header's repo widget still fetches star/fork counts as JSON
+  # from api.github.com because repo_url is set.)
+  - privacy:
+      assets_expr_map:
+        # Material's default .js pattern only matches URLs ending in
+        # .js/.css/.json. The extra branch also catches the
+        # ResizeObserver polyfill URL, which has no extension.
+        .js: '["''](?P<url>(?:https?:)?//(?:[^"'']+\.(?:css|js(?:on)?)|unpkg\.com/resize-observer-polyfill))["'']'
 
 extra_css:
   - stylesheets/landing.css
@@ -170,7 +186,7 @@ nav:
       - Figma file & assets: design/figma.md
   - Operations:
       - operations/index.md
-      - Deploying with docker-compose: operations/docker-compose.md
+      - Running locally with docker compose: operations/docker-compose.md
       - Bootstrap & first sign-in: operations/bootstrap.md
       - Agent onboarding: operations/agent-onboarding.md
       - Authentication: operations/authentication.md
