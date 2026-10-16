@@ -62,15 +62,16 @@ one per user.
 !!! note "Running the api in a container instead"
     `docker compose up -d --build` also builds the `api` service from the
     repo's Dockerfile and runs it on port 8080. Export the keys from step 2
-    in the same shell first: the compose file reads `SB_WRAP_MASTER_KEY`
-    from your environment and stops with an error when it is unset. Older
+    in the same shell first: the api container reads `SB_WRAP_MASTER_KEY`
+    and `SB_JWT_SECRET` from your environment and exits with an error when
+    either is unset. Older
     copies of the compose file shipped a fixed dev master key instead; pull
     the latest `main` rather than reusing it.
 
 ### 4. Run the UI
 
 From a checkout of the [`ui`](https://github.com/secrets-bridge/ui) repo
-(Node 20):
+(Node 22 or newer):
 
 ```bash
 npm ci
