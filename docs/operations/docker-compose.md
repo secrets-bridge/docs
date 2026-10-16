@@ -128,7 +128,8 @@ export SB_ENROLLMENT_TOKEN
 # 6. In the same shell, from a checkout of the agent repo: enroll on first
 #    boot, then heartbeat. It runs in the background; `kill %1` stops it.
 #    SB_VAULT_KV_MOUNT has to be the connection's mount from step 4. The
-#    agent defaults to `kv` and refuses jobs for any other mount.
+#    agent defaults to `kv`; with a mismatch it refuses discovery and
+#    points reads and patches at the wrong mount.
 cd ../agent   # wherever you cloned github.com/secrets-bridge/agent
 mkdir -p .local
 SB_CP_ENDPOINT="$CP" SB_INSECURE_TRANSPORT=true \
