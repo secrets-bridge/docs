@@ -22,19 +22,22 @@
         <link rel="next" href="../bootstrap/">
       
       
+        
+      
+      
       <link rel="icon" href="../../assets/favicon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
   
-    <title>Deploying with docker-compose - Secrets Bridge</title>
+    <title>Running locally with docker compose - Secrets Bridge</title>
   
 
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.8c3ca2c6.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -47,8 +50,8 @@
       
         
         
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        
+        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.56f7ac64.css">
         <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
       
     
@@ -61,7 +64,6 @@
 
     
     
-    
   
 
 
@@ -72,12 +74,12 @@
   
 
   
-  <link rel="canonical" href="https://secrets-bridge.io/latest/operations/docker-compose/" />
+  <link rel="canonical" href="https://secrets-bridge.io/latest/operations/docker-compose/">
 
   
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Secrets Bridge" />
-  <meta property="og:title" content="Deploying with docker-compose" />
+  <meta property="og:title" content="Running locally with docker compose" />
   <meta property="og:description" content="Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/operations/docker-compose/" />
   <meta property="og:image" content="https://secrets-bridge.io/assets/og-banner.png" />
@@ -88,7 +90,7 @@
 
   
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Deploying with docker-compose" />
+  <meta name="twitter:title" content="Running locally with docker compose" />
   <meta name="twitter:description" content="Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap." />
   <meta name="twitter:image" content="https://secrets-bridge.io/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge — The brain behind your secrets." />
@@ -109,7 +111,7 @@
   {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    "headline": "Deploying with docker-compose",
+    "headline": "Running locally with docker compose",
     "description": "Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap.",
     "url": "https://secrets-bridge.io/latest/operations/docker-compose/",
     "image": "https://secrets-bridge.io/assets/og-banner.png",
@@ -144,7 +146,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#deploying-with-docker-compose" class="md-skip">
+        <a href="#running-locally-with-docker-compose" class="md-skip">
           Skip to content
         </a>
       
@@ -183,7 +185,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Deploying with docker-compose
+              Running locally with docker compose
             
           </span>
         </div>
@@ -221,11 +223,13 @@
     
     
     
-      <label class="md-header__button md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-      </label>
-      <div class="md-search" data-md-component="search" role="dialog">
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
@@ -264,13 +268,14 @@
     </div>
   </div>
 </div>
+      
     
     
       <div class="md-header__source">
         <a href="https://github.com/secrets-bridge" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
   </div>
   <div class="md-source__repository">
     secrets-bridge
@@ -290,9 +295,11 @@
   
   
   
+  
     <li class="md-tabs__item">
       <a href="../.." class="md-tabs__link">
         
+  
   
     
   
@@ -307,11 +314,13 @@
   
   
   
+  
     
     
       <li class="md-tabs__item">
         <a href="../../overview/" class="md-tabs__link">
           
+  
   
     
   
@@ -327,11 +336,13 @@
   
   
   
+  
     
     
       <li class="md-tabs__item">
         <a href="../../components/" class="md-tabs__link">
           
+  
   
     
   
@@ -347,11 +358,13 @@
   
   
   
+  
     
     
       <li class="md-tabs__item">
         <a href="../../design/" class="md-tabs__link">
           
+  
   
     
   
@@ -366,6 +379,7 @@
         
   
   
+  
     
   
   
@@ -374,6 +388,7 @@
       <li class="md-tabs__item md-tabs__item--active">
         <a href="../" class="md-tabs__link">
           
+  
   
     
   
@@ -389,11 +404,13 @@
   
   
   
+  
     
     
       <li class="md-tabs__item">
         <a href="../../reference/" class="md-tabs__link">
           
+  
   
     
   
@@ -445,7 +462,7 @@
       <a href="https://github.com/secrets-bridge" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
   </div>
   <div class="md-source__repository">
     secrets-bridge
@@ -465,9 +482,16 @@
       <a href="../.." class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Home
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -500,6 +524,7 @@
       
     
     
+    
       
       
         
@@ -515,14 +540,20 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
         
           
-          
           <div class="md-nav__link md-nav__container">
             <a href="../../overview/" class="md-nav__link ">
               
   
+  
   <span class="md-ellipsis">
+    
+  
     Overview
+  
+
+    
   </span>
+  
   
 
             </a>
@@ -537,7 +568,11 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
-            Overview
+            
+  
+    Overview
+  
+
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -553,9 +588,16 @@
       <a href="../../overview/product-status/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Product status
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -574,9 +616,16 @@
       <a href="../../overview/architecture/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Architecture
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -595,9 +644,16 @@
       <a href="../../overview/teams-and-section-heads/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Teams and section heads
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -616,9 +672,16 @@
       <a href="../../overview/threat-model/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Threat model & hard rules
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -637,9 +700,16 @@
       <a href="../../overview/glossary/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Glossary
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -682,6 +752,7 @@
       
     
     
+    
       
       
         
@@ -697,14 +768,20 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
         
           
-          
           <div class="md-nav__link md-nav__container">
             <a href="../../components/" class="md-nav__link ">
               
   
+  
   <span class="md-ellipsis">
+    
+  
     Components
+  
+
+    
   </span>
+  
   
 
             </a>
@@ -719,7 +796,11 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
-            Components
+            
+  
+    Components
+  
+
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -735,9 +816,16 @@
       <a href="../../components/api/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Control Plane API
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -756,9 +844,16 @@
       <a href="../../components/agent/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Agent
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -777,9 +872,16 @@
       <a href="../../components/worker/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Worker
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -798,9 +900,16 @@
       <a href="../../components/controller/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Controller (Kubernetes)
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -819,9 +928,16 @@
       <a href="../../components/ui/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     UI (SPA)
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -840,9 +956,16 @@
       <a href="../../components/core/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Core (shared library)
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -879,6 +1002,7 @@
       
     
     
+    
       
       
         
@@ -894,14 +1018,20 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
         
           
-          
           <div class="md-nav__link md-nav__container">
             <a href="../../design/" class="md-nav__link ">
               
   
+  
   <span class="md-ellipsis">
+    
+  
     Design system
+  
+
+    
   </span>
+  
   
 
             </a>
@@ -916,7 +1046,11 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
-            Design system
+            
+  
+    Design system
+  
+
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -932,9 +1066,16 @@
       <a href="../../design/brand-voice/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Brand voice
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -953,9 +1094,16 @@
       <a href="../../design/tokens/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Tokens & theme
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -974,9 +1122,16 @@
       <a href="../../design/figma/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Figma file & assets
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1033,6 +1188,7 @@
       
     
     
+    
       
         
         
@@ -1049,14 +1205,20 @@
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-          
           <div class="md-nav__link md-nav__container">
             <a href="../" class="md-nav__link ">
               
   
+  
   <span class="md-ellipsis">
+    
+  
     Operations
+  
+
+    
   </span>
+  
   
 
             </a>
@@ -1071,7 +1233,11 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
-            Operations
+            
+  
+    Operations
+  
+
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1096,9 +1262,16 @@
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
   
+  
   <span class="md-ellipsis">
-    Deploying with docker-compose
+    
+  
+    Running locally with docker compose
+  
+
+    
   </span>
+  
   
 
           <span class="md-nav__icon md-icon"></span>
@@ -1107,9 +1280,16 @@
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
+  
   <span class="md-ellipsis">
-    Deploying with docker-compose
+    
+  
+    Running locally with docker compose
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1132,25 +1312,70 @@
         <li class="md-nav__item">
   <a href="#quick-start" class="md-nav__link">
     <span class="md-ellipsis">
-      Quick start
+      
+        Quick start
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-start-postgres-and-redis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Start Postgres and Redis
+      
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#optional-profiles" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#2-generate-dev-keys" class="md-nav__link">
     <span class="md-ellipsis">
-      Optional profiles
+      
+        2. Generate dev keys
+      
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-run-the-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Run the api
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-run-the-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Run the UI
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#wiring-an-agent-end-to-end-vault-example" class="md-nav__link">
     <span class="md-ellipsis">
-      Wiring an agent end-to-end (Vault example)
+      
+        Wiring an agent end to end (Vault example)
+      
     </span>
   </a>
   
@@ -1159,7 +1384,9 @@
         <li class="md-nav__item">
   <a href="#ports" class="md-nav__link">
     <span class="md-ellipsis">
-      Ports
+      
+        Ports
+      
     </span>
   </a>
   
@@ -1168,7 +1395,9 @@
         <li class="md-nav__item">
   <a href="#resetting-state" class="md-nav__link">
     <span class="md-ellipsis">
-      Resetting state
+      
+        Resetting state
+      
     </span>
   </a>
   
@@ -1177,7 +1406,9 @@
         <li class="md-nav__item">
   <a href="#what-docker-compose-is-good-for-what-its-not" class="md-nav__link">
     <span class="md-ellipsis">
-      What docker-compose is good for, what it's not
+      
+        What docker compose is good for, what it's not
+      
     </span>
   </a>
   
@@ -1202,9 +1433,16 @@
       <a href="../bootstrap/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Bootstrap & first sign-in
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1223,9 +1461,16 @@
       <a href="../agent-onboarding/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Agent onboarding
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1244,9 +1489,16 @@
       <a href="../authentication/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Authentication
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1265,9 +1517,16 @@
       <a href="../oidc-authentik/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     OIDC with Authentik
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1286,9 +1545,16 @@
       <a href="../project-environments/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Project environments
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1307,9 +1573,16 @@
       <a href="../policy-templates/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Policy templates
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1328,9 +1601,16 @@
       <a href="../reveal-sessions/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Reveal sessions
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1349,9 +1629,16 @@
       <a href="../cross-team-requests/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Cross-team requests
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1370,9 +1657,16 @@
       <a href="../provider-connections/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Provider connections
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1391,9 +1685,16 @@
       <a href="../config/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Configuration reference
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1412,9 +1713,16 @@
       <a href="../troubleshooting/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Troubleshooting
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1453,6 +1761,7 @@
       
     
     
+    
       
       
         
@@ -1468,14 +1777,20 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
         
           
-          
           <div class="md-nav__link md-nav__container">
             <a href="../../reference/" class="md-nav__link ">
               
   
+  
   <span class="md-ellipsis">
+    
+  
     Reference
+  
+
+    
   </span>
+  
   
 
             </a>
@@ -1490,7 +1805,11 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
-            Reference
+            
+  
+    Reference
+  
+
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1506,9 +1825,16 @@
       <a href="../../reference/api-endpoints/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     HTTP API endpoints
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1527,9 +1853,16 @@
       <a href="../../reference/providers/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Providers supported
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1548,9 +1881,16 @@
       <a href="../../reference/kms-backends/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     KMS backends
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1569,9 +1909,16 @@
       <a href="../../reference/permissions/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
+    
+  
     Permissions catalog
+  
+
+    
   </span>
+  
   
 
       </a>
@@ -1616,25 +1963,70 @@
         <li class="md-nav__item">
   <a href="#quick-start" class="md-nav__link">
     <span class="md-ellipsis">
-      Quick start
+      
+        Quick start
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick start">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-start-postgres-and-redis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Start Postgres and Redis
+      
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#optional-profiles" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#2-generate-dev-keys" class="md-nav__link">
     <span class="md-ellipsis">
-      Optional profiles
+      
+        2. Generate dev keys
+      
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-run-the-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Run the api
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-run-the-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Run the UI
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#wiring-an-agent-end-to-end-vault-example" class="md-nav__link">
     <span class="md-ellipsis">
-      Wiring an agent end-to-end (Vault example)
+      
+        Wiring an agent end to end (Vault example)
+      
     </span>
   </a>
   
@@ -1643,7 +2035,9 @@
         <li class="md-nav__item">
   <a href="#ports" class="md-nav__link">
     <span class="md-ellipsis">
-      Ports
+      
+        Ports
+      
     </span>
   </a>
   
@@ -1652,7 +2046,9 @@
         <li class="md-nav__item">
   <a href="#resetting-state" class="md-nav__link">
     <span class="md-ellipsis">
-      Resetting state
+      
+        Resetting state
+      
     </span>
   </a>
   
@@ -1661,7 +2057,9 @@
         <li class="md-nav__item">
   <a href="#what-docker-compose-is-good-for-what-its-not" class="md-nav__link">
     <span class="md-ellipsis">
-      What docker-compose is good for, what it's not
+      
+        What docker compose is good for, what it's not
+      
     </span>
   </a>
   
@@ -1677,12 +2075,14 @@
           
           
             <div class="md-content" data-md-component="content">
+              
               <article class="md-content__inner md-typeset">
                 
                   
 
+
   
-    <a href="https://github.com/secrets-bridge/edit/main/docs/operations/docker-compose.md" title="Edit this page" class="md-content__button md-icon">
+    <a href="https://github.com/secrets-bridge/edit/main/docs/operations/docker-compose.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1698,145 +2098,180 @@
   
 
 
-<h1 id="deploying-with-docker-compose">Deploying with docker-compose<a class="headerlink" href="#deploying-with-docker-compose" title="Permanent link">&para;</a></h1>
-<p>The fastest way to try Secrets Bridge end-to-end. Brings up
-Postgres + Redis + api + ui + ingress in one command; optional
-profiles add <code>worker</code>, <code>vault</code>, <code>agent</code>, or <code>full</code> (all of them).</p>
-<h2 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/secrets-bridge/secrets-bridge.git
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>secrets-bridge
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Default profile: postgres + redis + api + ui + ingress.</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Wait a few seconds, then check:</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>http://localhost:18080/readyz
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1"># → {"status":"ready"}</span>
-</span></code></pre></div>
-<p>Open <strong>http://localhost:18080/</strong> in your browser. The seed
-admin credentials are:</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Email</td>
-<td><code>admin@example.com</code></td>
-</tr>
-<tr>
-<td>Password</td>
-<td><code>admin</code></td>
-</tr>
-</tbody>
-</table>
-<p>You should land on the Dashboard.</p>
-<div class="admonition warning">
-<p class="admonition-title">Rotate these immediately for any non-toy use</p>
-<p>The seed password lives in <code>docker-compose.yml</code> and is
-intended <strong>only</strong> for local development. Override via shell env:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">SB_BOOTSTRAP_ADMIN_EMAIL</span><span class="o">=</span>alice@example.com<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nv">SB_BOOTSTRAP_ADMIN_PASSWORD</span><span class="o">=</span><span class="s2">"</span><span class="k">$(</span>openssl<span class="w"> </span>rand<span class="w"> </span>-base64<span class="w"> </span><span class="m">24</span><span class="k">)</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
-</span></code></pre></div>
-<p>The bootstrap step is idempotent. Once <code>local_users</code> has any
-row, the env vars are ignored. To re-seed, wipe the volume:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>down<span class="w"> </span>-v
-</span></code></pre></div>
+<h1 id="running-locally-with-docker-compose">Running locally with docker compose<a class="headerlink" href="#running-locally-with-docker-compose" title="Permanent link">&para;</a></h1>
+<p>A local loop for trying Secrets Bridge on one machine. The compose file
+lives in the <a href="https://github.com/secrets-bridge/api"><code>api</code></a> repo. It starts
+Postgres 17 and Redis 7, and can also build and run the api. The UI and the
+agent run from their own repos.</p>
+<div class="admonition danger">
+<p class="admonition-title">Local development only</p>
+<p>This setup uses dev-only switches: <code>SB_ENV=dev</code>, the <code>local</code> KMS backend,
+and for the agent walkthrough <code>SB_ALLOW_INSECURE_VAULT_ADDR</code> and
+<code>SB_INSECURE_TRANSPORT</code>. They are listed under
+<a href="../config/#insecure-switches-dev-only">Insecure switches</a>. Never expose
+this stack beyond your machine and never load real secrets into it.</p>
 </div>
-<h2 id="optional-profiles">Optional profiles<a class="headerlink" href="#optional-profiles" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Worker (sweepers + GitOps observation poller stub)</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>--profile<span class="w"> </span>worker<span class="w"> </span>up<span class="w"> </span>-d
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Vault dev container (needed for the agent to read/write real values)</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>docker<span class="w"> </span>compose<span class="w"> </span>--profile<span class="w"> </span>vault<span class="w"> </span>up<span class="w"> </span>-d
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># Agent: REQUIRES a manual mint step first; see below</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>docker<span class="w"> </span>compose<span class="w"> </span>--profile<span class="w"> </span>agent<span class="w"> </span>up<span class="w"> </span>-d
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1"># Everything at once</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>docker<span class="w"> </span>compose<span class="w"> </span>--profile<span class="w"> </span>full<span class="w"> </span>up<span class="w"> </span>-d
+<h2 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
+<h3 id="1-start-postgres-and-redis">1. Start Postgres and Redis<a class="headerlink" href="#1-start-postgres-and-redis" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/secrets-bridge/api.git
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>api
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>postgres<span class="w"> </span>redis
 </span></code></pre></div>
-<h2 id="wiring-an-agent-end-to-end-vault-example">Wiring an agent end-to-end (Vault example)<a class="headerlink" href="#wiring-an-agent-end-to-end-vault-example" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># 1. Mint an agent from the UI (Sidebar → Agents → + Mint agent)</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="c1">#    OR via curl:</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nv">TOKEN</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-fsS<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:18080/api/v1/auth/login<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"email":"admin@example.com","password":"admin"}'</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span>.token<span class="k">)</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="nv">MINT</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-fsS<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:18080/api/v1/agents<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"name":"local-vault","scope":{"cluster":"local"}}'</span><span class="k">)</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="nv">AGENT_ID</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">"</span><span class="nv">$MINT</span><span class="s2">"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span>.id<span class="k">)</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="nv">AGENT_SECRET</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">"</span><span class="nv">$MINT</span><span class="s2">"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span>.agent_secret<span class="k">)</span>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="c1"># 2. Bring up Vault + agent with those creds</span>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="nv">SB_AGENT_ID</span><span class="o">=</span><span class="nv">$AGENT_ID</span><span class="w"> </span><span class="nv">SB_AGENT_SECRET</span><span class="o">=</span><span class="nv">$AGENT_SECRET</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">  </span>docker<span class="w"> </span>compose<span class="w"> </span>--profile<span class="w"> </span>vault<span class="w"> </span>--profile<span class="w"> </span>agent<span class="w"> </span>up<span class="w"> </span>-d
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="c1"># 3. Seed a secret in Vault</span>
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>secrets-bridge-vault-1<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">  </span><span class="s1">'VAULT_ADDR=http://127.0.0.1:8200 VAULT_TOKEN=devroot \</span>
-</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="s1">   vault kv put secret/prod/db/password \</span>
-</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="s1">   DB_PASSWORD=hunter2-the-actual-prod-password'</span>
-</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>
-</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="c1"># 4. From the UI: Requests → + New request → Read flow against</span>
-</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="c1">#    target_ref=prod/db/password, leave provider config blank</span>
-</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="c1">#    (defaults to kvMount=secret for Vault).</span>
-</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>
-</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="c1"># 5. Sign in as a second user (or from another browser as the</span>
-</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="c1">#    same user with allow_self_approval enabled on the workflow)</span>
-</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a><span class="c1">#    and approve.</span>
-</span><span id="__span-4-32"><a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>
-</span><span id="__span-4-33"><a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a><span class="c1"># 6. The agent claims, fetches from Vault, posts the wrap. Back as</span>
-</span><span id="__span-4-34"><a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a><span class="c1">#    the requester, click Reveal → see the plaintext exactly once.</span>
+<h3 id="2-generate-dev-keys">2. Generate dev keys<a class="headerlink" href="#2-generate-dev-keys" title="Permanent link">&para;</a></h3>
+<p>Generate fresh keys for every new environment. Never reuse a value from
+these docs, an old compose file or another environment.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_WRAP_MASTER_KEY</span><span class="o">=</span><span class="s2">"</span><span class="k">$(</span>openssl<span class="w"> </span>rand<span class="w"> </span>-base64<span class="w"> </span><span class="m">32</span><span class="k">)</span><span class="s2">"</span><span class="w">   </span><span class="c1"># master key for the local KMS backend</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_JWT_SECRET</span><span class="o">=</span><span class="s2">"</span><span class="k">$(</span>openssl<span class="w"> </span>rand<span class="w"> </span>-base64<span class="w"> </span><span class="m">32</span><span class="k">)</span><span class="s2">"</span><span class="w">        </span><span class="c1"># HMAC key for login tokens</span>
 </span></code></pre></div>
+<p>The api refuses to start without <code>SB_JWT_SECRET</code> (32 bytes or more), and the
+<code>local</code> KMS backend refuses to start without <code>SB_WRAP_MASTER_KEY</code>.</p>
+<h3 id="3-run-the-api">3. Run the api<a class="headerlink" href="#3-run-the-api" title="Permanent link">&para;</a></h3>
+<p>From the <code>api</code> checkout (Go 1.25 or newer):</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_ENV</span><span class="o">=</span>dev<span class="w">   </span><span class="c1"># allows the local KMS backend and seeds three dev users</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DATABASE_URL</span><span class="o">=</span><span class="s2">"postgres://secrets_bridge:devpass@localhost:5432/secrets_bridge?sslmode=disable"</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">REDIS_URL</span><span class="o">=</span><span class="s2">"redis://localhost:6379/0"</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>go<span class="w"> </span>run<span class="w"> </span>./cmd/api
+</span></code></pre></div>
+<p>In another terminal:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>http://localhost:8080/readyz
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># → {"status":"ready"}</span>
+</span></code></pre></div>
+<p>On its first boot against an empty database the api seeds three dev users
+(an admin, an approver and a requester) and logs each user's email and
+password <strong>once</strong>. Copy them from that log output. Set <code>SB_DEV_SEED_PASSWORD</code>
+before the first boot if you want one shared password instead of a random
+one per user.</p>
+<div class="admonition note">
+<p class="admonition-title">Running the api in a container instead</p>
+<p><code>docker compose up -d --build</code> also builds the <code>api</code> service from the
+repo's Dockerfile and runs it on port 8080. Export the keys from step 2
+in the same shell first: the api container reads <code>SB_WRAP_MASTER_KEY</code>
+and <code>SB_JWT_SECRET</code> from your environment and exits with an error when
+either is unset. Older
+copies of the compose file shipped a fixed dev master key instead; pull
+the latest <code>main</code> rather than reusing it.</p>
+</div>
+<h3 id="4-run-the-ui">4. Run the UI<a class="headerlink" href="#4-run-the-ui" title="Permanent link">&para;</a></h3>
+<p>From a checkout of the <a href="https://github.com/secrets-bridge/ui"><code>ui</code></a> repo
+(Node 22 or newer):</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>npm<span class="w"> </span>ci
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>npm<span class="w"> </span>run<span class="w"> </span>dev
+</span></code></pre></div>
+<p>Open <strong>http://localhost:5173/</strong>. The Vite dev server proxies <code>/api</code> to
+<code>http://localhost:8080</code>. Sign in with the admin user from the api's boot
+log. <code>SB_ENV=dev</code> is what lets the session cookie work over plain
+<code>http://localhost</code>.</p>
+<h2 id="wiring-an-agent-end-to-end-vault-example">Wiring an agent end to end (Vault example)<a class="headerlink" href="#wiring-an-agent-end-to-end-vault-example" title="Permanent link">&para;</a></h2>
+<p>Agents onboard by enrollment: an admin creates a one-time token for a
+provider connection, and the agent exchanges it once for a persistent
+identity. The steps below run everything locally. See
+<a href="../agent-onboarding/">Agent onboarding</a> for the model.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># 1. A throwaway Vault dev server on localhost, with a fake value in it.</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">VAULT_DEV_TOKEN</span><span class="o">=</span><span class="s2">"</span><span class="k">$(</span>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">16</span><span class="k">)</span><span class="s2">"</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>sb-vault-dev<span class="w"> </span>-p<span class="w"> </span><span class="m">127</span>.0.0.1:8200:8200<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span>-e<span class="w"> </span><span class="nv">VAULT_DEV_ROOT_TOKEN_ID</span><span class="o">=</span><span class="s2">"</span><span class="nv">$VAULT_DEV_TOKEN</span><span class="s2">"</span><span class="w"> </span>hashicorp/vault:2.2
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-e<span class="w"> </span><span class="nv">VAULT_ADDR</span><span class="o">=</span>http://127.0.0.1:8200<span class="w"> </span>-e<span class="w"> </span><span class="nv">VAULT_TOKEN</span><span class="o">=</span><span class="s2">"</span><span class="nv">$VAULT_DEV_TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span>sb-vault-dev<span class="w"> </span>vault<span class="w"> </span>kv<span class="w"> </span>put<span class="w"> </span>secret/team-alpha/dev/db<span class="w"> </span><span class="nv">DB_PASSWORD</span><span class="o">=</span>not-a-real-password
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="c1"># 2. Restart the api with SB_ALLOW_INSECURE_VAULT_ADDR=true (dev only):</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="c1">#    the dev Vault listens on http://, which provider connections refuse</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="c1">#    by default.</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="c1"># 3. Sign in as the seeded admin. The bearer token stays in this shell.</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="nv">CP</span><span class="o">=</span>http://localhost:8080
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="nb">read</span><span class="w"> </span>-rp<span class="w"> </span><span class="s1">'Admin email: '</span><span class="w"> </span>SB_ADMIN_EMAIL
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="nb">read</span><span class="w"> </span>-rsp<span class="w"> </span><span class="s1">'Admin password: '</span><span class="w"> </span>SB_ADMIN_PASSWORD<span class="p">;</span><span class="w"> </span><span class="nb">echo</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="nv">TOKEN</span><span class="o">=</span><span class="k">$(</span>jq<span class="w"> </span>-n<span class="w"> </span>--arg<span class="w"> </span>e<span class="w"> </span><span class="s2">"</span><span class="nv">$SB_ADMIN_EMAIL</span><span class="s2">"</span><span class="w"> </span>--arg<span class="w"> </span>p<span class="w"> </span><span class="s2">"</span><span class="nv">$SB_ADMIN_PASSWORD</span><span class="s2">"</span><span class="w"> </span><span class="s1">'{email:$e,password:$p}'</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>curl<span class="w"> </span>-fsS<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/auth/login"</span><span class="w"> </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span>--data-binary<span class="w"> </span>@-<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span>.token<span class="k">)</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="c1"># 4. Register the Vault provider connection.</span>
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="nv">CONN_ID</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-fsS<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/provider-connections"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span><span class="w"> </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"name":"local-vault","type":"vault","auth_method":"token","cluster_name":"local",</span>
+</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="s1">       "scope":{"address":"http://127.0.0.1:8200","mount":"secret"},</span>
+</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="s1">       "discover_interval_seconds":3600}'</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span>.id<span class="k">)</span>
+</span><span id="__span-5-27"><a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>
+</span><span id="__span-5-28"><a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a><span class="c1"># 5. Create a one-time enrollment token for that connection (15 minutes by default).</span>
+</span><span id="__span-5-29"><a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a><span class="nv">SB_ENROLLMENT_TOKEN</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-fsS<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/provider-connections/</span><span class="nv">$CONN_ID</span><span class="s2">/agent-enrollment-token"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-30"><a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span><span class="w"> </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-31"><a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"name":"local-agent","expected_cluster_name":"local","expected_provider_type":"vault"}'</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-32"><a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-j<span class="w"> </span>.enrollment_token<span class="k">)</span>
+</span><span id="__span-5-33"><a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a><span class="nb">export</span><span class="w"> </span>SB_ENROLLMENT_TOKEN
+</span><span id="__span-5-34"><a id="__codelineno-5-34" name="__codelineno-5-34" href="#__codelineno-5-34"></a>
+</span><span id="__span-5-35"><a id="__codelineno-5-35" name="__codelineno-5-35" href="#__codelineno-5-35"></a><span class="c1"># 6. In the same shell, from a checkout of the agent repo: enroll on first</span>
+</span><span id="__span-5-36"><a id="__codelineno-5-36" name="__codelineno-5-36" href="#__codelineno-5-36"></a><span class="c1">#    boot, then heartbeat. It runs in the background; `kill %1` stops it.</span>
+</span><span id="__span-5-37"><a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a><span class="nb">cd</span><span class="w"> </span>../agent<span class="w">   </span><span class="c1"># wherever you cloned github.com/secrets-bridge/agent</span>
+</span><span id="__span-5-38"><a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>.local
+</span><span id="__span-5-39"><a id="__codelineno-5-39" name="__codelineno-5-39" href="#__codelineno-5-39"></a><span class="nv">SB_CP_ENDPOINT</span><span class="o">=</span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">"</span><span class="w"> </span><span class="nv">SB_INSECURE_TRANSPORT</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-40"><a id="__codelineno-5-40" name="__codelineno-5-40" href="#__codelineno-5-40"></a><span class="nv">SB_ENROLLMENT_ENABLED</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="nv">SB_IDENTITY_FILE</span><span class="o">=</span><span class="s2">"</span><span class="nv">$PWD</span><span class="s2">/.local/identity.json"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-41"><a id="__codelineno-5-41" name="__codelineno-5-41" href="#__codelineno-5-41"></a><span class="nv">SB_PROVIDER_TYPE</span><span class="o">=</span>vault<span class="w"> </span><span class="nv">SB_CLUSTER_NAME</span><span class="o">=</span><span class="nb">local</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-42"><a id="__codelineno-5-42" name="__codelineno-5-42" href="#__codelineno-5-42"></a><span class="nv">SB_VAULT_ADDR</span><span class="o">=</span>http://127.0.0.1:8200<span class="w"> </span><span class="nv">SB_VAULT_TOKEN</span><span class="o">=</span><span class="s2">"</span><span class="nv">$VAULT_DEV_TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-43"><a id="__codelineno-5-43" name="__codelineno-5-43" href="#__codelineno-5-43"></a><span class="w">  </span>go<span class="w"> </span>run<span class="w"> </span>./cmd/agent<span class="w"> </span>&gt;<span class="w"> </span>.local/agent.log<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="p">&amp;</span>
+</span><span id="__span-5-44"><a id="__codelineno-5-44" name="__codelineno-5-44" href="#__codelineno-5-44"></a>
+</span><span id="__span-5-45"><a id="__codelineno-5-45" name="__codelineno-5-45" href="#__codelineno-5-45"></a><span class="c1"># 7. After a few seconds the log shows "enrolled and persisted credential"</span>
+</span><span id="__span-5-46"><a id="__codelineno-5-46" name="__codelineno-5-46" href="#__codelineno-5-46"></a><span class="c1">#    and the agent is listed, `active`, against the connection.</span>
+</span><span id="__span-5-47"><a id="__codelineno-5-47" name="__codelineno-5-47" href="#__codelineno-5-47"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/provider-connections/</span><span class="nv">$CONN_ID</span><span class="s2">/agents"</span><span class="w"> </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq
+</span></code></pre></div>
+<p>The token is spent by step 6. The agent writes its identity to
+<code>SB_IDENTITY_FILE</code> (mode <code>0600</code>) and reuses it on every restart, so a
+restart never needs a second token. To start over, revoke the agent, delete
+the identity file and create a new token.</p>
 <h2 id="ports">Ports<a class="headerlink" href="#ports" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
 <th>Host port</th>
-<th>Container</th>
+<th>Service</th>
 <th>What</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>18080</code></td>
-<td>ingress (nginx shim)</td>
-<td>Front door. UI on <code>/</code>, api on <code>/api/v1/*</code>, probes on <code>/healthz</code> / <code>/readyz</code></td>
+<td><code>8080</code></td>
+<td>api</td>
+<td>Control Plane API: <code>/api/v1/*</code>, <code>/healthz</code>, <code>/readyz</code>, <code>/metrics</code>. Change it with <code>API_HOST_PORT</code> when the api runs in compose.</td>
 </tr>
 <tr>
-<td><code>5432</code> (only if exposed)</td>
+<td><code>5432</code></td>
 <td>postgres</td>
-<td>Postgres, <strong>not exposed by default</strong></td>
+<td>Postgres 17 (<code>secrets_bridge</code> / <code>devpass</code>)</td>
 </tr>
 <tr>
-<td><code>6379</code> (only if exposed)</td>
+<td><code>6379</code></td>
 <td>redis</td>
-<td>Redis, <strong>not exposed by default</strong></td>
+<td>Redis 7</td>
 </tr>
 <tr>
-<td><code>8200</code> (<code>--profile vault</code>)</td>
-<td>vault</td>
-<td>Vault dev mode</td>
+<td><code>4566</code></td>
+<td>localstack (<code>--profile awskms</code>)</td>
+<td>LocalStack KMS, for trying the <code>aws-kms</code> backend</td>
+</tr>
+<tr>
+<td><code>5173</code></td>
+<td>Vite dev server</td>
+<td>The UI, from the <code>ui</code> repo</td>
+</tr>
+<tr>
+<td><code>8200</code></td>
+<td>Vault dev server</td>
+<td>Only if you started it for the agent walkthrough</td>
 </tr>
 </tbody>
 </table>
-<p>Override the host port via <code>INGRESS_HOST_PORT</code>:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">INGRESS_HOST_PORT</span><span class="o">=</span><span class="m">19090</span><span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d
-</span></code></pre></div>
+<p>The compose file publishes its ports on <code>127.0.0.1</code> only, so nothing is
+reachable from other machines. Older copies of the compose file published
+Postgres and Redis on every interface with fixed dev credentials; if yours
+still does, pull the latest <code>main</code> before you start it on a shared network.</p>
 <h2 id="resetting-state">Resetting state<a class="headerlink" href="#resetting-state" title="Permanent link">&para;</a></h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Stop everything and drop the Postgres volume (wipes all data,</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1"># including the bootstrapped admin)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1"># including the seeded users)</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>docker<span class="w"> </span>compose<span class="w"> </span>down<span class="w"> </span>-v
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>docker<span class="w"> </span>rm<span class="w"> </span>-f<span class="w"> </span>sb-vault-dev<span class="w">   </span><span class="c1"># if you started it</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>rm<span class="w"> </span>-f<span class="w"> </span>.local/identity.json<span class="w">  </span><span class="c1"># in the agent checkout</span>
 </span></code></pre></div>
-<h2 id="what-docker-compose-is-good-for-what-its-not">What docker-compose is good for, what it's not<a class="headerlink" href="#what-docker-compose-is-good-for-what-its-not" title="Permanent link">&para;</a></h2>
+<h2 id="what-docker-compose-is-good-for-what-its-not">What docker compose is good for, what it's not<a class="headerlink" href="#what-docker-compose-is-good-for-what-its-not" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1850,7 +2285,7 @@ row, the env vars are ignored. To re-seed, wipe the volume:</p>
 <td>Production</td>
 </tr>
 <tr>
-<td>Smoke tests + e2e in CI</td>
+<td>Smoke tests and e2e in CI</td>
 <td>Multi-replica deployments</td>
 </tr>
 <tr>
@@ -1863,9 +2298,9 @@ row, the env vars are ignored. To re-seed, wipe the volume:</p>
 </tr>
 </tbody>
 </table>
-<p>For production, use the Helm chart (when <code>charts</code> ships) on a
-real Kubernetes cluster with a managed Postgres + Redis + a real
-KMS backend.</p>
+<p>For production, install the hardened Helm charts on a real Kubernetes
+cluster with managed Postgres and Redis and a real KMS backend. See
+<a href="../#production-deployment">Production deployment</a>.</p>
 
 
 
@@ -1903,28 +2338,29 @@ KMS backend.</p>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2026 Secrets Bridge contributors. Built by <a href="https://www.linkedin.com/in/haydercyber1/" rel="author" target="_blank">Haider Raed</a>. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
+      Copyright &copy; 2026 Secrets Bridge contributors. Built by <a href="https://www.linkedin.com/in/haydercyber1/" rel="author noopener" target="_blank">Haider Raed</a>. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
     </div>
   
   
 </div>
       
-        <div class="md-social">
+        
+<div class="md-social">
   
     
     
     
     
     <a href="https://github.com/secrets-bridge" target="_blank" rel="noopener" title="GitHub organisation" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
     </a>
   
     
     
     
     
-    <a href="https://hub.docker.com/u/secretsbridge" target="_blank" rel="noopener" title="Docker images" class="md-social__link">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M349.9 236.3h-66.1v-59.4h66.1zm0-204.3h-66.1v60.7h66.1zm78.2 144.8H362v59.4h66.1zm-156.3-72.1h-66.1v60.1h66.1zm78.1 0h-66.1v60.1h66.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1zm78.1 0h-66.1v59.4h66.1zm-78.1-72.1h-66.1v60.1h66.1z"/></svg>
+    <a href="https://github.com/orgs/secrets-bridge/packages" target="_blank" rel="noopener" title="Container images and Helm charts (ghcr.io/secrets-bridge)" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M349.9 236.3h-66.1v-59.4h66.1zm0-204.3h-66.1v60.7h66.1zm78.2 144.8H362v59.4h66.1zm-156.3-72.1h-66.1v60.1h66.1zm78.1 0h-66.1v60.1h66.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1zm78.1 0h-66.1v59.4h66.1zm-78.1-72.1h-66.1v60.1h66.1z"/></svg>
     </a>
   
 </div>
@@ -1941,10 +2377,13 @@ KMS backend.</p>
       <div class="md-progress" data-md-component="progress" role="progressbar"></div>
     
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "navigation.tracking", "navigation.instant", "navigation.instant.progress", "toc.follow", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.action.edit", "content.action.view", "search.suggest", "search.highlight", "search.share", "announce.dismiss"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "navigation.tracking", "navigation.instant", "navigation.instant.progress", "toc.follow", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.action.edit", "content.action.view", "search.suggest", "search.highlight", "search.share", "announce.dismiss"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.525ec568.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
