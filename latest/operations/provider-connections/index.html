@@ -2726,12 +2726,12 @@ the minimum the api validates; provider connectors may accept more.</p>
 <tr>
 <td><code>mount</code></td>
 <td>yes</td>
-<td>KV v2 mount path (e.g. <code>secret</code>)</td>
+<td>KV v2 mount path (e.g. <code>secret</code>). Run the agent for this connection with the same <code>SB_VAULT_KV_MOUNT</code> (default <code>kv</code>). It refuses jobs that name another mount, and jobs that name none use its own, so a mismatch fails discovery and sends reads/patches to the wrong mount</td>
 </tr>
 <tr>
 <td><code>kvPrefix</code></td>
 <td>no</td>
-<td>optional path prefix scoping discovery</td>
+<td>optional path prefix scoping discovery. Must equal the agent's <code>SB_VAULT_KV_PREFIX</code> when set</td>
 </tr>
 <tr>
 <td><code>namespace</code></td>
