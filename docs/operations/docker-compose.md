@@ -127,12 +127,15 @@ export SB_ENROLLMENT_TOKEN
 
 # 6. In the same shell, from a checkout of the agent repo: enroll on first
 #    boot, then heartbeat. It runs in the background; `kill %1` stops it.
+#    SB_VAULT_KV_MOUNT has to be the connection's mount from step 4. The
+#    agent defaults to `kv` and refuses jobs for any other mount.
 cd ../agent   # wherever you cloned github.com/secrets-bridge/agent
 mkdir -p .local
 SB_CP_ENDPOINT="$CP" SB_INSECURE_TRANSPORT=true \
 SB_ENROLLMENT_ENABLED=true SB_IDENTITY_FILE="$PWD/.local/identity.json" \
 SB_PROVIDER_TYPE=vault SB_CLUSTER_NAME=local \
 SB_VAULT_ADDR=http://127.0.0.1:8200 SB_VAULT_TOKEN="$VAULT_DEV_TOKEN" \
+SB_VAULT_KV_MOUNT=secret \
   go run ./cmd/agent > .local/agent.log 2>&1 &
 
 # 7. After a few seconds the log shows "enrolled and persisted credential"
