@@ -1960,7 +1960,7 @@ envelope as <code>data_key_ciphertext</code>.</p>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_VAULT_KEY</span><span class="o">=</span>sb-wrap
 </span></code></pre></div>
 <p>The api logs the resolved backend at boot:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>{&quot;msg&quot;:&quot;keymgmt backend ready&quot;,&quot;key_id&quot;:&quot;vault-transit:transit/sb-wrap&quot;}
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>{"msg":"keymgmt backend ready","key_id":"vault-transit:transit/sb-wrap"}
 </span></code></pre></div>
 <h3 id="key-rotation">Key rotation<a class="headerlink" href="#key-rotation" title="Permanent link">&para;</a></h3>
 <p>Use Vault's native rotation:</p>
@@ -2010,7 +2010,7 @@ you pass an alias. So if you rotate <code>alias/sb-wrap</code> to point at a
 new CMK, the old rows still tell you which exact key wrapped them.
 Critical for forensic audit.</p>
 <h3 id="setup_1">Setup<a class="headerlink" href="#setup_1" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>aws<span class="w"> </span>kms<span class="w"> </span>create-key<span class="w"> </span>--description<span class="w"> </span><span class="s2">&quot;Secrets Bridge wrap key&quot;</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>aws<span class="w"> </span>kms<span class="w"> </span>create-key<span class="w"> </span>--description<span class="w"> </span><span class="s2">"Secrets Bridge wrap key"</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>aws<span class="w"> </span>kms<span class="w"> </span>create-alias<span class="w"> </span>--alias-name<span class="w"> </span>alias/sb-wrap<span class="w"> </span>--target-key-id<span class="w"> </span>&lt;key-id&gt;
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">SB_KMS_BACKEND</span><span class="o">=</span>aws-kms
