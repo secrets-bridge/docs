@@ -39,11 +39,11 @@ appearing.
     surfaces it. The whole point of a KMS is to move the master out
     of the workload. `local` defeats that.
 
-    A future PR will WARN at boot when `SB_KMS_BACKEND=local` is
-    set outside a clearly-marked dev profile (tracked as
-    [api#29](https://github.com/secrets-bridge/api/issues/29)) and
-    the Helm chart will default to `vault-transit` (tracked as
-    [charts#2](https://github.com/secrets-bridge/charts/issues/2)).
+    The api refuses to boot with `SB_KMS_BACKEND=local` unless
+    `SB_ENV=dev`, and `SB_ENV` defaults to `production`. The
+    `secrets-bridge` Helm chart defaults to `vault-transit` and refuses
+    to render `kms.backend=local` with `env=production`. See
+    [Insecure switches](../operations/config.md#insecure-switches-dev-only).
 
 ## `vault-transit`
 

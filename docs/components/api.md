@@ -18,7 +18,7 @@ api/
 ├── internal/
 │   ├── auth/               # JWT signer + permission catalog + auth.Require
 │   ├── handlers/           # HTTP layer (one file per aggregate)
-│   ├── middleware/         # Auth (Bearer→X-User-Id→anon), RequestID, Logger, Recover
+│   ├── middleware/         # Auth (session cookie → bearer JWT), default-deny gate, RequestID, Logger, Recover
 │   ├── observability/      # slog JSON logger
 │   └── services/           # business logic (one file per aggregate)
 └── pkg/
@@ -32,6 +32,29 @@ api/
 The `internal/` boundary is closed; the `pkg/` boundary is
 deliberately open because `worker` imports `pkg/storage` and
 `pkg/keymgmt`.
+
+## How a request gets its identity
+
+`middleware.AuthWith` resolves the caller once per request, in this order:
+
+1. **Session cookie** (`sb_session`), issued by `/auth/login` and the OIDC
+   callback.
+2. **Bearer JWT** in `Authorization: Bearer <token>`, the HS256 token that
+   `/auth/login` also returns.
+3. Otherwise the caller is anonymous, and the default-deny gate on
+   `/api/v1` answers `401` for every route that isn't explicitly public.
+   Per-route `auth.Require(perm)` checks then run on top for authenticated
+   callers.
+
+Agent routes under `/api/v1/agents/:id/` authenticate separately, with the
+agent's `X-Agent-Secret`. `POST /api/v1/agents/enroll` authenticates with the
+one-time enrollment token in the body.
+
+The legacy `X-User-Id` header is **ignored** unless the api runs with
+`SB_ALLOW_INSECURE_HEADER_AUTH=true`, a dev-only switch that lets anyone
+claim any identity. It is checked only after the cookie and bearer token,
+and it must never be set on a deployment anyone else can reach. See
+[Insecure switches](../operations/config.md#insecure-switches-dev-only).
 
 ## Runtime endpoints
 
@@ -62,7 +85,8 @@ full surface.
 | `SB_GITOPS_ENABLED` | no | `false` | Mounts BRD §26 ArgoCD endpoints when true |
 
 See [Configuration reference](../operations/config.md) for the
-exhaustive list.
+exhaustive list, including the
+[dev-only insecure switches](../operations/config.md#insecure-switches-dev-only).
 
 ## What's stable, what isn't
 
@@ -72,7 +96,7 @@ exhaustive list.
 | Patch + read flows end-to-end against Vault + AWS SM | Stable |
 | Single-shot wrap consumption | Stable, race-tested (6 concurrent racers) |
 | JWT login + `auth.Require(perm)` gating on write endpoints | Stable since slice 7 |
-| OIDC | **Not shipped**, tracked at [api#26](https://github.com/secrets-bridge/api/issues/26) |
+| OIDC sign-in (PKCE, group-to-role mapping, back-channel logout) | Shipped; see [Authentication](../operations/authentication.md) |
 | Per-tenant KMS scoping | **Not shipped**, tracked as Piece 8c |
-| Rate limiting on auth + heartbeat | **Not shipped**, tracked at [api#30](https://github.com/secrets-bridge/api/issues/30) |
+| Login brute-force defence | Shipped: per-account lockout (5 wrong passwords, 15 minutes) plus per-IP rate limits on the auth routes and a per-agent heartbeat limit; see [Authentication](../operations/authentication.md) |
 | Tested key-rotation runbook | **Not shipped**, tracked at [api#31](https://github.com/secrets-bridge/api/issues/31) |

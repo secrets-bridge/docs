@@ -39,9 +39,9 @@ via this page.
 | `description` | optional, ≤ 500 characters |
 | `status` | `active` (default) or `disabled` |
 | `scope` | JSON object, provider-specific connection metadata. **No credentials.** |
-| `auth_method` | optional provider hint (e.g. `kubernetes` for Vault) |
+| `auth_method` | required; one of the methods allowed for the `type`: `token` / `kubernetes` (vault), `default` / `assume_role` (aws-sm), `default` / `service_account` (gcp-sm), `default` / `service_principal` (azure-kv), `in_cluster` / `kubeconfig` (kubernetes). A hint for the form; the agent picks the real auth chain from its own config |
 | `discover_enabled` | toggles whether the worker schedules periodic discovery |
-| `discover_interval_seconds` | between 60 and 86400 |
+| `discover_interval_seconds` | required, between 60 and 86400, even when `discover_enabled` is false |
 | `last_discover_*` | `at` / `status` / `started_at` / `error`, written by the worker after each discover job |
 
 ### Project binding model
@@ -73,7 +73,7 @@ the minimum the api validates; provider connectors may accept more.
 | Key | Required | Notes |
 |---|---|---|
 | `address` | yes | `https://` URL; `http://` refused unless `SB_ALLOW_INSECURE_VAULT_ADDR=true` on the api |
-| `kvMount` | yes | KV v2 mount path (e.g. `secret`) |
+| `mount` | yes | KV v2 mount path (e.g. `secret`) |
 | `kvPrefix` | no | optional path prefix scoping discovery |
 | `namespace` | no | Vault Enterprise namespace |
 
@@ -549,11 +549,12 @@ worker#13 (P-follow-up) tracks the final removal.
 ## Live end-to-end walkthrough
 
 The full P loop against the docker-compose stack from
-[Deploying with docker-compose](docker-compose.md):
+[Running locally with docker compose](docker-compose.md):
 
 1. **Admin creates `vault-prod`**:
-   `POST /provider-connections` with `type=vault`, `cluster_name=cluster-a`,
-   `scope={"address":"https://vault.example.com", "kvMount":"secret"}`,
+   `POST /provider-connections` with `type=vault`, `auth_method=kubernetes`,
+   `cluster_name=cluster-a`,
+   `scope={"address":"https://vault.example.com", "mount":"secret"}`,
    `discover_enabled=true`, `discover_interval_seconds=3600`. Returns 201
    with the new row.
 2. **Admin binds to `tenant-a/prod` + `tenant-a` (project-wide)**:

@@ -1,137 +1,184 @@
-# Deploying with docker-compose
+# Running locally with docker compose
 
-The fastest way to try Secrets Bridge end-to-end. Brings up
-Postgres + Redis + api + ui + ingress in one command; optional
-profiles add `worker`, `vault`, `agent`, or `full` (all of them).
+A local loop for trying Secrets Bridge on one machine. The compose file
+lives in the [`api`](https://github.com/secrets-bridge/api) repo. It starts
+Postgres 17 and Redis 7, and can also build and run the api. The UI and the
+agent run from their own repos.
+
+!!! danger "Local development only"
+    This setup uses dev-only switches: `SB_ENV=dev`, the `local` KMS backend,
+    and for the agent walkthrough `SB_ALLOW_INSECURE_VAULT_ADDR` and
+    `SB_INSECURE_TRANSPORT`. They are listed under
+    [Insecure switches](config.md#insecure-switches-dev-only). Never expose
+    this stack beyond your machine and never load real secrets into it.
 
 ## Quick start
 
+### 1. Start Postgres and Redis
+
 ```bash
-git clone https://github.com/secrets-bridge/secrets-bridge.git
-cd secrets-bridge
+git clone https://github.com/secrets-bridge/api.git
+cd api
+docker compose up -d postgres redis
+```
 
-# Default profile: postgres + redis + api + ui + ingress.
-docker compose up -d --build
+### 2. Generate dev keys
 
-# Wait a few seconds, then check:
-curl -fsS http://localhost:18080/readyz
+Generate fresh keys for every new environment. Never reuse a value from
+these docs, an old compose file or another environment.
+
+```bash
+export SB_WRAP_MASTER_KEY="$(openssl rand -base64 32)"   # master key for the local KMS backend
+export SB_JWT_SECRET="$(openssl rand -base64 32)"        # HMAC key for login tokens
+```
+
+The api refuses to start without `SB_JWT_SECRET` (32 bytes or more), and the
+`local` KMS backend refuses to start without `SB_WRAP_MASTER_KEY`.
+
+### 3. Run the api
+
+From the `api` checkout (Go 1.25 or newer):
+
+```bash
+export SB_ENV=dev   # allows the local KMS backend and seeds three dev users
+export DATABASE_URL="postgres://secrets_bridge:devpass@localhost:5432/secrets_bridge?sslmode=disable"
+export REDIS_URL="redis://localhost:6379/0"
+go run ./cmd/api
+```
+
+In another terminal:
+
+```bash
+curl -fsS http://localhost:8080/readyz
 # → {"status":"ready"}
 ```
 
-Open **http://localhost:18080/** in your browser. The seed
-admin credentials are:
+On its first boot against an empty database the api seeds three dev users
+(an admin, an approver and a requester) and logs each user's email and
+password **once**. Copy them from that log output. Set `SB_DEV_SEED_PASSWORD`
+before the first boot if you want one shared password instead of a random
+one per user.
 
-| Field | Value |
-|---|---|
-| Email | `admin@example.com` |
-| Password | `admin` |
+!!! note "Running the api in a container instead"
+    `docker compose up -d --build` also builds the `api` service from the
+    repo's Dockerfile and runs it on port 8080. Export the keys from step 2
+    in the same shell first: the compose file reads `SB_WRAP_MASTER_KEY`
+    from your environment and stops with an error when it is unset. Older
+    copies of the compose file shipped a fixed dev master key instead; pull
+    the latest `main` rather than reusing it.
 
-You should land on the Dashboard.
+### 4. Run the UI
 
-!!! warning "Rotate these immediately for any non-toy use"
-    The seed password lives in `docker-compose.yml` and is
-    intended **only** for local development. Override via shell env:
-
-    ```bash
-    SB_BOOTSTRAP_ADMIN_EMAIL=alice@example.com \
-    SB_BOOTSTRAP_ADMIN_PASSWORD="$(openssl rand -base64 24)" \
-    docker compose up -d
-    ```
-
-    The bootstrap step is idempotent. Once `local_users` has any
-    row, the env vars are ignored. To re-seed, wipe the volume:
-
-    ```bash
-    docker compose down -v
-    ```
-
-## Optional profiles
+From a checkout of the [`ui`](https://github.com/secrets-bridge/ui) repo
+(Node 20):
 
 ```bash
-# Worker (sweepers + GitOps observation poller stub)
-docker compose --profile worker up -d
-
-# Vault dev container (needed for the agent to read/write real values)
-docker compose --profile vault up -d
-
-# Agent: REQUIRES a manual mint step first; see below
-docker compose --profile agent up -d
-
-# Everything at once
-docker compose --profile full up -d
+npm ci
+npm run dev
 ```
 
-## Wiring an agent end-to-end (Vault example)
+Open **http://localhost:5173/**. The Vite dev server proxies `/api` to
+`http://localhost:8080`. Sign in with the admin user from the api's boot
+log. `SB_ENV=dev` is what lets the session cookie work over plain
+`http://localhost`.
+
+## Wiring an agent end to end (Vault example)
+
+Agents onboard by enrollment: an admin creates a one-time token for a
+provider connection, and the agent exchanges it once for a persistent
+identity. The steps below run everything locally. See
+[Agent onboarding](agent-onboarding.md) for the model.
 
 ```bash
-# 1. Mint an agent from the UI (Sidebar → Agents → + Mint agent)
-#    OR via curl:
-TOKEN=$(curl -fsS -X POST http://localhost:18080/api/v1/auth/login \
-  -H 'Content-Type: application/json' \
-  -d '{"email":"admin@example.com","password":"admin"}' \
+# 1. A throwaway Vault dev server on localhost, with a fake value in it.
+export VAULT_DEV_TOKEN="$(openssl rand -hex 16)"
+docker run -d --name sb-vault-dev -p 127.0.0.1:8200:8200 \
+  -e VAULT_DEV_ROOT_TOKEN_ID="$VAULT_DEV_TOKEN" hashicorp/vault:2.2
+docker exec -e VAULT_ADDR=http://127.0.0.1:8200 -e VAULT_TOKEN="$VAULT_DEV_TOKEN" \
+  sb-vault-dev vault kv put secret/team-alpha/dev/db DB_PASSWORD=not-a-real-password
+
+# 2. Restart the api with SB_ALLOW_INSECURE_VAULT_ADDR=true (dev only):
+#    the dev Vault listens on http://, which provider connections refuse
+#    by default.
+
+# 3. Sign in as the seeded admin. The bearer token stays in this shell.
+CP=http://localhost:8080
+read -rp 'Admin email: ' SB_ADMIN_EMAIL
+read -rsp 'Admin password: ' SB_ADMIN_PASSWORD; echo
+TOKEN=$(jq -n --arg e "$SB_ADMIN_EMAIL" --arg p "$SB_ADMIN_PASSWORD" '{email:$e,password:$p}' \
+  | curl -fsS -X POST "$CP/api/v1/auth/login" -H 'Content-Type: application/json' --data-binary @- \
   | jq -r .token)
 
-MINT=$(curl -fsS -X POST http://localhost:18080/api/v1/agents \
-  -H "Authorization: Bearer $TOKEN" \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"local-vault","scope":{"cluster":"local"}}')
-AGENT_ID=$(echo "$MINT" | jq -r .id)
-AGENT_SECRET=$(echo "$MINT" | jq -r .agent_secret)
+# 4. Register the Vault provider connection.
+CONN_ID=$(curl -fsS -X POST "$CP/api/v1/provider-connections" \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"name":"local-vault","type":"vault","auth_method":"token","cluster_name":"local",
+       "scope":{"address":"http://127.0.0.1:8200","mount":"secret"},
+       "discover_interval_seconds":3600}' \
+  | jq -r .id)
 
-# 2. Bring up Vault + agent with those creds
-SB_AGENT_ID=$AGENT_ID SB_AGENT_SECRET=$AGENT_SECRET \
-  docker compose --profile vault --profile agent up -d
+# 5. Create a one-time enrollment token for that connection (15 minutes by default).
+SB_ENROLLMENT_TOKEN=$(curl -fsS -X POST "$CP/api/v1/provider-connections/$CONN_ID/agent-enrollment-token" \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"name":"local-agent","expected_cluster_name":"local","expected_provider_type":"vault"}' \
+  | jq -j .enrollment_token)
+export SB_ENROLLMENT_TOKEN
 
-# 3. Seed a secret in Vault
-docker exec secrets-bridge-vault-1 sh -c \
-  'VAULT_ADDR=http://127.0.0.1:8200 VAULT_TOKEN=devroot \
-   vault kv put secret/prod/db/password \
-   DB_PASSWORD=hunter2-the-actual-prod-password'
+# 6. In the same shell, from a checkout of the agent repo: enroll on first
+#    boot, then heartbeat. It runs in the background; `kill %1` stops it.
+cd ../agent   # wherever you cloned github.com/secrets-bridge/agent
+mkdir -p .local
+SB_CP_ENDPOINT="$CP" SB_INSECURE_TRANSPORT=true \
+SB_ENROLLMENT_ENABLED=true SB_IDENTITY_FILE="$PWD/.local/identity.json" \
+SB_PROVIDER_TYPE=vault SB_CLUSTER_NAME=local \
+SB_VAULT_ADDR=http://127.0.0.1:8200 SB_VAULT_TOKEN="$VAULT_DEV_TOKEN" \
+  go run ./cmd/agent > .local/agent.log 2>&1 &
 
-# 4. From the UI: Requests → + New request → Read flow against
-#    target_ref=prod/db/password, leave provider config blank
-#    (defaults to kvMount=secret for Vault).
-
-# 5. Sign in as a second user (or from another browser as the
-#    same user with allow_self_approval enabled on the workflow)
-#    and approve.
-
-# 6. The agent claims, fetches from Vault, posts the wrap. Back as
-#    the requester, click Reveal → see the plaintext exactly once.
+# 7. After a few seconds the log shows "enrolled and persisted credential"
+#    and the agent is listed, `active`, against the connection.
+curl -fsS "$CP/api/v1/provider-connections/$CONN_ID/agents" -H "Authorization: Bearer $TOKEN" | jq
 ```
+
+The token is spent by step 6. The agent writes its identity to
+`SB_IDENTITY_FILE` (mode `0600`) and reuses it on every restart, so a
+restart never needs a second token. To start over, revoke the agent, delete
+the identity file and create a new token.
 
 ## Ports
 
-| Host port | Container | What |
+| Host port | Service | What |
 |---|---|---|
-| `18080` | ingress (nginx shim) | Front door. UI on `/`, api on `/api/v1/*`, probes on `/healthz` / `/readyz` |
-| `5432` (only if exposed) | postgres | Postgres, **not exposed by default** |
-| `6379` (only if exposed) | redis | Redis, **not exposed by default** |
-| `8200` (`--profile vault`) | vault | Vault dev mode |
+| `8080` | api | Control Plane API: `/api/v1/*`, `/healthz`, `/readyz`, `/metrics`. Change it with `API_HOST_PORT` when the api runs in compose. |
+| `5432` | postgres | Postgres 17 (`secrets_bridge` / `devpass`) |
+| `6379` | redis | Redis 7 |
+| `4566` | localstack (`--profile awskms`) | LocalStack KMS, for trying the `aws-kms` backend |
+| `5173` | Vite dev server | The UI, from the `ui` repo |
+| `8200` | Vault dev server | Only if you started it for the agent walkthrough |
 
-Override the host port via `INGRESS_HOST_PORT`:
-
-```bash
-INGRESS_HOST_PORT=19090 docker compose up -d
-```
+The compose file publishes its ports on `127.0.0.1` only, so nothing is
+reachable from other machines. Older copies of the compose file published
+Postgres and Redis on every interface with fixed dev credentials; if yours
+still does, pull the latest `main` before you start it on a shared network.
 
 ## Resetting state
 
 ```bash
 # Stop everything and drop the Postgres volume (wipes all data,
-# including the bootstrapped admin)
+# including the seeded users)
 docker compose down -v
+docker rm -f sb-vault-dev   # if you started it
+rm -f .local/identity.json  # in the agent checkout
 ```
 
-## What docker-compose is good for, what it's not
+## What docker compose is good for, what it's not
 
 | Use it for | Don't use it for |
 |---|---|
 | Local development | Production |
-| Smoke tests + e2e in CI | Multi-replica deployments |
+| Smoke tests and e2e in CI | Multi-replica deployments |
 | Following along with this docs site | Anything internet-exposed |
 | Demoing to a colleague | Storing real secrets |
 
-For production, use the Helm chart (when `charts` ships) on a
-real Kubernetes cluster with a managed Postgres + Redis + a real
-KMS backend.
+For production, install the hardened Helm charts on a real Kubernetes
+cluster with managed Postgres and Redis and a real KMS backend. See
+[Production deployment](index.md#production-deployment).

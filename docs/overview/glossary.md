@@ -12,8 +12,9 @@ specific provider reference. Carries a status (`pending`,
 #### Agent
 The outbound-only worker process that runs inside the
 target account / cluster. Holds provider credentials *for its own
-boundary only*; never accepts inbound connections except loopback
-probes; never imports a database or Redis driver. One agent per
+boundary only*; never accepts inbound connections except health
+probes and metrics on `SB_LOCAL_ADDR`; never imports a database or Redis
+driver. One agent per
 cluster identity (`SB_CLUSTER_NAME`).
 
 #### `audit_event`

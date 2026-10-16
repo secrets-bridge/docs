@@ -16,8 +16,7 @@ the bootstrap env vars are set:
 2. **The new user is bound to the seed `admin` role** with global
    scope, via the existing user_roles flow.
 
-The api logs both actions at INFO so you can see them in
-`docker logs secrets-bridge-api-1`:
+The api logs both actions at INFO in its JSON log output:
 
 ```
 {"msg":"bootstrap local admin created","user_id":"<uuid>","email":"admin@example.com"}
@@ -34,9 +33,11 @@ The api logs both actions at INFO so you can see them in
 
 ## First sign-in
 
-1. Open the UI (`http://localhost:18080/` for docker-compose).
+1. Open the UI (`http://localhost:5173/` for the
+   [local docker compose setup](docker-compose.md)).
 2. You'll be redirected to `/login`.
-3. Enter the email + password from the env vars.
+3. Enter the email + password from the env vars (or a dev user from
+   the api's first-boot log when it runs with `SB_ENV=dev`).
 4. You land on the Dashboard with the `Agents Online` KPI showing
    `0 / 0`.
 
@@ -52,8 +53,9 @@ There's no UI surface for this in the current slice. For now, use
 # Generate a bcrypt hash for the new password
 NEW_HASH=$(htpasswd -bnBC 12 "" "your-new-password" | tr -d ':\n' | sed 's/^.\$2y/$2y/')
 
-# Update the row
-docker exec -i secrets-bridge-postgres-1 \
+# Update the row (local docker compose setup; use your own psql
+# connection elsewhere)
+docker compose exec -T postgres \
   psql -U secrets_bridge -d secrets_bridge \
   -c "UPDATE local_users SET password_hash = decode('$(echo "$NEW_HASH" | xxd -p)', 'hex') WHERE email = 'admin@example.com';"
 ```
@@ -74,23 +76,87 @@ A disabled user's login attempts return the same generic
 `401 invalid credentials`; the audit log records
 `error_kind=user_disabled`.
 
-## Minting your first agent
+## Enrolling your first agent
 
-From the Dashboard:
+Agents onboard by **enrollment**. An admin creates a one-time token bound to
+a provider connection; the agent exchanges it once for a persistent
+identity and stores that identity itself. See
+[Agent onboarding](agent-onboarding.md) for the model.
 
-1. **Sidebar → Agents**
-2. **+ Mint agent** → drawer opens
-3. Fill **Name** (e.g. `prod-eu-vault`) + **Scope cluster** (e.g.
-   `prod-eu`)
-4. **Mint** → the drawer swaps to the reveal-once panel
-5. **Copy the agent secret immediately.** The bash snippet at the
-   bottom is ready to drop into your agent container's env.
-6. Click **I've copied it** → the panel closes and the secret is
-   gone from React state forever.
+The UI has no enrollment screen yet, so create the token through the API.
+You need `agent.mint` (the seed `admin` role has it) and an active
+[provider connection](provider-connections.md).
 
-If you lose the secret before copying it, **revoke the agent** and
-mint a new one. There's no recovery path. That's the whole
-point of reveal-once.
+```bash
+CP=https://secrets-bridge.example.com   # http://localhost:8080 for the local setup
+
+# Sign in. The password is read from the terminal, not typed on the command line.
+read -rp 'Admin email: ' SB_ADMIN_EMAIL
+read -rsp 'Admin password: ' SB_ADMIN_PASSWORD; echo
+TOKEN=$(jq -n --arg e "$SB_ADMIN_EMAIL" --arg p "$SB_ADMIN_PASSWORD" '{email:$e,password:$p}' \
+  | curl -fsS -X POST "$CP/api/v1/auth/login" -H 'Content-Type: application/json' --data-binary @- \
+  | jq -r .token)
+
+# Pick the provider connection the agent will serve.
+curl -fsS "$CP/api/v1/provider-connections" -H "Authorization: Bearer $TOKEN" \
+  | jq '.[] | {id, name, type, cluster_name, status}'
+CONN_ID=<provider-connection-id>
+
+# Create the one-time token and put it straight into a Kubernetes Secret
+# in the workload cluster, without printing it.
+kubectl create namespace secrets-bridge   # skip if it already exists
+curl -fsS -X POST "$CP/api/v1/provider-connections/$CONN_ID/agent-enrollment-token" \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+  -d '{"name":"cluster-a-agent","expected_cluster_name":"cluster-a","expected_provider_type":"vault"}' \
+  | jq -j .enrollment_token \
+  | kubectl -n secrets-bridge create secret generic secrets-bridge-agent-enrollment \
+      --from-file=enrollment_token=/dev/stdin
+```
+
+All body fields are optional. `expires_in_seconds` defaults to 900 (15
+minutes) and is clamped to 60 to 86400. When `expected_cluster_name` or
+`expected_provider_type` is set, an agent that reports anything else is
+refused. The response carries the token exactly once, and its
+`install_hint` embeds it too, so don't log or paste the whole response.
+
+Then install the `agent` chart in enrollment mode (see
+[Production deployment](index.md#production-deployment) for the chart
+source):
+
+```bash
+helm install secrets-bridge-agent oci://ghcr.io/secrets-bridge/charts/secrets-bridge-agent \
+  --version <chart-version> \
+  --namespace secrets-bridge \
+  --set clusterName=cluster-a \
+  --set cp.endpoint=https://secrets-bridge.example.com \
+  --set enrollment.enabled=true \
+  --set enrollment.tokenSecretName=secrets-bridge-agent-enrollment \
+  --set identity.mode=file \
+  --set identity.persistence.enabled=true \
+  --set agent.providerType=vault \
+  --set providers.vault.enabled=true \
+  --set providers.vault.addr=https://vault.example.com \
+  --set providers.vault.kubernetesRole=secrets-bridge-agent
+```
+
+On first boot the agent calls `POST /api/v1/agents/enroll` with the token,
+writes `{agent_id, agent_secret}` to `SB_IDENTITY_FILE` on the persistent
+volume and starts heartbeating. Restarts reuse that file; the token is
+never spent twice. The agent shows up under
+`GET /api/v1/provider-connections/<id>/agents` and turns `active` on its
+first heartbeat.
+
+If the agent fails to enroll (expired token, wrong cluster name or provider
+type), fix the cause and create a new token. An unused token stops working
+when it expires, so keep `expires_in_seconds` short.
+
+!!! warning "Direct agent mint is a dev-only break-glass"
+    The **+ Mint agent** drawer on the Agents page and
+    `POST /api/v1/agents` use the legacy direct mint, which hands back a
+    long-lived `agent_secret`. The api refuses it with
+    `403 direct_agent_mint_disabled` unless it runs with
+    `SB_ALLOW_DIRECT_AGENT_MINT=true`. Leave that switch off outside a
+    local dev loop; see [Insecure switches](config.md#insecure-switches-dev-only).
 
 ## Submitting your first read request
 

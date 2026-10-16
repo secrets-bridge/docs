@@ -18,7 +18,7 @@ routing: `/` → ui, `/api/v1/*` → api).
 | `/` | Dashboard | KPI cards, pending approvals (preview), recent audit activity (preview), providers health (preview), **agents** card (real), requests-this-week chart (preview) |
 | `/requests` | Requests | My-requests filter pills (All / Pending / Approved / Rejected / Executed × patch / read) + Approver queue with inline Approve / Reject (with-reason) |
 | `/requests/:id` | Request detail | Timeline, Approvals, **Wraps** (single-shot Reveal modal, read flow), GitOps observations (disabled banner when §26 is off), Details, Approver actions, Cancel-own |
-| `/agents` | Agents | Mint drawer with **reveal-once panel** for agent secret + bash env snippet, Revoke confirm |
+| `/agents` | Agents | Revoke confirm, and a Mint drawer with a **reveal-once panel** for the agent secret. The drawer calls the legacy direct mint, which the api refuses (`403`) unless the dev-only `SB_ALLOW_DIRECT_AGENT_MINT` is on; onboard agents by [enrollment](../operations/bootstrap.md#enrolling-your-first-agent) |
 | `/secrets` | Discovered secrets | Filter strip (cluster / provider / ref prefix / status / label chips), two-pane (table + sticky details with provider_config JSON) |
 | `/audit` | Audit log | Filter strip + correlation drill-in chip on every row, sticky details with metadata JSON |
 | `/admin/projects` | Projects | Master-detail (340px project rail + envs panel); soft-delete via archive/restore |

@@ -23,7 +23,7 @@ KV v2 `{"data": {...}}` envelope.
 
 | Method | Required env | When |
 |---|---|---|
-| Token | `SB_VAULT_TOKEN` | Local dev, dev profile in docker-compose (`vault dev`) |
+| Token | `SB_VAULT_TOKEN` | Local dev against a Vault dev server (see [Running locally](../operations/docker-compose.md)) |
 | Kubernetes | `SB_VAULT_KUBERNETES_ROLE` | Production on K8s. Uses the projected SA token, lease-tracked + refresh |
 
 The token method auto-renews within `tokenRefreshMargin = 30s`
@@ -112,7 +112,7 @@ The pattern is established. The next provider lands as:
    `providers.ErrNotFound`, no-leak assertion on error messages.
 4. Agent: add to `internal/executor/resolvers.go` under
    `ResolverByType`. Refuse credential-shaped keys in the payload.
-5. Live e2e: bring up a real (or LocalStack) instance, mint an
-   agent, submit a patch + read, verify round-trip.
+5. Live e2e: bring up a real (or LocalStack) instance, enroll an
+   agent against it, submit a patch + read, verify round-trip.
 6. Open one PR per repo (`core` for the connector, `agent` for the
    resolver). Cross-link them.
