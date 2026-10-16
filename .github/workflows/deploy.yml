@@ -1,17 +1,24 @@
 name: Deploy docs
 
 # Versioned docs via `mike`:
-#   - push to main          → deploys as `dev` (rolling alias)
-#   - release tag v*.*.*    → deploys as `vMAJOR.MINOR` + aliases `latest`
-#   - manual dispatch       → choose action
+#   - push to main          → deploys as `latest` (the rolling version)
+#   - release tag v*.*.*    → deploys as `vMAJOR.MINOR` + alias `latest`
+#   - manual dispatch       → choose version + alias
 #
 # Visitors land on `latest` by default (configured in mkdocs.yml's
 # extra.version.default). The version selector in the top-right of
-# every page lets them switch between `dev`, `latest`, and any
-# previously-released version.
+# every page lets them switch between `latest` and any previously
+# released version.
 #
 # All versions live as subdirectories on the gh-pages branch; the
 # version selector reads `/versions.json` at runtime.
+#
+# Hardening:
+#   - every action is pinned to a full commit SHA (the comment is the tag)
+#   - dependencies install from the hash-pinned requirements.txt only
+#   - untrusted values (dispatch inputs, ref names) reach the shell
+#     through `env:`, never through `${{ }}` inside `run:`, and the
+#     version + alias are checked against a strict pattern
 
 on:
   push:
@@ -20,18 +27,15 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to deploy (e.g. v0.2 or dev)'
+        description: 'Version to deploy: `latest`, `dev` or `vMAJOR.MINOR` (e.g. v0.2)'
         required: true
         default: 'dev'
       alias:
-        description: 'Alias to apply (typically `latest` for releases, blank for dev)'
+        description: 'Alias to apply (typically `latest` for releases, blank otherwise)'
         required: false
         default: ''
 
-permissions:
-  contents: write   # mike pushes to the gh-pages branch
-  pages: write
-  id-token: write
+permissions: {}
 
 concurrency:
   group: docs-deploy
@@ -39,30 +43,33 @@ concurrency:
 
 jobs:
   build-and-deploy:
+    name: Build and deploy docs
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # mike pushes to the gh-pages branch; nothing else is needed
     steps:
+      # The token stays in .git/config on purpose: `mike deploy --push`
+      # and `mike set-default --push` push gh-pages with it. This is the
+      # only checkout in the workflow.
       - name: Checkout (with full history)
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0   # mike reads the gh-pages branch history
+          persist-credentials: true
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: "3.12"
 
-      - name: Cache mkdocs deps
-        uses: actions/cache@v4
-        with:
-          key: mkdocs-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
-          path: |
-            ~/.cache/pip
-            .venv
-
+      # requirements.txt is a full lock with hashes (generated from
+      # requirements.in), so pip refuses any file whose hash differs and
+      # installs wheels only. No actions/cache here: this job publishes
+      # the site, so it doesn't restore anything another run could have
+      # written (zizmor cache-poisoning).
       - name: Install mkdocs-material + mike
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install --require-hashes --only-binary ':all:' -r requirements.txt
 
       - name: Configure git for mike
         run: |
@@ -75,18 +82,29 @@ jobs:
       # Decide what to deploy based on the triggering ref.
       - name: Resolve deploy version + alias
         id: resolve
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_ALIAS: ${{ inputs.alias }}
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            VERSION="${{ inputs.version }}"
-            ALIAS="${{ inputs.alias }}"
-          elif [[ "${{ github.ref_type }}" == "tag" ]]; then
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            VERSION="$INPUT_VERSION"
+            ALIAS="$INPUT_ALIAS"
+          elif [[ "$REF_TYPE" == "tag" ]]; then
+            if [[ ! "$REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "::error::Refusing to deploy: release tag must be vMAJOR.MINOR.PATCH"
+              exit 1
+            fi
             # Tag like v0.2.0 → major.minor track (v0.2). Patch
             # releases roll the same /v0.2/ URL. Adjust this if you
             # want immutable /v0.2.0/ URLs instead.
-            FULL="${{ github.ref_name }}"
-            VERSION="${FULL%.*}"      # v0.2.0 → v0.2
+            VERSION="${REF_NAME%.*}"      # v0.2.0 → v0.2
             ALIAS="latest"
-          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          elif [[ "$REF" == "refs/heads/main" ]]; then
             # Pre-release: the public rolling version IS `latest`, so the
             # canonical URLs, OG tags, and version chip all read `latest`
             # (never `dev`). A real v* tag later publishes a pinned version
@@ -94,7 +112,17 @@ jobs:
             VERSION="latest"
             ALIAS=""
           else
-            echo "::error::Unsupported trigger ref ${{ github.ref }}"
+            echo "::error::Unsupported trigger ref"
+            exit 1
+          fi
+          # Strict allow-list. Anything else (a pre-release tag such as
+          # v0.2.0-rc.1, shell metacharacters in a tag or input) stops here.
+          if [[ ! "$VERSION" =~ ^(latest|dev|v[0-9]+\.[0-9]+)$ ]]; then
+            echo "::error::Refusing to deploy: version must be latest, dev or vMAJOR.MINOR"
+            exit 1
+          fi
+          if [[ ! "$ALIAS" =~ ^([a-z][a-z0-9-]{0,31})?$ ]]; then
+            echo "::error::Refusing to deploy: alias must be empty or match [a-z][a-z0-9-]{0,31}"
             exit 1
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
@@ -102,10 +130,11 @@ jobs:
           echo "Deploying as version=$VERSION alias=$ALIAS"
 
       - name: Mike deploy
+        env:
+          VERSION: ${{ steps.resolve.outputs.version }}
+          ALIAS: ${{ steps.resolve.outputs.alias }}
         run: |
           set -euo pipefail
-          VERSION="${{ steps.resolve.outputs.version }}"
-          ALIAS="${{ steps.resolve.outputs.alias }}"
           # Migration: retire a stale `dev` version (the pre-release rolling
           # version was renamed dev → latest) so /dev/ never appears in the
           # public version selector, canonical URLs, or OG tags.

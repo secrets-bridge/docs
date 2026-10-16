@@ -1,0 +1,25 @@
+# Direct dependencies of the docs site.
+#
+# requirements.txt is the hash-pinned lock generated from this file, and
+# it is the only file CI installs. After editing this file, regenerate it:
+#
+#   uv pip compile requirements.in --universal --generate-hashes \
+#     --python-version 3.10 -o requirements.txt
+#
+# then run `mkdocs build --strict` before opening the PR.
+
+mkdocs==1.6.1
+
+# 9.7.7 fixes the DOM XSS in the search.suggest feature
+# (CVE-2026-73295 / GHSA-xvg9-69gf-fjrf). The built-in `privacy` plugin
+# that self-hosts Mermaid and the web fonts ships in this edition.
+mkdocs-material==9.7.7
+
+# 11.0.1+ fixes the b64 path traversal (CVE-2026-61632) and the inline
+# regex backtracking DoS (CVE-2026-67422). 10.14+ was already required
+# for the fix that renders unlabeled fenced code blocks as blocks.
+pymdown-extensions==12.3
+
+# `mike` versions the docs by deploying to subdirectories on the
+# gh-pages branch. CI runs `mike deploy` instead of `mkdocs gh-deploy`.
+mike==2.1.3

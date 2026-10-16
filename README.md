@@ -37,6 +37,8 @@ mkdocs serve
 
 Open http://localhost:8000. Local serve doesn't use `mike`, you get a single un-versioned preview, which is what you want while authoring.
 
+`requirements.txt` is a hash-pinned lock generated from `requirements.in`; edit the `.in` file and regenerate the lock with the command at its top. The build downloads the web fonts and Mermaid once and serves them from the site itself (material's `privacy` plugin), so the first build needs network access.
+
 ## Build
 
 ```bash
