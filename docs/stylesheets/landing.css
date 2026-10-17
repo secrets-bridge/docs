@@ -1,145 +1,303 @@
 /*
- * Landing-page styling for docs/index.md.
- *
- * Scoped to the home page only via the `.sb-landing` wrapper so other
- * pages get the default mkdocs-material chrome unchanged.
- *
- * Brand palette comes from the Figma file (page 02 Foundations).
- * Match these to ui/tailwind.config.js — when the SPA's tokens
- * change, this file changes too.
+ * Home page. Brand rules: plain and quiet, one ultramarine primary
+ * button, square corners, borders not shadows, IBM Plex. The display
+ * size is for this hero only. Colours come from brand.css (--sb-*).
  */
 
-:root {
-  --sb-bg: #0B1220;          /* Navy 900 */
-  --sb-surface: #0F172A;     /* Dark Navy */
-  --sb-text: #CBD5E1;        /* Slate 300 */
-  --sb-muted: #64748B;       /* Slate 500 */
-  --sb-accent: #06B6D4;      /* Cyan */
-  --sb-accent-bright: #22D3EE;
-  --sb-blue: #3B82F6;
-  --sb-border: #1E293B;
+/* The home page builds its own h1; hide Material's edit and view
+   buttons, which belong on documentation pages. */
+.md-content:has(.sb-home) .md-content__button {
+  display: none;
 }
 
-/* ---- Hero ---------------------------------------------------- */
+.sb-home {
+  max-width: 61rem; /* about 1220 px */
+  margin: 0 auto;
+}
+
+/* ---- Hero ----------------------------------------------------------- */
 
 .sb-hero {
-  padding: 3rem 0 2rem;
-  text-align: center;
+  padding: 2.4rem 0 1.6rem;
+  max-width: 40rem;
 }
 
-.sb-hero__eyebrow {
-  display: inline-block;
-  font-size: 0.7rem;
+.md-typeset .sb-display {
+  font-size: 3.2rem; /* 64 px display */
+  line-height: 1.03;
+  letter-spacing: -0.03em;
   font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--sb-accent);
-  padding: 0.35rem 0.8rem;
-  border: 1px solid rgba(6, 182, 212, 0.35);
-  border-radius: 999px;
-  background: rgba(6, 182, 212, 0.08);
+  margin: 0 0 1.2rem;
+  color: var(--sb-ink);
 }
 
-.sb-hero__wordmark {
-  font-size: clamp(2.5rem, 6vw, 4.5rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
-  margin: 1.25rem 0 0.75rem;
-}
-
-.sb-hero__tagline {
-  font-size: clamp(1.4rem, 3vw, 2.1rem);
-  font-weight: 600;
-  background: linear-gradient(135deg, var(--sb-accent) 0%, var(--sb-blue) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin: 0 0 1rem;
-}
-
-.sb-hero__subhead {
-  font-size: 1.05rem;
-  line-height: 1.55;
-  max-width: 720px;
-  margin: 0 auto 2rem;
-  color: var(--md-default-fg-color--light, var(--sb-muted));
-}
-
-.sb-hero__ctas {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-}
-
-.sb-hero__ctas .md-button {
-  font-weight: 600;
-}
-
-.sb-hero__ctas .md-button--primary {
-  background: linear-gradient(135deg, var(--sb-accent) 0%, var(--sb-blue) 100%);
-  border-color: transparent;
-  color: #0B1220;
-}
-
-.sb-hero__ctas .md-button--primary:hover {
-  filter: brightness(1.08);
-}
-
-/* ---- Pillar row (Material .grid.cards override) ------------- */
-
-.sb-pillars.grid.cards > ul,
-.sb-pillars.grid.cards {
-  margin: 2rem 0 3rem;
-}
-
-.sb-pillars.grid.cards > ul > li {
-  transition: border-color 0.15s ease, transform 0.15s ease;
-}
-
-.sb-pillars.grid.cards > ul > li:hover {
-  border-color: rgba(6, 182, 212, 0.5);
-  transform: translateY(-2px);
-}
-
-/* The icon shortcode picks up { .sb-pillar-icon } as a CSS class. */
-.sb-pillar-icon {
-  color: var(--sb-accent);
-}
-
-/* ---- Section dividers --------------------------------------- */
-
-.sb-section-heading {
-  text-align: center;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+.md-typeset .sb-lede {
+  font-size: 0.9rem; /* 18 px lede */
+  line-height: 1.61;
   color: var(--sb-muted);
-  margin: 3rem 0 1.5rem;
+  margin: 0 0 1.4rem;
+  max-width: 36rem;
 }
 
-/* ---- Status note -------------------------------------------- */
-
-.sb-status {
-  margin-top: 3.5rem;
-  padding: 1.25rem 1.5rem;
-  border-left: 4px solid rgba(234, 179, 8, 0.6);
-  background: rgba(234, 179, 8, 0.08);
-  border-radius: 6px;
-  font-size: 0.92rem;
+.md-typeset .sb-lede--small {
+  font-size: 0.8rem;
+  line-height: 1.6875;
 }
 
-.sb-status__title {
-  font-weight: 700;
-  color: #f59e0b;
+.sb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.md-typeset .sb-actions .md-button {
+  margin: 0;
+}
+
+.md-typeset .sb-textlink {
+  font-weight: 500;
+  font-size: 0.75rem;
+  padding: 0 0.2rem;
+}
+
+.md-typeset .sb-note {
+  font-size: 0.7rem;
+  color: var(--sb-muted);
+  margin: 0;
+}
+
+/* ---- Architecture figure -------------------------------------------- */
+
+.md-typeset .sb-figure {
+  margin: 0.8rem 0 0;
+  border: 1px solid var(--sb-border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--sb-bg);
+}
+
+.md-typeset .sb-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* One illustration per scheme (Material's #only-light / #only-dark,
+   restated because the rule above is more specific). */
+[data-md-color-scheme="default"] .md-typeset .sb-figure img[src$="#only-dark"],
+[data-md-color-scheme="slate"] .md-typeset .sb-figure img[src$="#only-light"] {
+  display: none;
+}
+
+/* ---- Sections ------------------------------------------------------- */
+
+.sb-section {
+  padding: 3.2rem 0 0;
+}
+
+.md-typeset .sb-section-title {
+  font-size: 1.9rem; /* 38 px section */
+  line-height: 1.13;
+  letter-spacing: -0.022em;
+  font-weight: 600;
+  margin: 0 0 1.4rem;
+  color: var(--sb-ink);
+}
+
+/* How a request works: four steps in a row, one bordered block */
+.md-typeset ol.sb-steps {
+  list-style: none;
+  counter-reset: sb-step;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--sb-border);
+  border-radius: 4px;
+  background: var(--sb-surface);
+}
+
+.md-typeset ol.sb-steps > li {
+  counter-increment: sb-step;
+  margin: 0;
+  padding: 1.2rem 1.2rem 1.3rem;
+  border-left: 1px solid var(--sb-rule);
+}
+
+.md-typeset ol.sb-steps > li:first-child {
+  border-left: 0;
+}
+
+.md-typeset ol.sb-steps > li::before {
+  content: counter(sb-step, decimal-leading-zero);
+  display: block;
+  font-family: var(--md-code-font-family);
+  font-size: 0.6rem;
+  color: var(--sb-muted);
+  margin-bottom: 0.8rem;
+}
+
+.md-typeset .sb-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: var(--sb-accent);
+  display: block;
+  margin-bottom: 0.7rem;
+}
+
+.md-typeset ol.sb-steps h3 {
+  font-size: 0.9rem;
   margin: 0 0 0.4rem;
 }
 
-/* ---- Visual polish: hide page TOC + breadcrumbs ------------- */
+.md-typeset ol.sb-steps p {
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: var(--sb-muted);
+  margin: 0;
+}
 
-.sb-landing .md-typeset h1:first-child {
-  display: none;  /* Hero replaces the H1 visually */
+/* What it holds to: heading on the left, rules on the right */
+.sb-split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 2.4rem;
+  align-items: start;
+}
+
+.md-typeset ul.sb-rules {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--sb-border);
+}
+
+.md-typeset ul.sb-rules > li {
+  margin: 0;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--sb-rule);
+  font-size: 0.8rem;
+  color: var(--sb-muted);
+}
+
+.md-typeset ul.sb-rules strong {
+  color: var(--sb-ink);
+}
+
+/* What works today: two bordered columns */
+.sb-status {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--sb-border);
+  border-radius: 4px;
+  background: var(--sb-surface);
+  margin-bottom: 0.8rem;
+}
+
+.sb-status > div {
+  padding: 1.1rem 1.3rem 1.2rem;
+}
+
+.sb-status > div + div {
+  border-left: 1px solid var(--sb-rule);
+}
+
+.md-typeset .sb-status h3 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0 0 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+/* Status: a small square and the word, like the console */
+.md-typeset .sb-status h3::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  box-sizing: border-box;
+  background: var(--sb-ok);
+}
+
+.md-typeset .sb-status > div + div h3::before {
+  background: transparent;
+  border: 1.5px solid var(--sb-edge);
+}
+
+.md-typeset .sb-status ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.md-typeset .sb-status li {
+  font-size: 0.75rem;
+  margin: 0.2rem 0;
+}
+
+.md-typeset .sb-muted {
+  color: var(--sb-muted);
+  font-size: 0.7rem;
+  margin: 0.6rem 0 0;
+}
+
+.sb-end {
+  padding-bottom: 2.4rem;
+}
+
+/* ---- Small screens -------------------------------------------------- */
+
+@media screen and (max-width: 76.1875em) {
+  .md-typeset ol.sb-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .md-typeset ol.sb-steps > li:nth-child(3) {
+    border-left: 0;
+  }
+  .md-typeset ol.sb-steps > li:nth-child(n + 3) {
+    border-top: 1px solid var(--sb-rule);
+  }
+}
+
+@media screen and (max-width: 44.9375em) {
+  /* The diagram stays readable: full size, scrolling sideways in its box. */
+  .md-typeset .sb-figure {
+    overflow-x: auto;
+  }
+  .md-typeset .sb-figure img {
+    width: 46rem;
+    max-width: none;
+  }
+  .sb-hero {
+    padding-top: 1.2rem;
+  }
+  .md-typeset .sb-display {
+    font-size: 2.1rem; /* the page-title size on phones */
+    line-height: 1.12;
+  }
+  .md-typeset .sb-section-title {
+    font-size: 1.4rem;
+  }
+  .sb-section {
+    padding-top: 2.2rem;
+  }
+  .md-typeset ol.sb-steps,
+  .sb-status,
+  .sb-split {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+  .md-typeset ol.sb-steps > li {
+    border-left: 0;
+    border-top: 1px solid var(--sb-rule);
+  }
+  .md-typeset ol.sb-steps > li:first-child {
+    border-top: 0;
+  }
+  .sb-status > div + div {
+    border-left: 0;
+    border-top: 1px solid var(--sb-rule);
+  }
 }

@@ -77,7 +77,7 @@ To redeploy an old version (e.g. backporting a typo fix):
 
 ## Contributing
 
-- Match the [brand voice](docs/design/brand-voice.md), tagline, wordmark conventions, voice rules
-- Tokens and theme come from the [Figma file](docs/design/figma.md); don't invent new colors
+- Match the [brand voice](docs/design/brand-voice.md): say what we keep, describe the mechanism, label maturity exactly
+- Colours, type and assets come from [tokens](docs/design/tokens.md) and [logos and assets](docs/design/assets.md); don't invent new colours
 - Every external surface, README, social card, blog post, should reference these docs as the source of truth
 - File issues at [`secrets-bridge/.github`](https://github.com/secrets-bridge/.github)

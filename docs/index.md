@@ -1,152 +1,132 @@
 ---
 title: Secrets Bridge
-# Quoted because the value contains a `:` (after "plane") which YAML
-# would otherwise interpret as a second mapping. An unquoted colon
-# silently kills the whole frontmatter (page.meta becomes empty, the
-# nav config wins page.title, and SEO tags fall back to site defaults.
-seo_title: "Secrets Bridge: Unified Secrets Control Plane"
-description: "Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap."
+# Quoted: the value contains a `:`, which YAML would otherwise read as a
+# second mapping and drop the whole frontmatter.
+seo_title: "Secrets Bridge: access control for the secrets you already keep"
+description: "Secrets Bridge adds access requests, approvals, audit and agent execution around the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider."
 hide:
   - navigation
   - toc
 ---
 
+<div class="sb-home" markdown>
 
-# Secrets Bridge
+<section class="sb-hero" aria-labelledby="sb-hero-title" markdown>
 
-<div class="sb-landing" markdown>
+<h1 id="sb-hero-title" class="sb-display">Govern who uses your secrets.</h1>
 
-<div class="sb-hero" markdown>
-
-<span class="sb-hero__eyebrow">Unified secrets control plane</span>
-
-<div class="sb-hero__wordmark">SecretsBridge</div>
-
-<h2 class="sb-hero__tagline">The control plane for secrets governance.</h2>
-
-<p class="sb-hero__subhead">
-Keep secrets in Vault, AWS Secrets Manager, Azure Key Vault, GCP
-Secret Manager, or Kubernetes. Secrets Bridge governs who can
-request, approve, reveal, patch, and audit access, without storing
-plaintext secrets in the control plane.
+<p class="sb-lede">
+Secrets Bridge adds access requests, approvals, audit and agent execution
+around the secrets you already keep in AWS Secrets Manager and HashiCorp
+Vault. We keep requests, approvals and audit metadata. Your secret values
+stay in your provider.
 </p>
 
-<div class="sb-hero__ctas" markdown>
-[:material-rocket-launch: Try it locally](operations/docker-compose.md){ .md-button .md-button--primary }
-[:material-book-open-variant: Read the architecture](overview/architecture.md){ .md-button }
-[:material-github: Star on GitHub](https://github.com/secrets-bridge){ .md-button }
+<div class="sb-actions" markdown>
+[Run it locally](operations/docker-compose.md){ .md-button .md-button--primary }
+[Read the architecture](overview/architecture.md){ .md-button }
+<a class="sb-textlink" href="https://github.com/secrets-bridge">Source on GitHub</a>
 </div>
 
+<p class="sb-note">Open source and pre-1.0. <a href="overview/product-status/">See what is live today</a> and what is still on the roadmap.</p>
+
+</section>
+
+<figure class="sb-figure" tabindex="0" role="region" aria-label="Architecture diagram">
+<img src="assets/architecture-light.svg#only-light" width="1100" height="400" alt="People use the console and API. The control plane holds workflow, policy, audit and metadata. An agent inside your boundary calls out to it and reads the provider. Providers connect only to the agent.">
+<img src="assets/architecture-dark.svg#only-dark" width="1100" height="400" alt="People use the console and API. The control plane holds workflow, policy, audit and metadata. An agent inside your boundary calls out to it and reads the provider. Providers connect only to the agent.">
+</figure>
+
+<section class="sb-section" aria-labelledby="sb-how" markdown>
+
+<h2 id="sb-how" class="sb-section-title">How a request works</h2>
+
+<ol class="sb-steps">
+<li>
+<svg class="sb-icon" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="butt"><rect x="3.5" y="4" width="11" height="16"/><path d="M10 12H20.5M17 8.5L20.5 12L17 15.5"/></g></svg>
+<h3>Ask for access</h3>
+<p>Name the secret, the keys you need and why. A request carries key names, never a value.</p>
+</li>
+<li>
+<svg class="sb-icon" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="butt"><path d="M5 3.5V20.5"/><path d="M9.5 12.5L13 16L20 8"/></g></svg>
+<h3>Someone approves</h3>
+<p>The policy for the project and environment decides how many approvals it needs and from whom. By default, nobody approves their own request.</p>
+</li>
+<li>
+<svg class="sb-icon" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="butt"><path d="M3.5 11H20.5V20.5H3.5Z"/><path d="M12 16V3.5M8.5 7L12 3.5L15.5 7"/></g></svg>
+<h3>The agent reads it</h3>
+<p>An agent inside your boundary claims the job, reads the provider and seals the values into a single-use wrap. It only ever calls out.</p>
+</li>
+<li>
+<svg class="sb-icon" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="butt"><path d="M9 6H20.5M9 12H20.5M9 18H16"/><path d="M4 5H6.5V7.5H4ZM4 11H6.5V13.5H4ZM4 17H6.5V19.5H4Z"/></g></svg>
+<h3>Reveal once, on the record</h3>
+<p>The requester reveals each value once, behind a second factor. Every step lands in the audit log under one correlation ID.</p>
+</li>
+</ol>
+
+</section>
+
+<section class="sb-section sb-split" aria-labelledby="sb-holds" markdown>
+
+<div markdown>
+<h2 id="sb-holds" class="sb-section-title">What it holds to</h2>
+<p class="sb-lede sb-lede--small">These are enforced in code, not left to policy. The <a href="overview/threat-model/">threat model</a> shows how each boundary is kept.</p>
 </div>
 
-<h2 class="sb-section-heading">What is Secrets Bridge?</h2>
+<ul class="sb-rules">
+<li><strong>No values at rest in the control plane.</strong> Not in Postgres, Redis, logs, audit events or the browser.</li>
+<li><strong>The agent only calls out.</strong> No inbound port, no database, no Kubernetes API access to Secrets.</li>
+<li><strong>Production never allows direct reveal.</strong> The refusal is enforced in code and audited.</li>
+<li><strong>Values move once.</strong> KMS-wrapped, single-use, short-lived, and opened only by the right person.</li>
+<li><strong>Audit is append-only and metadata-only.</strong> Who, what, when and why, never the value.</li>
+<li><strong>Agents are bound and revocable.</strong> One-time enrollment tokens, one provider connection per agent, revoked at once.</li>
+</ul>
 
-Secrets Bridge is a **unified secrets control plane** for governing secrets
-across external providers **without storing secret values in the control
-plane**.
+</section>
 
-It **does not replace** HashiCorp Vault, AWS Secrets Manager, Azure Key Vault,
-GCP Secret Manager, or Kubernetes External Secrets. It governs **access,
-workflows, approvals, audit, and agent execution** around them. The values stay
-in your provider.
+<section class="sb-section" aria-labelledby="sb-today" markdown>
 
-[:material-check-decagram: See what's live, QA-certified, and on the roadmap](overview/product-status.md){ .md-button .md-button--primary }
+<h2 id="sb-today" class="sb-section-title">What works today</h2>
 
-<h2 class="sb-section-heading">Why Secrets Bridge</h2>
-
-<div class="grid cards sb-pillars" markdown>
-
--   :material-shield-key:{ .lg .middle .sb-pillar-icon } &nbsp;**Workflow-gated reads & writes**
-
-    ---
-
-    Developers request access through configurable workflows.
-    Approvers vote. Agents fetch (or write) values. **Every
-    value is single-shot, audited, and KMS-wrapped at rest.**
-
--   :material-archive-eye:{ .lg .middle .sb-pillar-icon } &nbsp;**SOC2-ready audit**
-
-    ---
-
-    The `audit_events` table is append-only at the schema
-    layer: `BEFORE UPDATE` / `BEFORE DELETE` triggers reject
-    mutations. Every action emits a correlation ID you can
-    drill into.
-
--   :material-cloud-key-outline:{ .lg .middle .sb-pillar-icon } &nbsp;**No KMS lock-in**
-
-    ---
-
-    Three backends ship today behind one `SB_KMS_BACKEND`
-    knob: `local` (dev), `vault-transit` (OSS production),
-    `aws-kms` (AWS production). Bring your own. No cloud lock-in.
-
--   :material-shield-lock-open:{ .lg .middle .sb-pillar-icon } &nbsp;**Plaintext never on the wire**
-
-    ---
-
-    TLS + per-direction wire-envelope encryption (X25519 for
-    CP→Agent, KMS-DEK + AES-GCM for Agent→CP). Even a
-    TLS-terminating proxy in your mesh sees only ciphertext.
-
+<div class="sb-status">
+<div>
+<h3>Implemented</h3>
+<ul>
+<li>AWS Secrets Manager and HashiCorp Vault through the agent</li>
+<li>Read requests with policy-driven approval</li>
+<li>Direct reveal in non-production, behind a second factor</li>
+<li>Cross-team requests: another team supplies the values</li>
+<li>Agent enrollment, status and revoke</li>
+<li>Append-only audit trail</li>
+</ul>
+</div>
+<div>
+<h3>Roadmap</h3>
+<ul>
+<li>Azure Key Vault and GCP Secret Manager providers</li>
+<li>Deeper Kubernetes External Secrets integration</li>
+<li>Flux integration</li>
+<li>Agents that claim only their own connection's jobs</li>
+</ul>
+<p class="sb-muted">Not shipped. Don't plan around these yet.</p>
+</div>
 </div>
 
-<h2 class="sb-section-heading">Who this is for</h2>
+<p><a href="overview/product-status/">Full product status</a>, with what is QA-certified and what is in progress.</p>
 
-- **Regulated teams** (fintech, healthtech, defence-adjacent)
-  where "everyone has full Vault read access" is no longer an
-  answer your auditor will accept.
-- **Platform teams** standing up multi-cluster / multi-account
-  secrets governance from scratch.
-- **Compliance engineers** who need a real audit trail
-  (correlation IDs, immutable rows, value-free metadata) without
-  reaching for an SIEM bolt-on.
+</section>
 
-<h2 class="sb-section-heading">How it's different</h2>
+<section class="sb-section sb-end" aria-labelledby="sb-start" markdown>
 
-| | Secrets Bridge | Direct Vault | AWS Secrets Manager + IAM | Most "secrets SaaS" |
-|---|---|---|---|---|
-| Multi-provider | ✅ Vault + AWS today; Azure + GCP on roadmap | Vault only | AWS only | Varies |
-| Workflow approval per read | ✅ Built-in | Plugin / RFC | ❌ | Some |
-| Single-shot reveal-once UX | ✅ Built-in | ❌ | ❌ | Some |
-| Append-only audit at schema | ✅ Postgres triggers | ❌ application-layer | CloudTrail (not append-only) | Varies |
-| Self-hostable | ✅ OSS, no SaaS dependency | ✅ | n/a | ❌ |
-| KMS choice | ✅ Vault Transit / AWS KMS / local | n/a | AWS KMS only | Provider-controlled |
-| Agent uses **only** outbound traffic | ✅ No inbound except health probes | n/a | n/a | Varies |
+<h2 id="sb-start" class="sb-section-title">Start on your laptop</h2>
 
-<h2 class="sb-section-heading">On the roadmap (not live yet)</h2>
+<p class="sb-lede sb-lede--small">The api repo's compose file starts Postgres, Redis and the control plane; the console and the agent run from their own repos. The local guide walks through the whole flow against a dev Vault.</p>
 
-Listed here because they are **not** shipped. See the
-[product status page](overview/product-status.md) for the exact
-Live / QA-certified / In-progress / Roadmap split.
-
-- **Azure Key Vault** and **GCP Secret Manager** providers. The agent's
-  resolvers ship Vault + AWS Secrets Manager today; the others are next.
-- **HashiCorp Vault advanced flows** and deeper **Kubernetes External Secrets**
-  integration.
-- **Flux** integration (read-only ArgoCD observation ships today).
-- **Per-tenant KMS scoping**: one CMK per deployment for now.
-- **Agent connection-scoped job claim** and a **richer agent fleet dashboard**.
-- **Native Slack / PagerDuty** notification sinks: webhook is in; native
-  sinks are next.
-
-<div class="sb-status" markdown>
-<p class="sb-status__title">🚧 Pre-v1.0</p>
-<p>
-The architectural foundation is solid (BRD-aligned, polyrepo,
-infra-free <code>core</code>, type-safe Go), but several P0
-items from the
-<a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">SECURITY_REVIEW</a>
-are still open: real OIDC, agent workload identity, rate
-limiting, key-rotation runbook. We're tracking them on the
-<a href="https://github.com/orgs/secrets-bridge/projects/1">org project board</a>.
-</p>
-<p>
-If you'd like to be a <strong>design partner</strong>,
-particularly if you're in financial services, healthcare, or
-government-adjacent, please open an issue at
-<a href="https://github.com/secrets-bridge/.github">secrets-bridge/.github</a>.
-</p>
+<div class="sb-actions" markdown>
+[Run it locally](operations/docker-compose.md){ .md-button }
+[Operations guide](operations/index.md){ .md-button }
 </div>
+
+</section>
 
 </div>

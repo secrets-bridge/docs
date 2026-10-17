@@ -1,0 +1,437 @@
+/*
+ * Secrets Bridge brand on mkdocs-material: the console's tokens (October
+ * handoff), mapped onto Material's variables, for the light and dark
+ * schemes. Ultramarine is a signal (links, the current tab, the focus
+ * ring, one primary button), never a large fill. Square corners, 4 px at
+ * most. Panels separate with a border, not a shadow.
+ */
+
+[data-md-color-scheme="default"] {
+  --sb-bg: #F6F5F1;
+  --sb-surface: #FFFFFF;
+  --sb-sunken: #EFEEE9;
+  --sb-ink: #15171C;
+  --sb-muted: #5B606B;
+  --sb-border: #DDDBD4;
+  --sb-rule: #E8E6E0;
+  --sb-edge: #7E838D;
+  --sb-accent: #3141C8;
+  --sb-on-accent: #FFFFFF;
+  --sb-accent-soft: #E9EBFB;
+  --sb-accent-line: #BFC5F3;
+  --sb-ok: #1E7A46;
+  --sb-ok-bg: #E6F4EC;
+  --sb-ok-line: #A7D7BA;
+  --sb-warn: #7A5200;
+  --sb-warn-bg: #FFF3D6;
+  --sb-warn-line: #EACB86;
+  --sb-bad: #B3261E;
+  --sb-bad-bg: #FDECEA;
+  --sb-bad-line: #F1B8B3;
+  --sb-info: #3E4A5C;
+  --sb-info-bg: #EEF0F3;
+  --sb-info-line: #C9CED8;
+  color-scheme: light;
+}
+
+[data-md-color-scheme="slate"] {
+  --sb-bg: #0F1013;
+  --sb-surface: #17191E;
+  --sb-sunken: #1D1F25;
+  --sb-ink: #ECECEE;
+  --sb-muted: #A2A6AF;
+  --sb-border: #2B2E36;
+  --sb-rule: #22252B;
+  --sb-edge: #686D7A;
+  --sb-accent: #9AA3FF;
+  --sb-on-accent: #0F1013;
+  --sb-accent-soft: #1D2140;
+  --sb-accent-line: #3A4285;
+  --sb-ok: #6FCF97;
+  --sb-ok-bg: #132219;
+  --sb-ok-line: #24432F;
+  --sb-warn: #F2C14E;
+  --sb-warn-bg: #2A2210;
+  --sb-warn-line: #4E4024;
+  --sb-bad: #FF8A80;
+  --sb-bad-bg: #2C1513;
+  --sb-bad-line: #4E2522;
+  --sb-info: #B7C0CF;
+  --sb-info-bg: #1B1F27;
+  --sb-info-line: #323846;
+  --md-hue: 225deg;
+  color-scheme: dark;
+}
+
+[data-md-color-scheme="default"],
+[data-md-color-scheme="slate"] {
+  /* Page and text */
+  --md-default-bg-color: var(--sb-bg);
+  --md-default-fg-color: var(--sb-ink);
+  --md-default-fg-color--light: var(--sb-muted);
+  --md-default-fg-color--lighter: var(--sb-edge);
+  --md-default-fg-color--lightest: var(--sb-border);
+  --md-typeset-color: var(--sb-ink);
+
+  /* Header and tabs: the surface with ink, not a coloured bar */
+  --md-primary-fg-color: var(--sb-surface);
+  --md-primary-fg-color--light: var(--sb-surface);
+  --md-primary-fg-color--dark: var(--sb-surface);
+  --md-primary-bg-color: var(--sb-ink);
+  --md-primary-bg-color--light: var(--sb-muted);
+
+  /* Accent: links, hover, focus, the current item */
+  --md-accent-fg-color: var(--sb-accent);
+  --md-accent-fg-color--transparent: var(--sb-accent-soft);
+  --md-accent-bg-color: var(--sb-on-accent);
+  --md-typeset-a-color: var(--sb-accent);
+
+  /* Code */
+  --md-code-bg-color: var(--sb-sunken);
+  --md-code-fg-color: var(--sb-ink);
+  --md-code-hl-color: var(--sb-accent-soft);
+  --md-code-hl-color--light: var(--sb-accent-soft);
+
+  /* Tables, marks, footer */
+  --md-typeset-table-color: var(--sb-border);
+  --md-typeset-table-color--light: var(--sb-sunken);
+  --md-typeset-mark-color: var(--sb-warn-bg);
+  --md-footer-bg-color: var(--sb-surface);
+  --md-footer-bg-color--dark: var(--sb-surface);
+  --md-footer-fg-color: var(--sb-ink);
+  --md-footer-fg-color--light: var(--sb-muted);
+  --md-footer-fg-color--lighter: var(--sb-edge);
+
+  /* Admonitions sit on the surface */
+  --md-admonition-bg-color: var(--sb-surface);
+  --md-admonition-fg-color: var(--sb-ink);
+  --md-shadow-z1: none;
+  --md-shadow-z2: none;
+  --md-shadow-z3: 0 1px 2px rgba(21, 23, 28, 0.06), 0 16px 40px rgba(21, 23, 28, 0.16);
+}
+
+/* ---- Type: IBM Plex, the website scale ----------------------------- */
+
+.md-typeset {
+  font-size: 0.8rem; /* 16 px body-docs at Material's 20 px root */
+  line-height: 1.6875;
+}
+
+.md-typeset h1 {
+  font-weight: 600;
+  font-size: 2.1rem; /* 42 px page-title */
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: var(--sb-ink);
+  margin: 0 0 1rem;
+}
+
+.md-typeset h2 {
+  font-weight: 600;
+  font-size: 1.15rem; /* 23 px heading */
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: var(--sb-ink);
+  margin-top: 2.4rem;
+}
+
+.md-typeset h3 {
+  font-weight: 600;
+  font-size: 0.9rem; /* 18 px */
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--sb-ink);
+}
+
+.md-typeset h4,
+.md-typeset h5,
+.md-typeset h6 {
+  font-weight: 600;
+  color: var(--sb-ink);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.md-typeset strong {
+  font-weight: 600;
+}
+
+.md-typeset code,
+.md-typeset kbd,
+.md-typeset pre {
+  font-feature-settings: "calt" 0;
+}
+
+.md-typeset code {
+  border-radius: 3px;
+  padding: 0.05em 0.3em;
+}
+
+/* Tabular figures where numbers line up */
+.md-typeset table:not([class]) {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Header and navigation ----------------------------------------- */
+
+.md-header {
+  border-bottom: 1px solid var(--sb-border);
+  box-shadow: none;
+}
+
+.md-header--shadow {
+  box-shadow: none;
+}
+
+.md-tabs {
+  background-color: var(--sb-surface);
+  border-bottom: 1px solid var(--sb-border);
+  color: var(--sb-muted);
+}
+
+.md-tabs__link {
+  opacity: 1;
+  color: var(--sb-muted);
+  font-weight: 500;
+  font-size: 0.68rem;
+}
+
+.md-tabs__link:hover,
+.md-tabs__item--active .md-tabs__link {
+  color: var(--sb-ink);
+}
+
+/* The current tab carries the accent underline, like the console's tabs */
+.md-tabs__item--active {
+  box-shadow: inset 0 -2px 0 var(--sb-accent);
+}
+
+.md-header__title {
+  font-weight: 600;
+}
+
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 1.3rem;
+  width: auto;
+}
+
+/* The lockup already carries the name; don't retype it beside it. The
+   page title still slides in on scroll (the second topic). */
+.md-header__title .md-header__topic:first-child {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Ultramarine on light, periwinkle on dark (approved colourings).
+   Material takes one logo file, so swap it here. */
+[data-md-color-scheme="slate"] .md-header__button.md-logo img,
+[data-md-color-scheme="slate"] .md-nav__button.md-logo img {
+  content: url("../assets/logo-horizontal-dark.svg");
+}
+
+.md-search__form {
+  background-color: var(--sb-sunken);
+  border: 1px solid var(--sb-border);
+  border-radius: 4px;
+}
+
+.md-search__form:hover {
+  background-color: var(--sb-sunken);
+}
+
+.md-search__input,
+.md-search__input::placeholder,
+.md-search__icon {
+  color: var(--sb-muted);
+}
+
+[data-md-toggle="search"]:checked ~ .md-header .md-search__form {
+  border-radius: 4px 4px 0 0;
+}
+
+.md-nav__link--active,
+.md-nav__item .md-nav__link--active {
+  color: var(--sb-accent);
+  font-weight: 500;
+}
+
+.md-nav__title {
+  color: var(--sb-ink);
+  font-weight: 600;
+}
+
+/* ---- Content blocks ------------------------------------------------ */
+
+.md-typeset table:not([class]) {
+  border: 1px solid var(--sb-border);
+  border-radius: 4px;
+  box-shadow: none;
+  font-size: 0.7rem;
+  background: var(--sb-surface);
+}
+
+.md-typeset table:not([class]) th {
+  background: var(--sb-surface);
+  color: var(--sb-muted);
+  font-weight: 500;
+  border-bottom: 1px solid var(--sb-border);
+}
+
+.md-typeset table:not([class]) td {
+  border-top: 1px solid var(--sb-rule);
+}
+
+.md-typeset table:not([class]) tbody tr:hover {
+  background-color: var(--sb-sunken);
+  box-shadow: none;
+}
+
+/* Admonitions: a border all round, a neutral title, the status colours
+   only for warnings and failures. No coloured left bars. */
+.md-typeset .admonition,
+.md-typeset details,
+.md-typeset .admonition[class],
+.md-typeset details[class] {
+  border: 1px solid var(--sb-border);
+  border-radius: 4px;
+  box-shadow: none;
+  font-size: 0.75rem;
+  background: var(--sb-surface);
+}
+
+.md-typeset .admonition-title,
+.md-typeset summary {
+  background-color: transparent !important;
+  border: 0;
+  font-weight: 600;
+  color: var(--sb-ink);
+}
+
+.md-typeset .admonition-title::before,
+.md-typeset summary::before {
+  background-color: var(--sb-muted) !important;
+}
+
+/* Material colours each admonition type; neutral types stay neutral. */
+.md-typeset .admonition[class] > .admonition-title,
+.md-typeset details[class] > summary {
+  background-color: transparent;
+}
+
+.md-typeset .admonition.warning[class],
+.md-typeset details.warning[class],
+.md-typeset .admonition.caution[class],
+.md-typeset .admonition.attention[class] {
+  border-color: var(--sb-warn-line);
+  background: var(--sb-warn-bg);
+}
+
+.md-typeset .admonition.warning > .admonition-title::before,
+.md-typeset details.warning > summary::before,
+.md-typeset .admonition.caution > .admonition-title::before,
+.md-typeset .admonition.attention > .admonition-title::before {
+  background-color: var(--sb-warn) !important;
+}
+
+.md-typeset .admonition.danger[class],
+.md-typeset details.danger[class],
+.md-typeset .admonition.failure[class],
+.md-typeset .admonition.error[class] {
+  border-color: var(--sb-bad-line);
+  background: var(--sb-bad-bg);
+}
+
+.md-typeset .admonition.danger > .admonition-title::before,
+.md-typeset details.danger > summary::before,
+.md-typeset .admonition.failure > .admonition-title::before,
+.md-typeset .admonition.error > .admonition-title::before {
+  background-color: var(--sb-bad) !important;
+}
+
+.md-typeset .admonition.success[class],
+.md-typeset details.success[class],
+.md-typeset .admonition.check[class],
+.md-typeset .admonition.done[class] {
+  border-color: var(--sb-ok-line);
+  background: var(--sb-ok-bg);
+}
+
+.md-typeset .admonition.success > .admonition-title::before,
+.md-typeset details.success > summary::before {
+  background-color: var(--sb-ok) !important;
+}
+
+/* Buttons: one ultramarine primary, the rest outlined in edge */
+.md-typeset .md-button {
+  border: 1px solid var(--sb-edge);
+  border-radius: 4px;
+  color: var(--sb-ink);
+  font-weight: 500;
+  padding: 0.45em 1em;
+  font-size: 0.75rem;
+}
+
+.md-typeset .md-button:hover,
+.md-typeset .md-button:focus {
+  background-color: var(--sb-sunken);
+  border-color: var(--sb-edge);
+  color: var(--sb-ink);
+}
+
+.md-typeset .md-button--primary {
+  background-color: var(--sb-accent);
+  border-color: var(--sb-accent);
+  color: var(--sb-on-accent);
+  font-weight: 600;
+}
+
+.md-typeset .md-button--primary:hover,
+.md-typeset .md-button--primary:focus {
+  background-color: var(--sb-accent);
+  border-color: var(--sb-accent);
+  color: var(--sb-on-accent);
+  filter: brightness(1.1);
+}
+
+/* Focus: a visible 2 px accent ring everywhere */
+:focus-visible,
+.md-typeset a:focus-visible,
+.md-typeset .md-button:focus-visible {
+  outline: 2px solid var(--sb-accent);
+  outline-offset: 2px;
+}
+
+/* Footer: a border, no dark band */
+.md-footer {
+  border-top: 1px solid var(--sb-border);
+}
+
+.md-footer-meta {
+  background-color: var(--sb-surface);
+}
+
+.md-footer-meta__inner,
+.md-copyright,
+.md-copyright__highlight {
+  color: var(--sb-muted);
+}
+
+/* Code copy button and annotations take the accent only on hover */
+.md-clipboard {
+  color: var(--sb-edge);
+}
+
+.md-clipboard:hover {
+  color: var(--sb-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}

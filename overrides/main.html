@@ -48,7 +48,7 @@
   <meta property="og:image" content="{{ og_image }}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="{{ config.extra.brand.name }} — {{ config.extra.brand.tagline }}" />
+  <meta property="og:image:alt" content="{{ config.extra.brand.name }}: {{ config.extra.brand.tagline }}" />
   <meta property="og:locale" content="en_US" />
 
   {# Twitter card. Use summary_large_image so the OG banner renders at
@@ -57,19 +57,19 @@
   <meta name="twitter:title" content="{{ page_title }}" />
   <meta name="twitter:description" content="{{ page_description }}" />
   <meta name="twitter:image" content="{{ og_image }}" />
-  <meta name="twitter:image:alt" content="{{ config.extra.brand.name }} — {{ config.extra.brand.tagline }}" />
+  <meta name="twitter:image:alt" content="{{ config.extra.brand.name }}: {{ config.extra.brand.tagline }}" />
   {% if config.extra.brand.twitter_handle %}
   <meta name="twitter:site" content="{{ config.extra.brand.twitter_handle }}" />
   {% endif %}
 
-  {# Apple touch icon — used when a visitor adds the site to their home
-     screen on iOS / iPadOS. Falls through to the favicon for everyone
-     else. #}
-  <link rel="apple-touch-icon" href="{{ 'assets/icon.svg' | url }}" />
+  {# Apple touch icon: used when a visitor adds the site to their home
+     screen on iOS / iPadOS. iOS wants a PNG; everyone else uses the
+     SVG favicon. #}
+  <link rel="apple-touch-icon" href="{{ 'assets/apple-touch-icon.png' | url }}" />
 
-  {# Theme color matches the brand Navy 900 so the iOS / Android browser
-     chrome doesn't render a default blue strip. #}
-  <meta name="theme-color" content="#0B1220" />
+  {# Browser chrome follows the page surface in each scheme. #}
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#17191E" media="(prefers-color-scheme: dark)" />
 
   {# Robots — explicit allow for clarity. The robots.txt at the root
      covers the same ground but per-page directives let us mark specific

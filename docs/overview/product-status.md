@@ -1,6 +1,6 @@
 ---
 title: Product status
-description: What Secrets Bridge actually does today: implemented and QA-certified features, what's in progress, and what's on the roadmap. No overclaiming.
+description: "What Secrets Bridge actually does today: implemented and QA-certified features, what's in progress, and what's on the roadmap. No overclaiming."
 ---
 
 # Product status
