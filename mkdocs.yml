@@ -91,10 +91,9 @@ extra:
   brand:
     name: Secrets Bridge
     tagline: Access control for the secrets you already keep.
-    # Self-hosted on the docs domain. raw.githubusercontent.com is
-    # rate-limited and not cache-friendly for social crawlers (SEO
-    # audit 2026-05-30 P2-7). 1200×630 PNG.
-    og_image: https://secrets-bridge.io/assets/og-banner.png
+    # Path under the site root of the version being served; the template
+    # makes it absolute from the page's canonical URL. 1200x630 PNG.
+    og_image: assets/og-banner.png
     twitter_handle: ""  # set when an org Twitter account exists
   social:
     - icon: fontawesome/brands/github

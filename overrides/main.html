@@ -32,7 +32,12 @@
   {% set page_title = page.meta.seo_title if page and page.meta and page.meta.seo_title else page.meta.title if page and page.meta and page.meta.title else page.title if page and page.title else config.site_name %}
   {% set page_description = page.meta.description if page and page.meta and page.meta.description else config.site_description %}
   {% set page_url = page.canonical_url if page and page.canonical_url else config.site_url %}
-  {% set og_image = page.meta.image if page and page.meta and page.meta.image else config.extra.brand.og_image %}
+  {# mike serves each version under its own path (/latest/, /dev/), and
+     the canonical URL carries it, so the social image is resolved from
+     the canonical root of this page rather than the bare domain (where
+     it 404s). #}
+  {% set site_root = page.canonical_url[:(page.canonical_url | length) - (page.url | length)] if page and page.canonical_url and page.url else (page.canonical_url if page and page.canonical_url else config.site_url) %}
+  {% set og_image = page.meta.image if page and page.meta and page.meta.image else site_root ~ config.extra.brand.og_image %}
 
   {# Canonical URL — prevents duplicate-content penalties when the site
      is mirrored or accessed through alternate hosts. #}
