@@ -1648,6 +1648,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#boot-behaviour" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Boot behaviour
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#helm-chart-values" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1765,6 +1776,56 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Upgrading: moving existing logos">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#migration-0040" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migration 0040
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-backfill" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The backfill
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rollout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rollout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rolling-back" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rolling back
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2114,6 +2175,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#boot-behaviour" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Boot behaviour
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#helm-chart-values" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2232,6 +2304,56 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Upgrading: moving existing logos">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#migration-0040" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migration 0040
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-backfill" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The backfill
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rollout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rollout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rolling-back" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rolling back
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -2272,12 +2394,11 @@
 the S3 API, such as MinIO. Postgres keeps only the metadata for each file.</p>
 <div class="admonition warning">
 <p class="admonition-title">In progress</p>
-<p>Object storage is being built in
-<a href="https://github.com/secrets-bridge/api/issues/253">api#253</a> and
-<a href="https://github.com/secrets-bridge/charts/issues/39">charts#39</a>. It is
-not live yet. See <a href="../../overview/product-status/">Product status</a>.
-Details marked <strong>Check the release notes</strong> below are not settled and
-may change before release.</p>
+<p>Object storage is implemented in
+<a href="https://github.com/secrets-bridge/api/pull/255">api#255</a> and the chart
+values in <a href="https://github.com/secrets-bridge/charts/pull/40">charts#40</a>
+and <a href="https://github.com/secrets-bridge/charts/pull/42">charts#42</a>. It
+has not passed QA yet. See <a href="../../overview/product-status/">Product status</a>.</p>
 </div>
 <h2 id="what-is-stored-there">What is stored there<a class="headerlink" href="#what-is-stored-there" title="Permanent link">&para;</a></h2>
 <p>Only media. Today that means the project and team logos served by
@@ -2308,7 +2429,7 @@ media fields added later use the same store.</p>
 </tr>
 <tr>
 <td><code>&lt;kind&gt;</code></td>
-<td><code>projects</code> or <code>teams</code></td>
+<td><code>project</code> or <code>team</code> (singular, lower case)</td>
 </tr>
 <tr>
 <td><code>&lt;entity-id&gt;</code></td>
@@ -2320,15 +2441,15 @@ media fields added later use the same store.</p>
 </tr>
 </tbody>
 </table>
-<p>Uploading the same image twice writes the same key, so writes are
+<p>For example, with <code>SB_OBJECTSTORE_PREFIX=secrets-bridge</code> a project logo
+lives at <code>secrets-bridge/logos/project/&lt;project-id&gt;/&lt;sha256&gt;.png</code>. Without
+a prefix the key starts at <code>logos/</code>. The api trims slashes at either end
+of the prefix.</p>
+<p>Uploading the same image twice maps to the same key, so writes are
 idempotent. When a logo is replaced, the api deletes the old object after
-the database row points at the new one.</p>
-<div class="admonition note">
-<p class="admonition-title">Check the release notes</p>
-<p>The exact <code>&lt;kind&gt;</code> strings are set by the api implementation. Confirm
-them in the release notes before writing lifecycle rules or IAM
-conditions that match on them.</p>
-</div>
+the database row points at the new one. The row stores the full key, so
+changing <code>SB_OBJECTSTORE_PREFIX</code> later does not move existing logos: they
+stay at their old keys.</p>
 <h3 id="how-a-logo-moves-through-the-system">How a logo moves through the system<a class="headerlink" href="#how-a-logo-moves-through-the-system" title="Permanent link">&para;</a></h3>
 <p>The bucket stays private. The console never talks to it. Every read and
 write goes through the api, so the existing authorization rules apply:
@@ -2350,9 +2471,19 @@ the global <code>team.edit</code> permission.</p>
     API-&gt;&gt;PG: Read metadata row
     API-&gt;&gt;OS: GetObject
     API--&gt;&gt;UI: image/png with ETag</code></pre>
-<p>If the object write fails, the database row is not changed. If the row
-write fails, the api removes the object it just wrote. If a row points at
-an object that is missing, the api returns <code>404</code> and logs the error.</p>
+<p>If the object write fails, the database row is not changed and the api
+returns <code>503 logo storage is unavailable</code>. If the row write fails, the api
+removes the object it just wrote, unless the current row already uses that
+same key, and returns <code>500 internal error</code>. If deleting the old object
+fails, the object is left behind and the api logs a warning; no row points
+at it.</p>
+<p>On reads, the api answers <code>If-None-Match</code> from the row without reading the
+object. A row that still holds its image in the <code>png</code> column (before the
+backfill, or written by an old replica during a rollout) is served from
+those bytes with the same headers and <code>ETag</code>. If a row points at an object
+that is missing, the api returns <code>404</code> and logs an error that names the
+key; the key is not in the response body.</p>
+<p>The api never sets an ACL on an object and does not issue presigned URLs.</p>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <p>The api reads these environment variables. The full list is in the
 <a href="../config/#api">Configuration reference</a>.</p>
@@ -2365,32 +2496,44 @@ an object that is missing, the api returns <code>404</code> and logs the error.<
 </thead>
 <tbody>
 <tr>
+<td>Env var</td>
+<td>Default</td>
+</tr>
+<tr>
+<td>---</td>
+<td>---</td>
+</tr>
+<tr>
 <td><code>SB_OBJECTSTORE_BUCKET</code></td>
-<td>Bucket name</td>
+<td>unset</td>
 </tr>
 <tr>
 <td><code>SB_OBJECTSTORE_REGION</code></td>
-<td>Bucket region, for example <code>us-east-1</code></td>
+<td>unset</td>
 </tr>
 <tr>
 <td><code>SB_OBJECTSTORE_ENDPOINT</code></td>
-<td>Optional. Endpoint override for S3-compatible servers, for example <code>https://s3.example.com</code>. Leave unset for AWS S3.</td>
-</tr>
-<tr>
-<td><code>SB_OBJECTSTORE_PREFIX</code></td>
-<td>Key prefix inside the bucket, for example <code>secrets-bridge</code></td>
-</tr>
-<tr>
-<td><code>SB_OBJECTSTORE_SSE</code></td>
-<td><code>AES256</code> (SSE-S3) or <code>aws:kms</code> (SSE-KMS)</td>
-</tr>
-<tr>
-<td><code>SB_OBJECTSTORE_KMS_KEY_ID</code></td>
-<td>KMS key id, ARN or alias. Used with <code>SB_OBJECTSTORE_SSE=aws:kms</code>.</td>
+<td>unset</td>
 </tr>
 <tr>
 <td><code>SB_OBJECTSTORE_FORCE_PATH_STYLE</code></td>
-<td><code>true</code> for servers that need path-style addressing, such as most MinIO setups</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>SB_OBJECTSTORE_PREFIX</code></td>
+<td>unset</td>
+</tr>
+<tr>
+<td><code>SB_OBJECTSTORE_SSE</code></td>
+<td>unset</td>
+</tr>
+<tr>
+<td><code>SB_OBJECTSTORE_KMS_KEY_ID</code></td>
+<td>unset</td>
+</tr>
+<tr>
+<td><code>SB_OBJECTSTORE_LOGO_BACKFILL</code></td>
+<td><code>true</code></td>
 </tr>
 </tbody>
 </table>
@@ -2398,13 +2541,36 @@ an object that is missing, the api returns <code>404</code> and logs the error.<
 or <code>AWS_ACCESS_KEY_ID</code> / <code>AWS_SECRET_ACCESS_KEY</code> in the environment. This
 is the same chain the <code>aws-kms</code> backend uses. There are no
 <code>SB_OBJECTSTORE_*</code> variables for credentials.</p>
-<p>The api fails at boot with an error when the object-storage settings are
-present but invalid.</p>
-<div class="admonition note">
-<p class="admonition-title">Check the release notes</p>
-<p>What the api does when object storage is not configured at all (refuse
-to boot, or run with logo uploads turned off) is not settled yet.</p>
-</div>
+<h3 id="boot-behaviour">Boot behaviour<a class="headerlink" href="#boot-behaviour" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>What the api does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Not configured (no <code>SB_OBJECTSTORE_*</code> set)</td>
+<td>Boots normally. <code>PUT</code> and <code>DELETE</code> on a logo return <code>503 logo storage is not configured</code>. Logos still stored in Postgres keep being served. The api never falls back to writing media to Postgres. If inline logos exist, the boot logs a warning with their count.</td>
+</tr>
+<tr>
+<td>Misconfigured</td>
+<td>Refuses to boot with an error. This covers any <code>SB_OBJECTSTORE_*</code> setting without a bucket, a bucket without a region, an unknown SSE value, <code>aws:kms</code> without a key id, a key id with another SSE mode, a malformed endpoint or prefix, and a <code>SB_OBJECTSTORE_FORCE_PATH_STYLE</code> that is not <code>true</code> or <code>false</code>.</td>
+</tr>
+<tr>
+<td>Configured, bucket unreachable</td>
+<td>Refuses to boot. The api calls <code>HeadBucket</code> at start and gives up after 15 seconds. A denied <code>HeadBucket</code> (see the <a href="#least-privilege-iam-policy">IAM policy</a>) fails the same way.</td>
+</tr>
+<tr>
+<td>Configured and reachable</td>
+<td>Logs <code>object storage ready</code>, writes and reads logos in the bucket, and starts the backfill unless <code>SB_OBJECTSTORE_LOGO_BACKFILL=false</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>When the bucket is reachable at boot but fails later, logo requests that
+need it return <code>503 logo storage is unavailable</code>. The rest of the api
+keeps working.</p>
 <h3 id="helm-chart-values">Helm chart values<a class="headerlink" href="#helm-chart-values" title="Permanent link">&para;</a></h3>
 <p>The <code>secrets-bridge</code> chart maps <code>objectStore.*</code> values to the
 <code>SB_OBJECTSTORE_*</code> variables on the api:</p>
@@ -2412,58 +2578,103 @@ to boot, or run with logo uploads turned off) is not settled yet.</p>
 <thead>
 <tr>
 <th>Value</th>
-<th>Env var</th>
+<th>Default</th>
+<th>Env var on the api</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>objectStore.enabled</code></td>
-<td>Turns the settings below on</td>
+<td><code>false</code></td>
+<td>Turns the settings below on. Off renders no <code>SB_OBJECTSTORE_*</code> at all.</td>
 </tr>
 <tr>
 <td><code>objectStore.bucket</code></td>
-<td><code>SB_OBJECTSTORE_BUCKET</code></td>
+<td><code>""</code></td>
+<td><code>SB_OBJECTSTORE_BUCKET</code> (required when enabled)</td>
 </tr>
 <tr>
 <td><code>objectStore.region</code></td>
-<td><code>SB_OBJECTSTORE_REGION</code></td>
+<td><code>""</code></td>
+<td><code>SB_OBJECTSTORE_REGION</code> (required when enabled)</td>
 </tr>
 <tr>
 <td><code>objectStore.endpoint</code></td>
+<td><code>""</code></td>
 <td><code>SB_OBJECTSTORE_ENDPOINT</code></td>
 </tr>
 <tr>
 <td><code>objectStore.prefix</code></td>
+<td><code>""</code></td>
 <td><code>SB_OBJECTSTORE_PREFIX</code></td>
 </tr>
 <tr>
 <td><code>objectStore.sse</code></td>
-<td><code>SB_OBJECTSTORE_SSE</code></td>
+<td><code>AES256</code></td>
+<td><code>SB_OBJECTSTORE_SSE</code>. <code>""</code> renders no variable, so no SSE header is sent.</td>
 </tr>
 <tr>
 <td><code>objectStore.kmsKeyId</code></td>
-<td><code>SB_OBJECTSTORE_KMS_KEY_ID</code></td>
+<td><code>""</code></td>
+<td><code>SB_OBJECTSTORE_KMS_KEY_ID</code> (only with <code>sse: aws:kms</code>)</td>
 </tr>
 <tr>
 <td><code>objectStore.forcePathStyle</code></td>
-<td><code>SB_OBJECTSTORE_FORCE_PATH_STYLE</code></td>
+<td><code>false</code></td>
+<td><code>SB_OBJECTSTORE_FORCE_PATH_STYLE</code>, always rendered as <code>"true"</code> or <code>"false"</code></td>
+</tr>
+<tr>
+<td><code>objectStore.logoBackfill</code></td>
+<td><code>true</code></td>
+<td><code>SB_OBJECTSTORE_LOGO_BACKFILL</code>, always rendered as <code>"true"</code> or <code>"false"</code></td>
+</tr>
+<tr>
+<td><code>objectStore.credentials.existingSecret</code></td>
+<td><code>""</code></td>
+<td>Name of a Secret with static keys. When set, the api gets <code>AWS_ACCESS_KEY_ID</code> and <code>AWS_SECRET_ACCESS_KEY</code> through <code>secretKeyRef</code>.</td>
+</tr>
+<tr>
+<td><code>objectStore.credentials.accessKeyIdKey</code></td>
+<td><code>AWS_ACCESS_KEY_ID</code></td>
+<td>Key in that Secret for the access key id</td>
+</tr>
+<tr>
+<td><code>objectStore.credentials.secretAccessKeyKey</code></td>
+<td><code>AWS_SECRET_ACCESS_KEY</code></td>
+<td>Key in that Secret for the secret access key</td>
+</tr>
+<tr>
+<td><code>api.networkPolicy.egress.objectStore.enabled</code></td>
+<td><code>true</code></td>
+<td>Adds a TCP egress rule to the object store when <code>objectStore.enabled</code></td>
+</tr>
+<tr>
+<td><code>api.networkPolicy.egress.objectStore.to</code></td>
+<td><code>[]</code></td>
+<td>NetworkPolicy peers that narrow the rule. Empty allows the port to any destination.</td>
 </tr>
 </tbody>
 </table>
-<p>The chart does not take credentials in values. Use IRSA through
-<code>api.serviceAccount.annotations</code>, or point the chart at an existing
-Secret that holds <code>AWS_ACCESS_KEY_ID</code> and <code>AWS_SECRET_ACCESS_KEY</code>.</p>
-<p>The chart's render-time guards refuse an empty <code>bucket</code> when object
-storage is required, and refuse a plain <code>http://</code> endpoint with
-<code>env=production</code>. If NetworkPolicies are on, the api needs egress to the
-S3 endpoint on port 443.</p>
-<div class="admonition note">
-<p class="admonition-title">Check the release notes</p>
-<p>The value that names the existing credentials Secret, and the exact
-NetworkPolicy settings for S3 egress, are being finalized in
-<a href="https://github.com/secrets-bridge/charts/issues/39">charts#39</a>. Use the
-chart README for the released names.</p>
-</div>
+<p>The chart's default for <code>sse</code> is <code>AES256</code>, while the api on its own sends
+no SSE header when <code>SB_OBJECTSTORE_SSE</code> is unset. Only the api gets these
+variables; the worker does not read media.</p>
+<p>The chart does not take credentials in values. On AWS, use IRSA through
+<code>api.serviceAccount.annotations</code>. For an S3-compatible server, use
+<code>objectStore.credentials.existingSecret</code>. Static keys cannot be combined
+with <code>kms.backend=aws-kms</code>, because the SDK prefers them over IRSA and the
+KMS client would sign with them.</p>
+<p>The chart refuses to render when object storage is enabled and <code>bucket</code>
+or <code>region</code> is empty, <code>sse</code> is not <code>AES256</code>, <code>aws:kms</code> or empty,
+<code>sse: aws:kms</code> has no <code>kmsKeyId</code>, <code>kmsKeyId</code> is set with another <code>sse</code>,
+the endpoint is not <code>http(s)://host[:port]</code>, the endpoint is plain
+<code>http://</code> with <code>env=production</code>, the prefix has an empty, <code>.</code> or <code>..</code>
+segment, <code>logoBackfill</code> is not <code>true</code> or <code>false</code>, or static keys are
+combined with <code>kms.backend=aws-kms</code>.</p>
+<p>The egress port comes from <code>objectStore.endpoint</code>: its explicit port, else
+443 for <code>https</code> and 80 for <code>http</code>, and 443 when no endpoint is set (AWS
+S3). To manage the rule yourself, set
+<code>api.networkPolicy.egress.objectStore.enabled: false</code> and add it to
+<code>api.networkPolicy.egress.extraRules</code>.</p>
 <h2 id="aws-s3-with-irsa">AWS S3 with IRSA<a class="headerlink" href="#aws-s3-with-irsa" title="Permanent link">&para;</a></h2>
 <ol>
 <li>Create a bucket, for example <code>example-bucket</code>, in the same region as
@@ -2507,11 +2718,23 @@ values.</p>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nt">bucket</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">example-bucket</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="nt">region</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">us-east-1</span>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">secrets-bridge</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="nt">sse</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AES256</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="nt">sse</span><span class="p">:</span><span class="w"> </span><span class="s">""</span><span class="w">                  </span><span class="c1"># no SSE header; see the notes below</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="nt">credentials</span><span class="p">:</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="nt">existingSecret</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">secrets-bridge-objectstore</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="nt">api</span><span class="p">:</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="nt">networkPolicy</span><span class="p">:</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="nt">egress</span><span class="p">:</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">      </span><span class="nt">objectStore</span><span class="p">:</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">        </span><span class="nt">to</span><span class="p">:</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">namespaceSelector</span><span class="p">:</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">              </span><span class="nt">matchLabels</span><span class="p">:</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">                </span><span class="nt">kubernetes.io/metadata.name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">minio</span>
 </span></code></pre></div>
-<p>Then reference the Secret with the chart's existing-Secret value (see the
-note under <a href="#helm-chart-values">Helm chart values</a>). Deliver the Secret
-with External Secrets, sealed-secrets or a similar tool.</p>
+<p>The keys in the Secret above match the default
+<code>credentials.accessKeyIdKey</code> and <code>credentials.secretAccessKeyKey</code>, so
+those don't need to be set. Deliver the Secret with External Secrets,
+sealed-secrets or a similar tool. The <code>to</code> block is only needed when
+MinIO runs in the cluster and you want to narrow the egress rule.</p>
 <p>Notes for MinIO:</p>
 <ul>
 <li>Create a MinIO user with a policy limited to the bucket and prefix, in
@@ -2520,16 +2743,18 @@ with External Secrets, sealed-secrets or a similar tool.</p>
   <code>env=production</code>.</li>
 <li><code>region</code> must match the region the server is configured with. MinIO
   uses <code>us-east-1</code> unless you set another one.</li>
-<li><code>AES256</code> needs server-side encryption configured on the MinIO server
-  (for example with MinIO KES). Without it, uploads that request SSE fail.</li>
+<li><code>sse: AES256</code> needs server-side encryption configured on the MinIO
+  server (for example with MinIO KES). Without it, uploads that request
+  SSE fail, so use <code>sse: ""</code> and let the server's own settings apply.</li>
 </ul>
 <p>For local development, the api repository's <code>docker-compose.yml</code> runs a
 MinIO service and creates the bucket. See
 <a href="../docker-compose/">Running locally with docker compose</a>.</p>
 <h2 id="least-privilege-iam-policy">Least-privilege IAM policy<a class="headerlink" href="#least-privilege-iam-policy" title="Permanent link">&para;</a></h2>
-<p>Grant object access only under the prefix, and limit <code>s3:ListBucket</code> to
-the same prefix. Replace <code>example-bucket</code> and <code>secrets-bridge</code> with your
-bucket and <code>SB_OBJECTSTORE_PREFIX</code>.</p>
+<p>Grant object access only under the prefix, and <code>s3:ListBucket</code> on the
+bucket itself. Replace <code>example-bucket</code> and <code>secrets-bridge</code> with your
+bucket and <code>SB_OBJECTSTORE_PREFIX</code>. Without a prefix, use
+<code>arn:aws:s3:::example-bucket/logos/*</code> for the object statement.</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
@@ -2544,23 +2769,26 @@ bucket and <code>SB_OBJECTSTORE_PREFIX</code>.</p>
 </span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">      </span><span class="nt">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arn:aws:s3:::example-bucket/secrets-bridge/*"</span>
 </span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">    </span><span class="p">},</span>
 </span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="p">{</span>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">      </span><span class="nt">"Sid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ListPrefixOnly"</span><span class="p">,</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">      </span><span class="nt">"Sid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BucketCheck"</span><span class="p">,</span>
 </span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">      </span><span class="nt">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span>
 </span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">      </span><span class="nt">"Action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"s3:ListBucket"</span><span class="p">,</span>
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">      </span><span class="nt">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arn:aws:s3:::example-bucket"</span><span class="p">,</span>
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">      </span><span class="nt">"Condition"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">        </span><span class="nt">"StringLike"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">          </span><span class="nt">"s3:prefix"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="w">            </span><span class="s2">"secrets-bridge/*"</span>
-</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="w">          </span><span class="p">]</span>
-</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="w">        </span><span class="p">}</span>
-</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="w">      </span><span class="p">}</span>
-</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="w">  </span><span class="p">]</span>
-</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="p">}</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">      </span><span class="nt">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arn:aws:s3:::example-bucket"</span>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">  </span><span class="p">]</span>
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>s3:ListBucket</code> lets <code>HeadObject</code> return <code>404</code> instead of <code>403</code> for a
-missing key, so the api can tell a missing logo from a permission error.</p>
+<p><code>s3:ListBucket</code> is needed for two things:</p>
+<ul>
+<li><strong>The boot check.</strong> The api calls <code>HeadBucket</code> at start, and S3
+  authorizes <code>HeadBucket</code> with <code>s3:ListBucket</code> on the bucket. A
+  <code>HeadBucket</code> request carries no prefix, so do not add an <code>s3:prefix</code>
+  condition to this statement: with the condition, <code>HeadBucket</code> is denied
+  and the api refuses to boot.</li>
+<li><strong>Missing keys.</strong> With <code>s3:ListBucket</code>, <code>HeadObject</code> and <code>GetObject</code>
+  return <code>404</code> instead of <code>403</code> for a key that doesn't exist, so the api
+  can tell a missing logo from a permission error.</li>
+</ul>
+<p>The api itself never lists objects.</p>
 <p>The policy does not grant <code>s3:PutObjectAcl</code>, bucket policy changes or
 any access outside the prefix. The api does not need them.</p>
 <h2 id="encryption-at-rest">Encryption at rest<a class="headerlink" href="#encryption-at-rest" title="Permanent link">&para;</a></h2>
@@ -2663,41 +2891,91 @@ back the metadata rows, which point at object keys, but not the images.</p>
 </ul>
 <h2 id="upgrading-moving-existing-logos">Upgrading: moving existing logos<a class="headerlink" href="#upgrading-moving-existing-logos" title="Permanent link">&para;</a></h2>
 <p>Before object storage, logos were stored as <code>BYTEA</code> in the <code>png</code> column of
-<code>project_logos</code> and <code>team_logos</code>. The move to object storage is done in
-two steps, so existing logos keep working during the rollout.</p>
+<code>project_logos</code> and <code>team_logos</code>.</p>
+<h3 id="migration-0040">Migration 0040<a class="headerlink" href="#migration-0040" title="Permanent link">&para;</a></h3>
+<p>Migration <code>0040</code> changes both tables:</p>
+<ul>
+<li>adds <code>object_key</code>, nullable, set by every new upload and by the backfill;</li>
+<li>adds <code>byte_length</code>, nullable, the stored PNG's size, so the delete audit
+  can report it without reading the object;</li>
+<li>makes <code>png</code> nullable. New uploads write <code>png = NULL</code>;</li>
+<li>adds a CHECK that every row has <code>png</code> or <code>object_key</code>.</li>
+</ul>
+<p>The <code>png</code> column stays for now. A later migration drops it (and the CHECK
+that references it) once deployments have run the backfill.</p>
+<h3 id="the-backfill">The backfill<a class="headerlink" href="#the-backfill" title="Permanent link">&para;</a></h3>
+<p>The backfill runs inside the api, at start, in the background. Boot does
+not wait for it, because logos still in <code>png</code> are served until they move.</p>
+<ul>
+<li>It runs on one replica at a time, under the Redis lock
+  <code>objectstore:logo-backfill</code>, which it renews while it runs. A replica
+  that finds the lock held skips the backfill.</li>
+<li>It pages through rows that still have <code>png</code>, checks that the bytes match
+  the recorded sha256, writes the object, and then clears <code>png</code> and sets
+  <code>object_key</code> and <code>byte_length</code> in one locked, conditional update. The
+  update only applies if the row still holds the same image inline.</li>
+<li>A row whose bytes don't match its sha256 is left inline and logged,
+  because moving it would change its <code>ETag</code>.</li>
+<li>It is idempotent. A second run finds nothing to move, and
+  content-addressed keys make a repeated write harmless.</li>
+<li>It also moves rows that old replicas write during a rolling upgrade, the
+  next time it runs.</li>
+<li>It writes no audit events, since the logo did not change.</li>
+<li>If it stops early (an error or its 30-minute limit), it logs
+  <code>logo backfill stopped early; will resume at next start</code> and continues
+  on the next api start.</li>
+</ul>
+<p>Set <code>SB_OBJECTSTORE_LOGO_BACKFILL=false</code> (chart value
+<code>objectStore.logoBackfill: false</code>) to switch it off. The api then logs
+<code>logo backfill switched off</code>.</p>
+<h3 id="rollout">Rollout<a class="headerlink" href="#rollout" title="Permanent link">&para;</a></h3>
 <pre class="mermaid"><code>flowchart LR
-    A["1. Create bucket, IAM and KMS access"] --&gt; B["2. Upgrade api and chart with objectStore set"]
-    B --&gt; C["3. Backfill copies png bytes to the bucket"]
-    C --&gt; D["4. Verify every row has an object key"]
+    A["1. Create bucket, IAM and KMS access"] --&gt; B["2. Deploy with logoBackfill false"]
+    B --&gt; C["3. All replicas new: logoBackfill true, restart"]
+    C --&gt; D["4. Verify no png rows are left"]
     D --&gt; E["5. Later release drops the png column"]</code></pre>
 <ol>
 <li><strong>Prepare storage.</strong> Create the bucket, the IAM policy and, for
    SSE-KMS, the key policy statement, as described above.</li>
-<li><strong>Deploy.</strong> Upgrade the chart and api together with <code>objectStore.*</code>
-   set. Migration <code>0040</code> adds an <code>object_key</code> column to both tables. The
-   <code>png</code> column stays, so logos that have not been copied yet still load.</li>
-<li><strong>Backfill.</strong> A one-time backfill copies the existing <code>png</code> bytes to
-   the bucket and fills <code>object_key</code>.</li>
-<li><strong>Verify.</strong> Check that no row is left without an <code>object_key</code> and
-   that logos load in the console.</li>
-<li><strong>Drop the old column.</strong> A later migration removes the <code>png</code> column.
-   Take a database backup before you upgrade to that release, because the
-   old bytes are gone after it runs.</li>
+<li><strong>Deploy with the backfill off.</strong> Upgrade the chart and api together
+   with <code>objectStore.*</code> set and <code>objectStore.logoBackfill: false</code>
+   (<code>SB_OBJECTSTORE_LOGO_BACKFILL=false</code>). Migration <code>0040</code> runs. Old
+   replicas keep reading and writing <code>png</code>. New replicas write new logos
+   to the bucket and serve both kinds. Until the rollout finishes, an old
+   replica serves an empty image for a logo uploaded through a new
+   replica.</li>
+<li><strong>Turn the backfill on.</strong> Once every replica runs the new version, set
+   <code>objectStore.logoBackfill: true</code> (the default) and restart the api. A
+   chart upgrade that changes the value restarts the pods. The backfill
+   moves every inline row, including any that old replicas wrote during
+   step 2.</li>
+<li>
+<p><strong>Verify.</strong> Look for the <code>logo backfill done</code> log line, which reports
+   <code>moved</code>, <code>skipped</code> and <code>failed</code> counts, or check that both queries
+   return 0:</p>
+<div class="language-sql highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">project_logos</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">png</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">team_logos</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">png</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span>
+</span></code></pre></div>
+<p>A non-zero count after the backfill means rows were skipped (digest
+mismatch) or failed; the api logs each one. When there is nothing left
+to move, the api logs nothing at the default level.
+5. <strong>Drop the old column.</strong> A later migration removes the <code>png</code> column.
+   Run the queries above before you upgrade to that release, and take a
+   database backup first, because the old bytes are gone after it runs.</p>
+</li>
 </ol>
-<div class="admonition note">
-<p class="admonition-title">Check the release notes</p>
-<p>These details are still being decided in
-<a href="https://github.com/secrets-bridge/api/issues/253">api#253</a>:</p>
+<p>With a single api replica, or when the short window in step 2 doesn't
+matter, deploy with the default (<code>logoBackfill: true</code>) and skip step 2.</p>
+<h3 id="rolling-back">Rolling back<a class="headerlink" href="#rolling-back" title="Permanent link">&para;</a></h3>
 <ul>
-<li>how the backfill runs (automatically at boot, through the worker, or
-  as a separate command), and how to see that it has finished;</li>
-<li>whether new uploads during the rollout also write the <code>png</code> column;</li>
-<li>which release drops the <code>png</code> column, and the query to confirm the
-  backfill is complete before that upgrade;</li>
-<li>whether rolling back to an api version from before step 2 is safe
-  once logos have been uploaded to object storage.</li>
+<li>Rolling the api image back to a version from before object storage
+  leaves the database at migration <code>0040</code>. Rows that were moved, or
+  uploaded through a new replica, have <code>png = NULL</code>, and the old version
+  serves an empty image for them.</li>
+<li>The <code>0040</code> down migration deletes the rows that live only in object
+  storage, because their bytes cannot be restored into Postgres. Those
+  logos have to be uploaded again. The objects stay in the bucket.</li>
 </ul>
-</div>
 
 
 

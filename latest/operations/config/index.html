@@ -2227,13 +2227,13 @@
 </tr>
 <tr>
 <td><code>SB_OBJECTSTORE_BUCKET</code></td>
-<td>see note</td>
+<td>no</td>
 <td></td>
-<td>Bucket for media (logos). See <a href="../object-storage/">Object storage</a></td>
+<td>Bucket for media (logos). Unset, with no other <code>SB_OBJECTSTORE_*</code> set, turns object storage off. See <a href="../object-storage/">Object storage</a></td>
 </tr>
 <tr>
 <td><code>SB_OBJECTSTORE_REGION</code></td>
-<td>see note</td>
+<td>yes with a bucket</td>
 <td></td>
 <td>Bucket region</td>
 </tr>
@@ -2241,41 +2241,49 @@
 <td><code>SB_OBJECTSTORE_ENDPOINT</code></td>
 <td>no</td>
 <td></td>
-<td>Endpoint override for S3-compatible servers such as MinIO (<code>https://s3.example.com</code>). Unset for AWS S3.</td>
+<td><code>http://</code> or <code>https://</code> endpoint override for S3-compatible servers such as MinIO, or a VPC endpoint (<code>https://s3.example.com</code>). Unset for AWS S3.</td>
+</tr>
+<tr>
+<td><code>SB_OBJECTSTORE_FORCE_PATH_STYLE</code></td>
+<td>no</td>
+<td><code>false</code></td>
+<td><code>true</code> or <code>false</code>. <code>true</code> for path-style addressing (MinIO)</td>
 </tr>
 <tr>
 <td><code>SB_OBJECTSTORE_PREFIX</code></td>
 <td>no</td>
 <td></td>
-<td>Key prefix inside the bucket</td>
+<td>Key prefix inside the bucket. Slashes at either end are trimmed</td>
 </tr>
 <tr>
 <td><code>SB_OBJECTSTORE_SSE</code></td>
 <td>no</td>
 <td></td>
-<td><code>AES256</code> (SSE-S3) or <code>aws:kms</code> (SSE-KMS)</td>
+<td>Unset or empty sends no SSE header. Otherwise exactly <code>AES256</code> (SSE-S3) or <code>aws:kms</code> (SSE-KMS)</td>
 </tr>
 <tr>
 <td><code>SB_OBJECTSTORE_KMS_KEY_ID</code></td>
 <td>yes for <code>aws:kms</code></td>
 <td></td>
-<td>KMS key id, ARN or alias</td>
+<td>KMS key id, ARN or alias. Refused with any other SSE mode</td>
 </tr>
 <tr>
-<td><code>SB_OBJECTSTORE_FORCE_PATH_STYLE</code></td>
+<td><code>SB_OBJECTSTORE_LOGO_BACKFILL</code></td>
 <td>no</td>
-<td></td>
-<td><code>true</code> for path-style addressing (most MinIO setups)</td>
+<td><code>true</code></td>
+<td>Move logos still stored in Postgres to the bucket at start. <code>false</code> for the first step of a rolling upgrade</td>
 </tr>
 </tbody>
 </table>
 <div class="admonition note">
-<p class="admonition-title">Object storage is in progress</p>
-<p>The <code>SB_OBJECTSTORE_*</code> settings ship with
-<a href="https://github.com/secrets-bridge/api/issues/253">api#253</a>. Whether
-they are required, and their defaults, are not settled yet. Check the
-release notes. Credentials come from the standard AWS SDK chain, as for
-<code>aws-kms</code>; there are no object-storage credential variables.</p>
+<p class="admonition-title">Object storage behaviour</p>
+<p>Without object storage the api boots, but logo uploads and deletes
+return <code>503 logo storage is not configured</code>, and logos still stored in
+Postgres are served. With any setting invalid, or a bucket that fails
+<code>HeadBucket</code> within 15 seconds, the api refuses to boot. Credentials
+come from the standard AWS SDK chain, as for <code>aws-kms</code>; there are no
+object-storage credential variables. Object storage has not passed QA
+yet. See <a href="../object-storage/">Object storage</a>.</p>
 </div>
 <p>The dev-only switches the api also reads are listed under
 <a href="#insecure-switches-dev-only">Insecure switches</a>.</p>
