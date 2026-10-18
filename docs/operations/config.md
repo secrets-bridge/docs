@@ -33,6 +33,20 @@ Every environment variable across `api` / `agent` / `worker` /
 | `SB_BOOTSTRAP_ADMIN_PASSWORD` | recommended on first boot |  | |
 | `SB_BOOTSTRAP_ADMIN_USER_ID` | optional |  | Opaque user_id for pre-OIDC role assignment |
 | `SB_GITOPS_ENABLED` | no | `false` | BRD §26 ArgoCD endpoints + observation fan-out |
+| `SB_OBJECTSTORE_BUCKET` | see note |  | Bucket for media (logos). See [Object storage](object-storage.md) |
+| `SB_OBJECTSTORE_REGION` | see note |  | Bucket region |
+| `SB_OBJECTSTORE_ENDPOINT` | no |  | Endpoint override for S3-compatible servers such as MinIO (`https://s3.example.com`). Unset for AWS S3. |
+| `SB_OBJECTSTORE_PREFIX` | no |  | Key prefix inside the bucket |
+| `SB_OBJECTSTORE_SSE` | no |  | `AES256` (SSE-S3) or `aws:kms` (SSE-KMS) |
+| `SB_OBJECTSTORE_KMS_KEY_ID` | yes for `aws:kms` |  | KMS key id, ARN or alias |
+| `SB_OBJECTSTORE_FORCE_PATH_STYLE` | no |  | `true` for path-style addressing (most MinIO setups) |
+
+!!! note "Object storage is in progress"
+    The `SB_OBJECTSTORE_*` settings ship with
+    [api#253](https://github.com/secrets-bridge/api/issues/253). Whether
+    they are required, and their defaults, are not settled yet. Check the
+    release notes. Credentials come from the standard AWS SDK chain, as for
+    `aws-kms`; there are no object-storage credential variables.
 
 The dev-only switches the api also reads are listed under
 [Insecure switches](#insecure-switches-dev-only).
