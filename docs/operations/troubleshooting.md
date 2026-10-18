@@ -45,10 +45,11 @@ Read the agent's log:
 docker logs secrets-bridge-agent-1 | grep -iE "job|error|fail" | tail
 ```
 
-The most common cause is **provider config missing**. For Vault:
-leave the Provider config field blank in the Submit drawer (the UI
-defaults to `kvMount=secret`). For AWS Secrets Manager: the
-`region` is required.
+The most common cause is **agent provider settings**. For Vault:
+the agent's `SB_VAULT_KV_MOUNT` (default `kv`) has to match the
+provider connection's `mount`, otherwise the job fails with a
+`kvMount` error. For AWS Secrets Manager: the agent needs
+`SB_AWS_REGION`.
 
 For a deeper trace, set the agent's log level to debug:
 
