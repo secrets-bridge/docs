@@ -107,7 +107,7 @@ The api reads these environment variables. The full list is in the
 |---|---|---|
 | `SB_OBJECTSTORE_BUCKET` | unset | Bucket name. Unset, with no other `SB_OBJECTSTORE_*` set, means object storage is off. |
 | `SB_OBJECTSTORE_REGION` | unset | Bucket region, for example `us-east-1`. Required when the bucket is set. |
-| `SB_OBJECTSTORE_ENDPOINT` | unset | Endpoint override for S3-compatible servers or a VPC endpoint, as an `http://` or `https://` URL, for example `https://s3.example.com`. Leave unset for AWS S3. |
+| `SB_OBJECTSTORE_ENDPOINT` | unset | Endpoint override for S3-compatible servers or a VPC endpoint, for example `https://s3.example.com`. Plain `http://` is accepted only with `SB_ENV=dev`. Leave unset for AWS S3. |
 | `SB_OBJECTSTORE_FORCE_PATH_STYLE` | `false` | `true` or `false`. `true` for servers that need path-style addressing, such as MinIO. |
 | `SB_OBJECTSTORE_PREFIX` | unset | Key prefix inside the bucket, for example `secrets-bridge`. Slashes at either end are trimmed. Empty, `.` or `..` segments are refused. |
 | `SB_OBJECTSTORE_SSE` | unset | Unset or empty sends no SSE header, so the bucket's default encryption applies. Otherwise exactly `AES256` (SSE-S3) or `aws:kms` (SSE-KMS). Case-sensitive. |
@@ -124,7 +124,7 @@ is the same chain the `aws-kms` backend uses. There are no
 | State | What the api does |
 |---|---|
 | Not configured (no `SB_OBJECTSTORE_*` set) | Boots normally. `PUT` and `DELETE` on a logo return `503 logo storage is not configured`. Logos still stored in Postgres keep being served. The api never falls back to writing media to Postgres. If inline logos exist, the boot logs a warning with their count. |
-| Misconfigured | Refuses to boot with an error. This covers any `SB_OBJECTSTORE_*` setting without a bucket, a bucket without a region, an unknown SSE value, `aws:kms` without a key id, a key id with another SSE mode, a malformed endpoint or prefix, and a `SB_OBJECTSTORE_FORCE_PATH_STYLE` that is not `true` or `false`. |
+| Misconfigured | Refuses to boot with an error. This covers any `SB_OBJECTSTORE_*` setting without a bucket, a bucket without a region, an unknown SSE value, `aws:kms` without a key id, a key id with another SSE mode, a malformed endpoint or prefix, a plain `http://` endpoint when `SB_ENV` is not `dev`, and a `SB_OBJECTSTORE_FORCE_PATH_STYLE` that is not `true` or `false`. |
 | Configured, bucket unreachable | Refuses to boot. The api calls `HeadBucket` at start and gives up after 15 seconds. A denied `HeadBucket` (see the [IAM policy](#least-privilege-iam-policy)) fails the same way. |
 | Configured and reachable | Logs `object storage ready`, writes and reads logos in the bucket, and starts the backfill unless `SB_OBJECTSTORE_LOGO_BACKFILL=false`. |
 
@@ -254,7 +254,8 @@ Notes for MinIO:
 - Create a MinIO user with a policy limited to the bucket and prefix, in
   the same shape as the IAM policy below. Do not use the root user.
 - Use `https://`. The chart refuses a plain `http://` endpoint with
-  `env=production`.
+  `env=production`, and the api refuses it at boot unless `SB_ENV=dev`,
+  including when the settings come from `secrets.existingSecret`.
 - `region` must match the region the server is configured with. MinIO
   uses `us-east-1` unless you set another one.
 - `sse: AES256` needs server-side encryption configured on the MinIO
