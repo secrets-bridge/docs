@@ -1,152 +1,131 @@
 ---
 title: Secrets Bridge
-# Quoted because the value contains a `:` (after "plane") which YAML
-# would otherwise interpret as a second mapping. An unquoted colon
-# silently kills the whole frontmatter (page.meta becomes empty, the
-# nav config wins page.title, and SEO tags fall back to site defaults.
-seo_title: "Secrets Bridge: Unified Secrets Control Plane"
-description: "Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap."
+# Quoted: the value contains a `:`, which YAML would otherwise read as a
+# second mapping and drop the whole frontmatter.
+seo_title: "Secrets Bridge: access control for the secrets you already keep"
+description: "Secrets Bridge adds access requests, approvals, audit and agent execution around the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider."
 hide:
   - navigation
   - toc
 ---
 
+<div class="sb-home" markdown>
 
-# Secrets Bridge
+<section class="sb-hero" aria-labelledby="sb-hero-title" markdown>
 
-<div class="sb-landing" markdown>
+<div class="sb-hero__copy" markdown>
 
-<div class="sb-hero" markdown>
+<h1 id="sb-hero-title" class="sb-display">Govern who uses your secrets.</h1>
 
-<span class="sb-hero__eyebrow">Unified secrets control plane</span>
-
-<div class="sb-hero__wordmark">SecretsBridge</div>
-
-<h2 class="sb-hero__tagline">The control plane for secrets governance.</h2>
-
-<p class="sb-hero__subhead">
-Keep secrets in Vault, AWS Secrets Manager, Azure Key Vault, GCP
-Secret Manager, or Kubernetes. Secrets Bridge governs who can
-request, approve, reveal, patch, and audit access, without storing
-plaintext secrets in the control plane.
+<p class="sb-lede">
+Secrets Bridge adds access requests, approvals, audit and agent execution
+around the secrets you already keep in AWS Secrets Manager and HashiCorp
+Vault. We keep requests, approvals and audit metadata. Your secret values
+stay in your provider.
 </p>
 
-<div class="sb-hero__ctas" markdown>
-[:material-rocket-launch: Try it locally](operations/docker-compose.md){ .md-button .md-button--primary }
-[:material-book-open-variant: Read the architecture](overview/architecture.md){ .md-button }
-[:material-github: Star on GitHub](https://github.com/secrets-bridge){ .md-button }
+<div class="sb-actions" markdown>
+[Run it locally](operations/docker-compose.md){ .md-button .md-button--primary }
+[Read the architecture](overview/architecture.md){ .md-button }
+<a class="sb-textlink" href="https://github.com/secrets-bridge">Source on GitHub</a>
 </div>
 
-</div>
-
-<h2 class="sb-section-heading">What is Secrets Bridge?</h2>
-
-Secrets Bridge is a **unified secrets control plane** for governing secrets
-across external providers **without storing secret values in the control
-plane**.
-
-It **does not replace** HashiCorp Vault, AWS Secrets Manager, Azure Key Vault,
-GCP Secret Manager, or Kubernetes External Secrets. It governs **access,
-workflows, approvals, audit, and agent execution** around them. The values stay
-in your provider.
-
-[:material-check-decagram: See what's live, QA-certified, and on the roadmap](overview/product-status.md){ .md-button .md-button--primary }
-
-<h2 class="sb-section-heading">Why Secrets Bridge</h2>
-
-<div class="grid cards sb-pillars" markdown>
-
--   :material-shield-key:{ .lg .middle .sb-pillar-icon } &nbsp;**Workflow-gated reads & writes**
-
-    ---
-
-    Developers request access through configurable workflows.
-    Approvers vote. Agents fetch (or write) values. **Every
-    value is single-shot, audited, and KMS-wrapped at rest.**
-
--   :material-archive-eye:{ .lg .middle .sb-pillar-icon } &nbsp;**SOC2-ready audit**
-
-    ---
-
-    The `audit_events` table is append-only at the schema
-    layer: `BEFORE UPDATE` / `BEFORE DELETE` triggers reject
-    mutations. Every action emits a correlation ID you can
-    drill into.
-
--   :material-cloud-key-outline:{ .lg .middle .sb-pillar-icon } &nbsp;**No KMS lock-in**
-
-    ---
-
-    Three backends ship today behind one `SB_KMS_BACKEND`
-    knob: `local` (dev), `vault-transit` (OSS production),
-    `aws-kms` (AWS production). Bring your own. No cloud lock-in.
-
--   :material-shield-lock-open:{ .lg .middle .sb-pillar-icon } &nbsp;**Plaintext never on the wire**
-
-    ---
-
-    TLS + per-direction wire-envelope encryption (X25519 for
-    CP→Agent, KMS-DEK + AES-GCM for Agent→CP). Even a
-    TLS-terminating proxy in your mesh sees only ciphertext.
+<p class="sb-note">Open source and pre-1.0. <a href="overview/product-status/">See what is live today</a> and what is still on the roadmap.</p>
 
 </div>
 
-<h2 class="sb-section-heading">Who this is for</h2>
-
-- **Regulated teams** (fintech, healthtech, defence-adjacent)
-  where "everyone has full Vault read access" is no longer an
-  answer your auditor will accept.
-- **Platform teams** standing up multi-cluster / multi-account
-  secrets governance from scratch.
-- **Compliance engineers** who need a real audit trail
-  (correlation IDs, immutable rows, value-free metadata) without
-  reaching for an SIEM bolt-on.
-
-<h2 class="sb-section-heading">How it's different</h2>
-
-| | Secrets Bridge | Direct Vault | AWS Secrets Manager + IAM | Most "secrets SaaS" |
-|---|---|---|---|---|
-| Multi-provider | ✅ Vault + AWS today; Azure + GCP on roadmap | Vault only | AWS only | Varies |
-| Workflow approval per read | ✅ Built-in | Plugin / RFC | ❌ | Some |
-| Single-shot reveal-once UX | ✅ Built-in | ❌ | ❌ | Some |
-| Append-only audit at schema | ✅ Postgres triggers | ❌ application-layer | CloudTrail (not append-only) | Varies |
-| Self-hostable | ✅ OSS, no SaaS dependency | ✅ | n/a | ❌ |
-| KMS choice | ✅ Vault Transit / AWS KMS / local | n/a | AWS KMS only | Provider-controlled |
-| Agent uses **only** outbound traffic | ✅ No inbound except health probes | n/a | n/a | Varies |
-
-<h2 class="sb-section-heading">On the roadmap (not live yet)</h2>
-
-Listed here because they are **not** shipped. See the
-[product status page](overview/product-status.md) for the exact
-Live / QA-certified / In-progress / Roadmap split.
-
-- **Azure Key Vault** and **GCP Secret Manager** providers. The agent's
-  resolvers ship Vault + AWS Secrets Manager today; the others are next.
-- **HashiCorp Vault advanced flows** and deeper **Kubernetes External Secrets**
-  integration.
-- **Flux** integration (read-only ArgoCD observation ships today).
-- **Per-tenant KMS scoping**: one CMK per deployment for now.
-- **Agent connection-scoped job claim** and a **richer agent fleet dashboard**.
-- **Native Slack / PagerDuty** notification sinks: webhook is in; native
-  sinks are next.
-
-<div class="sb-status" markdown>
-<p class="sb-status__title">🚧 Pre-v1.0</p>
-<p>
-The architectural foundation is solid (BRD-aligned, polyrepo,
-infra-free <code>core</code>, type-safe Go), but several P0
-items from the
-<a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">SECURITY_REVIEW</a>
-are still open: real OIDC, agent workload identity, rate
-limiting, key-rotation runbook. We're tracking them on the
-<a href="https://github.com/orgs/secrets-bridge/projects/1">org project board</a>.
-</p>
-<p>
-If you'd like to be a <strong>design partner</strong>,
-particularly if you're in financial services, healthcare, or
-government-adjacent, please open an issue at
-<a href="https://github.com/secrets-bridge/.github">secrets-bridge/.github</a>.
-</p>
+<aside class="sb-keep" aria-label="What Secrets Bridge keeps and never keeps">
+<div class="sb-keep__col">
+<h2 class="sb-keep__title sb-keep__title--ok">We keep</h2>
+<ul>
+<li>Requests, and who approved them</li>
+<li>The audit trail: who, what, when and why</li>
+<li>Which secret paths and key names a project may use</li>
+</ul>
 </div>
+<div class="sb-keep__col">
+<h2 class="sb-keep__title sb-keep__title--never">We never keep</h2>
+<ul>
+<li>Secret values in plain text. In transit a value exists only as an encrypted, single-use wrap with a short lifetime.</li>
+<li>Provider credentials. The agent uses its own, inside your infrastructure.</li>
+</ul>
+</div>
+<p class="sb-keep__foot">The agent runs inside your infrastructure and only calls out, so you open no inbound port.</p>
+</aside>
+
+</section>
+
+<section class="sb-section sb-section--flow" aria-labelledby="sb-flow-title" markdown>
+
+<h2 id="sb-flow-title" class="sb-section-title">Where your secrets go, and where they don't</h2>
+
+<p class="sb-lede sb-lede--small">Values stay in your provider until an approved request needs them. Then they travel once, sealed, and only to the person who asked. Pick a step to follow it.</p>
+
+--8<-- "includes/flow.html"
+
+</section>
+
+<section class="sb-section sb-split" aria-labelledby="sb-holds" markdown>
+
+<div markdown>
+<h2 id="sb-holds" class="sb-section-title">What it holds to</h2>
+<p class="sb-lede sb-lede--small">These are enforced in code, not left to policy. The <a href="overview/threat-model/">threat model</a> shows how each boundary is kept.</p>
+</div>
+
+<ul class="sb-rules">
+<li><strong>No plaintext values in the control plane.</strong> Not in Postgres, Redis, logs, audit events or the browser. In transit, values are KMS-wrapped.</li>
+<li><strong>The agent only calls out.</strong> No inbound port, no database, no Kubernetes API access to Secrets.</li>
+<li><strong>Production never allows direct reveal.</strong> The refusal is enforced in code and audited.</li>
+<li><strong>Values move once.</strong> KMS-wrapped, single-use, short-lived, and opened only by the right person.</li>
+<li><strong>Audit is append-only and metadata-only.</strong> Who, what, when and why, never the value.</li>
+<li><strong>Agents are bound and revocable.</strong> One-time enrollment tokens, one provider connection per agent, revoked at once.</li>
+</ul>
+
+</section>
+
+<section class="sb-section" aria-labelledby="sb-today" markdown>
+
+<h2 id="sb-today" class="sb-section-title">What works today</h2>
+
+<div class="sb-status">
+<div>
+<h3>Implemented</h3>
+<ul>
+<li>AWS Secrets Manager and HashiCorp Vault through the agent</li>
+<li>Read requests with policy-driven approval</li>
+<li>Direct reveal in non-production, behind a second factor</li>
+<li>Cross-team requests: another team supplies the values</li>
+<li>Agent enrollment, status and revoke</li>
+<li>Append-only audit trail</li>
+</ul>
+</div>
+<div>
+<h3>Roadmap</h3>
+<ul>
+<li>Azure Key Vault and GCP Secret Manager providers</li>
+<li>Deeper Kubernetes External Secrets integration</li>
+<li>Flux integration</li>
+<li>Agents that claim only their own connection's jobs</li>
+</ul>
+<p class="sb-muted">Not shipped. Don't plan around these yet.</p>
+</div>
+</div>
+
+<p><a href="overview/product-status/">Full product status</a>, with what is QA-certified and what is in progress.</p>
+
+</section>
+
+<section class="sb-section sb-end" aria-labelledby="sb-start" markdown>
+
+<h2 id="sb-start" class="sb-section-title">Start on your laptop</h2>
+
+<p class="sb-lede sb-lede--small">The api repo's compose file starts Postgres, Redis and the control plane; the console and the agent run from their own repos. The local guide walks through the whole flow against a dev Vault.</p>
+
+<div class="sb-actions" markdown>
+[Run it locally](operations/docker-compose.md){ .md-button }
+[Operations guide](operations/index.md){ .md-button }
+</div>
+
+</section>
 
 </div>

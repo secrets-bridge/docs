@@ -1,145 +1,745 @@
 /*
- * Landing-page styling for docs/index.md.
- *
- * Scoped to the home page only via the `.sb-landing` wrapper so other
- * pages get the default mkdocs-material chrome unchanged.
- *
- * Brand palette comes from the Figma file (page 02 Foundations).
- * Match these to ui/tailwind.config.js — when the SPA's tokens
- * change, this file changes too.
+ * Home page. Brand rules: plain and quiet, one ultramarine primary
+ * button, square corners, borders not shadows, IBM Plex. The display
+ * size is for this hero only. Colours come from brand.css (--sb-*).
  */
 
-:root {
-  --sb-bg: #0B1220;          /* Navy 900 */
-  --sb-surface: #0F172A;     /* Dark Navy */
-  --sb-text: #CBD5E1;        /* Slate 300 */
-  --sb-muted: #64748B;       /* Slate 500 */
-  --sb-accent: #06B6D4;      /* Cyan */
-  --sb-accent-bright: #22D3EE;
-  --sb-blue: #3B82F6;
-  --sb-border: #1E293B;
+/* The home page builds its own h1; hide Material's edit and view
+   buttons, which belong on documentation pages. */
+.md-content:has(.sb-home) .md-content__button {
+  display: none;
 }
 
-/* ---- Hero ---------------------------------------------------- */
+.sb-home {
+  max-width: 61rem; /* about 1220 px */
+  margin: 0 auto;
+}
+
+/* ---- Hero ----------------------------------------------------------- */
 
 .sb-hero {
-  padding: 3rem 0 2rem;
-  text-align: center;
+  padding: 2.4rem 0 1.6rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr);
+  gap: 2.8rem;
+  align-items: center;
 }
 
-.sb-hero__eyebrow {
-  display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--sb-accent);
-  padding: 0.35rem 0.8rem;
-  border: 1px solid rgba(6, 182, 212, 0.35);
-  border-radius: 999px;
-  background: rgba(6, 182, 212, 0.08);
+/* What we keep, and what we never keep: the brand voice's first rule,
+   stated next to the headline. */
+.md-typeset .sb-keep {
+  border: 1px solid var(--sb-border);
+  border-radius: 4px;
+  background: var(--sb-surface);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
 }
 
-.sb-hero__wordmark {
-  font-size: clamp(2.5rem, 6vw, 4.5rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
-  margin: 1.25rem 0 0.75rem;
+.md-typeset .sb-keep__col {
+  padding: 1rem 1.2rem 0.9rem;
 }
 
-.sb-hero__tagline {
-  font-size: clamp(1.4rem, 3vw, 2.1rem);
-  font-weight: 600;
-  background: linear-gradient(135deg, var(--sb-accent) 0%, var(--sb-blue) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin: 0 0 1rem;
+.md-typeset .sb-keep__col + .sb-keep__col {
+  border-top: 1px solid var(--sb-rule);
 }
 
-.sb-hero__subhead {
-  font-size: 1.05rem;
-  line-height: 1.55;
-  max-width: 720px;
-  margin: 0 auto 2rem;
-  color: var(--md-default-fg-color--light, var(--sb-muted));
-}
-
-.sb-hero__ctas {
+.md-typeset .sb-keep__title {
   display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-}
-
-.sb-hero__ctas .md-button {
-  font-weight: 600;
-}
-
-.sb-hero__ctas .md-button--primary {
-  background: linear-gradient(135deg, var(--sb-accent) 0%, var(--sb-blue) 100%);
-  border-color: transparent;
-  color: #0B1220;
-}
-
-.sb-hero__ctas .md-button--primary:hover {
-  filter: brightness(1.08);
-}
-
-/* ---- Pillar row (Material .grid.cards override) ------------- */
-
-.sb-pillars.grid.cards > ul,
-.sb-pillars.grid.cards {
-  margin: 2rem 0 3rem;
-}
-
-.sb-pillars.grid.cards > ul > li {
-  transition: border-color 0.15s ease, transform 0.15s ease;
-}
-
-.sb-pillars.grid.cards > ul > li:hover {
-  border-color: rgba(6, 182, 212, 0.5);
-  transform: translateY(-2px);
-}
-
-/* The icon shortcode picks up { .sb-pillar-icon } as a CSS class. */
-.sb-pillar-icon {
-  color: var(--sb-accent);
-}
-
-/* ---- Section dividers --------------------------------------- */
-
-.sb-section-heading {
-  text-align: center;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.45rem;
   font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  color: var(--sb-ink);
+}
+
+.md-typeset .sb-keep__title::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  box-sizing: border-box;
+}
+
+.md-typeset .sb-keep__title--ok::before {
+  background: var(--sb-ok);
+}
+
+.md-typeset .sb-keep__title--never::before {
+  border: 1.5px solid var(--sb-bad);
+}
+
+.md-typeset .sb-keep ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.md-typeset .sb-keep li {
+  margin: 0;
+  padding: 0.28rem 0;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--sb-ink);
+  border-top: 1px dashed var(--sb-rule);
+}
+
+.md-typeset .sb-keep li:first-child {
+  border-top: 0;
+}
+
+.md-typeset .sb-keep__foot {
+  margin: 0;
+  padding: 0.75rem 1.2rem;
+  border-top: 1px solid var(--sb-rule);
+  background: var(--sb-sunken);
+  font-size: 0.68rem;
+  line-height: 1.5;
   color: var(--sb-muted);
-  margin: 3rem 0 1.5rem;
 }
 
-/* ---- Status note -------------------------------------------- */
-
-.sb-status {
-  margin-top: 3.5rem;
-  padding: 1.25rem 1.5rem;
-  border-left: 4px solid rgba(234, 179, 8, 0.6);
-  background: rgba(234, 179, 8, 0.08);
-  border-radius: 6px;
-  font-size: 0.92rem;
+.md-typeset .sb-display {
+  font-size: 3.2rem; /* 64 px display */
+  line-height: 1.03;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+  margin: 0 0 1.2rem;
+  color: var(--sb-ink);
 }
 
-.sb-status__title {
-  font-weight: 700;
-  color: #f59e0b;
+.md-typeset .sb-lede {
+  font-size: 0.9rem; /* 18 px lede */
+  line-height: 1.61;
+  color: var(--sb-muted);
+  margin: 0 0 1.4rem;
+  max-width: 36rem;
+}
+
+.md-typeset .sb-lede--small {
+  font-size: 0.8rem;
+  line-height: 1.6875;
+}
+
+.sb-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.md-typeset .sb-actions .md-button {
+  margin: 0;
+}
+
+.md-typeset .sb-textlink {
+  font-weight: 500;
+  font-size: 0.75rem;
+  padding: 0 0.2rem;
+}
+
+.md-typeset .sb-note {
+  font-size: 0.7rem;
+  color: var(--sb-muted);
+  margin: 0;
+}
+
+/* ---- Follow a request (includes/flow.html) -------------------------
+   Inline SVG coloured from the brand tokens, so it follows the theme.
+   Radio inputs drive the step highlight with :has(); no script. */
+
+.sb-flow-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0 0 0.8rem;
+}
+
+.sb-flow-controls__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--sb-ink);
+  margin-right: 0.4rem;
+}
+
+.sb-flow-controls input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.sb-flow-controls label {
+  display: inline-flex;
+  align-items: center;
+  min-width: 1.8rem;
+  height: 1.6rem;
+  justify-content: center;
+  padding: 0 0.6rem;
+  border: 1px solid var(--sb-edge);
+  border-radius: 4px;
+  background: var(--sb-surface);
+  color: var(--sb-ink);
+  font-size: 0.7rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sb-flow-controls label:hover {
+  background: var(--sb-sunken);
+}
+
+.sb-flow-controls input:checked + label {
+  border-color: var(--sb-ink);
+  background: var(--sb-ink);
+  color: var(--sb-bg);
+}
+
+.sb-flow-controls input:focus-visible + label {
+  outline: 2px solid var(--sb-accent);
+  outline-offset: 2px;
+}
+
+.sb-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.sb-flow-figure {
+  border: 1px solid var(--sb-border);
+  border-radius: 4px;
+  background: var(--sb-bg);
+  padding: 0.8rem 0.9rem 0.4rem;
+}
+
+.sb-d {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--md-text-font-family);
+}
+
+.sb-d--narrow {
+  display: none;
+}
+
+.sb-d-zone {
+  fill: none;
+  stroke: var(--sb-border);
+  stroke-width: 1.25;
+}
+
+.sb-d-zone--cp {
+  fill: var(--sb-accent-soft);
+  stroke: var(--sb-accent);
+}
+
+.sb-d-zone--infra {
+  stroke: var(--sb-edge);
+  stroke-dasharray: 6 5;
+}
+
+.sb-d-label {
+  font-family: var(--md-code-font-family);
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  fill: var(--sb-muted);
+}
+
+.sb-d-box rect {
+  fill: var(--sb-surface);
+  stroke: var(--sb-edge);
+  stroke-width: 1.25;
+}
+
+.sb-d-box--cp rect {
+  stroke: var(--sb-accent-line);
+}
+
+.sb-d-title {
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--sb-ink);
+}
+
+.sb-d-sub {
+  font-size: 12.5px;
+  fill: var(--sb-muted);
+}
+
+.sb-d-note {
+  font-size: 12.5px;
+  fill: var(--sb-muted);
+}
+
+.sb-d-line {
+  fill: none;
+  stroke: var(--sb-ink);
+  stroke-width: 1.5;
+}
+
+.sb-d-line--return {
+  stroke-dasharray: 5 4;
+}
+
+.sb-d-head {
+  fill: var(--sb-ink);
+}
+
+.sb-d-badge circle {
+  fill: var(--sb-surface);
+  stroke: var(--sb-ink);
+  stroke-width: 1.25;
+}
+
+.sb-d-badge text {
+  font-size: 11.5px;
+  font-weight: 600;
+  fill: var(--sb-ink);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.sb-d *,
+.sb-flow-steps li {
+  transition: opacity 120ms ease, stroke 120ms ease, fill 120ms ease;
+}
+
+/* Step captions: a numbered list under the figure */
+.md-typeset ol.sb-flow-steps {
+  list-style: none;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem 1.4rem;
+}
+
+.md-typeset ol.sb-flow-steps > li {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1.4rem minmax(0, 1fr);
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  line-height: 1.55;
+  color: var(--sb-muted);
+}
+
+.md-typeset ol.sb-flow-steps strong {
+  color: var(--sb-ink);
+}
+
+.sb-flow-steps__n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  border: 1.25px solid var(--sb-ink);
+  border-radius: 50%;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--sb-ink);
+  margin-top: 0.05rem;
+}
+
+/* A step is picked: its connections, badges and boxes take the accent,
+   everything else steps back. */
+.sb-flow:has(#sb-flow-1:checked) :is(.sb-d-line, .sb-d-head, .sb-d-badge):not(.s1):not(.sb-d-legend *),
+.sb-flow:has(#sb-flow-1:checked) .sb-d-box:not(.b1),
+.sb-flow:has(#sb-flow-1:checked) .sb-flow-steps li:not(.c1) {
+  opacity: 0.22;
+}
+.sb-flow:has(#sb-flow-1:checked) .sb-d-line.s1 {
+  stroke: var(--sb-accent);
+  stroke-width: 2.5;
+}
+.sb-flow:has(#sb-flow-1:checked) :is(.sb-d-head.s1, .sb-d-badge.s1 circle) {
+  fill: var(--sb-accent);
+  stroke: var(--sb-accent);
+}
+.sb-flow:has(#sb-flow-1:checked) .sb-d-badge.s1 text {
+  fill: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-1:checked) .sb-d-box.b1 rect {
+  stroke: var(--sb-accent);
+  stroke-width: 2;
+}
+.sb-flow:has(#sb-flow-1:checked) .sb-flow-steps li.c1 .sb-flow-steps__n {
+  background: var(--sb-accent);
+  border-color: var(--sb-accent);
+  color: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-2:checked) :is(.sb-d-line, .sb-d-head, .sb-d-badge):not(.s2):not(.sb-d-legend *),
+.sb-flow:has(#sb-flow-2:checked) .sb-d-box:not(.b2),
+.sb-flow:has(#sb-flow-2:checked) .sb-flow-steps li:not(.c2) {
+  opacity: 0.22;
+}
+.sb-flow:has(#sb-flow-2:checked) .sb-d-line.s2 {
+  stroke: var(--sb-accent);
+  stroke-width: 2.5;
+}
+.sb-flow:has(#sb-flow-2:checked) :is(.sb-d-head.s2, .sb-d-badge.s2 circle) {
+  fill: var(--sb-accent);
+  stroke: var(--sb-accent);
+}
+.sb-flow:has(#sb-flow-2:checked) .sb-d-badge.s2 text {
+  fill: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-2:checked) .sb-d-box.b2 rect {
+  stroke: var(--sb-accent);
+  stroke-width: 2;
+}
+.sb-flow:has(#sb-flow-2:checked) .sb-flow-steps li.c2 .sb-flow-steps__n {
+  background: var(--sb-accent);
+  border-color: var(--sb-accent);
+  color: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-3:checked) :is(.sb-d-line, .sb-d-head, .sb-d-badge):not(.s3):not(.sb-d-legend *),
+.sb-flow:has(#sb-flow-3:checked) .sb-d-box:not(.b3),
+.sb-flow:has(#sb-flow-3:checked) .sb-flow-steps li:not(.c3) {
+  opacity: 0.22;
+}
+.sb-flow:has(#sb-flow-3:checked) .sb-d-line.s3 {
+  stroke: var(--sb-accent);
+  stroke-width: 2.5;
+}
+.sb-flow:has(#sb-flow-3:checked) :is(.sb-d-head.s3, .sb-d-badge.s3 circle) {
+  fill: var(--sb-accent);
+  stroke: var(--sb-accent);
+}
+.sb-flow:has(#sb-flow-3:checked) .sb-d-badge.s3 text {
+  fill: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-3:checked) .sb-d-box.b3 rect {
+  stroke: var(--sb-accent);
+  stroke-width: 2;
+}
+.sb-flow:has(#sb-flow-3:checked) .sb-flow-steps li.c3 .sb-flow-steps__n {
+  background: var(--sb-accent);
+  border-color: var(--sb-accent);
+  color: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-4:checked) :is(.sb-d-line, .sb-d-head, .sb-d-badge):not(.s4):not(.sb-d-legend *),
+.sb-flow:has(#sb-flow-4:checked) .sb-d-box:not(.b4),
+.sb-flow:has(#sb-flow-4:checked) .sb-flow-steps li:not(.c4) {
+  opacity: 0.22;
+}
+.sb-flow:has(#sb-flow-4:checked) .sb-d-line.s4 {
+  stroke: var(--sb-accent);
+  stroke-width: 2.5;
+}
+.sb-flow:has(#sb-flow-4:checked) :is(.sb-d-head.s4, .sb-d-badge.s4 circle) {
+  fill: var(--sb-accent);
+  stroke: var(--sb-accent);
+}
+.sb-flow:has(#sb-flow-4:checked) .sb-d-badge.s4 text {
+  fill: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-4:checked) .sb-d-box.b4 rect {
+  stroke: var(--sb-accent);
+  stroke-width: 2;
+}
+.sb-flow:has(#sb-flow-4:checked) .sb-flow-steps li.c4 .sb-flow-steps__n {
+  background: var(--sb-accent);
+  border-color: var(--sb-accent);
+  color: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-5:checked) :is(.sb-d-line, .sb-d-head, .sb-d-badge):not(.s5):not(.sb-d-legend *),
+.sb-flow:has(#sb-flow-5:checked) .sb-d-box:not(.b5),
+.sb-flow:has(#sb-flow-5:checked) .sb-flow-steps li:not(.c5) {
+  opacity: 0.22;
+}
+.sb-flow:has(#sb-flow-5:checked) .sb-d-line.s5 {
+  stroke: var(--sb-accent);
+  stroke-width: 2.5;
+}
+.sb-flow:has(#sb-flow-5:checked) :is(.sb-d-head.s5, .sb-d-badge.s5 circle) {
+  fill: var(--sb-accent);
+  stroke: var(--sb-accent);
+}
+.sb-flow:has(#sb-flow-5:checked) .sb-d-badge.s5 text {
+  fill: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-5:checked) .sb-d-box.b5 rect {
+  stroke: var(--sb-accent);
+  stroke-width: 2;
+}
+.sb-flow:has(#sb-flow-5:checked) .sb-flow-steps li.c5 .sb-flow-steps__n {
+  background: var(--sb-accent);
+  border-color: var(--sb-accent);
+  color: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-6:checked) :is(.sb-d-line, .sb-d-head, .sb-d-badge):not(.s6):not(.sb-d-legend *),
+.sb-flow:has(#sb-flow-6:checked) .sb-d-box:not(.b6),
+.sb-flow:has(#sb-flow-6:checked) .sb-flow-steps li:not(.c6) {
+  opacity: 0.22;
+}
+.sb-flow:has(#sb-flow-6:checked) .sb-d-line.s6 {
+  stroke: var(--sb-accent);
+  stroke-width: 2.5;
+}
+.sb-flow:has(#sb-flow-6:checked) :is(.sb-d-head.s6, .sb-d-badge.s6 circle) {
+  fill: var(--sb-accent);
+  stroke: var(--sb-accent);
+}
+.sb-flow:has(#sb-flow-6:checked) .sb-d-badge.s6 text {
+  fill: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-6:checked) .sb-d-box.b6 rect {
+  stroke: var(--sb-accent);
+  stroke-width: 2;
+}
+.sb-flow:has(#sb-flow-6:checked) .sb-flow-steps li.c6 .sb-flow-steps__n {
+  background: var(--sb-accent);
+  border-color: var(--sb-accent);
+  color: var(--sb-on-accent);
+}
+
+/* ---- Sections ------------------------------------------------------- */
+
+.sb-section {
+  padding: 3.2rem 0 0;
+}
+
+.md-typeset .sb-section-title {
+  font-size: 1.9rem; /* 38 px section */
+  line-height: 1.13;
+  letter-spacing: -0.022em;
+  font-weight: 600;
+  margin: 0 0 1.4rem;
+  color: var(--sb-ink);
+}
+
+/* How a request works: four steps in a row, one bordered block */
+.md-typeset ol.sb-steps {
+  list-style: none;
+  counter-reset: sb-step;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--sb-border);
+  border-radius: 4px;
+  background: var(--sb-surface);
+}
+
+.md-typeset ol.sb-steps > li {
+  counter-increment: sb-step;
+  margin: 0;
+  padding: 1.2rem 1.2rem 1.3rem;
+  border-left: 1px solid var(--sb-rule);
+}
+
+.md-typeset ol.sb-steps > li:first-child {
+  border-left: 0;
+}
+
+.md-typeset ol.sb-steps > li::before {
+  content: counter(sb-step, decimal-leading-zero);
+  display: block;
+  font-family: var(--md-code-font-family);
+  font-size: 0.6rem;
+  color: var(--sb-muted);
+  margin-bottom: 0.8rem;
+}
+
+.md-typeset .sb-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: var(--sb-accent);
+  display: block;
+  margin-bottom: 0.7rem;
+}
+
+.md-typeset ol.sb-steps h3 {
+  font-size: 0.9rem;
   margin: 0 0 0.4rem;
 }
 
-/* ---- Visual polish: hide page TOC + breadcrumbs ------------- */
+.md-typeset ol.sb-steps p {
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: var(--sb-muted);
+  margin: 0;
+}
 
-.sb-landing .md-typeset h1:first-child {
-  display: none;  /* Hero replaces the H1 visually */
+/* What it holds to: heading on the left, rules on the right */
+.sb-split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 2.4rem;
+  align-items: start;
+}
+
+.md-typeset ul.sb-rules {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--sb-border);
+}
+
+.md-typeset ul.sb-rules > li {
+  margin: 0;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--sb-rule);
+  font-size: 0.8rem;
+  color: var(--sb-muted);
+}
+
+.md-typeset ul.sb-rules strong {
+  color: var(--sb-ink);
+}
+
+/* What works today: two bordered columns */
+.sb-status {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--sb-border);
+  border-radius: 4px;
+  background: var(--sb-surface);
+  margin-bottom: 0.8rem;
+}
+
+.sb-status > div {
+  padding: 1.1rem 1.3rem 1.2rem;
+}
+
+.sb-status > div + div {
+  border-left: 1px solid var(--sb-rule);
+}
+
+.md-typeset .sb-status h3 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0 0 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+/* Status: a small square and the word, like the console */
+.md-typeset .sb-status h3::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  box-sizing: border-box;
+  background: var(--sb-ok);
+}
+
+.md-typeset .sb-status > div + div h3::before {
+  background: transparent;
+  border: 1.5px solid var(--sb-edge);
+}
+
+.md-typeset .sb-status ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.md-typeset .sb-status li {
+  font-size: 0.75rem;
+  margin: 0.2rem 0;
+}
+
+.md-typeset .sb-muted {
+  color: var(--sb-muted);
+  font-size: 0.7rem;
+  margin: 0.6rem 0 0;
+}
+
+.sb-end {
+  padding-bottom: 2.4rem;
+}
+
+/* ---- Small screens -------------------------------------------------- */
+
+@media screen and (max-width: 76.1875em) {
+  .sb-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.8rem;
+  }
+  .md-typeset .sb-keep {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .md-typeset .sb-keep__col + .sb-keep__col {
+    border-top: 0;
+    border-left: 1px solid var(--sb-rule);
+  }
+  .md-typeset .sb-keep__foot {
+    grid-column: 1 / -1;
+  }
+  .md-typeset ol.sb-flow-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .md-typeset ol.sb-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .md-typeset ol.sb-steps > li:nth-child(3) {
+    border-left: 0;
+  }
+  .md-typeset ol.sb-steps > li:nth-child(n + 3) {
+    border-top: 1px solid var(--sb-rule);
+  }
+}
+
+@media screen and (max-width: 44.9375em) {
+  /* Phones get the vertical drawing, at a readable size. */
+  .sb-d--wide {
+    display: none;
+  }
+  .sb-d--narrow {
+    display: block;
+    max-width: 24rem;
+    margin: 0 auto;
+  }
+  .md-typeset ol.sb-flow-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .md-typeset .sb-keep {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .md-typeset .sb-keep__col + .sb-keep__col {
+    border-left: 0;
+    border-top: 1px solid var(--sb-rule);
+  }
+  .sb-hero {
+    padding-top: 1.2rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.6rem;
+  }
+  .md-typeset .sb-display {
+    font-size: 2.1rem; /* the page-title size on phones */
+    line-height: 1.12;
+  }
+  .md-typeset .sb-section-title {
+    font-size: 1.4rem;
+  }
+  .sb-section {
+    padding-top: 2.2rem;
+  }
+  .md-typeset ol.sb-steps,
+  .sb-status,
+  .sb-split {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+  .md-typeset ol.sb-steps > li {
+    border-left: 0;
+    border-top: 1px solid var(--sb-rule);
+  }
+  .md-typeset ol.sb-steps > li:first-child {
+    border-top: 0;
+  }
+  .sb-status > div + div {
+    border-left: 0;
+    border-top: 1px solid var(--sb-rule);
+  }
 }

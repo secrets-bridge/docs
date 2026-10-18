@@ -1,52 +1,34 @@
 ---
 title: Design system
-description: The Figma file, brand voice, design tokens, and asset library that keep every Secrets Bridge surface (SPA, docs, README banners, social cards) feeling like one product.
+description: "The Secrets Bridge brand: voice, tokens, logos and assets shared by the console, this site and the brand marks."
 ---
 
 # Design system
 
-Secrets Bridge has a consistent brand. The SPA, the GitHub
-org, the README banners, and these docs all use the same tokens,
-the same fonts, and the same canonical phrasing, so it feels
-like one product no matter where you encounter it.
+One system covers the console, this site and the brand marks. It aims for an operations tool written by the engineers who answer for it: plain, exact and quiet, with one ultramarine accent and nothing decorative.
 
-If you're contributing copy, building a new page, or shipping
-external comms, **read these three pages first**:
+Read these before you write copy, build a page or make an image:
 
-1. **[Brand voice](brand-voice.md)**: the tagline, wordmark
-   conventions, metaphor family, voice rules
-2. **[Tokens & theme](tokens.md)**: the color palette, type
-   ramp, spacing, and how they're consumed in Tailwind
-3. **[Figma file & assets](figma.md)**: where the canonical
-   design lives, how to download the brand assets, the sync
-   scripts that pull tokens from Figma into the SPA
-
-## Why we wrote this down
-
-A brand drifts the moment two people write copy without a shared
-reference. Every PR adds friction to "wait, do we call it
-*Secrets Bridge* or *SecretsBridge*?" Every external surface (a
-README, a social card, a marketing site, a conference slide) is
-an opportunity for a contributor to invent their own variant.
-
-The three pages above are the answer to "what do I match against?"
-Match these. If you find yourself wanting to deviate, open an
-issue against [`secrets-bridge/skills`](https://github.com/secrets-bridge/skills)
-and we'll either update the system or document the exception.
+1. **[Brand voice](brand-voice.md)**: how we describe the product and its maturity, and the words we avoid.
+2. **[Tokens and theme](tokens.md)**: colours for light and dark, the type scale, spacing, radii, and where each repo reads them.
+3. **[Logos and assets](assets.md)**: the Checkpoint mark, its approved colourings, the product icons and the architecture illustration.
 
 ## The short version
 
 | Question | Answer |
 |---|---|
-| Tagline? | **The brain behind your secrets.** (verbatim, including the trailing period) |
-| Eyebrow? | **UNIFIED SECRETS CONTROL PLANE** (all caps) |
-| Wordmark in logos / brand identity? | **SecretsBridge** (one word) |
-| Wordmark in body copy / READMEs / prose? | **Secrets Bridge** (two words) |
-| UI font? | [Inter](https://fonts.google.com/specimen/Inter) |
-| Code / CLI font? | [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono) |
-| Primary accent color? | Cyan `#06B6D4` (`text-accent` in Tailwind) |
-| Base background? | Navy 900 `#0B1220` (`bg-bg` in Tailwind) |
-| Canonical Figma file | [Secrets Bridge - Brand](figma.md) |
+| Name | **Secrets Bridge**, two words, everywhere. In logos it comes from the lockup files; never retype it. |
+| Fonts | IBM Plex Sans for what people read, IBM Plex Mono for what machines read (refs, key names, paths, times, code). Weights 400, 500 and 600. |
+| Accent | Ultramarine `#3141C8` on light, periwinkle `#9AA3FF` on dark. A signal only: links, one primary button per view, the current tab, the focus ring. |
+| Surfaces | Paper `bg`, white `surface`, `ink` text. Panels separate with a border, not a shadow. |
+| Corners | Square. 4 px is the largest radius. Only avatars are round. |
+| Status | A small square and the exact status word. Colour never carries a status alone. |
+| Secret values | Never shown outside the reveal panel: no values, lengths, hashes or previews. |
 
-Everything else is detail, but it's detail we've thought about,
-written down, and want you to use.
+## Where it lives
+
+- The console reads the tokens from `src/index.css` in the [`ui`](https://github.com/secrets-bridge/ui) repo (Tailwind `@theme`), with light and dark themes.
+- This site maps the same tokens onto mkdocs-material in `docs/stylesheets/brand.css`.
+- Logos, icons and the illustration are served from this site's `assets/` folder, listed on [Logos and assets](assets.md).
+
+If something here doesn't cover your case, open an issue in [`secrets-bridge/docs`](https://github.com/secrets-bridge/docs/issues) and we'll either extend the system or write down the exception.

@@ -1,0 +1,11 @@
+{#-
+  Material's logo partial with intrinsic dimensions (the horizontal lockup
+  is 174.47 x 24), so the header reserves its space before the SVG loads
+  (docs#9). The name is in the image, so the alt text says it.
+-#}
+{% if config.theme.logo %}
+  <img src="{{ config.theme.logo | url }}" alt="Secrets Bridge" width="175" height="24">
+{% else %}
+  {% set icon = config.theme.icon.logo or "material/library" %}
+  {% include ".icons/" ~ icon ~ ".svg" %}
+{% endif %}

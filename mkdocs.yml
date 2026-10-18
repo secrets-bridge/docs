@@ -14,7 +14,8 @@ site_description: >-
 site_author: Secrets Bridge contributors
 repo_name: secrets-bridge
 repo_url: https://github.com/secrets-bridge
-edit_uri: edit/main/docs/
+# repo_url is the organisation, so the edit link names the docs repo itself.
+edit_uri: https://github.com/secrets-bridge/docs/edit/main/docs/
 
 copyright: >-
   Copyright &copy; 2026 Secrets Bridge contributors.
@@ -27,30 +28,31 @@ theme:
   language: en
   custom_dir: overrides
   favicon: assets/favicon.svg
-  logo: assets/icon.svg
+  # The horizontal lockup (mark and wordmark), as the brand book asks;
+  # brand.css hides the retyped site name next to it.
+  logo: assets/logo-horizontal-color.svg
   palette:
-    # Match the SPA brand: cyan accent on Navy 900 / Dark Navy surfaces
-    # so the docs feel like the same product.
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: black
-      accent: cyan
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
+    # Colours come from docs/stylesheets/brand.css (the console's tokens);
+    # "custom" stops Material from layering its own palette on top.
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: black
-      accent: cyan
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-7
-        name: Switch to dark mode
+        name: Switch to dark theme
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light theme
   font:
-    text: Inter
-    code: JetBrains Mono
+    text: IBM Plex Sans
+    code: IBM Plex Mono
   icon:
     repo: fontawesome/brands/github
-    logo: material/key-chain
   features:
     - navigation.tabs
     - navigation.tabs.sticky
@@ -88,11 +90,10 @@ extra:
   # template, when brand details change.
   brand:
     name: Secrets Bridge
-    tagline: The brain behind your secrets.
-    # Self-hosted on the docs domain. raw.githubusercontent.com is
-    # rate-limited and not cache-friendly for social crawlers (SEO
-    # audit 2026-05-30 P2-7). 1200×630 PNG.
-    og_image: https://secrets-bridge.io/assets/og-banner.png
+    tagline: Access control for the secrets you already keep.
+    # Path under the site root of the version being served; the template
+    # makes it absolute from the page's canonical URL. 1200x630 PNG.
+    og_image: assets/og-banner.png
     twitter_handle: ""  # set when an org Twitter account exists
   social:
     - icon: fontawesome/brands/github
@@ -160,6 +161,7 @@ plugins:
         .js: '["''](?P<url>(?:https?:)?//(?:[^"'']+\.(?:css|js(?:on)?)|unpkg\.com/resize-observer-polyfill))["'']'
 
 extra_css:
+  - stylesheets/brand.css
   - stylesheets/landing.css
 
 nav:
@@ -182,8 +184,8 @@ nav:
   - Design system:
       - design/index.md
       - Brand voice: design/brand-voice.md
-      - Tokens & theme: design/tokens.md
-      - Figma file & assets: design/figma.md
+      - Tokens and theme: design/tokens.md
+      - Logos and assets: design/assets.md
   - Operations:
       - operations/index.md
       - Running locally with docker compose: operations/docker-compose.md
