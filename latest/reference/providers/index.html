@@ -2156,7 +2156,7 @@ interface.</p>
 <td><code>vault</code></td>
 <td>✅ ships</td>
 <td>Token (<code>SB_VAULT_TOKEN</code>) or Kubernetes (<code>SB_VAULT_KUBERNETES_ROLE</code>)</td>
-<td><code>address</code>, <code>kvMount</code> (default <code>secret</code>), <code>kvPrefix</code>, <code>namespace</code></td>
+<td><code>address</code>, <code>kvMount</code> (default <code>kv</code>), <code>kvPrefix</code>, <code>namespace</code></td>
 </tr>
 <tr>
 <td><code>aws-sm</code></td>
@@ -2186,7 +2186,9 @@ interface.</p>
 </table>
 <h2 id="hashicorp-vault">HashiCorp Vault<a class="headerlink" href="#hashicorp-vault" title="Permanent link">&para;</a></h2>
 <p><strong>KV v2 only.</strong> Path layout depends on the <code>kvMount</code> config (default
-<code>secret</code>). The agent reads via <code>{mount}/data/{ref}</code> and writes the
+<code>kv</code>). The agent pins its mount from <code>SB_VAULT_KV_MOUNT</code> and refuses a
+job that names a different one, so set it to the provider connection's
+<code>mount</code>. The agent reads via <code>{mount}/data/{ref}</code> and writes the
 KV v2 <code>{"data": {...}}</code> envelope.</p>
 <h3 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h3>
 <table>

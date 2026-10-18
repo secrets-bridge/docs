@@ -2210,8 +2210,9 @@ configured for it:</p>
 <li><strong>Sidebar → Requests → + New request</strong></li>
 <li><strong>Read</strong> type</li>
 <li><strong>Provider</strong>: Vault (or AWS Secrets Manager)</li>
-<li><strong>Provider config</strong>: leave blank for Vault (defaults to
-   <code>kvMount=secret</code>)</li>
+<li><strong>Project</strong> and <strong>Environment</strong>: the project and environment the
+   secret is bound to. Environment is required when the binding is
+   scoped to one</li>
 <li><strong>Secret reference</strong>: e.g. <code>prod/db/password</code></li>
 <li><strong>Keys</strong>: e.g. <code>DB_PASSWORD</code> (or leave one empty row for "all
    keys in the bundle")</li>

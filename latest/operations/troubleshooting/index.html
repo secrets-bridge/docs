@@ -2273,10 +2273,11 @@ ready, the response body lists which:</p>
 <p>Read the agent's log:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>docker<span class="w"> </span>logs<span class="w"> </span>secrets-bridge-agent-1<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-iE<span class="w"> </span><span class="s2">"job|error|fail"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tail
 </span></code></pre></div>
-<p>The most common cause is <strong>provider config missing</strong>. For Vault:
-leave the Provider config field blank in the Submit drawer (the UI
-defaults to <code>kvMount=secret</code>). For AWS Secrets Manager: the
-<code>region</code> is required.</p>
+<p>The most common cause is <strong>agent provider settings</strong>. For Vault:
+the agent's <code>SB_VAULT_KV_MOUNT</code> (default <code>kv</code>) has to match the
+provider connection's <code>mount</code>, otherwise the job fails with a
+<code>kvMount</code> error. For AWS Secrets Manager: the agent needs
+<code>SB_AWS_REGION</code>.</p>
 <p>For a deeper trace, set the agent's log level to debug:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">SB_LOG_LEVEL</span><span class="o">=</span>debug<span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>agent
 </span></code></pre></div>
