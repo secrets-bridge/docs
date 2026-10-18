@@ -2226,8 +2226,9 @@ You need <code>agent.mint</code> (the seed <code>admin</code> role has it) and a
 <p>All body fields are optional. <code>expires_in_seconds</code> defaults to 900 (15
 minutes) and is clamped to 60 to 86400. When <code>expected_cluster_name</code> or
 <code>expected_provider_type</code> is set, an agent that reports anything else is
-refused. The response carries the token exactly once, and its
-<code>install_hint</code> embeds it too, so don't log or paste the whole response.</p>
+refused. The response carries the token exactly once, so don't log or
+paste the whole response. Its <code>install_hint</code> commands don't contain the
+token: they read it at a silent prompt.</p>
 <p>Then install the <code>agent</code> chart in enrollment mode (see
 <a href="../#production-deployment">Production deployment</a> for the chart
 source):</p>
