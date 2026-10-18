@@ -116,8 +116,9 @@ curl -fsS -X POST "$CP/api/v1/provider-connections/$CONN_ID/agent-enrollment-tok
 All body fields are optional. `expires_in_seconds` defaults to 900 (15
 minutes) and is clamped to 60 to 86400. When `expected_cluster_name` or
 `expected_provider_type` is set, an agent that reports anything else is
-refused. The response carries the token exactly once, and its
-`install_hint` embeds it too, so don't log or paste the whole response.
+refused. The response carries the token exactly once, so don't log or
+paste the whole response. Its `install_hint` commands don't contain the
+token: they read it at a silent prompt.
 
 Then install the `agent` chart in enrollment mode (see
 [Production deployment](index.md#production-deployment) for the chart
