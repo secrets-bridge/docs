@@ -9,12 +9,11 @@ The api can keep media files in an S3 bucket or on any server that speaks
 the S3 API, such as MinIO. Postgres keeps only the metadata for each file.
 
 !!! warning "In progress"
-    Object storage is being built in
-    [api#253](https://github.com/secrets-bridge/api/issues/253) and
-    [charts#39](https://github.com/secrets-bridge/charts/issues/39). It is
-    not live yet. See [Product status](../overview/product-status.md).
-    Details marked **Check the release notes** below are not settled and
-    may change before release.
+    Object storage is implemented in
+    [api#255](https://github.com/secrets-bridge/api/pull/255) and the chart
+    values in [charts#40](https://github.com/secrets-bridge/charts/pull/40)
+    and [charts#42](https://github.com/secrets-bridge/charts/pull/42). It
+    has not passed QA yet. See [Product status](../overview/product-status.md).
 
 ## What is stored there
 
@@ -40,18 +39,20 @@ Each object is keyed by the sha256 of its content:
 | Part | Value |
 |---|---|
 | `<prefix>` | `SB_OBJECTSTORE_PREFIX` |
-| `<kind>` | `projects` or `teams` |
+| `<kind>` | `project` or `team` (singular, lower case) |
 | `<entity-id>` | The project or team id |
 | `<sha256>` | Hash of the re-encoded PNG. It is also the `ETag` the api returns. |
 
-Uploading the same image twice writes the same key, so writes are
-idempotent. When a logo is replaced, the api deletes the old object after
-the database row points at the new one.
+For example, with `SB_OBJECTSTORE_PREFIX=secrets-bridge` a project logo
+lives at `secrets-bridge/logos/project/<project-id>/<sha256>.png`. Without
+a prefix the key starts at `logos/`. The api trims slashes at either end
+of the prefix.
 
-!!! note "Check the release notes"
-    The exact `<kind>` strings are set by the api implementation. Confirm
-    them in the release notes before writing lifecycle rules or IAM
-    conditions that match on them.
+Uploading the same image twice maps to the same key, so writes are
+idempotent. When a logo is replaced, the api deletes the old object after
+the database row points at the new one. The row stores the full key, so
+changing `SB_OBJECTSTORE_PREFIX` later does not move existing logos: they
+stay at their old keys.
 
 ### How a logo moves through the system
 
@@ -79,9 +80,21 @@ sequenceDiagram
     API-->>UI: image/png with ETag
 ```
 
-If the object write fails, the database row is not changed. If the row
-write fails, the api removes the object it just wrote. If a row points at
-an object that is missing, the api returns `404` and logs the error.
+If the object write fails, the database row is not changed and the api
+returns `503 logo storage is unavailable`. If the row write fails, the api
+removes the object it just wrote, unless the current row already uses that
+same key, and returns `500 internal error`. If deleting the old object
+fails, the object is left behind and the api logs a warning; no row points
+at it.
+
+On reads, the api answers `If-None-Match` from the row without reading the
+object. A row that still holds its image in the `png` column (before the
+backfill, or written by an old replica during a rollout) is served from
+those bytes with the same headers and `ETag`. If a row points at an object
+that is missing, the api returns `404` and logs an error that names the
+key; the key is not in the response body.
+
+The api never sets an ACL on an object and does not issue presigned URLs.
 
 ## Configuration
 
@@ -90,56 +103,80 @@ The api reads these environment variables. The full list is in the
 
 | Env var | Notes |
 |---|---|
-| `SB_OBJECTSTORE_BUCKET` | Bucket name |
-| `SB_OBJECTSTORE_REGION` | Bucket region, for example `us-east-1` |
-| `SB_OBJECTSTORE_ENDPOINT` | Optional. Endpoint override for S3-compatible servers, for example `https://s3.example.com`. Leave unset for AWS S3. |
-| `SB_OBJECTSTORE_PREFIX` | Key prefix inside the bucket, for example `secrets-bridge` |
-| `SB_OBJECTSTORE_SSE` | `AES256` (SSE-S3) or `aws:kms` (SSE-KMS) |
-| `SB_OBJECTSTORE_KMS_KEY_ID` | KMS key id, ARN or alias. Used with `SB_OBJECTSTORE_SSE=aws:kms`. |
-| `SB_OBJECTSTORE_FORCE_PATH_STYLE` | `true` for servers that need path-style addressing, such as most MinIO setups |
+| Env var | Default | Notes |
+|---|---|---|
+| `SB_OBJECTSTORE_BUCKET` | unset | Bucket name. Unset, with no other `SB_OBJECTSTORE_*` set, means object storage is off. |
+| `SB_OBJECTSTORE_REGION` | unset | Bucket region, for example `us-east-1`. Required when the bucket is set. |
+| `SB_OBJECTSTORE_ENDPOINT` | unset | Endpoint override for S3-compatible servers or a VPC endpoint, as an `http://` or `https://` URL, for example `https://s3.example.com`. Leave unset for AWS S3. |
+| `SB_OBJECTSTORE_FORCE_PATH_STYLE` | `false` | `true` or `false`. `true` for servers that need path-style addressing, such as MinIO. |
+| `SB_OBJECTSTORE_PREFIX` | unset | Key prefix inside the bucket, for example `secrets-bridge`. Slashes at either end are trimmed. Empty, `.` or `..` segments are refused. |
+| `SB_OBJECTSTORE_SSE` | unset | Unset or empty sends no SSE header, so the bucket's default encryption applies. Otherwise exactly `AES256` (SSE-S3) or `aws:kms` (SSE-KMS). Case-sensitive. |
+| `SB_OBJECTSTORE_KMS_KEY_ID` | unset | KMS key id, ARN or alias. Required with `SB_OBJECTSTORE_SSE=aws:kms`, and refused with any other SSE mode. |
+| `SB_OBJECTSTORE_LOGO_BACKFILL` | `true` | Run the logo backfill at api start. Set `false` for the first step of a rolling upgrade. See [Upgrading: moving existing logos](#upgrading-moving-existing-logos). |
 
 Credentials come from the standard AWS SDK chain: IRSA, an instance role,
 or `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` in the environment. This
 is the same chain the `aws-kms` backend uses. There are no
 `SB_OBJECTSTORE_*` variables for credentials.
 
-The api fails at boot with an error when the object-storage settings are
-present but invalid.
+### Boot behaviour
 
-!!! note "Check the release notes"
-    What the api does when object storage is not configured at all (refuse
-    to boot, or run with logo uploads turned off) is not settled yet.
+| State | What the api does |
+|---|---|
+| Not configured (no `SB_OBJECTSTORE_*` set) | Boots normally. `PUT` and `DELETE` on a logo return `503 logo storage is not configured`. Logos still stored in Postgres keep being served. The api never falls back to writing media to Postgres. If inline logos exist, the boot logs a warning with their count. |
+| Misconfigured | Refuses to boot with an error. This covers any `SB_OBJECTSTORE_*` setting without a bucket, a bucket without a region, an unknown SSE value, `aws:kms` without a key id, a key id with another SSE mode, a malformed endpoint or prefix, and a `SB_OBJECTSTORE_FORCE_PATH_STYLE` that is not `true` or `false`. |
+| Configured, bucket unreachable | Refuses to boot. The api calls `HeadBucket` at start and gives up after 15 seconds. A denied `HeadBucket` (see the [IAM policy](#least-privilege-iam-policy)) fails the same way. |
+| Configured and reachable | Logs `object storage ready`, writes and reads logos in the bucket, and starts the backfill unless `SB_OBJECTSTORE_LOGO_BACKFILL=false`. |
+
+When the bucket is reachable at boot but fails later, logo requests that
+need it return `503 logo storage is unavailable`. The rest of the api
+keeps working.
 
 ### Helm chart values
 
 The `secrets-bridge` chart maps `objectStore.*` values to the
 `SB_OBJECTSTORE_*` variables on the api:
 
-| Value | Env var |
-|---|---|
-| `objectStore.enabled` | Turns the settings below on |
-| `objectStore.bucket` | `SB_OBJECTSTORE_BUCKET` |
-| `objectStore.region` | `SB_OBJECTSTORE_REGION` |
-| `objectStore.endpoint` | `SB_OBJECTSTORE_ENDPOINT` |
-| `objectStore.prefix` | `SB_OBJECTSTORE_PREFIX` |
-| `objectStore.sse` | `SB_OBJECTSTORE_SSE` |
-| `objectStore.kmsKeyId` | `SB_OBJECTSTORE_KMS_KEY_ID` |
-| `objectStore.forcePathStyle` | `SB_OBJECTSTORE_FORCE_PATH_STYLE` |
+| Value | Default | Env var on the api |
+|---|---|---|
+| `objectStore.enabled` | `false` | Turns the settings below on. Off renders no `SB_OBJECTSTORE_*` at all. |
+| `objectStore.bucket` | `""` | `SB_OBJECTSTORE_BUCKET` (required when enabled) |
+| `objectStore.region` | `""` | `SB_OBJECTSTORE_REGION` (required when enabled) |
+| `objectStore.endpoint` | `""` | `SB_OBJECTSTORE_ENDPOINT` |
+| `objectStore.prefix` | `""` | `SB_OBJECTSTORE_PREFIX` |
+| `objectStore.sse` | `AES256` | `SB_OBJECTSTORE_SSE`. `""` renders no variable, so no SSE header is sent. |
+| `objectStore.kmsKeyId` | `""` | `SB_OBJECTSTORE_KMS_KEY_ID` (only with `sse: aws:kms`) |
+| `objectStore.forcePathStyle` | `false` | `SB_OBJECTSTORE_FORCE_PATH_STYLE`, always rendered as `"true"` or `"false"` |
+| `objectStore.logoBackfill` | `true` | `SB_OBJECTSTORE_LOGO_BACKFILL`, always rendered as `"true"` or `"false"` |
+| `objectStore.credentials.existingSecret` | `""` | Name of a Secret with static keys. When set, the api gets `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` through `secretKeyRef`. |
+| `objectStore.credentials.accessKeyIdKey` | `AWS_ACCESS_KEY_ID` | Key in that Secret for the access key id |
+| `objectStore.credentials.secretAccessKeyKey` | `AWS_SECRET_ACCESS_KEY` | Key in that Secret for the secret access key |
+| `api.networkPolicy.egress.objectStore.enabled` | `true` | Adds a TCP egress rule to the object store when `objectStore.enabled` |
+| `api.networkPolicy.egress.objectStore.to` | `[]` | NetworkPolicy peers that narrow the rule. Empty allows the port to any destination. |
 
-The chart does not take credentials in values. Use IRSA through
-`api.serviceAccount.annotations`, or point the chart at an existing
-Secret that holds `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+The chart's default for `sse` is `AES256`, while the api on its own sends
+no SSE header when `SB_OBJECTSTORE_SSE` is unset. Only the api gets these
+variables; the worker does not read media.
 
-The chart's render-time guards refuse an empty `bucket` when object
-storage is required, and refuse a plain `http://` endpoint with
-`env=production`. If NetworkPolicies are on, the api needs egress to the
-S3 endpoint on port 443.
+The chart does not take credentials in values. On AWS, use IRSA through
+`api.serviceAccount.annotations`. For an S3-compatible server, use
+`objectStore.credentials.existingSecret`. Static keys cannot be combined
+with `kms.backend=aws-kms`, because the SDK prefers them over IRSA and the
+KMS client would sign with them.
 
-!!! note "Check the release notes"
-    The value that names the existing credentials Secret, and the exact
-    NetworkPolicy settings for S3 egress, are being finalized in
-    [charts#39](https://github.com/secrets-bridge/charts/issues/39). Use the
-    chart README for the released names.
+The chart refuses to render when object storage is enabled and `bucket`
+or `region` is empty, `sse` is not `AES256`, `aws:kms` or empty,
+`sse: aws:kms` has no `kmsKeyId`, `kmsKeyId` is set with another `sse`,
+the endpoint is not `http(s)://host[:port]`, the endpoint is plain
+`http://` with `env=production`, the prefix has an empty, `.` or `..`
+segment, `logoBackfill` is not `true` or `false`, or static keys are
+combined with `kms.backend=aws-kms`.
+
+The egress port comes from `objectStore.endpoint`: its explicit port, else
+443 for `https` and 80 for `http`, and 443 when no endpoint is set (AWS
+S3). To manage the rule yourself, set
+`api.networkPolicy.egress.objectStore.enabled: false` and add it to
+`api.networkPolicy.egress.extraRules`.
 
 ## AWS S3 with IRSA
 
@@ -193,12 +230,24 @@ objectStore:
   bucket: example-bucket
   region: us-east-1
   prefix: secrets-bridge
-  sse: AES256
+  sse: ""                  # no SSE header; see the notes below
+  credentials:
+    existingSecret: secrets-bridge-objectstore
+api:
+  networkPolicy:
+    egress:
+      objectStore:
+        to:
+          - namespaceSelector:
+              matchLabels:
+                kubernetes.io/metadata.name: minio
 ```
 
-Then reference the Secret with the chart's existing-Secret value (see the
-note under [Helm chart values](#helm-chart-values)). Deliver the Secret
-with External Secrets, sealed-secrets or a similar tool.
+The keys in the Secret above match the default
+`credentials.accessKeyIdKey` and `credentials.secretAccessKeyKey`, so
+those don't need to be set. Deliver the Secret with External Secrets,
+sealed-secrets or a similar tool. The `to` block is only needed when
+MinIO runs in the cluster and you want to narrow the egress rule.
 
 Notes for MinIO:
 
@@ -208,8 +257,9 @@ Notes for MinIO:
   `env=production`.
 - `region` must match the region the server is configured with. MinIO
   uses `us-east-1` unless you set another one.
-- `AES256` needs server-side encryption configured on the MinIO server
-  (for example with MinIO KES). Without it, uploads that request SSE fail.
+- `sse: AES256` needs server-side encryption configured on the MinIO
+  server (for example with MinIO KES). Without it, uploads that request
+  SSE fail, so use `sse: ""` and let the server's own settings apply.
 
 For local development, the api repository's `docker-compose.yml` runs a
 MinIO service and creates the bucket. See
@@ -217,9 +267,10 @@ MinIO service and creates the bucket. See
 
 ## Least-privilege IAM policy
 
-Grant object access only under the prefix, and limit `s3:ListBucket` to
-the same prefix. Replace `example-bucket` and `secrets-bridge` with your
-bucket and `SB_OBJECTSTORE_PREFIX`.
+Grant object access only under the prefix, and `s3:ListBucket` on the
+bucket itself. Replace `example-bucket` and `secrets-bridge` with your
+bucket and `SB_OBJECTSTORE_PREFIX`. Without a prefix, use
+`arn:aws:s3:::example-bucket/logos/*` for the object statement.
 
 ```json
 {
@@ -236,24 +287,27 @@ bucket and `SB_OBJECTSTORE_PREFIX`.
       "Resource": "arn:aws:s3:::example-bucket/secrets-bridge/*"
     },
     {
-      "Sid": "ListPrefixOnly",
+      "Sid": "BucketCheck",
       "Effect": "Allow",
       "Action": "s3:ListBucket",
-      "Resource": "arn:aws:s3:::example-bucket",
-      "Condition": {
-        "StringLike": {
-          "s3:prefix": [
-            "secrets-bridge/*"
-          ]
-        }
-      }
+      "Resource": "arn:aws:s3:::example-bucket"
     }
   ]
 }
 ```
 
-`s3:ListBucket` lets `HeadObject` return `404` instead of `403` for a
-missing key, so the api can tell a missing logo from a permission error.
+`s3:ListBucket` is needed for two things:
+
+- **The boot check.** The api calls `HeadBucket` at start, and S3
+  authorizes `HeadBucket` with `s3:ListBucket` on the bucket. A
+  `HeadBucket` request carries no prefix, so do not add an `s3:prefix`
+  condition to this statement: with the condition, `HeadBucket` is denied
+  and the api refuses to boot.
+- **Missing keys.** With `s3:ListBucket`, `HeadObject` and `GetObject`
+  return `404` instead of `403` for a key that doesn't exist, so the api
+  can tell a missing logo from a permission error.
+
+The api itself never lists objects.
 
 The policy does not grant `s3:PutObjectAcl`, bucket policy changes or
 any access outside the prefix. The api does not need them.
@@ -351,38 +405,97 @@ back the metadata rows, which point at object keys, but not the images.
 ## Upgrading: moving existing logos
 
 Before object storage, logos were stored as `BYTEA` in the `png` column of
-`project_logos` and `team_logos`. The move to object storage is done in
-two steps, so existing logos keep working during the rollout.
+`project_logos` and `team_logos`.
+
+### Migration 0040
+
+Migration `0040` changes both tables:
+
+- adds `object_key`, nullable, set by every new upload and by the backfill;
+- adds `byte_length`, nullable, the stored PNG's size, so the delete audit
+  can report it without reading the object;
+- makes `png` nullable. New uploads write `png = NULL`;
+- adds a CHECK that every row has `png` or `object_key`.
+
+The `png` column stays for now. A later migration drops it (and the CHECK
+that references it) once deployments have run the backfill.
+
+### The backfill
+
+The backfill runs inside the api, at start, in the background. Boot does
+not wait for it, because logos still in `png` are served until they move.
+
+- It runs on one replica at a time, under the Redis lock
+  `objectstore:logo-backfill`, which it renews while it runs. A replica
+  that finds the lock held skips the backfill.
+- It pages through rows that still have `png`, checks that the bytes match
+  the recorded sha256, writes the object, and then clears `png` and sets
+  `object_key` and `byte_length` in one locked, conditional update. The
+  update only applies if the row still holds the same image inline.
+- A row whose bytes don't match its sha256 is left inline and logged,
+  because moving it would change its `ETag`.
+- It is idempotent. A second run finds nothing to move, and
+  content-addressed keys make a repeated write harmless.
+- It also moves rows that old replicas write during a rolling upgrade, the
+  next time it runs.
+- It writes no audit events, since the logo did not change.
+- If it stops early (an error or its 30-minute limit), it logs
+  `logo backfill stopped early; will resume at next start` and continues
+  on the next api start.
+
+Set `SB_OBJECTSTORE_LOGO_BACKFILL=false` (chart value
+`objectStore.logoBackfill: false`) to switch it off. The api then logs
+`logo backfill switched off`.
+
+### Rollout
 
 ```mermaid
 flowchart LR
-    A["1. Create bucket, IAM and KMS access"] --> B["2. Upgrade api and chart with objectStore set"]
-    B --> C["3. Backfill copies png bytes to the bucket"]
-    C --> D["4. Verify every row has an object key"]
+    A["1. Create bucket, IAM and KMS access"] --> B["2. Deploy with logoBackfill false"]
+    B --> C["3. All replicas new: logoBackfill true, restart"]
+    C --> D["4. Verify no png rows are left"]
     D --> E["5. Later release drops the png column"]
 ```
 
 1. **Prepare storage.** Create the bucket, the IAM policy and, for
    SSE-KMS, the key policy statement, as described above.
-2. **Deploy.** Upgrade the chart and api together with `objectStore.*`
-   set. Migration `0040` adds an `object_key` column to both tables. The
-   `png` column stays, so logos that have not been copied yet still load.
-3. **Backfill.** A one-time backfill copies the existing `png` bytes to
-   the bucket and fills `object_key`.
-4. **Verify.** Check that no row is left without an `object_key` and
-   that logos load in the console.
+2. **Deploy with the backfill off.** Upgrade the chart and api together
+   with `objectStore.*` set and `objectStore.logoBackfill: false`
+   (`SB_OBJECTSTORE_LOGO_BACKFILL=false`). Migration `0040` runs. Old
+   replicas keep reading and writing `png`. New replicas write new logos
+   to the bucket and serve both kinds. Until the rollout finishes, an old
+   replica serves an empty image for a logo uploaded through a new
+   replica.
+3. **Turn the backfill on.** Once every replica runs the new version, set
+   `objectStore.logoBackfill: true` (the default) and restart the api. A
+   chart upgrade that changes the value restarts the pods. The backfill
+   moves every inline row, including any that old replicas wrote during
+   step 2.
+4. **Verify.** Look for the `logo backfill done` log line, which reports
+   `moved`, `skipped` and `failed` counts, or check that both queries
+   return 0:
+
+    ```sql
+    SELECT count(*) FROM project_logos WHERE png IS NOT NULL;
+    SELECT count(*) FROM team_logos WHERE png IS NOT NULL;
+    ```
+
+    A non-zero count after the backfill means rows were skipped (digest
+    mismatch) or failed; the api logs each one. When there is nothing left
+    to move, the api logs nothing at the default level.
 5. **Drop the old column.** A later migration removes the `png` column.
-   Take a database backup before you upgrade to that release, because the
-   old bytes are gone after it runs.
+   Run the queries above before you upgrade to that release, and take a
+   database backup first, because the old bytes are gone after it runs.
 
-!!! note "Check the release notes"
-    These details are still being decided in
-    [api#253](https://github.com/secrets-bridge/api/issues/253):
+With a single api replica, or when the short window in step 2 doesn't
+matter, deploy with the default (`logoBackfill: true`) and skip step 2.
 
-    - how the backfill runs (automatically at boot, through the worker, or
-      as a separate command), and how to see that it has finished;
-    - whether new uploads during the rollout also write the `png` column;
-    - which release drops the `png` column, and the query to confirm the
-      backfill is complete before that upgrade;
-    - whether rolling back to an api version from before step 2 is safe
-      once logos have been uploaded to object storage.
+### Rolling back
+
+- Rolling the api image back to a version from before object storage
+  leaves the database at migration `0040`. Rows that were moved, or
+  uploaded through a new replica, have `png = NULL`, and the old version
+  serves an empty image for them.
+- The `0040` down migration deletes the rows that live only in object
+  storage, because their bytes cannot be restored into Postgres. Those
+  logos have to be uploaded again. The objects stay in the bucket.
