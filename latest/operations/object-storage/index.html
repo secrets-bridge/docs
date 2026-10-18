@@ -2556,7 +2556,7 @@ is the same chain the <code>aws-kms</code> backend uses. There are no
 </tr>
 <tr>
 <td>Misconfigured</td>
-<td>Refuses to boot with an error. This covers any <code>SB_OBJECTSTORE_*</code> setting without a bucket, a bucket without a region, an unknown SSE value, <code>aws:kms</code> without a key id, a key id with another SSE mode, a malformed endpoint or prefix, and a <code>SB_OBJECTSTORE_FORCE_PATH_STYLE</code> that is not <code>true</code> or <code>false</code>.</td>
+<td>Refuses to boot with an error. This covers any <code>SB_OBJECTSTORE_*</code> setting without a bucket, a bucket without a region, an unknown SSE value, <code>aws:kms</code> without a key id, a key id with another SSE mode, a malformed endpoint or prefix, a plain <code>http://</code> endpoint when <code>SB_ENV</code> is not <code>dev</code>, and a <code>SB_OBJECTSTORE_FORCE_PATH_STYLE</code> that is not <code>true</code> or <code>false</code>.</td>
 </tr>
 <tr>
 <td>Configured, bucket unreachable</td>
@@ -2740,7 +2740,8 @@ MinIO runs in the cluster and you want to narrow the egress rule.</p>
 <li>Create a MinIO user with a policy limited to the bucket and prefix, in
   the same shape as the IAM policy below. Do not use the root user.</li>
 <li>Use <code>https://</code>. The chart refuses a plain <code>http://</code> endpoint with
-  <code>env=production</code>.</li>
+  <code>env=production</code>, and the api refuses it at boot unless <code>SB_ENV=dev</code>,
+  including when the settings come from <code>secrets.existingSecret</code>.</li>
 <li><code>region</code> must match the region the server is configured with. MinIO
   uses <code>us-east-1</code> unless you set another one.</li>
 <li><code>sse: AES256</code> needs server-side encryption configured on the MinIO
