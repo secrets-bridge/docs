@@ -1333,6 +1333,8 @@
       
         
       
+        
+      
     
     
     
@@ -1656,6 +1658,34 @@
     
   
     Provider connections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/object-storage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object storage
   
 
     
@@ -2195,6 +2225,10 @@ release / demo candidate. "PASS" means verified end-to-end, not merely merged.</
   built; rolling it onto a live agent is gated on a controlled rollout.</li>
 <li><strong>Richer agent fleet dashboard (UI)</strong>: the agent management API exists; the
   full fleet UI view is next.</li>
+<li><strong>Object storage for media</strong>: project and team logos move from Postgres to
+  a private S3 or S3-compatible bucket, served through the api with the
+  existing authorization. Secret values never go to object storage. See
+  <a href="../../operations/object-storage/">Object storage</a>.</li>
 </ul>
 <h2 id="live-vs-roadmap">Live vs Roadmap<a class="headerlink" href="#live-vs-roadmap" title="Permanent link">&para;</a></h2>
 <h3 id="live-implemented">Live / implemented<a class="headerlink" href="#live-implemented" title="Permanent link">&para;</a></h3>
