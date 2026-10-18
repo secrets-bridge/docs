@@ -64,6 +64,11 @@ Being built now; not yet live or certified. Do not depend on these yet.
   existing authorization. Secret values never go to object storage.
   Implemented in the api and the chart, not yet through QA. See
   [Object storage](../operations/object-storage.md).
+- **Signed releases**: every image and chart is signed with cosign by the
+  workflow that built it, and images carry an SBOM and build provenance.
+  All repos release together under one shared version; the first release
+  has not been tagged yet. See
+  [Verifying images and charts](../operations/verifying-releases.md).
 
 ## Live vs Roadmap
 
