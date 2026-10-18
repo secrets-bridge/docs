@@ -1335,6 +1335,8 @@
       
         
       
+        
+      
     
     
     
@@ -1686,6 +1688,34 @@
     
   
     Object storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/verifying-releases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Verifying images and charts
   
 
     
@@ -2230,6 +2260,11 @@ release / demo candidate. "PASS" means verified end-to-end, not merely merged.</
   existing authorization. Secret values never go to object storage.
   Implemented in the api and the chart, not yet through QA. See
   <a href="../../operations/object-storage/">Object storage</a>.</li>
+<li><strong>Signed releases</strong>: every image and chart is signed with cosign by the
+  workflow that built it, and images carry an SBOM and build provenance.
+  All repos release together under one shared version; the first release
+  has not been tagged yet. See
+  <a href="../../operations/verifying-releases/">Verifying images and charts</a>.</li>
 </ul>
 <h2 id="live-vs-roadmap">Live vs Roadmap<a class="headerlink" href="#live-vs-roadmap" title="Permanent link">&para;</a></h2>
 <h3 id="live-implemented">Live / implemented<a class="headerlink" href="#live-implemented" title="Permanent link">&para;</a></h3>
