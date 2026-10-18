@@ -19,7 +19,83 @@
 
 .sb-hero {
   padding: 2.4rem 0 1.6rem;
-  max-width: 40rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr);
+  gap: 2.8rem;
+  align-items: center;
+}
+
+/* What we keep, and what we never keep: the brand voice's first rule,
+   stated next to the headline. */
+.md-typeset .sb-keep {
+  border: 1px solid var(--sb-border);
+  border-radius: 4px;
+  background: var(--sb-surface);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.md-typeset .sb-keep__col {
+  padding: 1rem 1.2rem 0.9rem;
+}
+
+.md-typeset .sb-keep__col + .sb-keep__col {
+  border-top: 1px solid var(--sb-rule);
+}
+
+.md-typeset .sb-keep__title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.45rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--sb-ink);
+}
+
+.md-typeset .sb-keep__title::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  box-sizing: border-box;
+}
+
+.md-typeset .sb-keep__title--ok::before {
+  background: var(--sb-ok);
+}
+
+.md-typeset .sb-keep__title--never::before {
+  border: 1.5px solid var(--sb-bad);
+}
+
+.md-typeset .sb-keep ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.md-typeset .sb-keep li {
+  margin: 0;
+  padding: 0.28rem 0;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--sb-ink);
+  border-top: 1px dashed var(--sb-rule);
+}
+
+.md-typeset .sb-keep li:first-child {
+  border-top: 0;
+}
+
+.md-typeset .sb-keep__foot {
+  margin: 0;
+  padding: 0.75rem 1.2rem;
+  border-top: 1px solid var(--sb-rule);
+  background: var(--sb-sunken);
+  font-size: 0.68rem;
+  line-height: 1.5;
+  color: var(--sb-muted);
 }
 
 .md-typeset .sb-display {
@@ -68,27 +144,363 @@
   margin: 0;
 }
 
-/* ---- Architecture figure -------------------------------------------- */
+/* ---- Follow a request (includes/flow.html) -------------------------
+   Inline SVG coloured from the brand tokens, so it follows the theme.
+   Radio inputs drive the step highlight with :has(); no script. */
 
-.md-typeset .sb-figure {
-  margin: 0.8rem 0 0;
-  border: 1px solid var(--sb-border);
-  border-radius: 4px;
-  overflow: hidden;
-  background: var(--sb-bg);
+.sb-flow-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0 0 0.8rem;
 }
 
-.md-typeset .sb-figure img {
+.sb-flow-controls__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--sb-ink);
+  margin-right: 0.4rem;
+}
+
+.sb-flow-controls input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.sb-flow-controls label {
+  display: inline-flex;
+  align-items: center;
+  min-width: 1.8rem;
+  height: 1.6rem;
+  justify-content: center;
+  padding: 0 0.6rem;
+  border: 1px solid var(--sb-edge);
+  border-radius: 4px;
+  background: var(--sb-surface);
+  color: var(--sb-ink);
+  font-size: 0.7rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  user-select: none;
+}
+
+.sb-flow-controls label:hover {
+  background: var(--sb-sunken);
+}
+
+.sb-flow-controls input:checked + label {
+  border-color: var(--sb-ink);
+  background: var(--sb-ink);
+  color: var(--sb-bg);
+}
+
+.sb-flow-controls input:focus-visible + label {
+  outline: 2px solid var(--sb-accent);
+  outline-offset: 2px;
+}
+
+.sb-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.sb-flow-figure {
+  border: 1px solid var(--sb-border);
+  border-radius: 4px;
+  background: var(--sb-bg);
+  padding: 0.8rem 0.9rem 0.4rem;
+}
+
+.sb-d {
   display: block;
   width: 100%;
   height: auto;
+  font-family: var(--md-text-font-family);
 }
 
-/* One illustration per scheme (Material's #only-light / #only-dark,
-   restated because the rule above is more specific). */
-[data-md-color-scheme="default"] .md-typeset .sb-figure img[src$="#only-dark"],
-[data-md-color-scheme="slate"] .md-typeset .sb-figure img[src$="#only-light"] {
+.sb-d--narrow {
   display: none;
+}
+
+.sb-d-zone {
+  fill: none;
+  stroke: var(--sb-border);
+  stroke-width: 1.25;
+}
+
+.sb-d-zone--cp {
+  fill: var(--sb-accent-soft);
+  stroke: var(--sb-accent);
+}
+
+.sb-d-zone--infra {
+  stroke: var(--sb-edge);
+  stroke-dasharray: 6 5;
+}
+
+.sb-d-label {
+  font-family: var(--md-code-font-family);
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  fill: var(--sb-muted);
+}
+
+.sb-d-box rect {
+  fill: var(--sb-surface);
+  stroke: var(--sb-edge);
+  stroke-width: 1.25;
+}
+
+.sb-d-box--cp rect {
+  stroke: var(--sb-accent-line);
+}
+
+.sb-d-title {
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--sb-ink);
+}
+
+.sb-d-sub {
+  font-size: 12.5px;
+  fill: var(--sb-muted);
+}
+
+.sb-d-note {
+  font-size: 12.5px;
+  fill: var(--sb-muted);
+}
+
+.sb-d-line {
+  fill: none;
+  stroke: var(--sb-ink);
+  stroke-width: 1.5;
+}
+
+.sb-d-line--return {
+  stroke-dasharray: 5 4;
+}
+
+.sb-d-head {
+  fill: var(--sb-ink);
+}
+
+.sb-d-badge circle {
+  fill: var(--sb-surface);
+  stroke: var(--sb-ink);
+  stroke-width: 1.25;
+}
+
+.sb-d-badge text {
+  font-size: 11.5px;
+  font-weight: 600;
+  fill: var(--sb-ink);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.sb-d *,
+.sb-flow-steps li {
+  transition: opacity 120ms ease, stroke 120ms ease, fill 120ms ease;
+}
+
+/* Step captions: a numbered list under the figure */
+.md-typeset ol.sb-flow-steps {
+  list-style: none;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem 1.4rem;
+}
+
+.md-typeset ol.sb-flow-steps > li {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1.4rem minmax(0, 1fr);
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  line-height: 1.55;
+  color: var(--sb-muted);
+}
+
+.md-typeset ol.sb-flow-steps strong {
+  color: var(--sb-ink);
+}
+
+.sb-flow-steps__n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.3rem;
+  height: 1.3rem;
+  border: 1.25px solid var(--sb-ink);
+  border-radius: 50%;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--sb-ink);
+  margin-top: 0.05rem;
+}
+
+/* A step is picked: its connections, badges and boxes take the accent,
+   everything else steps back. */
+.sb-flow:has(#sb-flow-1:checked) :is(.sb-d-line, .sb-d-head, .sb-d-badge):not(.s1):not(.sb-d-legend *),
+.sb-flow:has(#sb-flow-1:checked) .sb-d-box:not(.b1),
+.sb-flow:has(#sb-flow-1:checked) .sb-flow-steps li:not(.c1) {
+  opacity: 0.22;
+}
+.sb-flow:has(#sb-flow-1:checked) .sb-d-line.s1 {
+  stroke: var(--sb-accent);
+  stroke-width: 2.5;
+}
+.sb-flow:has(#sb-flow-1:checked) :is(.sb-d-head.s1, .sb-d-badge.s1 circle) {
+  fill: var(--sb-accent);
+  stroke: var(--sb-accent);
+}
+.sb-flow:has(#sb-flow-1:checked) .sb-d-badge.s1 text {
+  fill: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-1:checked) .sb-d-box.b1 rect {
+  stroke: var(--sb-accent);
+  stroke-width: 2;
+}
+.sb-flow:has(#sb-flow-1:checked) .sb-flow-steps li.c1 .sb-flow-steps__n {
+  background: var(--sb-accent);
+  border-color: var(--sb-accent);
+  color: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-2:checked) :is(.sb-d-line, .sb-d-head, .sb-d-badge):not(.s2):not(.sb-d-legend *),
+.sb-flow:has(#sb-flow-2:checked) .sb-d-box:not(.b2),
+.sb-flow:has(#sb-flow-2:checked) .sb-flow-steps li:not(.c2) {
+  opacity: 0.22;
+}
+.sb-flow:has(#sb-flow-2:checked) .sb-d-line.s2 {
+  stroke: var(--sb-accent);
+  stroke-width: 2.5;
+}
+.sb-flow:has(#sb-flow-2:checked) :is(.sb-d-head.s2, .sb-d-badge.s2 circle) {
+  fill: var(--sb-accent);
+  stroke: var(--sb-accent);
+}
+.sb-flow:has(#sb-flow-2:checked) .sb-d-badge.s2 text {
+  fill: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-2:checked) .sb-d-box.b2 rect {
+  stroke: var(--sb-accent);
+  stroke-width: 2;
+}
+.sb-flow:has(#sb-flow-2:checked) .sb-flow-steps li.c2 .sb-flow-steps__n {
+  background: var(--sb-accent);
+  border-color: var(--sb-accent);
+  color: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-3:checked) :is(.sb-d-line, .sb-d-head, .sb-d-badge):not(.s3):not(.sb-d-legend *),
+.sb-flow:has(#sb-flow-3:checked) .sb-d-box:not(.b3),
+.sb-flow:has(#sb-flow-3:checked) .sb-flow-steps li:not(.c3) {
+  opacity: 0.22;
+}
+.sb-flow:has(#sb-flow-3:checked) .sb-d-line.s3 {
+  stroke: var(--sb-accent);
+  stroke-width: 2.5;
+}
+.sb-flow:has(#sb-flow-3:checked) :is(.sb-d-head.s3, .sb-d-badge.s3 circle) {
+  fill: var(--sb-accent);
+  stroke: var(--sb-accent);
+}
+.sb-flow:has(#sb-flow-3:checked) .sb-d-badge.s3 text {
+  fill: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-3:checked) .sb-d-box.b3 rect {
+  stroke: var(--sb-accent);
+  stroke-width: 2;
+}
+.sb-flow:has(#sb-flow-3:checked) .sb-flow-steps li.c3 .sb-flow-steps__n {
+  background: var(--sb-accent);
+  border-color: var(--sb-accent);
+  color: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-4:checked) :is(.sb-d-line, .sb-d-head, .sb-d-badge):not(.s4):not(.sb-d-legend *),
+.sb-flow:has(#sb-flow-4:checked) .sb-d-box:not(.b4),
+.sb-flow:has(#sb-flow-4:checked) .sb-flow-steps li:not(.c4) {
+  opacity: 0.22;
+}
+.sb-flow:has(#sb-flow-4:checked) .sb-d-line.s4 {
+  stroke: var(--sb-accent);
+  stroke-width: 2.5;
+}
+.sb-flow:has(#sb-flow-4:checked) :is(.sb-d-head.s4, .sb-d-badge.s4 circle) {
+  fill: var(--sb-accent);
+  stroke: var(--sb-accent);
+}
+.sb-flow:has(#sb-flow-4:checked) .sb-d-badge.s4 text {
+  fill: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-4:checked) .sb-d-box.b4 rect {
+  stroke: var(--sb-accent);
+  stroke-width: 2;
+}
+.sb-flow:has(#sb-flow-4:checked) .sb-flow-steps li.c4 .sb-flow-steps__n {
+  background: var(--sb-accent);
+  border-color: var(--sb-accent);
+  color: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-5:checked) :is(.sb-d-line, .sb-d-head, .sb-d-badge):not(.s5):not(.sb-d-legend *),
+.sb-flow:has(#sb-flow-5:checked) .sb-d-box:not(.b5),
+.sb-flow:has(#sb-flow-5:checked) .sb-flow-steps li:not(.c5) {
+  opacity: 0.22;
+}
+.sb-flow:has(#sb-flow-5:checked) .sb-d-line.s5 {
+  stroke: var(--sb-accent);
+  stroke-width: 2.5;
+}
+.sb-flow:has(#sb-flow-5:checked) :is(.sb-d-head.s5, .sb-d-badge.s5 circle) {
+  fill: var(--sb-accent);
+  stroke: var(--sb-accent);
+}
+.sb-flow:has(#sb-flow-5:checked) .sb-d-badge.s5 text {
+  fill: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-5:checked) .sb-d-box.b5 rect {
+  stroke: var(--sb-accent);
+  stroke-width: 2;
+}
+.sb-flow:has(#sb-flow-5:checked) .sb-flow-steps li.c5 .sb-flow-steps__n {
+  background: var(--sb-accent);
+  border-color: var(--sb-accent);
+  color: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-6:checked) :is(.sb-d-line, .sb-d-head, .sb-d-badge):not(.s6):not(.sb-d-legend *),
+.sb-flow:has(#sb-flow-6:checked) .sb-d-box:not(.b6),
+.sb-flow:has(#sb-flow-6:checked) .sb-flow-steps li:not(.c6) {
+  opacity: 0.22;
+}
+.sb-flow:has(#sb-flow-6:checked) .sb-d-line.s6 {
+  stroke: var(--sb-accent);
+  stroke-width: 2.5;
+}
+.sb-flow:has(#sb-flow-6:checked) :is(.sb-d-head.s6, .sb-d-badge.s6 circle) {
+  fill: var(--sb-accent);
+  stroke: var(--sb-accent);
+}
+.sb-flow:has(#sb-flow-6:checked) .sb-d-badge.s6 text {
+  fill: var(--sb-on-accent);
+}
+.sb-flow:has(#sb-flow-6:checked) .sb-d-box.b6 rect {
+  stroke: var(--sb-accent);
+  stroke-width: 2;
+}
+.sb-flow:has(#sb-flow-6:checked) .sb-flow-steps li.c6 .sb-flow-steps__n {
+  background: var(--sb-accent);
+  border-color: var(--sb-accent);
+  color: var(--sb-on-accent);
 }
 
 /* ---- Sections ------------------------------------------------------- */
@@ -250,6 +662,23 @@
 /* ---- Small screens -------------------------------------------------- */
 
 @media screen and (max-width: 76.1875em) {
+  .sb-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.8rem;
+  }
+  .md-typeset .sb-keep {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .md-typeset .sb-keep__col + .sb-keep__col {
+    border-top: 0;
+    border-left: 1px solid var(--sb-rule);
+  }
+  .md-typeset .sb-keep__foot {
+    grid-column: 1 / -1;
+  }
+  .md-typeset ol.sb-flow-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .md-typeset ol.sb-steps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -262,16 +691,29 @@
 }
 
 @media screen and (max-width: 44.9375em) {
-  /* The diagram stays readable: full size, scrolling sideways in its box. */
-  .md-typeset .sb-figure {
-    overflow-x: auto;
+  /* Phones get the vertical drawing, at a readable size. */
+  .sb-d--wide {
+    display: none;
   }
-  .md-typeset .sb-figure img {
-    width: 46rem;
-    max-width: none;
+  .sb-d--narrow {
+    display: block;
+    max-width: 24rem;
+    margin: 0 auto;
+  }
+  .md-typeset ol.sb-flow-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .md-typeset .sb-keep {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .md-typeset .sb-keep__col + .sb-keep__col {
+    border-left: 0;
+    border-top: 1px solid var(--sb-rule);
   }
   .sb-hero {
     padding-top: 1.2rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.6rem;
   }
   .md-typeset .sb-display {
     font-size: 2.1rem; /* the page-title size on phones */

@@ -102,6 +102,34 @@
   --md-footer-fg-color--light: var(--sb-muted);
   --md-footer-fg-color--lighter: var(--sb-edge);
 
+  /* Mermaid diagrams in the docs take the brand too */
+  --md-mermaid-font-family: var(--md-text-font-family);
+  --md-mermaid-edge-color: var(--sb-ink);
+  --md-mermaid-node-bg-color: var(--sb-surface);
+  --md-mermaid-node-fg-color: var(--sb-ink);
+  --md-mermaid-label-bg-color: var(--sb-bg);
+  --md-mermaid-label-fg-color: var(--sb-ink);
+  --md-mermaid-sequence-actor-bg-color: var(--sb-surface);
+  --md-mermaid-sequence-actor-fg-color: var(--sb-ink);
+  --md-mermaid-sequence-actor-border-color: var(--sb-edge);
+  --md-mermaid-sequence-actor-line-color: var(--sb-edge);
+  --md-mermaid-sequence-actorman-bg-color: var(--sb-surface);
+  --md-mermaid-sequence-actorman-line-color: var(--sb-edge);
+  --md-mermaid-sequence-box-bg-color: var(--sb-accent-soft);
+  --md-mermaid-sequence-box-fg-color: var(--sb-ink);
+  --md-mermaid-sequence-label-bg-color: var(--sb-surface);
+  --md-mermaid-sequence-label-fg-color: var(--sb-ink);
+  --md-mermaid-sequence-loop-bg-color: var(--sb-sunken);
+  --md-mermaid-sequence-loop-fg-color: var(--sb-ink);
+  --md-mermaid-sequence-loop-border-color: var(--sb-border);
+  --md-mermaid-sequence-message-fg-color: var(--sb-ink);
+  --md-mermaid-sequence-message-line-color: var(--sb-ink);
+  --md-mermaid-sequence-note-bg-color: var(--sb-warn-bg);
+  --md-mermaid-sequence-note-fg-color: var(--sb-ink);
+  --md-mermaid-sequence-note-border-color: var(--sb-warn-line);
+  --md-mermaid-sequence-number-bg-color: var(--sb-accent);
+  --md-mermaid-sequence-number-fg-color: var(--sb-on-accent);
+
   /* Admonitions sit on the surface */
   --md-admonition-bg-color: var(--sb-surface);
   --md-admonition-fg-color: var(--sb-ink);
@@ -119,9 +147,9 @@
 
 .md-typeset h1 {
   font-weight: 600;
-  font-size: 2.1rem; /* 42 px page-title */
-  line-height: 1.12;
-  letter-spacing: -0.025em;
+  font-size: 1.6rem; /* 32 px: docs pages; the home page uses its own display size */
+  line-height: 1.15;
+  letter-spacing: -0.022em;
   color: var(--sb-ink);
   margin: 0 0 1rem;
 }

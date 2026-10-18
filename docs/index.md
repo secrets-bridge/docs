@@ -13,6 +13,8 @@ hide:
 
 <section class="sb-hero" aria-labelledby="sb-hero-title" markdown>
 
+<div class="sb-hero__copy" markdown>
+
 <h1 id="sb-hero-title" class="sb-display">Govern who uses your secrets.</h1>
 
 <p class="sb-lede">
@@ -30,39 +32,36 @@ stay in your provider.
 
 <p class="sb-note">Open source and pre-1.0. <a href="overview/product-status/">See what is live today</a> and what is still on the roadmap.</p>
 
+</div>
+
+<aside class="sb-keep" aria-label="What Secrets Bridge keeps and never keeps">
+<div class="sb-keep__col">
+<h2 class="sb-keep__title sb-keep__title--ok">We keep</h2>
+<ul>
+<li>Requests, and who approved them</li>
+<li>The audit trail: who, what, when and why</li>
+<li>Which secret paths and key names a project may use</li>
+</ul>
+</div>
+<div class="sb-keep__col">
+<h2 class="sb-keep__title sb-keep__title--never">We never keep</h2>
+<ul>
+<li>Secret values in plain text. In transit a value exists only as an encrypted, single-use wrap with a short lifetime.</li>
+<li>Provider credentials. The agent uses its own, inside your infrastructure.</li>
+</ul>
+</div>
+<p class="sb-keep__foot">The agent runs inside your infrastructure and only calls out, so you open no inbound port.</p>
+</aside>
+
 </section>
 
-<figure class="sb-figure" tabindex="0" role="region" aria-label="Architecture diagram">
-<img src="assets/architecture-light.svg#only-light" width="1100" height="400" alt="People use the console and API. The control plane holds workflow, policy, audit and metadata. An agent inside your boundary calls out to it and reads the provider. Providers connect only to the agent.">
-<img src="assets/architecture-dark.svg#only-dark" width="1100" height="400" alt="People use the console and API. The control plane holds workflow, policy, audit and metadata. An agent inside your boundary calls out to it and reads the provider. Providers connect only to the agent.">
-</figure>
+<section class="sb-section sb-section--flow" aria-labelledby="sb-flow-title" markdown>
 
-<section class="sb-section" aria-labelledby="sb-how" markdown>
+<h2 id="sb-flow-title" class="sb-section-title">Where your secrets go, and where they don't</h2>
 
-<h2 id="sb-how" class="sb-section-title">How a request works</h2>
+<p class="sb-lede sb-lede--small">Values stay in your provider until an approved request needs them. Then they travel once, sealed, and only to the person who asked. Pick a step to follow it.</p>
 
-<ol class="sb-steps">
-<li>
-<svg class="sb-icon" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="butt"><rect x="3.5" y="4" width="11" height="16"/><path d="M10 12H20.5M17 8.5L20.5 12L17 15.5"/></g></svg>
-<h3>Ask for access</h3>
-<p>Name the secret, the keys you need and why. A request carries key names, never a value.</p>
-</li>
-<li>
-<svg class="sb-icon" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="butt"><path d="M5 3.5V20.5"/><path d="M9.5 12.5L13 16L20 8"/></g></svg>
-<h3>Someone approves</h3>
-<p>The policy for the project and environment decides how many approvals it needs and from whom. By default, nobody approves their own request.</p>
-</li>
-<li>
-<svg class="sb-icon" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="butt"><path d="M3.5 11H20.5V20.5H3.5Z"/><path d="M12 16V3.5M8.5 7L12 3.5L15.5 7"/></g></svg>
-<h3>The agent reads it</h3>
-<p>An agent inside your boundary claims the job, reads the provider and seals the values into a single-use wrap. It only ever calls out.</p>
-</li>
-<li>
-<svg class="sb-icon" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="butt"><path d="M9 6H20.5M9 12H20.5M9 18H16"/><path d="M4 5H6.5V7.5H4ZM4 11H6.5V13.5H4ZM4 17H6.5V19.5H4Z"/></g></svg>
-<h3>Reveal once, on the record</h3>
-<p>The requester reveals each value once, behind a second factor. Every step lands in the audit log under one correlation ID.</p>
-</li>
-</ol>
+--8<-- "includes/flow.html"
 
 </section>
 
@@ -74,7 +73,7 @@ stay in your provider.
 </div>
 
 <ul class="sb-rules">
-<li><strong>No values at rest in the control plane.</strong> Not in Postgres, Redis, logs, audit events or the browser.</li>
+<li><strong>No plaintext values in the control plane.</strong> Not in Postgres, Redis, logs, audit events or the browser. In transit, values are KMS-wrapped.</li>
 <li><strong>The agent only calls out.</strong> No inbound port, no database, no Kubernetes API access to Secrets.</li>
 <li><strong>Production never allows direct reveal.</strong> The refusal is enforced in code and audited.</li>
 <li><strong>Values move once.</strong> KMS-wrapped, single-use, short-lived, and opened only by the right person.</li>
