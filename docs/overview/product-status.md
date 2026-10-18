@@ -59,6 +59,10 @@ Being built now; not yet live or certified. Do not depend on these yet.
   built; rolling it onto a live agent is gated on a controlled rollout.
 - **Richer agent fleet dashboard (UI)**: the agent management API exists; the
   full fleet UI view is next.
+- **Object storage for media**: project and team logos move from Postgres to
+  a private S3 or S3-compatible bucket, served through the api with the
+  existing authorization. Secret values never go to object storage. See
+  [Object storage](../operations/object-storage.md).
 
 ## Live vs Roadmap
 

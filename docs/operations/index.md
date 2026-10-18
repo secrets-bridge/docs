@@ -11,6 +11,7 @@ Everything you need to run Secrets Bridge.
 |---|---|
 | [Running locally with docker compose](docker-compose.md) | First time trying it locally; smoke tests in CI |
 | [Bootstrap & first sign-in](bootstrap.md) | After the stack is up, how to sign in, enroll your first agent, run your first request |
+| [Object storage](object-storage.md) | Setting up an S3 or S3-compatible bucket for media such as logos (in progress) |
 | [Configuration reference](config.md) | Exhaustive env-var table for `api` / `agent` / `worker` / `controller`, plus the dev-only insecure switches |
 | [Troubleshooting](troubleshooting.md) | When things go wrong, common pitfalls + how to read the audit log |
 

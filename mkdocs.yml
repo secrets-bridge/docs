@@ -198,6 +198,7 @@ nav:
       - Reveal sessions: operations/reveal-sessions.md
       - Cross-team requests: operations/cross-team-requests.md
       - Provider connections: operations/provider-connections.md
+      - Object storage: operations/object-storage.md
       - Configuration reference: operations/config.md
       - Troubleshooting: operations/troubleshooting.md
   - Reference:
