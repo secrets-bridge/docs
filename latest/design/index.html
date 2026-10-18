@@ -7,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="The Figma file, brand voice, design tokens, and asset library that keep every Secrets Bridge surface (SPA, docs, README banners, social cards) feeling like one product.">
+        <meta name="description" content="The Secrets Bridge brand: voice, tokens, logos and assets shared by the console, this site and the brand marks.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
@@ -51,10 +51,12 @@
         
         
         
-        <link rel="stylesheet" href="../assets/external/fonts.googleapis.com/css.56f7ac64.css">
-        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="../assets/external/fonts.googleapis.com/css.804a7bde.css">
+        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../stylesheets/brand.css">
     
       <link rel="stylesheet" href="../stylesheets/landing.css">
     
@@ -72,6 +74,8 @@
   
   
   
+  
+  
 
   
   <link rel="canonical" href="https://secrets-bridge.io/latest/design/">
@@ -80,27 +84,28 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Secrets Bridge" />
   <meta property="og:title" content="Design system" />
-  <meta property="og:description" content="The Figma file, brand voice, design tokens, and asset library that keep every Secrets Bridge surface (SPA, docs, README banners, social cards) feeling like one product." />
+  <meta property="og:description" content="The Secrets Bridge brand: voice, tokens, logos and assets shared by the console, this site and the brand marks." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/design/" />
-  <meta property="og:image" content="https://secrets-bridge.io/assets/og-banner.png" />
+  <meta property="og:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Secrets Bridge — The brain behind your secrets." />
+  <meta property="og:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   <meta property="og:locale" content="en_US" />
 
   
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Design system" />
-  <meta name="twitter:description" content="The Figma file, brand voice, design tokens, and asset library that keep every Secrets Bridge surface (SPA, docs, README banners, social cards) feeling like one product." />
-  <meta name="twitter:image" content="https://secrets-bridge.io/assets/og-banner.png" />
-  <meta name="twitter:image:alt" content="Secrets Bridge — The brain behind your secrets." />
+  <meta name="twitter:description" content="The Secrets Bridge brand: voice, tokens, logos and assets shared by the console, this site and the brand marks." />
+  <meta name="twitter:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
+  <meta name="twitter:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   
 
   
-  <link rel="apple-touch-icon" href="../assets/icon.svg" />
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png" />
 
   
-  <meta name="theme-color" content="#0B1220" />
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#17191E" media="(prefers-color-scheme: dark)" />
 
   
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
@@ -112,15 +117,15 @@
     "@context": "https://schema.org",
     "@type": "TechArticle",
     "headline": "Design system",
-    "description": "The Figma file, brand voice, design tokens, and asset library that keep every Secrets Bridge surface (SPA, docs, README banners, social cards) feeling like one product.",
+    "description": "The Secrets Bridge brand: voice, tokens, logos and assets shared by the console, this site and the brand marks.",
     "url": "https://secrets-bridge.io/latest/design/",
-    "image": "https://secrets-bridge.io/assets/og-banner.png",
+    "image": "https://secrets-bridge.io/latest/assets/og-banner.png",
     "publisher": {
       "@type": "Organization",
       "name": "Secrets Bridge",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://secrets-bridge.io/assets/og-banner.png"
+        "url": "https://secrets-bridge.io/latest/assets/og-banner.png"
       }
     }
   }
@@ -137,7 +142,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="cyan">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -168,7 +173,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="Secrets Bridge" class="md-header__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../assets/icon.svg" alt="logo">
+  <img src="../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -198,20 +203,20 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark theme"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      <label class="md-header__button md-icon" title="Switch to dark theme" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
   
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="cyan"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light theme"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      <label class="md-header__button md-icon" title="Switch to light theme" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
   
@@ -452,7 +457,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="Secrets Bridge" class="md-nav__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../assets/icon.svg" alt="logo">
+  <img src="../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
 
     </a>
     Secrets Bridge
@@ -1101,7 +1106,7 @@
   <span class="md-ellipsis">
     
   
-    Tokens & theme
+    Tokens and theme
   
 
     
@@ -1122,14 +1127,14 @@
   
   
     <li class="md-nav__item">
-      <a href="figma/" class="md-nav__link">
+      <a href="assets/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Figma file & assets
+    Logos and assets
   
 
     
@@ -1809,10 +1814,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#why-we-wrote-this-down" class="md-nav__link">
+  <a href="#the-short-version" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why we wrote this down
+        The short version
       
     </span>
   </a>
@@ -1820,10 +1825,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-short-version" class="md-nav__link">
+  <a href="#where-it-lives" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The short version
+        Where it lives
       
     </span>
   </a>
@@ -1847,7 +1852,7 @@
 
 
   
-    <a href="https://github.com/secrets-bridge/edit/main/docs/design/index.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/secrets-bridge/docs/edit/main/docs/design/index.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1856,7 +1861,7 @@
     
       
     
-    <a href="https://github.com/secrets-bridge/raw/main/docs/design/index.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/secrets-bridge/docs/raw/main/docs/design/index.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
@@ -1864,31 +1869,13 @@
 
 
 <h1 id="design-system">Design system<a class="headerlink" href="#design-system" title="Permanent link">&para;</a></h1>
-<p>Secrets Bridge has a consistent brand. The SPA, the GitHub
-org, the README banners, and these docs all use the same tokens,
-the same fonts, and the same canonical phrasing, so it feels
-like one product no matter where you encounter it.</p>
-<p>If you're contributing copy, building a new page, or shipping
-external comms, <strong>read these three pages first</strong>:</p>
+<p>One system covers the console, this site and the brand marks. It aims for an operations tool written by the engineers who answer for it: plain, exact and quiet, with one ultramarine accent and nothing decorative.</p>
+<p>Read these before you write copy, build a page or make an image:</p>
 <ol>
-<li><strong><a href="brand-voice/">Brand voice</a></strong>: the tagline, wordmark
-   conventions, metaphor family, voice rules</li>
-<li><strong><a href="tokens/">Tokens &amp; theme</a></strong>: the color palette, type
-   ramp, spacing, and how they're consumed in Tailwind</li>
-<li><strong><a href="figma/">Figma file &amp; assets</a></strong>: where the canonical
-   design lives, how to download the brand assets, the sync
-   scripts that pull tokens from Figma into the SPA</li>
+<li><strong><a href="brand-voice/">Brand voice</a></strong>: how we describe the product and its maturity, and the words we avoid.</li>
+<li><strong><a href="tokens/">Tokens and theme</a></strong>: colours for light and dark, the type scale, spacing, radii, and where each repo reads them.</li>
+<li><strong><a href="assets/">Logos and assets</a></strong>: the Checkpoint mark, its approved colourings, the product icons and the architecture illustration.</li>
 </ol>
-<h2 id="why-we-wrote-this-down">Why we wrote this down<a class="headerlink" href="#why-we-wrote-this-down" title="Permanent link">&para;</a></h2>
-<p>A brand drifts the moment two people write copy without a shared
-reference. Every PR adds friction to "wait, do we call it
-<em>Secrets Bridge</em> or <em>SecretsBridge</em>?" Every external surface (a
-README, a social card, a marketing site, a conference slide) is
-an opportunity for a contributor to invent their own variant.</p>
-<p>The three pages above are the answer to "what do I match against?"
-Match these. If you find yourself wanting to deviate, open an
-issue against <a href="https://github.com/secrets-bridge/skills"><code>secrets-bridge/skills</code></a>
-and we'll either update the system or document the exception.</p>
 <h2 id="the-short-version">The short version<a class="headerlink" href="#the-short-version" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1899,45 +1886,42 @@ and we'll either update the system or document the exception.</p>
 </thead>
 <tbody>
 <tr>
-<td>Tagline?</td>
-<td><strong>The brain behind your secrets.</strong> (verbatim, including the trailing period)</td>
+<td>Name</td>
+<td><strong>Secrets Bridge</strong>, two words, everywhere. In logos it comes from the lockup files; never retype it.</td>
 </tr>
 <tr>
-<td>Eyebrow?</td>
-<td><strong>UNIFIED SECRETS CONTROL PLANE</strong> (all caps)</td>
+<td>Fonts</td>
+<td>IBM Plex Sans for what people read, IBM Plex Mono for what machines read (refs, key names, paths, times, code). Weights 400, 500 and 600.</td>
 </tr>
 <tr>
-<td>Wordmark in logos / brand identity?</td>
-<td><strong>SecretsBridge</strong> (one word)</td>
+<td>Accent</td>
+<td>Ultramarine <code>#3141C8</code> on light, periwinkle <code>#9AA3FF</code> on dark. A signal only: links, one primary button per view, the current tab, the focus ring.</td>
 </tr>
 <tr>
-<td>Wordmark in body copy / READMEs / prose?</td>
-<td><strong>Secrets Bridge</strong> (two words)</td>
+<td>Surfaces</td>
+<td>Paper <code>bg</code>, white <code>surface</code>, <code>ink</code> text. Panels separate with a border, not a shadow.</td>
 </tr>
 <tr>
-<td>UI font?</td>
-<td><a href="https://fonts.google.com/specimen/Inter">Inter</a></td>
+<td>Corners</td>
+<td>Square. 4 px is the largest radius. Only avatars are round.</td>
 </tr>
 <tr>
-<td>Code / CLI font?</td>
-<td><a href="https://fonts.google.com/specimen/JetBrains+Mono">JetBrains Mono</a></td>
+<td>Status</td>
+<td>A small square and the exact status word. Colour never carries a status alone.</td>
 </tr>
 <tr>
-<td>Primary accent color?</td>
-<td>Cyan <code>#06B6D4</code> (<code>text-accent</code> in Tailwind)</td>
-</tr>
-<tr>
-<td>Base background?</td>
-<td>Navy 900 <code>#0B1220</code> (<code>bg-bg</code> in Tailwind)</td>
-</tr>
-<tr>
-<td>Canonical Figma file</td>
-<td><a href="figma/">Secrets Bridge - Brand</a></td>
+<td>Secret values</td>
+<td>Never shown outside the reveal panel: no values, lengths, hashes or previews.</td>
 </tr>
 </tbody>
 </table>
-<p>Everything else is detail, but it's detail we've thought about,
-written down, and want you to use.</p>
+<h2 id="where-it-lives">Where it lives<a class="headerlink" href="#where-it-lives" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The console reads the tokens from <code>src/index.css</code> in the <a href="https://github.com/secrets-bridge/ui"><code>ui</code></a> repo (Tailwind <code>@theme</code>), with light and dark themes.</li>
+<li>This site maps the same tokens onto mkdocs-material in <code>docs/stylesheets/brand.css</code>.</li>
+<li>Logos, icons and the illustration are served from this site's <code>assets/</code> folder, listed on <a href="assets/">Logos and assets</a>.</li>
+</ul>
+<p>If something here doesn't cover your case, open an issue in <a href="https://github.com/secrets-bridge/docs/issues"><code>secrets-bridge/docs</code></a> and we'll either extend the system or write down the exception.</p>
 
 
 

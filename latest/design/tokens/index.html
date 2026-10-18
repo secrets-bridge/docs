@@ -7,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap.">
+        <meta name="description" content="Secrets Bridge design tokens: colours for light and dark, the type scale, spacing, radii and control sizes.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
@@ -19,7 +19,7 @@
         <link rel="prev" href="../brand-voice/">
       
       
-        <link rel="next" href="../figma/">
+        <link rel="next" href="../assets/">
       
       
         
@@ -30,7 +30,7 @@
     
     
   
-    <title>Tokens & theme - Secrets Bridge</title>
+    <title>Tokens and theme - Secrets Bridge</title>
   
 
     
@@ -51,10 +51,12 @@
         
         
         
-        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.56f7ac64.css">
-        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.804a7bde.css">
+        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../../stylesheets/brand.css">
     
       <link rel="stylesheet" href="../../stylesheets/landing.css">
     
@@ -72,6 +74,8 @@
   
   
   
+  
+  
 
   
   <link rel="canonical" href="https://secrets-bridge.io/latest/design/tokens/">
@@ -79,28 +83,29 @@
   
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Secrets Bridge" />
-  <meta property="og:title" content="Tokens & theme" />
-  <meta property="og:description" content="Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap." />
+  <meta property="og:title" content="Tokens and theme" />
+  <meta property="og:description" content="Secrets Bridge design tokens: colours for light and dark, the type scale, spacing, radii and control sizes." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/design/tokens/" />
-  <meta property="og:image" content="https://secrets-bridge.io/assets/og-banner.png" />
+  <meta property="og:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Secrets Bridge — The brain behind your secrets." />
+  <meta property="og:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   <meta property="og:locale" content="en_US" />
 
   
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Tokens & theme" />
-  <meta name="twitter:description" content="Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap." />
-  <meta name="twitter:image" content="https://secrets-bridge.io/assets/og-banner.png" />
-  <meta name="twitter:image:alt" content="Secrets Bridge — The brain behind your secrets." />
+  <meta name="twitter:title" content="Tokens and theme" />
+  <meta name="twitter:description" content="Secrets Bridge design tokens: colours for light and dark, the type scale, spacing, radii and control sizes." />
+  <meta name="twitter:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
+  <meta name="twitter:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   
 
   
-  <link rel="apple-touch-icon" href="../../assets/icon.svg" />
+  <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png" />
 
   
-  <meta name="theme-color" content="#0B1220" />
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#17191E" media="(prefers-color-scheme: dark)" />
 
   
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
@@ -111,16 +116,16 @@
   {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    "headline": "Tokens & theme",
-    "description": "Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap.",
+    "headline": "Tokens and theme",
+    "description": "Secrets Bridge design tokens: colours for light and dark, the type scale, spacing, radii and control sizes.",
     "url": "https://secrets-bridge.io/latest/design/tokens/",
-    "image": "https://secrets-bridge.io/assets/og-banner.png",
+    "image": "https://secrets-bridge.io/latest/assets/og-banner.png",
     "publisher": {
       "@type": "Organization",
       "name": "Secrets Bridge",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://secrets-bridge.io/assets/og-banner.png"
+        "url": "https://secrets-bridge.io/latest/assets/og-banner.png"
       }
     }
   }
@@ -137,7 +142,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="cyan">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -146,7 +151,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#tokens-theme" class="md-skip">
+        <a href="#tokens-and-theme" class="md-skip">
           Skip to content
         </a>
       
@@ -168,7 +173,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Secrets Bridge" class="md-header__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/icon.svg" alt="logo">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -185,7 +190,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Tokens & theme
+              Tokens and theme
             
           </span>
         </div>
@@ -198,20 +203,20 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark theme"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      <label class="md-header__button md-icon" title="Switch to dark theme" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
   
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="cyan"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light theme"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      <label class="md-header__button md-icon" title="Switch to light theme" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
   
@@ -452,7 +457,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="Secrets Bridge" class="md-nav__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/icon.svg" alt="logo">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
 
     </a>
     Secrets Bridge
@@ -1110,7 +1115,7 @@
   <span class="md-ellipsis">
     
   
-    Tokens & theme
+    Tokens and theme
   
 
     
@@ -1128,7 +1133,7 @@
   <span class="md-ellipsis">
     
   
-    Tokens & theme
+    Tokens and theme
   
 
     
@@ -1154,66 +1159,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#color-tokens" class="md-nav__link">
+  <a href="#colour" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Color tokens
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Color tokens">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#status-colors-statuspill-variants" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Status colors (StatusPill variants)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#type-tokens" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Type tokens
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Type tokens">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#type-scale" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Type scale
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#spacing-layout" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Spacing &amp; layout
+        Colour
       
     </span>
   </a>
@@ -1221,10 +1170,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gradients" class="md-nav__link">
+  <a href="#status" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Gradients
+        Status
       
     </span>
   </a>
@@ -1232,10 +1181,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#where-these-live-in-code" class="md-nav__link">
+  <a href="#type" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where these live in code
+        Type
       
     </span>
   </a>
@@ -1243,10 +1192,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-to-update-a-token" class="md-nav__link">
+  <a href="#space-shape-and-size" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How to update a token
+        Space, shape and size
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#accessibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accessibility
       
     </span>
   </a>
@@ -1269,14 +1229,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../figma/" class="md-nav__link">
+      <a href="../assets/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Figma file & assets
+    Logos and assets
   
 
     
@@ -1956,66 +1916,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#color-tokens" class="md-nav__link">
+  <a href="#colour" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Color tokens
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Color tokens">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#status-colors-statuspill-variants" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Status colors (StatusPill variants)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#type-tokens" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Type tokens
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Type tokens">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#type-scale" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Type scale
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#spacing-layout" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Spacing &amp; layout
+        Colour
       
     </span>
   </a>
@@ -2023,10 +1927,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gradients" class="md-nav__link">
+  <a href="#status" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Gradients
+        Status
       
     </span>
   </a>
@@ -2034,10 +1938,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#where-these-live-in-code" class="md-nav__link">
+  <a href="#type" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where these live in code
+        Type
       
     </span>
   </a>
@@ -2045,10 +1949,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-to-update-a-token" class="md-nav__link">
+  <a href="#space-shape-and-size" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How to update a token
+        Space, shape and size
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#accessibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accessibility
       
     </span>
   </a>
@@ -2072,7 +1987,7 @@
 
 
   
-    <a href="https://github.com/secrets-bridge/edit/main/docs/design/tokens.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/secrets-bridge/docs/edit/main/docs/design/tokens.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2081,263 +1996,382 @@
     
       
     
-    <a href="https://github.com/secrets-bridge/raw/main/docs/design/tokens.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/secrets-bridge/docs/raw/main/docs/design/tokens.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="tokens-theme">Tokens &amp; theme<a class="headerlink" href="#tokens-theme" title="Permanent link">&para;</a></h1>
-<p>The SPA's Tailwind theme, this docs site, the GitHub social
-banners, and every brand surface use the same set of design
-tokens. The Figma file is the source; the SPA's
-<code>tailwind.config.js</code> is the consumer.</p>
-<h2 id="color-tokens">Color tokens<a class="headerlink" href="#color-tokens" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Tailwind name</th>
-<th>Hex</th>
-<th>Role</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>bg</code></td>
-<td><code>#0B1220</code></td>
-<td>Base page background (Navy 900)</td>
-</tr>
-<tr>
-<td><code>surface</code></td>
-<td><code>#0F172A</code></td>
-<td>Card / panel surface (Dark Navy)</td>
-</tr>
-<tr>
-<td><code>text</code></td>
-<td><code>#CBD5E1</code></td>
-<td>Body copy (Slate 300)</td>
-</tr>
-<tr>
-<td><code>muted</code></td>
-<td><code>#64748B</code></td>
-<td>Secondary text / labels (Slate 500)</td>
-</tr>
-<tr>
-<td><code>accent</code></td>
-<td><code>#06B6D4</code></td>
-<td><strong>Primary accent</strong> (Cyan)</td>
-</tr>
-<tr>
-<td><code>accent-bright</code></td>
-<td><code>#22D3EE</code></td>
-<td>Highlight / hover</td>
-</tr>
-<tr>
-<td><code>border</code></td>
-<td><code>#1E293B</code></td>
-<td>Card edges, separators</td>
-</tr>
-<tr>
-<td><code>teal</code></td>
-<td><code>#14B8A6</code></td>
-<td>Secondary accent</td>
-</tr>
-<tr>
-<td><code>blue</code></td>
-<td><code>#3B82F6</code></td>
-<td>Tertiary / brand-gradient end</td>
-</tr>
-<tr>
-<td><code>purple</code></td>
-<td><code>#A855F7</code></td>
-<td>Tertiary (sparingly)</td>
-</tr>
-<tr>
-<td><code>success</code></td>
-<td><code>#10B981</code></td>
-<td>StatusPill success (Vault healthy, request approved)</td>
-</tr>
-</tbody>
-</table>
-<h3 id="status-colors-statuspill-variants">Status colors (StatusPill variants)<a class="headerlink" href="#status-colors-statuspill-variants" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Variant</th>
-<th>When</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>success</code></td>
-<td>Green outline / fill: agent active, request approved, audit success, secret present</td>
-</tr>
-<tr>
-<td><code>warning</code></td>
-<td>Yellow outline / fill: agent stale, audit denied, env uat, archived project, applied_unverified</td>
-</tr>
-<tr>
-<td><code>error</code></td>
-<td>Red outline / fill: request rejected/failed, env prod, audit failure</td>
-</tr>
-<tr>
-<td><code>pending</code></td>
-<td>Yellow: request pending</td>
-</tr>
-<tr>
-<td><code>accent</code></td>
-<td>Cyan: role badges, env staging</td>
-</tr>
-<tr>
-<td><code>system</code></td>
-<td>Cyan outline: system-seed row marker</td>
-</tr>
-<tr>
-<td><code>neutral</code></td>
-<td>Muted: env other, preview chips</td>
-</tr>
-<tr>
-<td><code>cancelled</code></td>
-<td>Muted strikethrough: consumed wraps</td>
-</tr>
-</tbody>
-</table>
-<h2 id="type-tokens">Type tokens<a class="headerlink" href="#type-tokens" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Family</th>
-<th>Font</th>
-<th>When</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Sans</td>
-<td><a href="https://fonts.google.com/specimen/Inter">Inter</a></td>
-<td>Body copy, headings, UI labels</td>
-</tr>
-<tr>
-<td>Mono</td>
-<td><a href="https://fonts.google.com/specimen/JetBrains+Mono">JetBrains Mono</a></td>
-<td>Code, CLI snippets, identifiers, UUIDs, secret refs</td>
-</tr>
-</tbody>
-</table>
-<p>Loaded via Google Fonts with <code>preconnect</code> to keep CLS low. The
-SPA's CSP allows <code>fonts.googleapis.com</code> + <code>fonts.gstatic.com</code> for
-this reason.</p>
-<h3 id="type-scale">Type scale<a class="headerlink" href="#type-scale" title="Permanent link">&para;</a></h3>
+<h1 id="tokens-and-theme">Tokens and theme<a class="headerlink" href="#tokens-and-theme" title="Permanent link">&para;</a></h1>
+<p>The console, this site and the brand assets use one set of tokens with light and dark values. Take every colour, size, radius and font from here; never copy a hex value out of a screenshot.</p>
+<ul>
+<li><strong>Console:</strong> <code>src/index.css</code> in the <a href="https://github.com/secrets-bridge/ui"><code>ui</code></a> repo declares them as CSS variables and maps them into Tailwind with <code>@theme</code>. <code>data-theme</code> on <code>&lt;html&gt;</code> switches light and dark, and the system setting is the default.</li>
+<li><strong>This site:</strong> <code>docs/stylesheets/brand.css</code> maps them onto mkdocs-material's variables for its light and dark schemes.</li>
+</ul>
+<h2 id="colour">Colour<a class="headerlink" href="#colour" title="Permanent link">&para;</a></h2>
+<p>Build every screen from <code>bg</code>, <code>surface</code>, <code>ink</code>, <code>muted</code>, <code>border</code> and <code>rule</code>: roughly 70% <code>bg</code>, 13% <code>surface</code>, 10% <code>ink</code>, 5% <code>muted</code> and <code>rule</code>, and about 2% <code>accent</code>.</p>
 <table>
 <thead>
 <tr>
 <th>Token</th>
-<th>Tailwind class</th>
+<th>Light</th>
+<th>Dark</th>
 <th>Use</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>display</code></td>
-<td><code>text-5xl font-bold</code></td>
-<td>Hero headings (Figma frames only)</td>
+<td><code>bg</code></td>
+<td><code>#F6F5F1</code></td>
+<td><code>#0F1013</code></td>
+<td>Paper. Page background behind everything; about 70% of a screen.</td>
 </tr>
 <tr>
-<td><code>h1</code></td>
-<td><code>text-2xl font-bold tracking-tight</code></td>
-<td>Page title (PageHeader)</td>
+<td><code>surface</code></td>
+<td><code>#FFFFFF</code></td>
+<td><code>#17191E</code></td>
+<td>Panels, tables, dialogs, drawers and inputs sitting on bg.</td>
 </tr>
 <tr>
-<td><code>h2</code></td>
-<td><code>text-base font-semibold</code></td>
-<td>Card / section headers</td>
+<td><code>sunken</code></td>
+<td><code>#EFEEE9</code></td>
+<td><code>#1D1F25</code></td>
+<td>Row hover, current nav item, read-only boxes, key chips.</td>
 </tr>
 <tr>
-<td><code>eyebrow</code></td>
-<td><code>text-[11px] uppercase tracking-wider text-muted font-medium</code></td>
-<td>Field labels, table headers</td>
+<td><code>ink</code></td>
+<td><code>#15171C</code></td>
+<td><code>#ECECEE</code></td>
+<td>Primary text and the production environment tag. 16.4:1 on bg (light), 16.1:1 (dark).</td>
 </tr>
 <tr>
-<td><code>body</code></td>
-<td><code>text-sm</code></td>
-<td>Default body copy</td>
+<td><code>muted</code></td>
+<td><code>#5B606B</code></td>
+<td><code>#A2A6AF</code></td>
+<td>Secondary text: subtitles, table headers, times, hints. 5.8:1 on bg (light), 7.8:1 (dark); passes 4.5:1 on surface and sunken too.</td>
 </tr>
 <tr>
-<td><code>caption</code></td>
-<td><code>text-[11px] text-muted</code></td>
-<td>Footer notes, helper text</td>
+<td><code>border</code></td>
+<td><code>#DDDBD4</code></td>
+<td><code>#2B2E36</code></td>
+<td>Outer edges of panels, tables and dividers between sections. Decorative only: never the only edge of a control.</td>
+</tr>
+<tr>
+<td><code>rule</code></td>
+<td><code>#E8E6E0</code></td>
+<td><code>#22252B</code></td>
+<td>Hairlines between rows inside a table, list or log.</td>
+</tr>
+<tr>
+<td><code>edge</code></td>
+<td><code>#7E838D</code></td>
+<td><code>#686D7A</code></td>
+<td>Control borders (inputs, secondary buttons), dashed empty states, hollow status squares. At least 3.3:1 on bg, surface and sunken in light; 3.2:1 in dark.</td>
+</tr>
+<tr>
+<td><code>accent</code></td>
+<td><code>#3141C8</code></td>
+<td><code>#9AA3FF</code></td>
+<td>Ultramarine. The brand mark, links, the one primary button per view, current-tab underline, focus ring, reveal progress. About 2% of a screen. 7.1:1 on bg (light), 8.2:1 (dark).</td>
+</tr>
+<tr>
+<td><code>on-accent</code></td>
+<td><code>#FFFFFF</code></td>
+<td><code>#0F1013</code></td>
+<td>Text and icons on accent fills (primary button, nav count). 7.7:1 (light), 8.2:1 (dark).</td>
+</tr>
+<tr>
+<td><code>accent-soft</code></td>
+<td><code>#E9EBFB</code></td>
+<td><code>#1D2140</code></td>
+<td>Control-plane zone in diagrams and the avatar background. Never a status.</td>
+</tr>
+<tr>
+<td><code>accent-line</code></td>
+<td><code>#BFC5F3</code></td>
+<td><code>#3A4285</code></td>
+<td>Border for accent-soft areas.</td>
+</tr>
+<tr>
+<td><code>ok</code></td>
+<td><code>#1E7A46</code></td>
+<td><code>#6FCF97</code></td>
+<td>Success: approved, executed, reveal ready, copied. Text on ok-bg, bg and surface (4.7:1 or more); always with a word. ok and bad differ by hue more than lightness, so never rely on the colour of a status square alone.</td>
+</tr>
+<tr>
+<td><code>ok-bg</code></td>
+<td><code>#E6F4EC</code></td>
+<td><code>#132219</code></td>
+<td>Success fill behind ok text.</td>
+</tr>
+<tr>
+<td><code>ok-line</code></td>
+<td><code>#A7D7BA</code></td>
+<td><code>#24432F</code></td>
+<td>Border around ok-bg.</td>
+</tr>
+<tr>
+<td><code>warn</code></td>
+<td><code>#7A5200</code></td>
+<td><code>#F2C14E</code></td>
+<td>Waiting: pending, pending_values, pending_verification. Text on warn-bg, bg and surface.</td>
+</tr>
+<tr>
+<td><code>warn-bg</code></td>
+<td><code>#FFF3D6</code></td>
+<td><code>#2A2210</code></td>
+<td>Waiting fill behind warn text.</td>
+</tr>
+<tr>
+<td><code>warn-line</code></td>
+<td><code>#EACB86</code></td>
+<td><code>#4E4024</code></td>
+<td>Border around warn-bg.</td>
+</tr>
+<tr>
+<td><code>bad</code></td>
+<td><code>#B3261E</code></td>
+<td><code>#FF8A80</code></td>
+<td>Failure: rejected, refused, failed, validation errors. Text on bad-bg, bg and surface; always with a word.</td>
+</tr>
+<tr>
+<td><code>bad-bg</code></td>
+<td><code>#FDECEA</code></td>
+<td><code>#2C1513</code></td>
+<td>Failure fill behind bad text; hover on danger buttons.</td>
+</tr>
+<tr>
+<td><code>bad-line</code></td>
+<td><code>#F1B8B3</code></td>
+<td><code>#4E2522</code></td>
+<td>Border of danger buttons and error banners.</td>
+</tr>
+<tr>
+<td><code>info</code></td>
+<td><code>#3E4A5C</code></td>
+<td><code>#B7C0CF</code></td>
+<td>Neutral information labels. Text on info-bg.</td>
+</tr>
+<tr>
+<td><code>info-bg</code></td>
+<td><code>#EEF0F3</code></td>
+<td><code>#1B1F27</code></td>
+<td>Neutral information fill.</td>
+</tr>
+<tr>
+<td><code>info-line</code></td>
+<td><code>#C9CED8</code></td>
+<td><code>#323846</code></td>
+<td>Border around info-bg.</td>
+</tr>
+<tr>
+<td><code>scrim</code></td>
+<td><code>rgba(21,23,28,0.36)</code></td>
+<td><code>rgba(0,0,0,0.6)</code></td>
+<td>Overlay behind dialogs and drawers.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="spacing-layout">Spacing &amp; layout<a class="headerlink" href="#spacing-layout" title="Permanent link">&para;</a></h2>
-<p>The SPA uses Tailwind's default 4px-grid spacing scale. Cards have:</p>
-<ul>
-<li><code>rounded-2xl</code> corners (16px)</li>
-<li><code>border border-border</code> outline</li>
-<li><code>bg-surface</code> background</li>
-<li><code>shadow-2xl</code> on modals only</li>
-</ul>
-<p>PageHeader carries a 6-unit (24px) bottom margin; Card → Card
-spacing is 16px (<code>gap-4</code>) on grids and 24px (<code>space-y-6</code>) on
-vertical stacks.</p>
-<h2 id="gradients">Gradients<a class="headerlink" href="#gradients" title="Permanent link">&para;</a></h2>
-<p><code>bg-brand-gradient</code> is the <strong>only</strong> gradient that ships in the SPA.
-It's the cyan→blue gradient used on every primary CTA pill (<code>+ New
-…</code>, <code>Reveal (one-time)</code>, <code>Mint</code>, <code>Submit</code>, <code>Sign in</code>):</p>
-<div class="language-css highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">background-image</span><span class="o">:</span><span class="w"> </span><span class="nt">linear-gradient</span><span class="o">(</span><span class="nt">135deg</span><span class="o">,</span><span class="w"> </span><span class="p">#</span><span class="nn">06B6D4</span><span class="w"> </span><span class="nt">0</span><span class="o">%,</span><span class="w"> </span><span class="p">#</span><span class="nn">3B82F6</span><span class="w"> </span><span class="nt">100</span><span class="o">%);</span>
-</span></code></pre></div>
-<p>Do not invent new gradients. If you need to highlight something
-that isn't a primary CTA, use a solid color (<code>bg-accent/10</code>) or a
-border-l-4 callout, not a new gradient.</p>
-<h2 id="where-these-live-in-code">Where these live in code<a class="headerlink" href="#where-these-live-in-code" title="Permanent link">&para;</a></h2>
+<p><code>accent</code> is a signal: the mark, links, one primary button per view, the current tab, the focus ring, reveal progress. It is never a large fill, a status, or emphasis in running text. <code>edge</code> is for what you operate (input and secondary-button borders); <code>border</code> and <code>rule</code> only separate.</p>
+<h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
+<p>Show the exact API status as a word after a small square:</p>
 <table>
 <thead>
 <tr>
-<th>File</th>
-<th>What</th>
+<th>Status</th>
+<th>Square</th>
+<th>Token</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><a href="https://github.com/secrets-bridge/ui/blob/main/tailwind.config.js"><code>ui/tailwind.config.js</code></a></td>
-<td>The canonical Tailwind config: every token above</td>
+<td>pending, pending_values, pending_verification</td>
+<td>hollow</td>
+<td><code>warn</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/secrets-bridge/ui/tree/main/src/ui"><code>ui/src/ui/</code></a></td>
-<td>The shared primitives that consume the tokens: <code>Button</code>, <code>Card</code>, <code>StatusPill</code>, <code>Drawer</code>, <code>ConfirmModal</code>, <code>PageHeader</code>, <code>LogoMark</code></td>
+<td>approved, executed</td>
+<td>solid</td>
+<td><code>ok</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/secrets-bridge/skills/tree/main/ui/design/tokens"><code>skills/ui/design/tokens/</code></a></td>
-<td>The Figma → JSON sync output; the <code>sync.sh</code> script + <code>design-tokens.json</code> + <code>mapping.md</code></td>
+<td>rejected, refused, failed</td>
+<td>solid</td>
+<td><code>bad</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/secrets-bridge/skills/blob/main/ui/design/BRAND_VOICE.md"><code>skills/ui/design/BRAND_VOICE.md</code></a></td>
-<td>The canonical brand voice doc</td>
+<td>cancelled, expired</td>
+<td>hollow</td>
+<td><code>edge</code></td>
 </tr>
 </tbody>
 </table>
-<h2 id="how-to-update-a-token">How to update a token<a class="headerlink" href="#how-to-update-a-token" title="Permanent link">&para;</a></h2>
-<p>The flow is <strong>Figma → skills/ui/design → tailwind.config.js</strong>:</p>
-<ol>
-<li>Make the change in the Figma file (versions 02 Foundations).</li>
-<li>Re-run <code>skills/ui/design/tokens/sync.sh</code> to pull the latest
-   token definitions into <code>design-tokens.json</code>.</li>
-<li>Update <code>ui/tailwind.config.js</code> to match: same Tailwind names,
-   new hex values.</li>
-<li>Rebuild the SPA; visual diff against the Figma frames in
-   <code>skills/ui/design/frames/</code> (six PNG renders cached at last
-   sync).</li>
-<li>Open a PR against both <code>ui</code> and <code>skills</code>; they ship together.</li>
-</ol>
-<p>The reverse direction (code → Figma) is not supported. Figma is
-upstream; the SPA is downstream.</p>
+<p>A reveal condition (ready, consumed, expired) shows separately from the status, in <code>ok</code> or <code>muted</code> text. <code>executed</code> alone never means a reveal is available.</p>
+<h2 id="type">Type<a class="headerlink" href="#type" title="Permanent link">&para;</a></h2>
+<p>IBM Plex Sans and IBM Plex Mono (SIL Open Font License 1.1), weights 400, 500 and 600, self-hosted. Emphasis is weight, never italics or colour. Sentence case everywhere, including buttons and navigation.</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Style</th>
+<th>Size / line</th>
+<th>Weight</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Website</td>
+<td><code>display</code></td>
+<td>64 / 66</td>
+<td>600</td>
+<td>The home page hero only</td>
+</tr>
+<tr>
+<td>Website</td>
+<td><code>page-title</code></td>
+<td>42 / 47</td>
+<td>600</td>
+<td>Page h1</td>
+</tr>
+<tr>
+<td>Website</td>
+<td><code>section</code></td>
+<td>38 / 43</td>
+<td>600</td>
+<td>Home page sections</td>
+</tr>
+<tr>
+<td>Website</td>
+<td><code>heading</code></td>
+<td>23 / 30</td>
+<td>600</td>
+<td>Headings in docs pages</td>
+</tr>
+<tr>
+<td>Website</td>
+<td><code>lede</code></td>
+<td>18 / 29</td>
+<td>400</td>
+<td>The paragraph under a title</td>
+</tr>
+<tr>
+<td>Website</td>
+<td><code>body-docs</code></td>
+<td>16 / 27</td>
+<td>400</td>
+<td>Docs body text</td>
+</tr>
+<tr>
+<td>Console</td>
+<td><code>console-title</code></td>
+<td>20 / 24</td>
+<td>600</td>
+<td>Page h1 in the console</td>
+</tr>
+<tr>
+<td>Console</td>
+<td><code>dialog-title</code></td>
+<td>17 / 22</td>
+<td>600</td>
+<td>Dialog and drawer titles</td>
+</tr>
+<tr>
+<td>Console</td>
+<td><code>block-heading</code></td>
+<td>13.5 / 20</td>
+<td>600</td>
+<td>Above tables and panels</td>
+</tr>
+<tr>
+<td>Console</td>
+<td><code>body</code></td>
+<td>13.5 / 20</td>
+<td>400</td>
+<td>Prose in the console</td>
+</tr>
+<tr>
+<td>Console</td>
+<td><code>ui</code></td>
+<td>13 / 18</td>
+<td>500</td>
+<td>Controls</td>
+</tr>
+<tr>
+<td>Console</td>
+<td><code>caption</code></td>
+<td>12.5 / 18</td>
+<td>400</td>
+<td>Hints</td>
+</tr>
+<tr>
+<td>Console</td>
+<td><code>label</code></td>
+<td>12 / 16</td>
+<td>500</td>
+<td>Table headers</td>
+</tr>
+<tr>
+<td>Mono</td>
+<td><code>mono</code>, <code>mono-small</code></td>
+<td>13, 12</td>
+<td>400</td>
+<td>Refs, key names, paths, times, IDs</td>
+</tr>
+</tbody>
+</table>
+<h2 id="space-shape-and-size">Space, shape and size<a class="headerlink" href="#space-shape-and-size" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Token</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>space-1</code> to <code>space-8</code></td>
+<td>4, 8, 12, 16, 20, 24, 28, 32 px</td>
+</tr>
+<tr>
+<td><code>radius-sm</code></td>
+<td>3 px (tags)</td>
+</tr>
+<tr>
+<td><code>radius-md</code></td>
+<td>4 px, the largest radius</td>
+</tr>
+<tr>
+<td><code>radius-round</code></td>
+<td>50%, avatars only</td>
+</tr>
+<tr>
+<td><code>control-md</code> / <code>control-sm</code> / <code>control-touch</code></td>
+<td>32 px default, 28 px in tables, 44 px on phones</td>
+</tr>
+<tr>
+<td><code>sidebar</code> / <code>rail</code></td>
+<td>216 px console sidebar, 260 px overview side column</td>
+</tr>
+</tbody>
+</table>
+<p>Panels separate with a <code>border</code> line, never a shadow. The <code>overlay</code> shadow is only for dialogs, drawers and toasts.</p>
+<h2 id="accessibility">Accessibility<a class="headerlink" href="#accessibility" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Text at least 4.5:1, and controls, focus rings and status squares at least 3:1, against their background in both themes. The usage notes above give the ratios.</li>
+<li>Focus ring: 2 px solid <code>accent</code>, 2 px offset, on every interactive element.</li>
+<li>Respect <code>prefers-reduced-motion</code>. Nothing in the product needs animation.</li>
+</ul>
 
 
 
 
 
 
+
+  
+  
 
 
 

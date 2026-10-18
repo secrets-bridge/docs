@@ -51,10 +51,12 @@
         
         
         
-        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.56f7ac64.css">
-        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.804a7bde.css">
+        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../../stylesheets/brand.css">
     
       <link rel="stylesheet" href="../../stylesheets/landing.css">
     
@@ -72,6 +74,8 @@
   
   
   
+  
+  
 
   
   <link rel="canonical" href="https://secrets-bridge.io/latest/operations/agent-onboarding/">
@@ -82,25 +86,26 @@
   <meta property="og:title" content="Agent onboarding" />
   <meta property="og:description" content="How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked, no inbound ports, no cluster-API access." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/operations/agent-onboarding/" />
-  <meta property="og:image" content="https://secrets-bridge.io/assets/og-banner.png" />
+  <meta property="og:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Secrets Bridge — The brain behind your secrets." />
+  <meta property="og:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   <meta property="og:locale" content="en_US" />
 
   
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Agent onboarding" />
   <meta name="twitter:description" content="How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked, no inbound ports, no cluster-API access." />
-  <meta name="twitter:image" content="https://secrets-bridge.io/assets/og-banner.png" />
-  <meta name="twitter:image:alt" content="Secrets Bridge — The brain behind your secrets." />
+  <meta name="twitter:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
+  <meta name="twitter:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   
 
   
-  <link rel="apple-touch-icon" href="../../assets/icon.svg" />
+  <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png" />
 
   
-  <meta name="theme-color" content="#0B1220" />
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#17191E" media="(prefers-color-scheme: dark)" />
 
   
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
@@ -114,13 +119,13 @@
     "headline": "Agent onboarding",
     "description": "How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked, no inbound ports, no cluster-API access.",
     "url": "https://secrets-bridge.io/latest/operations/agent-onboarding/",
-    "image": "https://secrets-bridge.io/assets/og-banner.png",
+    "image": "https://secrets-bridge.io/latest/assets/og-banner.png",
     "publisher": {
       "@type": "Organization",
       "name": "Secrets Bridge",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://secrets-bridge.io/assets/og-banner.png"
+        "url": "https://secrets-bridge.io/latest/assets/og-banner.png"
       }
     }
   }
@@ -137,7 +142,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="cyan">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -168,7 +173,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Secrets Bridge" class="md-header__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/icon.svg" alt="logo">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -198,20 +203,20 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark theme"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      <label class="md-header__button md-icon" title="Switch to dark theme" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
   
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="cyan"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light theme"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      <label class="md-header__button md-icon" title="Switch to light theme" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
   
@@ -452,7 +457,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="Secrets Bridge" class="md-nav__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/icon.svg" alt="logo">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
 
     </a>
     Secrets Bridge
@@ -1098,7 +1103,7 @@
   <span class="md-ellipsis">
     
   
-    Tokens & theme
+    Tokens and theme
   
 
     
@@ -1119,14 +1124,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../design/figma/" class="md-nav__link">
+      <a href="../../design/assets/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Figma file & assets
+    Logos and assets
   
 
     
@@ -1938,7 +1943,7 @@
 
 
   
-    <a href="https://github.com/secrets-bridge/edit/main/docs/operations/agent-onboarding.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/secrets-bridge/docs/edit/main/docs/operations/agent-onboarding.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -1947,7 +1952,7 @@
     
       
     
-    <a href="https://github.com/secrets-bridge/raw/main/docs/operations/agent-onboarding.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/secrets-bridge/docs/raw/main/docs/operations/agent-onboarding.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>

@@ -7,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap.">
+        <meta name="description" content="Secrets Bridge adds access requests, approvals, audit and agent execution around the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
@@ -28,7 +28,7 @@
     
     
   
-    <title>Secrets Bridge: Unified Secrets Control Plane</title>
+    <title>Secrets Bridge: access control for the secrets you already keep</title>
   
 
     
@@ -49,10 +49,12 @@
         
         
         
-        <link rel="stylesheet" href="assets/external/fonts.googleapis.com/css.56f7ac64.css">
-        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="assets/external/fonts.googleapis.com/css.804a7bde.css">
+        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="stylesheets/brand.css">
     
       <link rel="stylesheet" href="stylesheets/landing.css">
     
@@ -70,6 +72,8 @@
   
   
   
+  
+  
 
   
   <link rel="canonical" href="https://secrets-bridge.io/latest/">
@@ -77,28 +81,29 @@
   
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Secrets Bridge" />
-  <meta property="og:title" content="Secrets Bridge: Unified Secrets Control Plane" />
-  <meta property="og:description" content="Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap." />
+  <meta property="og:title" content="Secrets Bridge: access control for the secrets you already keep" />
+  <meta property="og:description" content="Secrets Bridge adds access requests, approvals, audit and agent execution around the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/" />
-  <meta property="og:image" content="https://secrets-bridge.io/assets/og-banner.png" />
+  <meta property="og:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Secrets Bridge — The brain behind your secrets." />
+  <meta property="og:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   <meta property="og:locale" content="en_US" />
 
   
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Secrets Bridge: Unified Secrets Control Plane" />
-  <meta name="twitter:description" content="Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap." />
-  <meta name="twitter:image" content="https://secrets-bridge.io/assets/og-banner.png" />
-  <meta name="twitter:image:alt" content="Secrets Bridge — The brain behind your secrets." />
+  <meta name="twitter:title" content="Secrets Bridge: access control for the secrets you already keep" />
+  <meta name="twitter:description" content="Secrets Bridge adds access requests, approvals, audit and agent execution around the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider." />
+  <meta name="twitter:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
+  <meta name="twitter:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   
 
   
-  <link rel="apple-touch-icon" href="assets/icon.svg" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
 
   
-  <meta name="theme-color" content="#0B1220" />
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#17191E" media="(prefers-color-scheme: dark)" />
 
   
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
@@ -112,7 +117,7 @@
     "name": "Secrets Bridge",
     "alternateName": "SecretsBridge",
     "url": "https://secrets-bridge.io/latest",
-    "logo": "https://secrets-bridge.io/assets/og-banner.png",
+    "logo": "https://secrets-bridge.io/latest/assets/og-banner.png",
     "description": "Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap.",
     "sameAs": [
       "https://github.com/secrets-bridge"
@@ -131,7 +136,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="cyan">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -140,7 +145,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#secrets-bridge" class="md-skip">
+        <a href="#sb-hero-title" class="md-skip">
           Skip to content
         </a>
       
@@ -162,7 +167,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="." title="Secrets Bridge" class="md-header__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="assets/icon.svg" alt="logo">
+  <img src="assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -192,20 +197,20 @@
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark theme"  type="radio" name="__palette" id="__palette_0">
     
-      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      <label class="md-header__button md-icon" title="Switch to dark theme" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
   
     
     
     
-    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="cyan"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light theme"  type="radio" name="__palette" id="__palette_1">
     
-      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      <label class="md-header__button md-icon" title="Switch to light theme" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
       </label>
     
   
@@ -448,7 +453,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="." title="Secrets Bridge" class="md-nav__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="assets/icon.svg" alt="logo">
+  <img src="assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
 
     </a>
     Secrets Bridge
@@ -535,10 +540,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-control-plane-for-secrets-governance" class="md-nav__link">
+  <a href="#we-keep" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The control plane for secrets governance.
+        We keep
       
     </span>
   </a>
@@ -546,10 +551,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-is-secrets-bridge" class="md-nav__link">
+  <a href="#we-never-keep" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What is Secrets Bridge?
+        We never keep
       
     </span>
   </a>
@@ -557,10 +562,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#why-secrets-bridge" class="md-nav__link">
+  <a href="#sb-flow-title" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why Secrets Bridge
+        Where your secrets go, and where they don't
       
     </span>
   </a>
@@ -568,10 +573,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#who-this-is-for" class="md-nav__link">
+  <a href="#sb-holds" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Who this is for
+        What it holds to
       
     </span>
   </a>
@@ -579,21 +584,49 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-its-different" class="md-nav__link">
+  <a href="#sb-today" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How it's different
+        What works today
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What works today">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#implemented" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implemented
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#on-the-roadmap-not-live-yet" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#roadmap" class="md-nav__link">
     <span class="md-ellipsis">
       
-        On the roadmap (not live yet)
+        Roadmap
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sb-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Start on your laptop
       
     </span>
   </a>
@@ -1207,7 +1240,7 @@
   <span class="md-ellipsis">
     
   
-    Tokens & theme
+    Tokens and theme
   
 
     
@@ -1228,14 +1261,14 @@
   
   
     <li class="md-nav__item">
-      <a href="design/figma/" class="md-nav__link">
+      <a href="design/assets/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Figma file & assets
+    Logos and assets
   
 
     
@@ -1917,10 +1950,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-control-plane-for-secrets-governance" class="md-nav__link">
+  <a href="#we-keep" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The control plane for secrets governance.
+        We keep
       
     </span>
   </a>
@@ -1928,10 +1961,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-is-secrets-bridge" class="md-nav__link">
+  <a href="#we-never-keep" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What is Secrets Bridge?
+        We never keep
       
     </span>
   </a>
@@ -1939,10 +1972,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#why-secrets-bridge" class="md-nav__link">
+  <a href="#sb-flow-title" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why Secrets Bridge
+        Where your secrets go, and where they don't
       
     </span>
   </a>
@@ -1950,10 +1983,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#who-this-is-for" class="md-nav__link">
+  <a href="#sb-holds" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Who this is for
+        What it holds to
       
     </span>
   </a>
@@ -1961,21 +1994,49 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-its-different" class="md-nav__link">
+  <a href="#sb-today" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How it's different
+        What works today
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What works today">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#implemented" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implemented
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#on-the-roadmap-not-live-yet" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#roadmap" class="md-nav__link">
     <span class="md-ellipsis">
       
-        On the roadmap (not live yet)
+        Roadmap
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sb-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Start on your laptop
       
     </span>
   </a>
@@ -2001,7 +2062,7 @@
 
 
   
-    <a href="https://github.com/secrets-bridge/edit/main/docs/index.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/secrets-bridge/docs/edit/main/docs/index.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
     </a>
@@ -2010,181 +2071,270 @@
     
       
     
-    <a href="https://github.com/secrets-bridge/raw/main/docs/index.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/secrets-bridge/docs/raw/main/docs/index.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
     </a>
   
 
 
-<h1 id="secrets-bridge">Secrets Bridge<a class="headerlink" href="#secrets-bridge" title="Permanent link">&para;</a></h1>
-<div class="sb-landing">
-<div class="sb-hero">
-<p><span class="sb-hero__eyebrow">Unified secrets control plane</span></p>
-<div class="sb-hero__wordmark">SecretsBridge</div>
-<h2 class="sb-hero__tagline" id="the-control-plane-for-secrets-governance">The control plane for secrets governance.<a class="headerlink" href="#the-control-plane-for-secrets-governance" title="Permanent link">&para;</a></h2>
-<p class="sb-hero__subhead">
-Keep secrets in Vault, AWS Secrets Manager, Azure Key Vault, GCP
-Secret Manager, or Kubernetes. Secrets Bridge governs who can
-request, approve, reveal, patch, and audit access, without storing
-plaintext secrets in the control plane.
+<div class="sb-home">
+<section aria-labelledby="sb-hero-title" class="sb-hero">
+<div class="sb-hero__copy">
+<h1 class="sb-display" id="sb-hero-title">Govern who uses your secrets.<a class="headerlink" href="#sb-hero-title" title="Permanent link">&para;</a></h1>
+<p class="sb-lede">
+Secrets Bridge adds access requests, approvals, audit and agent execution
+around the secrets you already keep in AWS Secrets Manager and HashiCorp
+Vault. We keep requests, approvals and audit metadata. Your secret values
+stay in your provider.
 </p>
-<div class="sb-hero__ctas">
-<p><a class="md-button md-button--primary" href="operations/docker-compose/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m13.13 22.19-1.63-3.83c1.57-.58 3.04-1.36 4.4-2.27zM5.64 12.5l-3.83-1.63 6.1-2.77C7 9.46 6.22 10.93 5.64 12.5M21.61 2.39S16.66.269 11 5.93c-2.19 2.19-3.5 4.6-4.35 6.71-.28.75-.09 1.57.46 2.13l2.13 2.12c.55.56 1.37.74 2.12.46A19.1 19.1 0 0 0 18.07 13c5.66-5.66 3.54-10.61 3.54-10.61m-7.07 7.07c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0c.77.78.78 2.05 0 2.83s-2.05.78-2.83 0m-5.66 7.07-1.41-1.41zM6.24 22l3.64-3.64c-.34-.09-.67-.24-.97-.45L4.83 22zM2 22h1.41l4.77-4.76-1.42-1.41L2 20.59zm0-2.83 4.09-4.08c-.21-.3-.36-.62-.45-.97L2 17.76z"/></svg></span> Try it locally</a>
-<a class="md-button" href="overview/architecture/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 21.5c-1.35-.85-3.8-1.5-5.5-1.5-1.65 0-3.35.3-4.75 1.05-.1.05-.15.05-.25.05-.25 0-.5-.25-.5-.5V6c.6-.45 1.25-.75 2-1 1.11-.35 2.33-.5 3.5-.5 1.95 0 4.05.4 5.5 1.5 1.45-1.1 3.55-1.5 5.5-1.5 1.17 0 2.39.15 3.5.5.75.25 1.4.55 2 1v14.6c0 .25-.25.5-.5.5-.1 0-.15 0-.25-.05-1.4-.75-3.1-1.05-4.75-1.05-1.7 0-4.15.65-5.5 1.5M12 8v11.5c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5V7c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5m1 3.5c1.11-.68 2.6-1 4.5-1 .91 0 1.76.09 2.5.28V9.23c-.87-.15-1.71-.23-2.5-.23q-2.655 0-4.5.84zm4.5.17c-1.71 0-3.21.26-4.5.79v1.69c1.11-.65 2.6-.99 4.5-.99 1.04 0 1.88.08 2.5.24v-1.5c-.87-.16-1.71-.23-2.5-.23m2.5 2.9c-.87-.16-1.71-.24-2.5-.24-1.83 0-3.33.27-4.5.8v1.69c1.11-.66 2.6-.99 4.5-.99 1.04 0 1.88.08 2.5.24z"/></svg></span> Read the architecture</a>
-<a class="md-button" href="https://github.com/secrets-bridge"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/></svg></span> Star on GitHub</a></p>
+<div class="sb-actions">
+<p><a class="md-button md-button--primary" href="operations/docker-compose/">Run it locally</a>
+<a class="md-button" href="overview/architecture/">Read the architecture</a>
+<a class="sb-textlink" href="https://github.com/secrets-bridge">Source on GitHub</a></p>
 </div>
+<p class="sb-note">Open source and pre-1.0. <a href="overview/product-status/">See what is live today</a> and what is still on the roadmap.</p>
 </div>
-<h2 class="sb-section-heading" id="what-is-secrets-bridge">What is Secrets Bridge?<a class="headerlink" href="#what-is-secrets-bridge" title="Permanent link">&para;</a></h2>
-<p>Secrets Bridge is a <strong>unified secrets control plane</strong> for governing secrets
-across external providers <strong>without storing secret values in the control
-plane</strong>.</p>
-<p>It <strong>does not replace</strong> HashiCorp Vault, AWS Secrets Manager, Azure Key Vault,
-GCP Secret Manager, or Kubernetes External Secrets. It governs <strong>access,
-workflows, approvals, audit, and agent execution</strong> around them. The values stay
-in your provider.</p>
-<p><a class="md-button md-button--primary" href="overview/product-status/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m23 12-2.44-2.78.34-3.68-3.61-.82-1.89-3.18L12 3 8.6 1.54 6.71 4.72l-3.61.81.34 3.68L1 12l2.44 2.78-.34 3.69 3.61.82 1.89 3.18L12 21l3.4 1.46 1.89-3.18 3.61-.82-.34-3.68zm-13 5-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9z"/></svg></span> See what's live, QA-certified, and on the roadmap</a></p>
-<h2 class="sb-section-heading" id="why-secrets-bridge">Why Secrets Bridge<a class="headerlink" href="#why-secrets-bridge" title="Permanent link">&para;</a></h2>
-<div class="grid cards sb-pillars">
+<aside aria-label="What Secrets Bridge keeps and never keeps" class="sb-keep">
+<div class="sb-keep__col">
+<h2 class="sb-keep__title sb-keep__title--ok" id="we-keep">We keep<a class="headerlink" href="#we-keep" title="Permanent link">&para;</a></h2>
 <ul>
-<li>
-<p><span class="twemoji lg middle sb-pillar-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a1 1 0 0 1 1 1 1 1 0 0 1-1 1 1 1 0 0 1-1-1 1 1 0 0 1 1-1m9 3c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V5l9-4 9 4zm-9-5a3 3 0 0 0-3 3c0 1.31.83 2.42 2 2.83V18h2v-2h2v-2h-2v-2.17c1.17-.41 2-1.52 2-2.83a3 3 0 0 0-3-3"/></svg></span> &nbsp;<strong>Workflow-gated reads &amp; writes</strong></p>
-<hr />
-<p>Developers request access through configurable workflows.
-Approvers vote. Agents fetch (or write) values. <strong>Every
-value is single-shot, audited, and KMS-wrapped at rest.</strong></p>
-</li>
-<li>
-<p><span class="twemoji lg middle sb-pillar-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 7H3V3h18zM9.14 19.75c.18.44.4.86.64 1.25H4V8h16v5.55c-.94-.36-1.95-.55-3-.55-3.5 0-6.57 2.06-7.86 5.25l-.29.75zM9 13h6v-1.5c0-.28-.22-.5-.5-.5h-5c-.28 0-.5.22-.5.5zm8 5c-.56 0-1 .44-1 1s.44 1 1 1 1-.44 1-1-.44-1-1-1m6 1c-.94 2.34-3.27 4-6 4s-5.06-1.66-6-4c.94-2.34 3.27-4 6-4s5.06 1.66 6 4m-3.5 0a2.5 2.5 0 0 0-5 0 2.5 2.5 0 0 0 5 0"/></svg></span> &nbsp;<strong>SOC2-ready audit</strong></p>
-<hr />
-<p>The <code>audit_events</code> table is append-only at the schema
-layer: <code>BEFORE UPDATE</code> / <code>BEFORE DELETE</code> triggers reject
-mutations. Every action emits a correlation ID you can
-drill into.</p>
-</li>
-<li>
-<p><span class="twemoji lg middle sb-pillar-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.41 20H6.5c-1.5 0-2.82-.5-3.89-1.57C1.54 17.38 1 16.09 1 14.58q0-1.95 1.17-3.48a5.25 5.25 0 0 1 3.08-1.95c.42-1.53 1.25-2.77 2.5-3.72C9 4.5 10.42 4 12 4c1.95 0 3.61.68 4.96 2.04C18.32 7.39 19 9.05 19 11c1.15.13 2.11.63 2.86 1.5.64.73 1 1.56 1.1 2.5h-2c-.1-.5-.32-.91-.69-1.27-.48-.49-1.07-.73-1.77-.73H17v-2c0-1.38-.5-2.56-1.46-3.54C14.57 6.5 13.39 6 12 6c-1.38 0-2.56.5-3.54 1.46C7.5 8.44 7 9.62 7 11h-.5c-.97 0-1.79.34-2.47 1.03-.69.68-1.03 1.5-1.03 2.47s.34 1.8 1.03 2.5c.68.67 1.5 1 2.47 1H9c0 .72.15 1.39.41 2M23 17v2h-2v2h-2v-2h-2.2c-.4 1.2-1.5 2-2.8 2-1.7 0-3-1.3-3-3s1.3-3 3-3c1.3 0 2.4.8 2.8 2zm-8 1c0-.5-.4-1-1-1s-1 .5-1 1 .4 1 1 1 1-.5 1-1"/></svg></span> &nbsp;<strong>No KMS lock-in</strong></p>
-<hr />
-<p>Three backends ship today behind one <code>SB_KMS_BACKEND</code>
-knob: <code>local</code> (dev), <code>vault-transit</code> (OSS production),
-<code>aws-kms</code> (AWS production). Bring your own. No cloud lock-in.</p>
-</li>
-<li>
-<p><span class="twemoji lg middle sb-pillar-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1 3 5v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V5zm4 14.8c0 .6-.6 1.2-1.3 1.2H9.2c-.6 0-1.2-.6-1.2-1.3v-3.5c0-.6.6-1.2 1.2-1.2V8.5C9.2 7.1 10.6 6 12 6s2.8 1.1 2.8 2.5V9h-1.3v-.5c0-.8-.7-1.3-1.5-1.3s-1.5.5-1.5 1.3V11h4.3c.6 0 1.2.6 1.2 1.3z"/></svg></span> &nbsp;<strong>Plaintext never on the wire</strong></p>
-<hr />
-<p>TLS + per-direction wire-envelope encryption (X25519 for
-CP→Agent, KMS-DEK + AES-GCM for Agent→CP). Even a
-TLS-terminating proxy in your mesh sees only ciphertext.</p>
-</li>
+<li>Requests, and who approved them</li>
+<li>The audit trail: who, what, when and why</li>
+<li>Which secret paths and key names a project may use</li>
 </ul>
 </div>
-<h2 class="sb-section-heading" id="who-this-is-for">Who this is for<a class="headerlink" href="#who-this-is-for" title="Permanent link">&para;</a></h2>
+<div class="sb-keep__col">
+<h2 class="sb-keep__title sb-keep__title--never" id="we-never-keep">We never keep<a class="headerlink" href="#we-never-keep" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Regulated teams</strong> (fintech, healthtech, defence-adjacent)
-  where "everyone has full Vault read access" is no longer an
-  answer your auditor will accept.</li>
-<li><strong>Platform teams</strong> standing up multi-cluster / multi-account
-  secrets governance from scratch.</li>
-<li><strong>Compliance engineers</strong> who need a real audit trail
-  (correlation IDs, immutable rows, value-free metadata) without
-  reaching for an SIEM bolt-on.</li>
+<li>Secret values in plain text. In transit a value exists only as an encrypted, single-use wrap with a short lifetime.</li>
+<li>Provider credentials. The agent uses its own, inside your infrastructure.</li>
 </ul>
-<h2 class="sb-section-heading" id="how-its-different">How it's different<a class="headerlink" href="#how-its-different" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>Secrets Bridge</th>
-<th>Direct Vault</th>
-<th>AWS Secrets Manager + IAM</th>
-<th>Most "secrets SaaS"</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Multi-provider</td>
-<td>✅ Vault + AWS today; Azure + GCP on roadmap</td>
-<td>Vault only</td>
-<td>AWS only</td>
-<td>Varies</td>
-</tr>
-<tr>
-<td>Workflow approval per read</td>
-<td>✅ Built-in</td>
-<td>Plugin / RFC</td>
-<td>❌</td>
-<td>Some</td>
-</tr>
-<tr>
-<td>Single-shot reveal-once UX</td>
-<td>✅ Built-in</td>
-<td>❌</td>
-<td>❌</td>
-<td>Some</td>
-</tr>
-<tr>
-<td>Append-only audit at schema</td>
-<td>✅ Postgres triggers</td>
-<td>❌ application-layer</td>
-<td>CloudTrail (not append-only)</td>
-<td>Varies</td>
-</tr>
-<tr>
-<td>Self-hostable</td>
-<td>✅ OSS, no SaaS dependency</td>
-<td>✅</td>
-<td>n/a</td>
-<td>❌</td>
-</tr>
-<tr>
-<td>KMS choice</td>
-<td>✅ Vault Transit / AWS KMS / local</td>
-<td>n/a</td>
-<td>AWS KMS only</td>
-<td>Provider-controlled</td>
-</tr>
-<tr>
-<td>Agent uses <strong>only</strong> outbound traffic</td>
-<td>✅ No inbound except health probes</td>
-<td>n/a</td>
-<td>n/a</td>
-<td>Varies</td>
-</tr>
-</tbody>
-</table>
-<h2 class="sb-section-heading" id="on-the-roadmap-not-live-yet">On the roadmap (not live yet)<a class="headerlink" href="#on-the-roadmap-not-live-yet" title="Permanent link">&para;</a></h2>
-<p>Listed here because they are <strong>not</strong> shipped. See the
-<a href="overview/product-status/">product status page</a> for the exact
-Live / QA-certified / In-progress / Roadmap split.</p>
-<ul>
-<li><strong>Azure Key Vault</strong> and <strong>GCP Secret Manager</strong> providers. The agent's
-  resolvers ship Vault + AWS Secrets Manager today; the others are next.</li>
-<li><strong>HashiCorp Vault advanced flows</strong> and deeper <strong>Kubernetes External Secrets</strong>
-  integration.</li>
-<li><strong>Flux</strong> integration (read-only ArgoCD observation ships today).</li>
-<li><strong>Per-tenant KMS scoping</strong>: one CMK per deployment for now.</li>
-<li><strong>Agent connection-scoped job claim</strong> and a <strong>richer agent fleet dashboard</strong>.</li>
-<li><strong>Native Slack / PagerDuty</strong> notification sinks: webhook is in; native
-  sinks are next.</li>
+</div>
+<p class="sb-keep__foot">The agent runs inside your infrastructure and only calls out, so you open no inbound port.</p>
+</aside>
+</section>
+<section aria-labelledby="sb-flow-title" class="sb-section sb-section--flow">
+<h2 class="sb-section-title" id="sb-flow-title">Where your secrets go, and where they don't<a class="headerlink" href="#sb-flow-title" title="Permanent link">&para;</a></h2>
+<p class="sb-lede sb-lede--small">Values stay in your provider until an approved request needs them. Then they travel once, sealed, and only to the person who asked. Pick a step to follow it.</p>
+<!-- Generated by scripts/gen_flow.py. Edit the script, not this file. -->
+<div class="sb-flow">
+<div aria-label="Follow a request, step by step" class="sb-flow-controls" role="radiogroup">
+<span class="sb-flow-controls__label" aria-hidden="true">Follow a request</span>
+<input type="radio" name="sb-flow" id="sb-flow-all" checked><label for="sb-flow-all">All steps</label>
+<input type="radio" name="sb-flow" id="sb-flow-1"><label for="sb-flow-1"><span class="sb-sr">Step </span>1<span class="sb-sr">: Ask for access</span></label>
+<input type="radio" name="sb-flow" id="sb-flow-2"><label for="sb-flow-2"><span class="sb-sr">Step </span>2<span class="sb-sr">: Someone approves</span></label>
+<input type="radio" name="sb-flow" id="sb-flow-3"><label for="sb-flow-3"><span class="sb-sr">Step </span>3<span class="sb-sr">: The agent claims the job</span></label>
+<input type="radio" name="sb-flow" id="sb-flow-4"><label for="sb-flow-4"><span class="sb-sr">Step </span>4<span class="sb-sr">: It reads the provider</span></label>
+<input type="radio" name="sb-flow" id="sb-flow-5"><label for="sb-flow-5"><span class="sb-sr">Step </span>5<span class="sb-sr">: It sends back a sealed wrap</span></label>
+<input type="radio" name="sb-flow" id="sb-flow-6"><label for="sb-flow-6"><span class="sb-sr">Step </span>6<span class="sb-sr">: Reveal once</span></label>
+</div>
+<div class="sb-flow-figure">
+<svg class="sb-d sb-d--wide" viewBox="0 0 1160 470" role="img" aria-label="Six steps between people, the Secrets Bridge control plane and an agent in your infrastructure. 1, the requester asks for access. 2, an approver decides. 3, the agent calls out and claims the job. 4, the agent reads the provider. 5, the agent returns the values as a sealed, single-use wrap. 6, the requester reveals each value once. Providers connect only to the agent.">
+<rect class="sb-d-zone sb-d-zone--people" x="16" y="40" width="200" height="384" rx="4"/><text class="sb-d-label" x="32" y="64">PEOPLE</text>
+<g class="sb-d-box b1 b6 ">
+<rect x="36" y="96" width="160" height="70" rx="3"/>
+<text class="sb-d-title" x="50" y="121">Requester</text>
+<text class="sb-d-sub" x="50" y="140">asks, then reveals</text>
+</g>
+<g class="sb-d-box b2 ">
+<rect x="36" y="296" width="160" height="70" rx="3"/>
+<text class="sb-d-title" x="50" y="321">Approver</text>
+<text class="sb-d-sub" x="50" y="340">decides</text>
+</g>
+<rect class="sb-d-zone sb-d-zone--cp" x="310" y="40" width="380" height="384" rx="4"/><text class="sb-d-label" x="326" y="64">SECRETS BRIDGE CONTROL PLANE</text>
+<g class="sb-d-box b1 b2 b6 sb-d-box--cp">
+<rect x="330" y="96" width="340" height="70" rx="3"/>
+<text class="sb-d-title" x="344" y="121">Console and API</text>
+<text class="sb-d-sub" x="344" y="140">sign-in, policy, second factor</text>
+</g>
+<g class="sb-d-box b2 sb-d-box--cp">
+<rect x="330" y="196" width="340" height="70" rx="3"/>
+<text class="sb-d-title" x="344" y="221">Requests, approvals, audit</text>
+<text class="sb-d-sub" x="344" y="240">metadata only; audit is append-only</text>
+</g>
+<g class="sb-d-box b3 b5 b6 sb-d-box--cp">
+<rect x="330" y="296" width="340" height="70" rx="3"/>
+<text class="sb-d-title" x="344" y="321">Jobs and single-use wraps</text>
+<text class="sb-d-sub" x="344" y="340">values sealed, opened once</text>
+</g>
+<text class="sb-d-note" x="500" y="404" text-anchor="middle">No plaintext values are kept here.</text>
+<rect class="sb-d-zone sb-d-zone--infra" x="784" y="40" width="360" height="384" rx="4"/><text class="sb-d-label" x="800" y="64">YOUR INFRASTRUCTURE</text>
+<g class="sb-d-box b3 b4 b5 ">
+<rect x="804" y="96" width="136" height="270" rx="3"/>
+<text class="sb-d-title" x="818" y="121">Agent</text>
+<text class="sb-d-sub" x="818" y="140">calls out only</text>
+<text class="sb-d-sub" x="818" y="157">no inbound port</text>
+<text class="sb-d-sub" x="818" y="174">its own credentials</text>
+</g>
+<text class="sb-d-label" x="988" y="124">PROVIDERS</text>
+<g class="sb-d-box b4 ">
+<rect x="988" y="140" width="140" height="78" rx="3"/>
+<text class="sb-d-title" x="1002" y="165">AWS Secrets</text>
+<text class="sb-d-title" x="1002" y="184">Manager</text>
+</g>
+<g class="sb-d-box b4 ">
+<rect x="988" y="256" width="140" height="78" rx="3"/>
+<text class="sb-d-title" x="1002" y="281">HashiCorp</text>
+<text class="sb-d-title" x="1002" y="300">Vault</text>
+<text class="sb-d-sub" x="1002" y="319">KV v2</text>
+</g>
+<text class="sb-d-note" x="964" y="404" text-anchor="middle">Values leave only as a sealed wrap.</text>
+<path class="sb-d-line s1" d="M196 120 L330 120"/>
+<path class="sb-d-head s1" d="M330.0 120.0L322.0 116.0L322.0 124.0Z"/>
+<path class="sb-d-line s6 sb-d-line--return" d="M330 146 L196 146"/>
+<path class="sb-d-head s6" d="M196.0 146.0L204.0 150.0L204.0 142.0Z"/>
+<path class="sb-d-line s2" d="M196 331 L253 331 L253 231 L330 231"/>
+<path class="sb-d-head s2" d="M330.0 231.0L322.0 227.0L322.0 235.0Z"/>
+<path class="sb-d-line s3" d="M804 316 L670 316"/>
+<path class="sb-d-head s3" d="M670.0 316.0L678.0 320.0L678.0 312.0Z"/>
+<path class="sb-d-line s5" d="M804 346 L670 346"/>
+<path class="sb-d-head s5" d="M670.0 346.0L678.0 350.0L678.0 342.0Z"/>
+<path class="sb-d-line s4" d="M940 237 L964 237"/>
+<path class="sb-d-line s4" d="M964 179 L964 295"/>
+<path class="sb-d-line s4" d="M964 179 L988 179"/>
+<path class="sb-d-head s4" d="M988.0 179.0L980.0 175.0L980.0 183.0Z"/>
+<path class="sb-d-line s4" d="M964 295 L988 295"/>
+<path class="sb-d-head s4" d="M988.0 295.0L980.0 291.0L980.0 299.0Z"/>
+<g class="sb-d-badge s1"><circle cx="240" cy="120" r="11"/><text x="240" y="120">1</text></g>
+<g class="sb-d-badge s6"><circle cx="286" cy="146" r="11"/><text x="286" y="146">6</text></g>
+<g class="sb-d-badge s2"><circle cx="253" cy="281" r="11"/><text x="253" y="281">2</text></g>
+<g class="sb-d-badge s3"><circle cx="715" cy="316" r="11"/><text x="715" y="316">3</text></g>
+<g class="sb-d-badge s5"><circle cx="759" cy="346" r="11"/><text x="759" y="346">5</text></g>
+<g class="sb-d-badge s4"><circle cx="952" cy="237" r="11"/><text x="952" y="237">4</text></g>
+<g class="sb-d-legend"><path class="sb-d-line s0" d="M16 452 L52 452"/>
+<path class="sb-d-head s0" d="M52.0 452.0L44.0 448.0L44.0 456.0Z"/><text class="sb-d-note" x="60" y="456">opens the connection</text><path class="sb-d-line s0 sb-d-line--return" d="M222 452 L258 452"/>
+<path class="sb-d-head s0" d="M258.0 452.0L250.0 448.0L250.0 456.0Z"/><text class="sb-d-note" x="266" y="456">comes back</text><text class="sb-d-note" x="380" y="456">Providers are reached only by the agent, inside your infrastructure.</text></g>
+</svg>
+<svg class="sb-d sb-d--narrow" viewBox="0 0 360 990" role="img" aria-label="Six steps between people, the Secrets Bridge control plane and an agent in your infrastructure. 1, the requester asks for access. 2, an approver decides. 3, the agent calls out and claims the job. 4, the agent reads the provider. 5, the agent returns the values as a sealed, single-use wrap. 6, the requester reveals each value once. Providers connect only to the agent.">
+<rect class="sb-d-zone sb-d-zone--people" x="8" y="16" width="344" height="150" rx="4"/><text class="sb-d-label" x="24" y="40">PEOPLE</text>
+<g class="sb-d-box b1 b6 ">
+<rect x="24" y="52" width="148" height="70" rx="3"/>
+<text class="sb-d-title" x="38" y="77">Requester</text>
+<text class="sb-d-sub" x="38" y="96">asks, then reveals</text>
+</g>
+<g class="sb-d-box b2 ">
+<rect x="188" y="52" width="148" height="70" rx="3"/>
+<text class="sb-d-title" x="202" y="77">Approver</text>
+<text class="sb-d-sub" x="202" y="96">decides</text>
+</g>
+<rect class="sb-d-zone sb-d-zone--cp" x="8" y="236" width="344" height="392" rx="4"/><text class="sb-d-label" x="24" y="260">CONTROL PLANE</text>
+<g class="sb-d-box b1 b2 b6 sb-d-box--cp">
+<rect x="24" y="280" width="312" height="70" rx="3"/>
+<text class="sb-d-title" x="38" y="305">Console and API</text>
+<text class="sb-d-sub" x="38" y="324">sign-in, policy, second factor</text>
+</g>
+<g class="sb-d-box b2 sb-d-box--cp">
+<rect x="24" y="380" width="312" height="70" rx="3"/>
+<text class="sb-d-title" x="38" y="405">Requests, approvals, audit</text>
+<text class="sb-d-sub" x="38" y="424">metadata only; append-only audit</text>
+</g>
+<g class="sb-d-box b3 b5 b6 sb-d-box--cp">
+<rect x="24" y="480" width="312" height="70" rx="3"/>
+<text class="sb-d-title" x="38" y="505">Jobs and single-use wraps</text>
+<text class="sb-d-sub" x="38" y="524">values sealed, opened once</text>
+</g>
+<text class="sb-d-note" x="180" y="604" text-anchor="middle">No plaintext values are kept here.</text>
+<rect class="sb-d-zone sb-d-zone--infra" x="8" y="698" width="344" height="280" rx="4"/><text class="sb-d-label" x="24" y="722">YOUR INFRASTRUCTURE</text>
+<g class="sb-d-box b3 b4 b5 ">
+<rect x="24" y="742" width="312" height="70" rx="3"/>
+<text class="sb-d-title" x="38" y="767">Agent</text>
+<text class="sb-d-sub" x="38" y="786">calls out only; no inbound port</text>
+</g>
+<g class="sb-d-box b4 ">
+<rect x="24" y="872" width="148" height="78" rx="3"/>
+<text class="sb-d-title" x="38" y="897">AWS Secrets</text>
+<text class="sb-d-title" x="38" y="916">Manager</text>
+</g>
+<g class="sb-d-box b4 ">
+<rect x="188" y="872" width="148" height="78" rx="3"/>
+<text class="sb-d-title" x="202" y="897">HashiCorp</text>
+<text class="sb-d-title" x="202" y="916">Vault</text>
+<text class="sb-d-sub" x="202" y="935">KV v2</text>
+</g>
+<path class="sb-d-line s1" d="M72 122 L72 280"/>
+<path class="sb-d-head s1" d="M72.0 280.0L76.0 272.0L68.0 272.0Z"/>
+<path class="sb-d-line s6 sb-d-line--return" d="M124 280 L124 122"/>
+<path class="sb-d-head s6" d="M124.0 122.0L120.0 130.0L128.0 130.0Z"/>
+<path class="sb-d-line s2" d="M262 122 L262 280"/>
+<path class="sb-d-head s2" d="M262.0 280.0L266.0 272.0L258.0 272.0Z"/>
+<path class="sb-d-line s3" d="M124 742 L124 550"/>
+<path class="sb-d-head s3" d="M124.0 550.0L120.0 558.0L128.0 558.0Z"/>
+<path class="sb-d-line s5" d="M236 742 L236 550"/>
+<path class="sb-d-head s5" d="M236.0 550.0L232.0 558.0L240.0 558.0Z"/>
+<path class="sb-d-line s4" d="M180 812 L180 842"/>
+<path class="sb-d-line s4" d="M98 842 L262 842"/>
+<path class="sb-d-line s4" d="M98 842 L98 872"/>
+<path class="sb-d-head s4" d="M98.0 872.0L102.0 864.0L94.0 864.0Z"/>
+<path class="sb-d-line s4" d="M262 842 L262 872"/>
+<path class="sb-d-head s4" d="M262.0 872.0L266.0 864.0L258.0 864.0Z"/>
+<g class="sb-d-badge s1"><circle cx="72" cy="200" r="11"/><text x="72" y="200">1</text></g>
+<g class="sb-d-badge s6"><circle cx="124" cy="200" r="11"/><text x="124" y="200">6</text></g>
+<g class="sb-d-badge s2"><circle cx="262" cy="200" r="11"/><text x="262" y="200">2</text></g>
+<g class="sb-d-badge s3"><circle cx="124" cy="662" r="11"/><text x="124" y="662">3</text></g>
+<g class="sb-d-badge s5"><circle cx="236" cy="662" r="11"/><text x="236" y="662">5</text></g>
+<g class="sb-d-badge s4"><circle cx="180" cy="827" r="11"/><text x="180" y="827">4</text></g>
+</svg>
+</div>
+<ol class="sb-flow-steps">
+<li class="c1"><span class="sb-flow-steps__n" aria-hidden="true">1</span><span><strong>Ask for access.</strong> The requester names the secret, the keys and why. No value is sent.</span></li>
+<li class="c2"><span class="sb-flow-steps__n" aria-hidden="true">2</span><span><strong>Someone approves.</strong> The policy for the project and environment decides how many approvals it needs and from whom.</span></li>
+<li class="c3"><span class="sb-flow-steps__n" aria-hidden="true">3</span><span><strong>The agent claims the job.</strong> The agent calls out to the control plane for work. Nothing calls in, so you open no inbound port.</span></li>
+<li class="c4"><span class="sb-flow-steps__n" aria-hidden="true">4</span><span><strong>It reads the provider.</strong> The agent reads only the approved keys, with its own credentials, inside your infrastructure.</span></li>
+<li class="c5"><span class="sb-flow-steps__n" aria-hidden="true">5</span><span><strong>It sends back a sealed wrap.</strong> The values travel back encrypted for this request and are held only as a single-use wrap with a short lifetime.</span></li>
+<li class="c6"><span class="sb-flow-steps__n" aria-hidden="true">6</span><span><strong>Reveal once.</strong> The requester confirms with a second factor and sees each value once. Every step is in the audit log.</span></li>
+</ol>
+</div>
+</section>
+<section aria-labelledby="sb-holds" class="sb-section sb-split">
+<div>
+<h2 class="sb-section-title" id="sb-holds">What it holds to<a class="headerlink" href="#sb-holds" title="Permanent link">&para;</a></h2>
+<p class="sb-lede sb-lede--small">These are enforced in code, not left to policy. The <a href="overview/threat-model/">threat model</a> shows how each boundary is kept.</p>
+</div>
+<ul class="sb-rules">
+<li><strong>No plaintext values in the control plane.</strong> Not in Postgres, Redis, logs, audit events or the browser. In transit, values are KMS-wrapped.</li>
+<li><strong>The agent only calls out.</strong> No inbound port, no database, no Kubernetes API access to Secrets.</li>
+<li><strong>Production never allows direct reveal.</strong> The refusal is enforced in code and audited.</li>
+<li><strong>Values move once.</strong> KMS-wrapped, single-use, short-lived, and opened only by the right person.</li>
+<li><strong>Audit is append-only and metadata-only.</strong> Who, what, when and why, never the value.</li>
+<li><strong>Agents are bound and revocable.</strong> One-time enrollment tokens, one provider connection per agent, revoked at once.</li>
 </ul>
+</section>
+<section aria-labelledby="sb-today" class="sb-section">
+<h2 class="sb-section-title" id="sb-today">What works today<a class="headerlink" href="#sb-today" title="Permanent link">&para;</a></h2>
 <div class="sb-status">
-<p class="sb-status__title">🚧 Pre-v1.0</p>
-<p>
-The architectural foundation is solid (BRD-aligned, polyrepo,
-infra-free <code>core</code>, type-safe Go), but several P0
-items from the
-<a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">SECURITY_REVIEW</a>
-are still open: real OIDC, agent workload identity, rate
-limiting, key-rotation runbook. We're tracking them on the
-<a href="https://github.com/orgs/secrets-bridge/projects/1">org project board</a>.
-</p>
-<p>
-If you'd like to be a <strong>design partner</strong>,
-particularly if you're in financial services, healthcare, or
-government-adjacent, please open an issue at
-<a href="https://github.com/secrets-bridge/.github">secrets-bridge/.github</a>.
-</p>
+<div>
+<h3 id="implemented">Implemented<a class="headerlink" href="#implemented" title="Permanent link">&para;</a></h3>
+<ul>
+<li>AWS Secrets Manager and HashiCorp Vault through the agent</li>
+<li>Read requests with policy-driven approval</li>
+<li>Direct reveal in non-production, behind a second factor</li>
+<li>Cross-team requests: another team supplies the values</li>
+<li>Agent enrollment, status and revoke</li>
+<li>Append-only audit trail</li>
+</ul>
 </div>
+<div>
+<h3 id="roadmap">Roadmap<a class="headerlink" href="#roadmap" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Azure Key Vault and GCP Secret Manager providers</li>
+<li>Deeper Kubernetes External Secrets integration</li>
+<li>Flux integration</li>
+<li>Agents that claim only their own connection's jobs</li>
+</ul>
+<p class="sb-muted">Not shipped. Don't plan around these yet.</p>
+</div>
+</div>
+<p><a href="overview/product-status/">Full product status</a>, with what is QA-certified and what is in progress.</p>
+</section>
+<section aria-labelledby="sb-start" class="sb-section sb-end">
+<h2 class="sb-section-title" id="sb-start">Start on your laptop<a class="headerlink" href="#sb-start" title="Permanent link">&para;</a></h2>
+<p class="sb-lede sb-lede--small">The api repo's compose file starts Postgres, Redis and the control plane; the console and the agent run from their own repos. The local guide walks through the whole flow against a dev Vault.</p>
+<div class="sb-actions">
+<p><a class="md-button" href="operations/docker-compose/">Run it locally</a>
+<a class="md-button" href="operations/">Operations guide</a></p>
+</div>
+</section>
 </div>
 
 
