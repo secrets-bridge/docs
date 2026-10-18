@@ -216,10 +216,17 @@ For MinIO or another S3 API, set the endpoint and turn on path-style
 addressing. Static credentials come from an existing Secret, never from
 values.
 
+Read the keys at silent prompts (paste each, then Enter) so they never
+reach a command line, the shell history or the process list. This works
+in bash and zsh:
+
 ```bash
+read -rs SB_S3_KEY_ID
+read -rs SB_S3_SECRET
 kubectl -n secrets-bridge create secret generic secrets-bridge-objectstore \
-  --from-literal=AWS_ACCESS_KEY_ID=<access-key> \
-  --from-literal=AWS_SECRET_ACCESS_KEY=<secret-key>
+  --from-file=AWS_ACCESS_KEY_ID=<(printf '%s' "$SB_S3_KEY_ID") \
+  --from-file=AWS_SECRET_ACCESS_KEY=<(printf '%s' "$SB_S3_SECRET")
+unset SB_S3_KEY_ID SB_S3_SECRET
 ```
 
 ```yaml
