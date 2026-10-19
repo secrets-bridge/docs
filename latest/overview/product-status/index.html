@@ -1337,6 +1337,8 @@
       
         
       
+        
+      
     
     
     
@@ -1492,6 +1494,34 @@
     
   
     Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/google-sign-in/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sign in with Google
   
 
     
@@ -2265,6 +2295,14 @@ release / demo candidate. "PASS" means verified end-to-end, not merely merged.</
   All repos release together under one shared version; the first release
   has not been tagged yet. See
   <a href="../../operations/verifying-releases/">Verifying images and charts</a>.</li>
+<li><strong>Sign in with Google, with admin approval</strong>: an admin connects a Google
+  Workspace from the console. Accounts are bound by Google's issuer and
+  subject, the <code>hd</code> claim must be in the allowed domains, and new accounts
+  wait for an admin to approve them with a role and scope. Existing
+  accounts connect Google from their profile. The worker can post one
+  webhook message per run about waiting accounts. Merged in the api,
+  console and worker, not yet through QA. See
+  <a href="../../operations/google-sign-in/">Sign in with Google</a>.</li>
 </ul>
 <h2 id="live-vs-roadmap">Live vs Roadmap<a class="headerlink" href="#live-vs-roadmap" title="Permanent link">&para;</a></h2>
 <h3 id="live-implemented">Live / implemented<a class="headerlink" href="#live-implemented" title="Permanent link">&para;</a></h3>

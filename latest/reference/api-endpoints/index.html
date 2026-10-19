@@ -1193,6 +1193,8 @@
       
         
       
+        
+      
     
     
     
@@ -1348,6 +1350,34 @@
     
   
     Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/google-sign-in/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sign in with Google
   
 
     
@@ -1817,6 +1847,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sign-in-with-google" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sign in with Google
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sign in with Google">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sign-in-round-trip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sign-in round trip
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sign-in-providers-and-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sign-in providers and settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accounts-waiting-for-approval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accounts waiting for approval
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#agents" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2281,6 +2361,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#sign-in-with-google" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sign in with Google
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sign in with Google">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sign-in-round-trip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sign-in round trip
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sign-in-providers-and-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sign-in providers and settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accounts-waiting-for-approval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accounts waiting for approval
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#agents" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2710,8 +2840,231 @@ required to call it.</p>
 <td>public</td>
 <td><code>{email, password}</code> → <code>{token, expires_at, user}</code></td>
 </tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/auth/providers</code></td>
+<td>public</td>
+<td>Sign-in buttons for the login page: each enabled console provider, plus the env-var OIDC provider (<code>type: "oidc"</code>) when <code>SB_OIDC_ISSUER</code> is set. 120 a minute per IP</td>
+</tr>
 </tbody>
 </table>
+<h2 id="sign-in-with-google">Sign in with Google<a class="headerlink" href="#sign-in-with-google" title="Permanent link">&para;</a></h2>
+<p>Google configured from the console. See
+<a href="../../operations/google-sign-in/">Sign in with Google</a> for the flow. "Fresh
+MFA" means the route also runs <code>RequireFreshMFA</code> and answers
+<code>401 step_up_required</code> on a stale session.</p>
+<h3 id="sign-in-round-trip">Sign-in round trip<a class="headerlink" href="#sign-in-round-trip" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/auth/sso/google/start</code></td>
+<td>public</td>
+<td>Redirects to Google. 30 a minute per IP</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/auth/sso/google/callback</code></td>
+<td>public</td>
+<td>Google returns here. On success, sets the session cookie and redirects to <code>return_to</code>. <strong>Every refusal redirects to <code>/login?error=sso</code></strong>, whatever the reason; the reason is in the audit log as <code>auth.sso.callback</code> <code>error_kind</code>. 60 a minute per IP</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/auth/sso/google/connect</code></td>
+<td>bearer + fresh MFA</td>
+<td>Starts Connect Google for the caller's account. Returns <code>{redirect_url}</code>; the callback comes back to <code>/me#sso_ticket=…</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/auth/sso/google/finish</code></td>
+<td>bearer</td>
+<td><code>{ticket}</code>. Redeems a Connect or Test ticket, only on the session that started it (<code>403 sso_ticket_refused</code> otherwise). Returns <code>{purpose, result}</code> with <code>result</code> <code>linked</code>, <code>ok</code> or <code>failed</code> (and <code>reason</code> for a failed test). A refused link is <code>409 link_refused</code> with a <code>reason</code> such as <code>identity_taken</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/users/me/identities</code></td>
+<td>bearer</td>
+<td>Connected accounts: <code>provider_type</code>, <code>email</code>, <code>linked_at</code></td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/users/me/identities/google</code></td>
+<td>bearer + fresh MFA</td>
+<td>Disconnect. <code>409 identity_required</code> when the Google sign-in created the account</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sign-in-providers-and-settings">Sign-in providers and settings<a class="headerlink" href="#sign-in-providers-and-settings" title="Permanent link">&para;</a></h3>
+<p>Every route needs a <strong>global</strong> <code>auth.sso.edit</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/sso/providers</code></td>
+<td><code>bearer + auth.sso.edit</code></td>
+<td>List. Each provider has <code>redirect_url</code> (empty until a public address is set) and <code>client_secret_set</code>, never the secret</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/sso/providers</code></td>
+<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td><code>{type: "google", display_name, client_id, client_secret, allowed_domains, require_approval, default_role_id}</code>. Created turned off. <code>require_approval</code> defaults to <code>true</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/sso/providers/:id</code></td>
+<td><code>bearer + auth.sso.edit</code></td>
+<td>One provider</td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/api/v1/sso/providers/:id</code></td>
+<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td>Edit everything except the secret and <code>enabled</code>. A <code>client_secret</code> field gets <code>400</code></td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/api/v1/sso/providers/:id/secret</code></td>
+<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td><code>{client_secret}</code>. Replace the secret</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/sso/providers/:id/enable</code></td>
+<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td><code>409 provider_not_ready</code> with <code>missing</code> (<code>public_url</code>, <code>client_secret</code>, <code>allowed_domains</code>)</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/sso/providers/:id/disable</code></td>
+<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/sso/providers/:id/test</code></td>
+<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td>Starts a Test round trip, also while the provider is off. Returns <code>{redirect_url}</code>; the callback comes back to <code>/admin/sign-in#sso_ticket=…</code></td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/sso/providers/:id</code></td>
+<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td>Remove</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/sso/settings</code></td>
+<td><code>bearer + auth.sso.edit</code></td>
+<td><code>public_url</code>, <code>public_url_source</code> (<code>env</code>, <code>console</code> or empty) and <code>pending_cap</code></td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/api/v1/sso/settings</code></td>
+<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td><code>{public_url, pending_cap}</code>; either may be left out. <code>409 public_url_from_env</code> when <code>SB_PUBLIC_URL</code> is set. <code>pending_cap</code> is 1 to 10,000</td>
+</tr>
+</tbody>
+</table>
+<p>Stable error codes on these routes:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>invalid_input</code></td>
+<td>400</td>
+<td>A field failed validation; <code>field</code> names it</td>
+</tr>
+<tr>
+<td><code>default_role_privileged</code></td>
+<td>400</td>
+<td>The default role holds something other than <code>secret.list</code>, <code>secret.request</code> or <code>audit.read</code></td>
+</tr>
+<tr>
+<td><code>default_role_needs_approval_off</code></td>
+<td>400</td>
+<td>A default role was set with approval on</td>
+</tr>
+<tr>
+<td><code>env_provider_is_google</code></td>
+<td>409</td>
+<td><code>SB_OIDC_ISSUER</code> is already Google</td>
+</tr>
+<tr>
+<td><code>provider_exists</code></td>
+<td>409</td>
+<td>A Google provider already exists</td>
+</tr>
+<tr>
+<td><code>provider_not_ready</code></td>
+<td>409</td>
+<td>Turn on is missing something; see <code>missing</code></td>
+</tr>
+<tr>
+<td><code>public_url_from_env</code></td>
+<td>409</td>
+<td>The address is set by <code>SB_PUBLIC_URL</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="accounts-waiting-for-approval">Accounts waiting for approval<a class="headerlink" href="#accounts-waiting-for-approval" title="Permanent link">&para;</a></h3>
+<p>Every route needs a <strong>global</strong> <code>user_role.edit</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/users/pending</code></td>
+<td><code>bearer + user_role.edit</code></td>
+<td>Waiting accounts, oldest first, at most 100, with <code>total</code> for the count</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/users/:id/approve</code></td>
+<td><code>bearer + user_role.edit</code></td>
+<td><code>{role_id, scope}</code>. Grants the role and clears the waiting flag in one transaction. <code>scope</code> uses the <code>POST /user-roles</code> rules; a malformed one gets <code>400</code>. <code>409 user_not_pending</code> for an account that isn't waiting</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/users/:id/decline</code></td>
+<td><code>bearer + user_role.edit</code></td>
+<td>Disables a waiting account. <code>409 user_not_pending</code> for any other account</td>
+</tr>
+</tbody>
+</table>
+<p>A waiting account may call only <code>GET /api/v1/users/me</code> (which includes
+<code>pending_approval: true</code>), <code>POST /api/v1/auth/logout</code> and
+<code>POST /api/v1/auth/oidc/logout</code>. Everything else answers
+<code>403 account_pending_approval</code>.</p>
 <h2 id="agents">Agents<a class="headerlink" href="#agents" title="Permanent link">&para;</a></h2>
 <p>Onboarding is <strong>self-enrollment by default</strong>: an admin mints a one-time,
 provider-connection-bound enrollment token; the agent exchanges it for its

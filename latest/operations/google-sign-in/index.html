@@ -1,0 +1,2868 @@
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Connect a Google Workspace from the console, approve the accounts it creates, and connect Google to existing accounts.">
+      
+      
+        <meta name="author" content="Secrets Bridge contributors">
+      
+      
+        <link rel="canonical" href="https://secrets-bridge.io/latest/operations/google-sign-in/">
+      
+      
+        <link rel="prev" href="../authentication/">
+      
+      
+        <link rel="next" href="../oidc-authentik/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+  
+    <title>Sign in with Google - Secrets Bridge</title>
+  
+
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.804a7bde.css">
+        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/brand.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/landing.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+  <link rel="canonical" href="https://secrets-bridge.io/latest/operations/google-sign-in/">
+
+  
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Secrets Bridge" />
+  <meta property="og:title" content="Sign in with Google" />
+  <meta property="og:description" content="Connect a Google Workspace from the console, approve the accounts it creates, and connect Google to existing accounts." />
+  <meta property="og:url" content="https://secrets-bridge.io/latest/operations/google-sign-in/" />
+  <meta property="og:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
+  <meta property="og:locale" content="en_US" />
+
+  
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Sign in with Google" />
+  <meta name="twitter:description" content="Connect a Google Workspace from the console, approve the accounts it creates, and connect Google to existing accounts." />
+  <meta name="twitter:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
+  <meta name="twitter:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
+  
+
+  
+  <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png" />
+
+  
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#17191E" media="(prefers-color-scheme: dark)" />
+
+  
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+
+  
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Sign in with Google",
+    "description": "Connect a Google Workspace from the console, approve the accounts it creates, and connect Google to existing accounts.",
+    "url": "https://secrets-bridge.io/latest/operations/google-sign-in/",
+    "image": "https://secrets-bridge.io/latest/assets/og-banner.png",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Secrets Bridge",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://secrets-bridge.io/latest/assets/og-banner.png"
+      }
+    }
+  }
+  </script>
+  
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#sign-in-with-google" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Secrets Bridge" class="md-header__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
+      
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Secrets Bridge
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Sign in with Google
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark theme"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark theme" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light theme"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light theme" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/secrets-bridge" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    secrets-bridge
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Overview
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../components/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Components
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../design/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Design system
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Operations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Secrets Bridge" class="md-nav__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
+      
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+
+    </a>
+    Secrets Bridge
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/secrets-bridge" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    secrets-bridge
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../overview/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Overview
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../overview/product-status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Product status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../overview/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../overview/teams-and-section-heads/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teams and section heads
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../overview/threat-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Threat model & hard rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../overview/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../components/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Components
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Components
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Control Plane API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/worker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Worker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/controller/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller (Kubernetes)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/ui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UI (SPA)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core (shared library)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../design/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design system
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design system
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/brand-voice/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Brand voice
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/tokens/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tokens and theme
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/assets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logos and assets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../docker-compose/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running locally with docker compose
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bootstrap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bootstrap & first sign-in
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-onboarding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent onboarding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sign in with Google
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sign in with Google
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#before-you-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before you start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#set-up-google-sign-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Set up Google sign-in
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Set up Google sign-in">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-set-the-public-address" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Set the public address
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-create-the-oauth-client-in-google-cloud-console" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Create the OAuth client in Google Cloud Console
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-enter-the-client-in-the-console" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Enter the client in the console
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-test-then-turn-it-on" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Test, then turn it on
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#who-can-sign-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Who can sign in
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#approve-new-accounts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Approve new accounts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Approve new accounts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-waiting-limit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The waiting limit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#letting-people-in-without-approval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Letting people in without approval
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connect-google-to-an-existing-account" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connect Google to an existing account
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notify-admins-from-the-worker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notify admins from the worker
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-to-the-env-var-oidc-provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next to the env-var OIDC provider
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audit-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audit events
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../oidc-authentik/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OIDC with Authentik
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../project-environments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project environments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../policy-templates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policy templates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reveal-sessions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reveal sessions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cross-team-requests/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cross-team requests
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../provider-connections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Provider connections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../object-storage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../verifying-releases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Verifying images and charts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../reference/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/api-endpoints/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HTTP API endpoints
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/providers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Providers supported
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/kms-backends/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KMS backends
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/permissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Permissions catalog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#before-you-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before you start
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#set-up-google-sign-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Set up Google sign-in
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Set up Google sign-in">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-set-the-public-address" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Set the public address
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-create-the-oauth-client-in-google-cloud-console" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Create the OAuth client in Google Cloud Console
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-enter-the-client-in-the-console" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Enter the client in the console
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-test-then-turn-it-on" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Test, then turn it on
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#who-can-sign-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Who can sign in
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#approve-new-accounts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Approve new accounts
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Approve new accounts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-waiting-limit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The waiting limit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#letting-people-in-without-approval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Letting people in without approval
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connect-google-to-an-existing-account" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connect Google to an existing account
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notify-admins-from-the-worker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notify admins from the worker
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-to-the-env-var-oidc-provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next to the env-var OIDC provider
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#audit-events" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Audit events
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/secrets-bridge/docs/edit/main/docs/operations/google-sign-in.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/secrets-bridge/docs/raw/main/docs/operations/google-sign-in.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 18c.56 0 1 .44 1 1s-.44 1-1 1-1-.44-1-1 .44-1 1-1m0-3c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5a2.5 2.5 0 0 1-2.5-2.5 2.5 2.5 0 0 1 2.5-2.5 2.5 2.5 0 0 1 2.5 2.5 2.5 2.5 0 0 1-2.5 2.5M9.27 20H6V4h7v5h5v4.07c.7.08 1.36.25 2 .49V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4.5a8.2 8.2 0 0 1-1.23-2"/></svg>
+    </a>
+  
+
+
+<h1 id="sign-in-with-google">Sign in with Google<a class="headerlink" href="#sign-in-with-google" title="Permanent link">&para;</a></h1>
+<p>An admin can connect the company's Google Workspace from the console, with
+no environment variables and no redeploy. People in the allowed Workspace
+domains then sign in with Google. By default, the first sign-in creates an
+account that waits until an admin approves it and gives it a role.</p>
+<div class="admonition warning">
+<p class="admonition-title">Merged, not yet through QA</p>
+<p>Google sign-in is in the api, console and worker on <code>main</code>, but it has
+not passed a QA cycle. See <a href="../../overview/product-status/">Product status</a>.</p>
+</div>
+<p>This page covers:</p>
+<ul>
+<li><a href="#set-up-google-sign-in">setting it up</a>: the public address, the Google
+  OAuth client, the console settings, Test and Turn on;</li>
+<li><a href="#who-can-sign-in">who can sign in</a> and how accounts are matched;</li>
+<li><a href="#approve-new-accounts">approving new accounts</a>, and the
+  <a href="#letting-people-in-without-approval">option to skip approval</a>;</li>
+<li><a href="#connect-google-to-an-existing-account">connecting Google to an existing account</a>;</li>
+<li><a href="#notify-admins-from-the-worker">the worker message</a> for new accounts;</li>
+<li><a href="#next-to-the-env-var-oidc-provider">how it sits next to the env-var OIDC provider</a>
+  and the break-glass admin.</li>
+</ul>
+<p>The examples use <code>https://secrets.example.com</code> as the install's address and
+<code>example.com</code> as the Workspace domain.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>sequenceDiagram
+    autonumber
+    actor P as New user
+    participant UI as Console
+    participant API as api
+    participant G as Google
+    actor A as Admin
+    P-&gt;&gt;UI: Sign in with Google
+    UI-&gt;&gt;API: GET /api/v1/auth/sso/google/start
+    API-&gt;&gt;G: redirect with PKCE, nonce and state
+    G-&gt;&gt;API: GET /api/v1/auth/sso/google/callback?code=...
+    API-&gt;&gt;API: check email_verified, hd and email domain
+    API-&gt;&gt;API: create account, waiting for approval
+    API-&gt;&gt;UI: session cookie, redirect
+    UI-&gt;&gt;P: Waiting for approval page
+    A-&gt;&gt;UI: Admin → Users, Approve with a role and scope
+    UI-&gt;&gt;API: POST /api/v1/users/:id/approve
+    P-&gt;&gt;UI: Check again
+    UI-&gt;&gt;P: console with the granted access</code></pre>
+<h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
+<p>You need:</p>
+<ul>
+<li>an account with a global <code>auth.sso.edit</code> grant and an enrolled second
+  factor. The seeded <code>admin</code> role holds <code>auth.sso.edit</code>, so the bootstrap
+  admin can do this right after the <a href="../bootstrap/">first sign-in</a>;</li>
+<li>a public <code>https</code> address for the install, the one people type in the
+  browser;</li>
+<li>a Google Workspace and a Google Cloud project in it where you can create
+  OAuth clients.</li>
+</ul>
+<p><strong>Every change asks for a fresh second factor.</strong> Saving the public address
+or the waiting limit, creating, editing or removing Google, replacing the
+client secret, Test, Turn on and Turn off all go through the step-up dialog
+(<code>RequireFreshMFA</code>). Whoever holds <code>auth.sso.edit</code> decides who can sign in,
+and the step-up means a stolen session cookie alone can't change these
+settings.</p>
+<h2 id="set-up-google-sign-in">Set up Google sign-in<a class="headerlink" href="#set-up-google-sign-in" title="Permanent link">&para;</a></h2>
+<h3 id="1-set-the-public-address">1. Set the public address<a class="headerlink" href="#1-set-the-public-address" title="Permanent link">&para;</a></h3>
+<p>Redirect URIs are built from the install's configured public address, never
+from the request's <code>Host</code> or <code>X-Forwarded-*</code> headers. A forged header can't
+send the authorization code somewhere else. The address comes from one of
+two places:</p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>How</th>
+<th>In the console</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SB_PUBLIC_URL</code></td>
+<td>Set it in the api's environment, for example in the chart's <code>secrets.existingSecret</code>. The worker reads the same Secret.</td>
+<td>Shown read-only, with "Set by SB_PUBLIC_URL on this install"</td>
+</tr>
+<tr>
+<td>The console</td>
+<td><strong>Admin → Sign-in → Public address</strong>. The field is prefilled from the address you are using.</td>
+<td>Editable</td>
+</tr>
+</tbody>
+</table>
+<p>When <code>SB_PUBLIC_URL</code> is set it always wins, and <code>PUT /sso/settings</code> refuses
+to change the address (<code>409 public_url_from_env</code>).</p>
+<p>The address must be an absolute <code>https</code> URL with no user info, query or
+fragment. A trailing slash is dropped. Plain <code>http</code> is accepted only for
+<code>localhost</code> or a loopback address, and only when <code>SB_ENV=dev</code>. The api
+refuses to start with an invalid <code>SB_PUBLIC_URL</code>. The console warns, without
+blocking, when a saved address isn't <code>https</code> or looks internal.</p>
+<p>Google can't be turned on until an address is set, and while none is set
+the login page doesn't offer Google.</p>
+<p>The <strong>Public address</strong> card also holds the <strong>waiting limit</strong>, the most
+accounts that can wait for approval at once. It defaults to 50 and accepts
+1 to 10,000. See <a href="#the-waiting-limit">The waiting limit</a>.</p>
+<h3 id="2-create-the-oauth-client-in-google-cloud-console">2. Create the OAuth client in Google Cloud Console<a class="headerlink" href="#2-create-the-oauth-client-in-google-cloud-console" title="Permanent link">&para;</a></h3>
+<p>With the address saved, <strong>Admin → Sign-in → Google → Set up Google</strong> shows
+the redirect URL to copy. It is always the public address plus
+<code>/api/v1/auth/sso/google/callback</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>https://secrets.example.com/api/v1/auth/sso/google/callback
+</span></code></pre></div>
+<p>In the Google Cloud project:</p>
+<ol>
+<li>Set the OAuth consent screen's user type to <strong>Internal</strong>, so only
+   accounts in your Workspace can use the client.</li>
+<li>Create an <strong>OAuth client ID</strong> of application type <strong>Web application</strong>.</li>
+<li>Add the redirect URL above under <strong>Authorized redirect URIs</strong>, exactly
+   as the console shows it.</li>
+<li>Copy the client ID and the client secret.</li>
+</ol>
+<p>Secrets Bridge uses Google's fixed issuer (<code>https://accounts.google.com</code>)
+and its discovery document, so you don't enter an issuer. It asks for the
+<code>openid</code>, <code>email</code> and <code>profile</code> scopes.</p>
+<h3 id="3-enter-the-client-in-the-console">3. Enter the client in the console<a class="headerlink" href="#3-enter-the-client-in-the-console" title="Permanent link">&para;</a></h3>
+<p>In the <strong>Set up Google</strong> drawer:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What to enter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Client ID</td>
+<td>From the OAuth client. Required, at most 255 characters, no spaces.</td>
+</tr>
+<tr>
+<td>Client secret</td>
+<td>From the OAuth client. Saved encrypted and never shown again.</td>
+</tr>
+<tr>
+<td>Workspace domains</td>
+<td>One per line, for example <code>example.com</code>. At least one, at most 20. They are lowercased and de-duplicated.</td>
+</tr>
+<tr>
+<td>New people</td>
+<td><strong>Wait for approval</strong> (the default) or <strong>Let them in right away</strong>.</td>
+</tr>
+<tr>
+<td>Role for new people</td>
+<td>Only with <strong>Let them in right away</strong>. Optional. See <a href="#letting-people-in-without-approval">Letting people in without approval</a>.</td>
+</tr>
+</tbody>
+</table>
+<p>The provider is saved <strong>turned off</strong>.</p>
+<p><strong>The client secret is write-only.</strong> It is envelope-encrypted with the
+configured KMS (a fresh data key, AES-256-GCM), the same way TOTP secrets
+are stored. No response returns it, only <code>client_secret_set: true</code>, and it
+is never logged or put in audit metadata. The console shows it as "Saved",
+with <strong>Replace…</strong> to set a new one. Replacing it is its own call,
+<code>PUT /sso/providers/:id/secret</code>, audited as <code>sso_provider.secret_rotate</code>.
+<code>PUT /sso/providers/:id</code> refuses a <code>client_secret</code> field with <code>400</code>.</p>
+<h3 id="4-test-then-turn-it-on">4. Test, then turn it on<a class="headerlink" href="#4-test-then-turn-it-on" title="Permanent link">&para;</a></h3>
+<p><strong>Test</strong> sends you through Google with your own account and back to
+<strong>Admin → Sign-in</strong>. It runs every check a real sign-in runs, creates
+nothing, issues no session, and works while Google is still off. The result
+shows as "Google sign-in works." or as the reason it didn't pass, and only
+the admin who ran it sees that reason.</p>
+<p><strong>Turn on</strong> needs a public address, a client secret and at least one
+domain. If any is missing the api answers <code>409 provider_not_ready</code> with a
+<code>missing</code> list, and the console names what to set. Once on, the login page
+shows <strong>Sign in with Google</strong> above the password form.</p>
+<p>Changes take effect on the next sign-in, without a restart: the OAuth client
+is built from the saved settings on every round trip.</p>
+<h2 id="who-can-sign-in">Who can sign in<a class="headerlink" href="#who-can-sign-in" title="Permanent link">&para;</a></h2>
+<p>On every Google sign-in, including returning users, the api checks:</p>
+<ul>
+<li>the email is verified by Google (<code>email_verified</code>);</li>
+<li>the ID token's <code>hd</code> claim (the Workspace domain) is present and in the
+  allowed domains;</li>
+<li>the email's domain is in the allowed domains as well.</li>
+</ul>
+<p><code>hd</code> is only present for Workspace accounts. A personal Google account with
+an address in an allowed domain has no <code>hd</code>, so it is refused. Removing a
+domain from the list refuses people in it from their next sign-in. When
+exactly one domain is allowed, the api also passes it to Google as the <code>hd</code>
+hint, so the account chooser offers only accounts in that Workspace.</p>
+<p><strong>Accounts are matched by Google's issuer and subject, never by email.</strong>
+The binding lives in the <code>user_identities</code> table, unique on (issuer,
+subject). The first sign-in of a Google identity:</p>
+<ul>
+<li>creates a new account when its email isn't used by any account here;</li>
+<li>is <strong>refused</strong> when the email already belongs to an account. That
+  person signs in with their password and
+  <a href="#connect-google-to-an-existing-account">connects Google</a> instead. This
+  stops a Google account with, say, the bootstrap admin's address from
+  reaching the bootstrap admin's account.</li>
+</ul>
+<p>The round trip itself uses PKCE (S256), a nonce and a single-use state
+that lives 5 minutes and is bound to the browser by the <code>sb_sso_state</code>
+cookie. Return paths must be on the same origin, as for the
+<a href="../authentication/#oidc-sign-in-slices-b-c-e">env-var OIDC provider</a>.</p>
+<p><strong>Every refused sign-in gets the same answer.</strong> The browser goes to
+<code>/login?error=sso</code>, and the login page says "You couldn't be signed in with
+that account." whatever the reason. The page never tells an outsider which
+emails have accounts. The reason goes to the audit log; see
+<a href="../troubleshooting/#google-sign-in-refused">Troubleshooting</a>.</p>
+<h2 id="approve-new-accounts">Approve new accounts<a class="headerlink" href="#approve-new-accounts" title="Permanent link">&para;</a></h2>
+<p>With <strong>Wait for approval</strong> on, a new account starts waiting. Until it is
+approved it can only read <code>GET /users/me</code> and sign out. Every other route
+answers <code>403 account_pending_approval</code>, and the console sends the person to
+a <strong>Waiting for approval</strong> page with <strong>Check again</strong> and <strong>Sign out</strong>. This
+is enforced at session validation, at the bearer-token lookup and at
+sign-in. If a waiting account signs in through the env-var OIDC provider,
+its group mapping is skipped, so it gets no role from IdP groups either.</p>
+<p>Admins who can approve see:</p>
+<ul>
+<li>a count on <strong>Users</strong> in the sidebar;</li>
+<li>a banner on <strong>Overview</strong> with a link while anyone is waiting;</li>
+<li>the <strong>Waiting for approval</strong> list on <strong>Admin → Users</strong>, longest wait
+  first;</li>
+<li>optionally, a <a href="#notify-admins-from-the-worker">webhook message from the worker</a>.</li>
+</ul>
+<p>Approving and declining need a <strong>global</strong> <code>user_role.edit</code>. A team-scoped
+grant, or <code>team.edit</code>, is not enough.</p>
+<p><strong>Approve…</strong> picks a role and, optionally, limits it to a team or a project.
+The api grants the role and clears the waiting flag in one transaction, so
+a failed grant leaves the account waiting. The scope is checked with the
+same rules as <code>POST /user-roles</code>: only <code>project_id</code>, <code>team_id</code>,
+<code>environment</code>, <code>secret_ref_prefix</code> and <code>provider_type</code> are accepted, each a
+non-empty string, IDs as UUIDs. A malformed scope is refused with <code>400</code>
+instead of being widened. The person gets the access on their next
+request, or after <strong>Check again</strong>.</p>
+<p><strong>Decline…</strong> disables a waiting account after a confirmation, and its
+sessions end on their next use. Decline only works on waiting accounts
+(<code>409 user_not_pending</code> otherwise), so it can't disable an active account
+or the break-glass admin. A declined account keeps its waiting flag, so it
+can't be approved or re-enabled from the console, and that Google account
+can't sign in again.</p>
+<h3 id="the-waiting-limit">The waiting limit<a class="headerlink" href="#the-waiting-limit" title="Permanent link">&para;</a></h3>
+<p>At most 50 accounts can wait at once by default; change the limit on
+<strong>Admin → Sign-in → Public address</strong>. Past it, new Google sign-ins are
+refused with the same generic page until you approve or decline some.
+Declined accounts don't count. Refusals at the limit are audited as
+<code>user.pending_refused</code>, aggregated per 10-minute window: the first refusal
+in a window writes one event, and the next window writes a summary with the
+count and the first and last times. A burst of sign-ins can't fill the
+append-only audit log.</p>
+<h3 id="letting-people-in-without-approval">Letting people in without approval<a class="headerlink" href="#letting-people-in-without-approval" title="Permanent link">&para;</a></h3>
+<p>With <strong>Let them in right away</strong>, a new account starts active. You can pick
+a <strong>Role for new people</strong>, granted globally when the account is created.
+Without one, the account starts with no role, and an admin grants one on
+the Users page.</p>
+<p>The default role must be non-privileged: every permission it holds must be
+in <code>secret.list</code>, <code>secret.request</code> and <code>audit.read</code> (<code>audit.read</code> only
+shows a user their own events). The api refuses anything else with
+<code>400 default_role_privileged</code>, and a default role with approval on with
+<code>400 default_role_needs_approval_off</code>. The seeded <code>developer</code> role doesn't
+qualify, because it holds <code>secret.reveal.direct</code>. Create a role with only
+those permissions if you want approval off.</p>
+<p>The rule holds after the provider is saved too:</p>
+<ul>
+<li>widening a role that a provider uses as its default
+  (<code>PUT /roles/:id/permissions</code>) is refused with <code>409 role_is_sso_default</code>,
+  and deleting it with <code>409</code> until you choose another default;</li>
+<li>the role is checked again at every sign-in. If it no longer qualifies,
+  the new account waits for approval like any other, and the api audits
+  <code>sso_provider.default_role_refused</code>.</li>
+</ul>
+<h2 id="connect-google-to-an-existing-account">Connect Google to an existing account<a class="headerlink" href="#connect-google-to-an-existing-account" title="Permanent link">&para;</a></h2>
+<p>Existing accounts, including the bootstrap admin, are never linked by
+email. The owner connects Google from their profile:</p>
+<ol>
+<li>Sign in with the password.</li>
+<li>Open the profile page and click <strong>Connect Google</strong>. It asks for a fresh
+   second factor.</li>
+<li>Choose the Google account. It must pass the <a href="#who-can-sign-in">same checks</a>
+   as a sign-in.</li>
+<li>Back in the console, the profile shows the connected account.</li>
+</ol>
+<p>Google must be turned on. The round trip is bound to the session that
+started it: the callback parks the result in a one-time ticket that lives 2
+minutes, and the console redeems it with <code>POST /auth/sso/google/finish</code>,
+which only succeeds on that same session (otherwise <code>403
+sso_ticket_refused</code>). A Google identity already connected to another
+account is refused (<code>409 link_refused</code>, reason <code>identity_taken</code>), and the
+profile says so. A link is audited as <code>user.identity_link</code>.</p>
+<p><strong>Disconnect…</strong> also needs a fresh second factor and is audited as
+<code>user.identity_unlink</code>. After it, the owner signs in with their password
+again.</p>
+<p><strong>An account created by a Google sign-in can't disconnect Google.</strong> It was
+given a random password nobody knows, so Google is its only way in.
+<code>DELETE /users/me/identities/google</code> answers <code>409 identity_required</code>, and
+the profile explains why instead of offering <strong>Disconnect…</strong>.</p>
+<h2 id="notify-admins-from-the-worker">Notify admins from the worker<a class="headerlink" href="#notify-admins-from-the-worker" title="Permanent link">&para;</a></h2>
+<p>The worker's <code>users-pending</code> sweeper posts a message when accounts start
+waiting. It needs <code>SB_WORKER_WEBHOOK_URL</code>, and isn't registered without it;
+the console's count and banner still work.</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SB_WORKER_WEBHOOK_URL</code></td>
+<td>(unset)</td>
+<td>Where to post. Required for this message.</td>
+</tr>
+<tr>
+<td><code>SB_WORKER_WEBHOOK_SLACK_FORMAT</code></td>
+<td><code>false</code></td>
+<td><code>true</code> posts <code>{"text": ...}</code> for a Slack incoming webhook.</td>
+</tr>
+<tr>
+<td><code>SB_WORKER_USERS_PENDING_INTERVAL</code></td>
+<td><code>1m</code></td>
+<td>How often it runs, and so the most often admins hear about new accounts. At least <code>30s</code>, or the worker refuses to start.</td>
+</tr>
+<tr>
+<td><code>SB_PUBLIC_URL</code></td>
+<td>(unset)</td>
+<td>Used for the link to Admin → Users. Unset, the address saved in the console is used.</td>
+</tr>
+</tbody>
+</table>
+<p>Each run posts <strong>at most one message</strong>. It covers the accounts that started
+waiting since the last message: up to 10 by email, oldest first, then "and
+N more", the total still waiting when older ones are left, and a link to
+<code>&lt;public address&gt;/admin/users</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>[info] 2 new accounts are waiting for approval
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>• sara@example.com
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>• omar@example.com
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>Approve or decline them in Admin → Users: https://secrets.example.com/admin/users
+</span></code></pre></div>
+<p>The message carries <strong>emails only</strong>, never display names, because a display
+name comes from the person's Google account and can contain anything. It
+goes to the webhook only. The worker logs counts, never who is waiting.
+Each account is announced once. A failed post is retried on the next run,
+together with anyone who arrived since. Declined accounts are left out.</p>
+<h2 id="next-to-the-env-var-oidc-provider">Next to the env-var OIDC provider<a class="headerlink" href="#next-to-the-env-var-oidc-provider" title="Permanent link">&para;</a></h2>
+<p>The <a href="../authentication/#oidc-sign-in-slices-b-c-e">env-var OIDC provider</a>
+(<code>SB_OIDC_ISSUER</code> and the other <code>SB_OIDC_*</code> variables) keeps working as
+before. When both are configured, the login page shows two buttons, <strong>Sign
+in with Google</strong> and <strong>Sign in with single sign-on</strong>, and each provider
+handles its own sign-ins. The env-var provider still matches accounts by
+verified email and doesn't create waiting accounts.</p>
+<p>When <code>SB_OIDC_ISSUER</code> is already Google (<code>https://accounts.google.com</code>),
+the console refuses to add Google (<code>409 env_provider_is_google</code>), the login
+page doesn't offer the console provider, and a provider saved earlier can't
+be turned on.</p>
+<p><strong>Password sign-in and the break-glass admin are never turned off by these
+settings.</strong> No sign-in setting disables <code>POST /auth/login</code>, and decline
+only touches waiting accounts. If Google is misconfigured or down, sign in
+with the bootstrap admin's password and fix it under Admin → Sign-in.</p>
+<h2 id="audit-events">Audit events<a class="headerlink" href="#audit-events" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sso_provider.create</code>, <code>.update</code>, <code>.delete</code>, <code>.enable</code>, <code>.disable</code></td>
+<td>Google changed in the console. Old and new values of the domains, the approval setting and the default role. Never the secret, only whether one is set.</td>
+</tr>
+<tr>
+<td><code>sso_provider.secret_rotate</code></td>
+<td>The client secret replaced</td>
+</tr>
+<tr>
+<td><code>sso_settings.update</code></td>
+<td>The public address or the waiting limit changed, with old and new values</td>
+</tr>
+<tr>
+<td><code>sso_provider.test</code></td>
+<td>A Test round trip, <code>success</code> or <code>denied</code> with <code>error_kind</code></td>
+</tr>
+<tr>
+<td><code>auth.sso.callback</code></td>
+<td>A Google sign-in or Connect Google round trip, <code>success</code> or <code>denied</code> with <code>error_kind</code></td>
+</tr>
+<tr>
+<td><code>user.pending</code></td>
+<td>An account created waiting for approval</td>
+</tr>
+<tr>
+<td><code>user.sso_provision</code></td>
+<td>An account created active, with approval off</td>
+</tr>
+<tr>
+<td><code>user.approve</code>, <code>user_role.grant</code></td>
+<td>An admin approved an account, with the role and scope</td>
+</tr>
+<tr>
+<td><code>user.decline</code></td>
+<td>An admin declined an account</td>
+</tr>
+<tr>
+<td><code>user.pending_refused</code></td>
+<td>Sign-ins refused at the waiting limit, aggregated per 10 minutes</td>
+</tr>
+<tr>
+<td><code>sso_provider.default_role_refused</code></td>
+<td>A default role no longer qualified at sign-in, so the account waits</td>
+</tr>
+<tr>
+<td><code>user.identity_link</code>, <code>user.identity_unlink</code></td>
+<td>Google connected to or disconnected from an account</td>
+</tr>
+</tbody>
+</table>
+<p>None of them carries a token, code, ticket or secret.</p>
+<h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
+<p>The routes are listed in the <a href="../../reference/api-endpoints/#sign-in-with-google">HTTP API reference</a>,
+and the permissions in the <a href="../../reference/permissions/#authentication">permissions catalog</a>.</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Secrets Bridge contributors. Built by <a href="https://www.linkedin.com/in/haydercyber1/" rel="author noopener" target="_blank">Haider Raed</a>. <a href="https://github.com/secrets-bridge/.github/blob/main/SECURITY.md">Security policy</a>.
+    </div>
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/secrets-bridge" target="_blank" rel="noopener" title="GitHub organisation" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://github.com/orgs/secrets-bridge/packages" target="_blank" rel="noopener" title="Container images and Helm charts (ghcr.io/secrets-bridge)" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M349.9 236.3h-66.1v-59.4h66.1zm0-204.3h-66.1v60.7h66.1zm78.2 144.8H362v59.4h66.1zm-156.3-72.1h-66.1v60.1h66.1zm78.1 0h-66.1v60.1h66.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1zm78.1 0h-66.1v59.4h66.1zm-78.1-72.1h-66.1v60.1h66.1z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "navigation.tracking", "navigation.instant", "navigation.instant.progress", "toc.follow", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.action.edit", "content.action.view", "search.suggest", "search.highlight", "search.share", "announce.dismiss"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

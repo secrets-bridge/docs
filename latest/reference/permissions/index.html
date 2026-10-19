@@ -1191,6 +1191,8 @@
       
         
       
+        
+      
     
     
     
@@ -1346,6 +1348,34 @@
     
   
     Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/google-sign-in/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sign in with Google
   
 
     
@@ -1944,6 +1974,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#observability" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2113,6 +2154,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#observability" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2226,8 +2278,8 @@ edit their permission lists but can't delete the rows.</p>
 <tbody>
 <tr>
 <td><code>admin</code></td>
-<td><code>role.edit</code>, <code>user_role.edit</code>, <code>workflow.edit</code>, <code>policy.edit</code>, <code>agent.mint</code>, <code>agent.revoke</code>, <code>secret.request</code>, <code>secret.approve</code>, <code>audit.read</code></td>
-<td></td>
+<td><code>role.edit</code>, <code>user_role.edit</code>, <code>workflow.edit</code>, <code>policy.edit</code>, <code>agent.mint</code>, <code>agent.revoke</code>, <code>secret.request</code>, <code>secret.approve</code>, <code>audit.read</code>, <code>auth.sso.edit</code></td>
+<td><code>auth.sso.edit</code> is added by migration 0043, so the bootstrap admin can connect Google from the console.</td>
 </tr>
 <tr>
 <td><code>approver</code></td>
@@ -2277,7 +2329,7 @@ edit their permission lists but can't delete the rows.</p>
 </tr>
 <tr>
 <td><code>user_role.edit</code></td>
-<td>Grant / revoke role assignments to users.</td>
+<td>Grant / revoke role assignments to users. A <strong>global</strong> grant also lists, approves and declines accounts <a href="../../operations/google-sign-in/#approve-new-accounts">waiting for approval</a> (<code>/users/pending</code>, <code>/users/:id/approve</code>, <code>/users/:id/decline</code>); a team-scoped grant gets 403 there.</td>
 </tr>
 </tbody>
 </table>
@@ -2358,6 +2410,22 @@ edit their permission lists but can't delete the rows.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Permission</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>auth.sso.edit</code></td>
+<td>Connect and manage sign-in providers such as <a href="../../operations/google-sign-in/">Google</a>, and set the install's public address and the waiting limit. <strong>Global only</strong>: a scoped grant gets 403. Every write, the secret replacement, Test, Turn on and Turn off also need a fresh second factor. Whoever holds it decides who can sign in, so grant it like an admin permission.</td>
+</tr>
+</tbody>
+</table>
+<p>A sign-in provider's <strong>default role</strong> (used only when approval is off) may hold only <code>secret.list</code>, <code>secret.request</code> and <code>audit.read</code>. The api refuses a role with anything else, and refuses to widen a role that is in use as a default (<code>409 role_is_sso_default</code>).</p>
 <h3 id="observability">Observability<a class="headerlink" href="#observability" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -2411,7 +2479,7 @@ gating on each endpoint lands as part of
 <p>The Roles admin page calls <code>GET /api/v1/permissions</code> on mount and
 hydrates the chip picker from the response. The catalog includes
 the group label so the chips render in the same RBAC / Workflows /
-Agents / Secrets / Observability / Integrations groupings.</p>
+Agents / Secrets / Authentication / Observability / Integrations groupings.</p>
 <p>If a role contains a permission string the catalog doesn't know
 about (e.g. a legacy custom permission from before
 <a href="https://github.com/secrets-bridge/api/issues/32">api#32</a> shipped

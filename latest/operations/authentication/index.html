@@ -19,7 +19,7 @@
         <link rel="prev" href="../agent-onboarding/">
       
       
-        <link rel="next" href="../oidc-authentik/">
+        <link rel="next" href="../google-sign-in/">
       
       
         
@@ -1195,6 +1195,8 @@
       
         
       
+        
+      
     
     
     
@@ -1498,6 +1500,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#google-sign-in-from-the-console" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google sign-in from the console
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#mfa-step-up-slices-h-i-current-model" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1656,6 +1669,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../google-sign-in/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sign in with Google
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2266,6 +2307,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#google-sign-in-from-the-console" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google sign-in from the console
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#mfa-step-up-slices-h-i-current-model" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2454,7 +2506,7 @@
 
 
 <h1 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h1>
-<p>Secrets Bridge ships <strong>two ways to sign in</strong> (OIDC for everyone, local-admin as break-glass) and gates Tier 2 operations (approve, reject, reveal) behind <strong>fresh MFA</strong>. This page explains the model end-to-end so an operator knows what's enforced where.</p>
+<p>Secrets Bridge has <strong>three ways to sign in</strong>: an OIDC provider set with <code>SB_OIDC_*</code> environment variables, <a href="../google-sign-in/">Google configured from the console</a>, and the local password, which stays available as break-glass. It gates Tier 2 operations (approve, reject, reveal) behind <strong>fresh MFA</strong>. This page explains the model end-to-end so an operator knows what's enforced where.</p>
 <h2 id="the-session-model-slices-a2-c">The session model (Slices A2 + C)<a class="headerlink" href="#the-session-model-slices-a2-c" title="Permanent link">&para;</a></h2>
 <p>Sessions are <strong>server-side</strong>, not stateless tokens.</p>
 <table>
@@ -2543,6 +2595,21 @@
 <td>60s</td>
 </tr>
 <tr>
+<td><code>GET /auth/providers</code></td>
+<td>120</td>
+<td>60s</td>
+</tr>
+<tr>
+<td><code>GET /auth/sso/google/start</code></td>
+<td>30</td>
+<td>60s</td>
+</tr>
+<tr>
+<td><code>GET /auth/sso/google/callback</code></td>
+<td>60</td>
+<td>60s</td>
+</tr>
+<tr>
 <td><code>POST /auth/oidc/{logout,backchannel}</code></td>
 <td>60</td>
 <td>60s</td>
@@ -2561,7 +2628,7 @@
 </table>
 <p>The login / callback caps are <strong>deliberately permissive</strong> so users behind shared CGNAT (an entire ISP or VPC behind one egress IP) aren't locked out by their neighbours. <strong>Brute-force defence lives in the per-account lockout above</strong>, not the per-IP rate limit, the lockout is IP-independent so rotating source IPs doesn't dodge it. Tuned for carrier-grade NAT and other shared-egress networks.</p>
 <h2 id="oidc-sign-in-slices-b-c-e">OIDC sign-in (Slices B + C + E)<a class="headerlink" href="#oidc-sign-in-slices-b-c-e" title="Permanent link">&para;</a></h2>
-<p>Single Identity Provider (architect Q4). The api refuses to mount the OIDC routes unless <code>SB_OIDC_ISSUER</code> is set; until then, only <code>/auth/login</code> (local admin) accepts sign-ins.</p>
+<p>One env-var Identity Provider (architect Q4). The api refuses to mount the <code>/auth/oidc/*</code> routes unless <code>SB_OIDC_ISSUER</code> is set; until then, only <code>/auth/login</code> (local password) and, when it is turned on, <a href="../google-sign-in/">Google from the console</a> accept sign-ins.</p>
 <p>The flow:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>SPA → GET /api/v1/auth/oidc/start
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>api → 302 to IdP with PKCE state/nonce/code_challenge
@@ -2601,6 +2668,9 @@
 <li>Operator overrides during incident response.</li>
 </ol>
 <p>If you ever find yourself "cleaning up" this filter, <strong>stop</strong>. It is the security boundary, not an accident.</p>
+<h2 id="google-sign-in-from-the-console">Google sign-in from the console<a class="headerlink" href="#google-sign-in-from-the-console" title="Permanent link">&para;</a></h2>
+<p>Separate from the env-var provider above, an admin with <code>auth.sso.edit</code> can connect a Google Workspace under <strong>Admin → Sign-in</strong>, with no restart. Its accounts are bound by Google's issuer and subject rather than by email, the ID token's <code>hd</code> claim must be in the allowed Workspace domains, and new accounts wait for an admin's approval by default. Existing accounts connect Google from their profile after a fresh second factor. Both providers can be configured at once; the login page shows a button for each.</p>
+<p>See <a href="../google-sign-in/">Sign in with Google</a> for setup, approvals and the audit events.</p>
 <h2 id="mfa-step-up-slices-h-i-current-model">MFA + step-up (Slices H + I, current model)<a class="headerlink" href="#mfa-step-up-slices-h-i-current-model" title="Permanent link">&para;</a></h2>
 <p>Tier 2 operations (approve / reject / reveal-wrap; future: rotate, role-edit, provider-edit) require a session whose <code>last_mfa_at</code> is within the step-up TTL.</p>
 <p><strong>The Control Plane owns MFA enrollment + step-up directly.</strong> Identity stays with the IdP; MFA is an app-level concern. This is an architectural inversion of the original Slice D design (described as the legacy path further down). Every user enrolls one or more factors in the SPA at <code>/me/mfa</code>; step-up runs through the api's <code>/auth/mfa/{challenge,verify}</code> endpoints. Local-admin and OIDC users follow the same enrollment surface and the same step-up flow.</p>

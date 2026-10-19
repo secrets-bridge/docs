@@ -1195,6 +1195,8 @@
       
         
       
+        
+      
     
     
     
@@ -1351,6 +1353,34 @@
     
   
     Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../google-sign-in/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sign in with Google
   
 
     
@@ -2256,6 +2286,12 @@
 <td>BRD §26 ArgoCD endpoints + observation fan-out</td>
 </tr>
 <tr>
+<td><code>SB_PUBLIC_URL</code></td>
+<td>no</td>
+<td></td>
+<td>The install's public address, for example <code>https://secrets.example.com</code>. Sign-in redirect URIs are built from it, never from request headers. When set, the console shows it read-only; unset, an admin saves it under Admin → Sign-in. Must be <code>https</code>, with no user info, query or fragment; plain <code>http</code> only for <code>localhost</code> or a loopback address with <code>SB_ENV=dev</code>. An invalid value stops the api at boot. See <a href="../google-sign-in/#1-set-the-public-address">Sign in with Google</a></td>
+</tr>
+<tr>
 <td><code>SB_OBJECTSTORE_BUCKET</code></td>
 <td>no</td>
 <td></td>
@@ -2569,16 +2605,28 @@ sources.</p>
 <td></td>
 </tr>
 <tr>
-<td><code>SB_NOTIFICATION_WEBHOOK_URL</code></td>
+<td><code>SB_WORKER_WEBHOOK_URL</code></td>
 <td>no</td>
 <td></td>
-<td>Generic webhook</td>
+<td>Generic webhook. Also turns on the waiting-account message, which goes to this webhook only</td>
 </tr>
 <tr>
-<td><code>SB_NOTIFICATION_WEBHOOK_FORMAT_SLACK</code></td>
+<td><code>SB_WORKER_WEBHOOK_SLACK_FORMAT</code></td>
 <td>no</td>
 <td><code>false</code></td>
 <td>Wraps payload in <code>{text: ...}</code></td>
+</tr>
+<tr>
+<td><code>SB_WORKER_USERS_PENDING_INTERVAL</code></td>
+<td>no</td>
+<td><code>1m</code></td>
+<td>How often the <code>users-pending</code> sweeper posts about accounts waiting for approval, at most one message per run. At least <code>30s</code>, or the worker refuses to start. See <a href="../google-sign-in/#notify-admins-from-the-worker">Sign in with Google</a></td>
+</tr>
+<tr>
+<td><code>SB_PUBLIC_URL</code></td>
+<td>no</td>
+<td></td>
+<td>Same variable as the api's, used for the link in the waiting-account message. Unset, the address saved in the console is used. An invalid value stops the worker at boot</td>
 </tr>
 </tbody>
 </table>

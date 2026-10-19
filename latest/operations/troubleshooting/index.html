@@ -1195,6 +1195,8 @@
       
         
       
+        
+      
     
     
     
@@ -1351,6 +1353,34 @@
     
   
     Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../google-sign-in/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sign in with Google
   
 
     
@@ -1710,6 +1740,39 @@
     <span class="md-ellipsis">
       
         Login returns 401 with a valid password
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#google-sign-in-refused" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google sign-in refused
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#google-shows-redirect_uri_mismatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google shows "redirect_uri_mismatch"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-sign-in-with-google-button-or-turn-on-fails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No "Sign in with Google" button, or Turn on fails
       
     </span>
   </a>
@@ -2121,6 +2184,39 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#google-sign-in-refused" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google sign-in refused
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#google-shows-redirect_uri_mismatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google shows "redirect_uri_mismatch"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#no-sign-in-with-google-button-or-turn-on-fails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        No "Sign in with Google" button, or Turn on fails
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#agent-job-fails-immediately-agent-reported-failure" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2329,9 +2425,127 @@ ready, the response body lists which:</p>
 </tr>
 </tbody>
 </table>
+<h3 id="google-sign-in-refused">Google sign-in refused<a class="headerlink" href="#google-sign-in-refused" title="Permanent link">&para;</a></h3>
+<p>A refused Google sign-in always lands on <code>/login?error=sso</code> with "You
+couldn't be signed in with that account.", whatever the reason, so the page
+can't reveal which emails have accounts. An admin with <code>audit.read</code> finds
+the reason in the audit log:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">"http://localhost:18080/api/v1/audit-events?action=auth.sso.callback"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[] | select(.status=="denied") | {time:.occurred_at, kind:.metadata.error_kind, purpose:.metadata.purpose}'</span>
+</span></code></pre></div>
+<p>The browser isn't signed in yet, so these events have the actor
+<code>anonymous</code> and no email. Match them to a person by time.</p>
+<table>
+<thead>
+<tr>
+<th><code>error_kind</code></th>
+<th>Meaning</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hd_not_allowed</code></td>
+<td>The ID token has no <code>hd</code> claim (a personal Google account) or a Workspace domain that isn't allowed</td>
+<td>Use a Workspace account, or add its domain under Admin → Sign-in</td>
+</tr>
+<tr>
+<td><code>email_domain_not_allowed</code></td>
+<td><code>hd</code> is allowed but the email's domain isn't</td>
+<td>Add the email's domain too</td>
+</tr>
+<tr>
+<td><code>email_unverified</code></td>
+<td>Google didn't mark the email as verified</td>
+<td>Verify it at Google</td>
+</tr>
+<tr>
+<td><code>email_has_account</code></td>
+<td>The email already belongs to an account here, which hasn't connected Google</td>
+<td>The person signs in with their password and uses Connect Google on their profile</td>
+</tr>
+<tr>
+<td><code>account_disabled</code></td>
+<td>The account was declined or disabled</td>
+<td>A declined account can't be re-enabled from the console</td>
+</tr>
+<tr>
+<td><code>provider_disabled</code></td>
+<td>Google is turned off, or <code>SB_OIDC_ISSUER</code> is Google</td>
+<td>Turn it on, or use the env-var provider</td>
+</tr>
+<tr>
+<td><code>no_public_url</code></td>
+<td>No public address is set</td>
+<td>Set <code>SB_PUBLIC_URL</code> or save one under Admin → Sign-in</td>
+</tr>
+<tr>
+<td><code>exchange_failed</code></td>
+<td>Google refused the code exchange, usually a wrong client ID or secret</td>
+<td>Check the client in Google Cloud Console, replace the secret, run Test</td>
+</tr>
+<tr>
+<td><code>id_token_invalid</code>, <code>claims_invalid</code>, <code>nonce_mismatch</code>, <code>missing_sub</code></td>
+<td>Google's answer couldn't be verified</td>
+<td>Check the client ID, then Test</td>
+</tr>
+<tr>
+<td><code>iat_invalid</code></td>
+<td>The ID token was too old or dated in the future</td>
+<td>Check the api server's clock</td>
+</tr>
+<tr>
+<td><code>no_code</code></td>
+<td>The person cancelled at Google, or Google returned an error</td>
+<td>Try again</td>
+</tr>
+<tr>
+<td><code>state_cookie</code>, <code>state_unknown</code>, <code>state_mismatch</code></td>
+<td>The round trip took longer than 5 minutes, or finished in another browser</td>
+<td>Try again in one browser</td>
+</tr>
+</tbody>
+</table>
+<p>Two other events explain refusals that aren't in <code>auth.sso.callback</code>:</p>
+<ul>
+<li><strong><code>user.pending_refused</code></strong>: the <a href="../google-sign-in/#the-waiting-limit">waiting limit</a>
+  was reached. Approve or decline waiting accounts, or raise the limit. The
+  events are aggregated per 10-minute window, with <code>count</code>, <code>first</code> and
+  <code>last</code>.</li>
+<li><strong><code>sso_provider.default_role_refused</code></strong>: approval is off, but the default
+  role now holds a privileged permission, so the account was created
+  waiting for approval instead. Fix the role or pick another default.</li>
+</ul>
+<p><strong>Test</strong> runs the same checks and shows the reason to the admin who ran it,
+which is the quickest way to check a setup.</p>
+<h3 id="google-shows-redirect_uri_mismatch">Google shows "redirect_uri_mismatch"<a class="headerlink" href="#google-shows-redirect_uri_mismatch" title="Permanent link">&para;</a></h3>
+<p>Google stops on its own error page and never comes back, so nothing is
+audited. The redirect URI registered on the OAuth client must match the one
+Secrets Bridge sends exactly:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>https://secrets.example.com/api/v1/auth/sso/google/callback
+</span></code></pre></div>
+<p>Copy it from <strong>Admin → Sign-in → Google → Redirect URL</strong>, and add it under
+<strong>Authorized redirect URIs</strong> in Google Cloud Console. The scheme, host,
+port and path must all match. If you change the public address, update the
+redirect URI at Google too.</p>
+<h3 id="no-sign-in-with-google-button-or-turn-on-fails">No "Sign in with Google" button, or Turn on fails<a class="headerlink" href="#no-sign-in-with-google-button-or-turn-on-fails" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>No public address.</strong> The login page doesn't offer Google while neither
+  <code>SB_PUBLIC_URL</code> nor a saved address is set, and Turn on answers
+  <code>409 provider_not_ready</code> with <code>missing: ["public_url"]</code>. Set one of them.</li>
+<li><strong>Missing secret or domains.</strong> <code>missing</code> also lists <code>client_secret</code> or
+  <code>allowed_domains</code>.</li>
+<li><strong>The env-var provider is Google.</strong> With <code>SB_OIDC_ISSUER</code> set to
+  <code>https://accounts.google.com</code>, the console provider is never offered
+  (<code>409 env_provider_is_google</code>). Use one or the other.</li>
+<li><strong>The api won't start</strong> after setting <code>SB_PUBLIC_URL</code>: the value is
+  invalid. It must be <code>https</code>, with no user info, query or fragment, and
+  plain <code>http</code> only for <code>localhost</code> with <code>SB_ENV=dev</code>.</li>
+</ul>
 <h3 id="agent-job-fails-immediately-agent-reported-failure">Agent job fails immediately ("agent reported failure")<a class="headerlink" href="#agent-job-fails-immediately-agent-reported-failure" title="Permanent link">&para;</a></h3>
 <p>Read the agent's log:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>docker<span class="w"> </span>logs<span class="w"> </span>secrets-bridge-agent-1<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-iE<span class="w"> </span><span class="s2">"job|error|fail"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tail
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>docker<span class="w"> </span>logs<span class="w"> </span>secrets-bridge-agent-1<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-iE<span class="w"> </span><span class="s2">"job|error|fail"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tail
 </span></code></pre></div>
 <p>The most common cause is <strong>agent provider settings</strong>. For Vault:
 the agent's <code>SB_VAULT_KV_MOUNT</code> (default <code>kv</code>) has to match the
@@ -2339,7 +2553,7 @@ provider connection's <code>mount</code>, otherwise the job fails with a
 <code>kvMount</code> error. For AWS Secrets Manager: the agent needs
 <code>SB_AWS_REGION</code>.</p>
 <p>For a deeper trace, set the agent's log level to debug:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">SB_LOG_LEVEL</span><span class="o">=</span>debug<span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>agent
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">SB_LOG_LEVEL</span><span class="o">=</span>debug<span class="w"> </span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>agent
 </span></code></pre></div>
 <h3 id="wraps-card-shows-no-wraps-issued-yet-after-the-agent-ran">"Wraps card shows 'No wraps issued yet'" after the agent ran<a class="headerlink" href="#wraps-card-shows-no-wraps-issued-yet-after-the-agent-ran" title="Permanent link">&para;</a></h3>
 <p>Two possibilities:</p>
@@ -2355,9 +2569,9 @@ provider connection's <code>mount</code>, otherwise the job fails with a
 <p>Likely <code>audit.read</code> permission missing. The seed admin role has
 it; if you're a different user, an admin needs to grant you the
 <code>audit.read</code> permission via a role.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># As admin:</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>http://localhost:18080/api/v1/audit-events<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># As admin:</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>http://localhost:18080/api/v1/audit-events<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span>
 </span></code></pre></div>
 <p>Expected: 200 with an array. If 403, your role doesn't carry
 <code>audit.read</code>.</p>
@@ -2366,7 +2580,7 @@ it; if you're a different user, an admin needs to grant you the
 <ol>
 <li><strong>The agent's heartbeat is reaching the CP.</strong> From the agent's
    network, run:
-   <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>secrets-bridge-agent-1<span class="w"> </span>wget<span class="w"> </span>-qO-<span class="w"> </span>http://api:8080/healthz
+   <div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>secrets-bridge-agent-1<span class="w"> </span>wget<span class="w"> </span>-qO-<span class="w"> </span>http://api:8080/healthz
 </span></code></pre></div></li>
 <li><strong>The agent secret is correct.</strong> A wrong secret returns 401 on
    heartbeat (generic message; the audit log records
@@ -2376,27 +2590,27 @@ it; if you're a different user, an admin needs to grant you the
 <p>The agent uses the credentials in <code>SB_VAULT_TOKEN</code> or via the
 configured Kubernetes auth role. Check that they have read access
 to the secret path:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>secrets-bridge-vault-1<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="s1">'VAULT_ADDR=http://127.0.0.1:8200 VAULT_TOKEN=devroot \</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="s1">   vault kv get secret/&lt;path&gt;'</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>secrets-bridge-vault-1<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="s1">'VAULT_ADDR=http://127.0.0.1:8200 VAULT_TOKEN=devroot \</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="s1">   vault kv get secret/&lt;path&gt;'</span>
 </span></code></pre></div>
 <p>If that works but the agent gets denied, the agent token has less
 scope than the dev token. Adjust the policy in Vault.</p>
 <h2 id="useful-queries-against-the-audit-log">Useful queries against the audit log<a class="headerlink" href="#useful-queries-against-the-audit-log" title="Permanent link">&para;</a></h2>
 <h3 id="find-every-action-for-one-request">Find every action for one request<a class="headerlink" href="#find-every-action-for-one-request" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">"http://localhost:18080/api/v1/audit-events?correlation_id=&lt;uuid&gt;"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[] | {time:.occurred_at, actor, action, resource}'</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">"http://localhost:18080/api/v1/audit-events?correlation_id=&lt;uuid&gt;"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[] | {time:.occurred_at, actor, action, resource}'</span>
 </span></code></pre></div>
 <h3 id="find-every-login-failure-in-the-last-hour">Find every login failure in the last hour<a class="headerlink" href="#find-every-login-failure-in-the-last-hour" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nv">SINCE</span><span class="o">=</span><span class="k">$(</span>date<span class="w"> </span>-u<span class="w"> </span>-d<span class="w"> </span><span class="s1">'1 hour ago'</span><span class="w"> </span>+%Y-%m-%dT%H:%M:%SZ<span class="k">)</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">"http://localhost:18080/api/v1/audit-events?action=auth.login&amp;since=</span><span class="nv">$SINCE</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[] | select(.status=="denied")'</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">SINCE</span><span class="o">=</span><span class="k">$(</span>date<span class="w"> </span>-u<span class="w"> </span>-d<span class="w"> </span><span class="s1">'1 hour ago'</span><span class="w"> </span>+%Y-%m-%dT%H:%M:%SZ<span class="k">)</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">"http://localhost:18080/api/v1/audit-events?action=auth.login&amp;since=</span><span class="nv">$SINCE</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[] | select(.status=="denied")'</span>
 </span></code></pre></div>
 <h3 id="find-every-wrap-retrieval-who-saw-which-value-when">Find every wrap retrieval (who saw which value when)<a class="headerlink" href="#find-every-wrap-retrieval-who-saw-which-value-when" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">"http://localhost:18080/api/v1/audit-events?action=wrap.retrieve"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[] | {time:.occurred_at, actor, resource, status}'</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">"http://localhost:18080/api/v1/audit-events?action=wrap.retrieve"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[] | {time:.occurred_at, actor, resource, status}'</span>
 </span></code></pre></div>
 <p>This is the SOC2-friendly query, every plaintext reveal across
 the platform, append-only, with the actor and timestamp.</p>

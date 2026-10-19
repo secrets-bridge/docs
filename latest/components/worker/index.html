@@ -1298,6 +1298,8 @@
       
         
       
+        
+      
     
     
     
@@ -1453,6 +1455,34 @@
     
   
     Authentication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/google-sign-in/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sign in with Google
   
 
     
@@ -2115,6 +2145,11 @@ read-only ArgoCD observation poller (BRD §26).</p>
 <td>60s</td>
 <td>Flip observations past their <code>timeout_at</code> to <code>applied_unverified</code></td>
 </tr>
+<tr>
+<td><code>users-pending</code></td>
+<td>1m</td>
+<td>Post one webhook message about accounts newly <a href="../../operations/google-sign-in/#notify-admins-from-the-worker">waiting for approval</a>, by email only. Registered only when <code>SB_WORKER_WEBHOOK_URL</code> is set</td>
+</tr>
 </tbody>
 </table>
 <h2 id="multi-replica-safety">Multi-replica safety<a class="headerlink" href="#multi-replica-safety" title="Permanent link">&para;</a></h2>
@@ -2172,7 +2207,10 @@ runs each sweeper per tick, the others record <code>worker_scheduler_lock_skippe
 <ul>
 <li>Stateless (NFR-08): all state in Postgres + Redis</li>
 <li>No secret values logged or notified. Sweeper errors carry
-  counts + cutoffs + sweeper names, never row contents</li>
+  counts + cutoffs + sweeper names, never row contents. The one
+  exception is <code>users-pending</code>, whose message lists the emails of
+  waiting accounts. It goes to the webhook only, and the worker logs
+  counts only</li>
 <li>No provider SDKs imported (worker doesn't fetch values; the
   agent does)</li>
 <li>Multi-replica safe by construction</li>
