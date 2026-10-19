@@ -2730,6 +2730,13 @@ deployment, treat it as an incident.</p>
 <td>WARN log at boot</td>
 </tr>
 <tr>
+<td><code>SB_ALLOW_UNSEALED_WRAPS=true</code></td>
+<td>api</td>
+<td><code>false</code></td>
+<td>Hands wraps to an agent with no X25519 public key on file as plaintext over TLS, and accepts a plaintext <code>value</code> when an agent posts a wrap. Only for an agent that predates wire-envelope sealing.</td>
+<td>WARN log at boot. While off, a keyless agent gets <code>409 agent_public_key_required</code> before the wrap is consumed and a <code>value</code> post gets <code>400 envelope_required</code>; both are audited</td>
+</tr>
+<tr>
 <td><code>SB_PROVIDER_CONN_REJECT_SECRETS=false</code></td>
 <td>api</td>
 <td><code>true</code></td>
