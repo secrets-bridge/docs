@@ -2108,7 +2108,7 @@ outbound HTTPS).</p>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>├── internal/
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│   ├── auth/               # JWT signer + permission catalog + auth.Require
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│   ├── handlers/           # HTTP layer (one file per aggregate)
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── middleware/         # Auth (session cookie → bearer JWT), default-deny gate, RequestID, Logger, Recover
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│   ├── middleware/         # Auth (session cookie), default-deny gate, RequestID, Logger, Recover
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│   ├── observability/      # slog JSON logger
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│   └── services/           # business logic (one file per aggregate)
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>└── pkg/
@@ -2124,21 +2124,23 @@ deliberately open because <code>worker</code> imports <code>pkg/storage</code> a
 <h2 id="how-a-request-gets-its-identity">How a request gets its identity<a class="headerlink" href="#how-a-request-gets-its-identity" title="Permanent link">&para;</a></h2>
 <p><code>middleware.AuthWith</code> resolves the caller once per request, in this order:</p>
 <ol>
-<li><strong>Session cookie</strong> (<code>sb_session</code>), issued by <code>/auth/login</code> and the OIDC
-   callback.</li>
-<li><strong>Bearer JWT</strong> in <code>Authorization: Bearer &lt;token&gt;</code>, the HS256 token that
-   <code>/auth/login</code> also returns.</li>
+<li><strong>Session cookie</strong> (<code>sb_session</code>, HttpOnly), issued by <code>/auth/login</code>
+   and the sign-in callbacks. It is the only user credential: logout,
+   session revocation and disabling the user end it.</li>
 <li>Otherwise the caller is anonymous, and the default-deny gate on
    <code>/api/v1</code> answers <code>401</code> for every route that isn't explicitly public.
    Per-route <code>auth.Require(perm)</code> checks then run on top for authenticated
    callers.</li>
 </ol>
+<p><code>Authorization: Bearer</code> is not read for users. Login returns no token, so
+scripts keep the session cookie in a cookie jar (<code>curl -c jar</code> to sign in,
+<code>-b jar</code> after).</p>
 <p>Agent routes under <code>/api/v1/agents/:id/</code> authenticate separately, with the
 agent's <code>X-Agent-Secret</code>. <code>POST /api/v1/agents/enroll</code> authenticates with the
 one-time enrollment token in the body.</p>
 <p>The legacy <code>X-User-Id</code> header is <strong>ignored</strong> unless the api runs with
 <code>SB_ALLOW_INSECURE_HEADER_AUTH=true</code>, a dev-only switch that lets anyone
-claim any identity. It is checked only after the cookie and bearer token,
+claim any identity. It is checked only after the session cookie,
 and it must never be set on a deployment anyone else can reach. See
 <a href="../../operations/config/#insecure-switches-dev-only">Insecure switches</a>.</p>
 <h2 id="runtime-endpoints">Runtime endpoints<a class="headerlink" href="#runtime-endpoints" title="Permanent link">&para;</a></h2>
@@ -2198,18 +2200,6 @@ full surface.</p>
 <td>yes</td>
 <td>-</td>
 <td><code>redis://...</code></td>
-</tr>
-<tr>
-<td><code>SB_JWT_SECRET</code></td>
-<td>yes</td>
-<td>-</td>
-<td>32+ bytes, base64 or raw. Fails boot if missing.</td>
-</tr>
-<tr>
-<td><code>SB_JWT_TOKEN_TTL</code></td>
-<td>no</td>
-<td><code>8h</code></td>
-<td>Login session lifetime</td>
 </tr>
 <tr>
 <td><code>SB_WRAP_MASTER_KEY</code></td>

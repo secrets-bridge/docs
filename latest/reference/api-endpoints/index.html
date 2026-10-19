@@ -2775,12 +2775,12 @@ required to call it.</p>
 <td>No auth, open route (probes, login)</td>
 </tr>
 <tr>
-<td><code>bearer</code></td>
-<td>A valid login JWT in <code>Authorization: Bearer &lt;jwt&gt;</code></td>
+<td><code>session</code></td>
+<td>A signed-in session: the <code>sb_session</code> cookie from <code>/auth/login</code> or a sign-in callback. There are no bearer tokens; scripts keep the cookie in a jar (<code>curl -c jar</code>, then <code>-b jar</code>)</td>
 </tr>
 <tr>
-<td><code>bearer + perm</code></td>
-<td>Bearer JWT + the named permission via <code>auth.Require(perm)</code></td>
+<td><code>session + perm</code></td>
+<td>A session + the named permission via <code>auth.Require(perm)</code></td>
 </tr>
 <tr>
 <td><code>agent</code></td>
@@ -2879,25 +2879,25 @@ MFA" means the route also runs <code>RequireFreshMFA</code> and answers
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/auth/sso/google/connect</code></td>
-<td>bearer + fresh MFA</td>
+<td>session + fresh MFA</td>
 <td>Starts Connect Google for the caller's account. Returns <code>{redirect_url}</code>; the callback comes back to <code>/me#sso_ticket=…</code></td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/auth/sso/google/finish</code></td>
-<td>bearer</td>
+<td>session</td>
 <td><code>{ticket}</code>. Redeems a Connect or Test ticket, only on the session that started it (<code>403 sso_ticket_refused</code> otherwise). Returns <code>{purpose, result}</code> with <code>result</code> <code>linked</code>, <code>ok</code> or <code>failed</code> (and <code>reason</code> for a failed test). A refused link is <code>409 link_refused</code> with a <code>reason</code> such as <code>identity_taken</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/users/me/identities</code></td>
-<td>bearer</td>
+<td>session</td>
 <td>Connected accounts: <code>provider_type</code>, <code>email</code>, <code>linked_at</code></td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/users/me/identities/google</code></td>
-<td>bearer + fresh MFA</td>
+<td>session + fresh MFA</td>
 <td>Disconnect. <code>409 identity_required</code> when the Google sign-in created the account</td>
 </tr>
 </tbody>
@@ -2917,67 +2917,67 @@ MFA" means the route also runs <code>RequireFreshMFA</code> and answers
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/sso/providers</code></td>
-<td><code>bearer + auth.sso.edit</code></td>
+<td><code>session + auth.sso.edit</code></td>
 <td>List. Each provider has <code>redirect_url</code> (empty until a public address is set) and <code>client_secret_set</code>, never the secret</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/sso/providers</code></td>
-<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td><code>session + auth.sso.edit</code> + fresh MFA</td>
 <td><code>{type: "google", display_name, client_id, client_secret, allowed_domains, require_approval, default_role_id}</code>. Created turned off. <code>require_approval</code> defaults to <code>true</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/sso/providers/:id</code></td>
-<td><code>bearer + auth.sso.edit</code></td>
+<td><code>session + auth.sso.edit</code></td>
 <td>One provider</td>
 </tr>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/sso/providers/:id</code></td>
-<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td><code>session + auth.sso.edit</code> + fresh MFA</td>
 <td>Edit everything except the secret and <code>enabled</code>. A <code>client_secret</code> field gets <code>400</code></td>
 </tr>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/sso/providers/:id/secret</code></td>
-<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td><code>session + auth.sso.edit</code> + fresh MFA</td>
 <td><code>{client_secret}</code>. Replace the secret</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/sso/providers/:id/enable</code></td>
-<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td><code>session + auth.sso.edit</code> + fresh MFA</td>
 <td><code>409 provider_not_ready</code> with <code>missing</code> (<code>public_url</code>, <code>client_secret</code>, <code>allowed_domains</code>)</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/sso/providers/:id/disable</code></td>
-<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td><code>session + auth.sso.edit</code> + fresh MFA</td>
 <td></td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/sso/providers/:id/test</code></td>
-<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td><code>session + auth.sso.edit</code> + fresh MFA</td>
 <td>Starts a Test round trip, also while the provider is off. Returns <code>{redirect_url}</code>; the callback comes back to <code>/admin/sign-in#sso_ticket=…</code></td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/sso/providers/:id</code></td>
-<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td><code>session + auth.sso.edit</code> + fresh MFA</td>
 <td>Remove</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/sso/settings</code></td>
-<td><code>bearer + auth.sso.edit</code></td>
+<td><code>session + auth.sso.edit</code></td>
 <td><code>public_url</code>, <code>public_url_source</code> (<code>env</code>, <code>console</code> or empty) and <code>pending_cap</code></td>
 </tr>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/sso/settings</code></td>
-<td><code>bearer + auth.sso.edit</code> + fresh MFA</td>
+<td><code>session + auth.sso.edit</code> + fresh MFA</td>
 <td><code>{public_url, pending_cap}</code>; either may be left out. <code>409 public_url_from_env</code> when <code>SB_PUBLIC_URL</code> is set. <code>pending_cap</code> is 1 to 10,000</td>
 </tr>
 </tbody>
@@ -3044,19 +3044,19 @@ MFA" means the route also runs <code>RequireFreshMFA</code> and answers
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/users/pending</code></td>
-<td><code>bearer + user_role.edit</code></td>
+<td><code>session + user_role.edit</code></td>
 <td>Waiting accounts, oldest first, at most 100, with <code>total</code> for the count</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/users/:id/approve</code></td>
-<td><code>bearer + user_role.edit</code></td>
+<td><code>session + user_role.edit</code></td>
 <td><code>{role_id, scope}</code>. Grants the role and clears the waiting flag in one transaction. <code>scope</code> uses the <code>POST /user-roles</code> rules; a malformed one gets <code>400</code>. <code>409 user_not_pending</code> for an account that isn't waiting</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/users/:id/decline</code></td>
-<td><code>bearer + user_role.edit</code></td>
+<td><code>session + user_role.edit</code></td>
 <td>Disables a waiting account. <code>409 user_not_pending</code> for any other account</td>
 </tr>
 </tbody>
@@ -3084,7 +3084,7 @@ enabled as a break-glass admin action.</p>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/provider-connections/:id/agent-enrollment-token</code></td>
-<td><code>bearer + agent.mint</code></td>
+<td><code>session + agent.mint</code></td>
 <td>Mint a one-time, connection-bound enrollment token (returned ONCE)</td>
 </tr>
 <tr>
@@ -3096,43 +3096,43 @@ enabled as a break-glass admin action.</p>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/agents</code></td>
-<td><code>bearer + agent.mint</code></td>
+<td><code>session + agent.mint</code></td>
 <td><strong>Legacy direct mint, disabled by default</strong> → <code>403 direct_agent_mint_disabled</code>. Break-glass only via <code>SB_ALLOW_DIRECT_AGENT_MINT=true</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/agents</code></td>
-<td><code>bearer + agent.list</code></td>
+<td><code>session + agent.list</code></td>
 <td>Thin list. New integrations should prefer the admin/provider projections below</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/admin/agents</code></td>
-<td><code>bearer + agent.list</code></td>
+<td><code>session + agent.list</code></td>
 <td>Rich admin list + filters (<code>provider_connection_id</code>, <code>status</code>, <code>cluster_name</code>, <code>provider_type</code>); shows <code>provider_connection_id</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/admin/agents/:id</code></td>
-<td><code>bearer + agent.list</code></td>
+<td><code>session + agent.list</code></td>
 <td>Rich admin get</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/provider-connections/:id/agents</code></td>
-<td><code>bearer + agent.list</code></td>
+<td><code>session + agent.list</code></td>
 <td>Agents for a provider connection (UI Agents tab)</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/admin/agents/:id/revoke</code></td>
-<td><code>bearer + agent.revoke</code></td>
+<td><code>session + agent.revoke</code></td>
 <td>Revoke with <code>reason</code> → <code>revoked_at</code>/<code>revoked_by</code>; emits <code>agent.revoked</code> audit (<code>agent_id</code>, <code>provider_connection_id</code>, <code>reason</code>)</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/agent-enrollment-tokens/:id/revoke</code></td>
-<td><code>bearer + agent.mint</code></td>
+<td><code>session + agent.mint</code></td>
 <td>Revoke an UNUSED enrollment token</td>
 </tr>
 </tbody>
@@ -3220,43 +3220,43 @@ enabled as a break-glass admin action.</p>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/requests</code></td>
-<td>bearer</td>
+<td>session</td>
 <td>Submit a patch request</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/requests/read</code></td>
-<td>bearer</td>
+<td>session</td>
 <td>Submit a read request</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/requests</code></td>
-<td>bearer</td>
+<td>session</td>
 <td>List with <code>?requester_id</code> + <code>?status</code> filters</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/requests/:id</code></td>
-<td>bearer</td>
+<td>session</td>
 <td>Get one + inline approvals</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/requests/:id/approve</code></td>
-<td>bearer</td>
+<td>session</td>
 <td><code>{approver_id, comment?}</code></td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/requests/:id/reject</code></td>
-<td>bearer</td>
+<td>session</td>
 <td><code>{approver_id, reason}</code></td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/requests/:id/cancel</code></td>
-<td>bearer</td>
+<td>session</td>
 <td><code>{actor_id}</code> (only the requester)</td>
 </tr>
 <tr>
@@ -3296,43 +3296,43 @@ operator model, state machine, and SoD matrix.</p>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/requests/cross-team</code></td>
-<td><code>bearer + secret.request</code></td>
+<td><code>session + secret.request</code></td>
 <td><code>{target_team_id, target_project_id, target_environment_id, destination_provider_connection_id, destination_secret_ref, destination_keys[], justification}</code> → <code>AccessRequest</code>. Refuses <code>min_approvers ≥ 2</code> with <code>cross_team_min_approvers_unsupported</code>. NO values in body. destination_keys is the NAME list.</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/requests/:id/fill</code></td>
-<td><code>bearer + secret.value.provide</code></td>
+<td><code>session + secret.value.provide</code></td>
 <td><code>{key_values: {&lt;key&gt;: base64}, fill_comment?}</code>. Late writers get <code>fill_window_expired</code> (410). Same-actor-as-requester returns <code>separation_of_duties_violated</code> (403).</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/requests/:id/refuse</code></td>
-<td><code>bearer + secret.value.provide</code></td>
+<td><code>session + secret.value.provide</code></td>
 <td><code>{reason}</code> (≥ 10 chars). Transitions to <code>refused</code>.</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/requests/:id/verify</code></td>
-<td><code>bearer + secret.approve</code> or <code>secret.security.approve</code></td>
+<td><code>session + secret.approve</code> or <code>secret.security.approve</code></td>
 <td><code>{decision, voted_as, comment?}</code> → <strong>200 OK</strong> with structured <code>VerifyResponse</code> (NOT 412 on partial votes). Body: <code>{vote_recorded, voted_as, source_votes, security_approval_required, security_vote_present, next_required[]}</code>.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/requests/inbox</code></td>
-<td><code>bearer + secret.value.provide</code></td>
+<td><code>session + secret.value.provide</code></td>
 <td><code>?team_id=</code> narrows to one team's inbox. Returns <code>AccessRequest[]</code> with <code>pending_values</code> status. Fail-closed: empty array when caller covers no teams.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/requests/inbox/count</code></td>
-<td><code>bearer + secret.value.provide</code></td>
+<td><code>session + secret.value.provide</code></td>
 <td><code>{total, per_team: [{team_id, team_name?, count}]}</code>. Drives the sidebar badge.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/provider-connections?project_id=:id</code></td>
-<td>bearer</td>
+<td>session</td>
 <td>Returns the connections bound to that project; the SPA's cross-team submit drawer hits this for the source project's destination dropdown.</td>
 </tr>
 </tbody>
@@ -3396,19 +3396,19 @@ guide.</p>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/reveal-sessions</code></td>
-<td>bearer + step-up MFA</td>
+<td>session + step-up MFA</td>
 <td><code>{access_request_id}</code> → <code>{session_id, expires_at, ttl_seconds, wraps[]}</code>. 20/60s per identity rate limit.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/reveal-sessions/me/active</code></td>
-<td>bearer</td>
+<td>session</td>
 <td>Caller's active sessions; value-free summaries (no envelopes)</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/reveal-sessions/:id/expire</code></td>
-<td>bearer</td>
+<td>session</td>
 <td><code>{reason: 'user_hide' \| 'unmount'}</code> → 204; owner-bound; idempotent server-side</td>
 </tr>
 </tbody>
@@ -3426,142 +3426,142 @@ guide.</p>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/roles</code></td>
-<td><code>bearer + role.edit</code></td>
+<td><code>session + role.edit</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/roles</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/roles/:id</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/roles/:id/permissions</code></td>
-<td><code>bearer + role.edit</code></td>
+<td><code>session + role.edit</code></td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/roles/:id</code></td>
-<td><code>bearer + role.edit</code></td>
+<td><code>session + role.edit</code></td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/user-roles</code></td>
-<td><code>bearer + user_role.edit</code></td>
+<td><code>session + user_role.edit</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/user-roles</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/user-roles/:id</code></td>
-<td><code>bearer + user_role.edit</code></td>
+<td><code>session + user_role.edit</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/users/:userID/roles</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/workflows</code></td>
-<td><code>bearer + workflow.edit</code></td>
+<td><code>session + workflow.edit</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/workflows</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/workflows/scoped-policy-authorable</code></td>
-<td><code>bearer + policy.author</code> at any scope</td>
+<td><code>session + policy.author</code> at any scope</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/workflows/:id</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/workflows/:id</code></td>
-<td><code>bearer + workflow.edit</code></td>
+<td><code>session + workflow.edit</code></td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/workflows/:id</code></td>
-<td><code>bearer + workflow.edit</code></td>
+<td><code>session + workflow.edit</code></td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/policies</code></td>
-<td><code>bearer + policy.edit</code></td>
+<td><code>session + policy.edit</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/policies</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/policies/:id</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/policies/:id</code></td>
-<td><code>bearer + policy.edit</code></td>
+<td><code>session + policy.edit</code></td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/policies/:id</code></td>
-<td><code>bearer + policy.edit</code></td>
+<td><code>session + policy.edit</code></td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/projects</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/projects</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/projects/:id</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/projects/:id/status</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/projects/:id/environments</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/environments</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/environments</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/environments/:id</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 </tbody>
 </table>
@@ -3579,13 +3579,13 @@ guide.</p>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/secrets</code></td>
-<td>bearer</td>
+<td>session</td>
 <td>Filter: <code>cluster_name</code>, <code>provider</code>, <code>ref_prefix</code>, <code>status</code>, repeated <code>?label=k:v</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/secrets/:id</code></td>
-<td>bearer</td>
+<td>session</td>
 <td>Single row</td>
 </tr>
 </tbody>
@@ -3604,7 +3604,7 @@ guide.</p>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/audit-events</code></td>
-<td><code>bearer + audit.read</code></td>
+<td><code>session + audit.read</code></td>
 <td>Filter: <code>actor</code>, <code>action</code>, <code>resource</code>, <code>correlation_id</code>, <code>since</code>, <code>until</code>, <code>limit</code></td>
 </tr>
 </tbody>
@@ -3622,7 +3622,7 @@ guide.</p>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/jobs</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 </tbody>
 </table>
@@ -3639,42 +3639,42 @@ guide.</p>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/argocd-endpoints</code></td>
-<td><code>bearer + integration.edit</code></td>
+<td><code>session + integration.edit</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/argocd-endpoints</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/argocd-endpoints/:id/discovered-apps</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/argocd-endpoints/:id/enabled</code></td>
-<td><code>bearer + integration.edit</code></td>
+<td><code>session + integration.edit</code></td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/argocd-endpoints/:id</code></td>
-<td><code>bearer + integration.edit</code></td>
+<td><code>session + integration.edit</code></td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/gitops-app-mappings</code></td>
-<td><code>bearer + integration.edit</code></td>
+<td><code>session + integration.edit</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/gitops-app-mappings</code></td>
-<td>bearer</td>
+<td>session</td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/gitops-app-mappings/:id</code></td>
-<td><code>bearer + integration.edit</code></td>
+<td><code>session + integration.edit</code></td>
 </tr>
 </tbody>
 </table>
@@ -3697,7 +3697,7 @@ for the full branching matrix. All errors land in the EPIC P envelope:
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/provider-connections</code></td>
-<td><code>bearer + integration.edit</code></td>
+<td><code>session + integration.edit</code></td>
 <td>Create. Body: <code>{name, type, cluster_name?, description?, status?, scope, auth_method?, discover_enabled?, discover_interval_seconds?}</code>. Returns the full row on 201.</td>
 </tr>
 <tr>
@@ -3709,43 +3709,43 @@ for the full branching matrix. All errors land in the EPIC P envelope:
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/provider-connections/:id</code></td>
-<td><code>bearer + integration.edit</code></td>
+<td><code>session + integration.edit</code></td>
 <td>Single row, full projection.</td>
 </tr>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/provider-connections/:id</code></td>
-<td><code>bearer + integration.edit</code></td>
+<td><code>session + integration.edit</code></td>
 <td>Update. <code>type</code> is silently rejected if changed (immutable per §5).</td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/provider-connections/:id</code></td>
-<td><code>bearer + integration.edit</code></td>
+<td><code>session + integration.edit</code></td>
 <td>204 on success. 409 <code>connection_in_use</code> with <code>{bindings_count, open_requests_count}</code> if any binding or pending request blocks it.</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/provider-connections/:id/discover-now</code></td>
-<td><code>bearer + integration.edit</code></td>
+<td><code>session + integration.edit</code></td>
 <td>Manual discover. 202 with <code>{job_id, correlation_id}</code>. 409 <code>connection_disabled</code> / <code>discovery_already_running</code> (per-target Redis lock) on contention. 400 <code>discover_requires_cluster</code> if <code>cluster_name</code> is null.</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/provider-connections/:id/bindings</code></td>
-<td><code>bearer + integration.edit</code></td>
+<td><code>session + integration.edit</code></td>
 <td>Bind to a (project, env). Body: <code>{project_id, environment_id?}</code>. <code>environment_id</code> absent or null binds project-wide. 409 <code>binding_exists</code> on duplicate; 400 <code>environment_not_in_project</code> if mismatched.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/provider-connections/:id/bindings</code></td>
-<td><code>bearer + integration.edit</code></td>
+<td><code>session + integration.edit</code></td>
 <td>List bindings for one connection.</td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/provider-connection-bindings/:bid</code></td>
-<td><code>bearer + integration.edit</code></td>
+<td><code>session + integration.edit</code></td>
 <td>Unbind. 204 on success. 404 <code>binding_not_found</code> otherwise.</td>
 </tr>
 </tbody>
@@ -3770,19 +3770,19 @@ project-ownership work, not platform registry administration. The
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/projects/:projectID/provider-connection-bindings</code></td>
-<td><code>bearer + integration.bind</code> scoped to (project, env)</td>
+<td><code>session + integration.bind</code> scoped to (project, env)</td>
 <td>Bind a self-service-bindable connection to a (project, env). Body: <code>{provider_connection_id, environment_id}</code>. <code>environment_id</code> is REQUIRED. Scoped binders never create project-wide bindings. 403 <code>connection_not_self_service_bindable</code> if the platform admin hasn't flipped the flag. 403 <code>prod_binding_not_allowed_for_scope</code> for prod envs. 409 <code>binding_exists</code>/<code>connection_disabled</code> per the locked chain.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/projects/:projectID/provider-connection-bindings[?environment_id=:id]</code></td>
-<td><code>bearer</code></td>
+<td><code>session</code></td>
 <td>Joined project bindings. Server-side join adds <code>environment_name</code>, <code>environment_kind</code>, <code>connection_name</code>, <code>connection_type</code>. Optional <code>environment_id</code> narrows to env-specific + project-wide for that env. Sanitized projection (no scope / auth_method / discovery fields).</td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/projects/:projectID/provider-connection-bindings/:bindingID</code></td>
-<td><code>bearer + integration.bind</code> scoped to (project, binding env)</td>
+<td><code>session + integration.bind</code> scoped to (project, binding env)</td>
 <td>Unbind. 204 on success. <strong>§4 correction pinned</strong>: if <code>bindingID</code> exists under a DIFFERENT project, returns 404 <code>binding_not_found</code>, never 403 <code>out_of_scope_binding</code> (which would leak existence under another project). 403 <code>prod_binding_not_allowed_for_scope</code> for prod env bindings (admin path required).</td>
 </tr>
 </tbody>
@@ -3851,31 +3851,31 @@ keep using them.</p>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/projects/:projectID/policy-rules</code></td>
-<td><code>bearer + policy.author</code> scoped to projectID</td>
+<td><code>session + policy.author</code> scoped to projectID</td>
 <td>Author a scoped rule. Body: <code>{name, selector, priority, workflow_id, enabled}</code>. Selector MUST carry <code>environment_kind="non_prod"</code> OR <code>environment_id</code>; the api runs the locked 6-gate chain (coverage → priority&lt;9000 → selector.project_id consistency → env constraint → workflow exists → INSERT). 8 stable codes listed below.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/projects/:projectID/policy-rules</code></td>
-<td><code>bearer</code></td>
+<td><code>session</code></td>
 <td>List scoped rules + inherited platform rules. <strong>§4 correction 1 sanitization</strong>: inherited platform rows carry <code>selector_keys</code> ONLY; the <code>selector</code> field is OMITTED server-side. Scoped rows carry the full selector. Route-pinned not perm-pinned; admins acting via this URL also get the sanitized view.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/projects/:projectID/policy-rules/:ruleID</code></td>
-<td><code>bearer</code></td>
+<td><code>session</code></td>
 <td>Single rule with the same sanitization rules as the list. Inherited platform row → sanitized projection. Scoped row whose <code>project_id</code> doesn't match URL projectID → 404 <code>policy_not_found</code> (§4 mismatch protection).</td>
 </tr>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/projects/:projectID/policy-rules/:ruleID</code></td>
-<td><code>bearer + policy.author</code> scoped to projectID</td>
+<td><code>session + policy.author</code> scoped to projectID</td>
 <td>Update scoped rule. All body fields optional (omitted = preserve). <strong>§3 Q9 lock</strong>: explicit empty <code>{}</code> selector REJECTED with <code>policy_scope_too_broad.reason=selector_empty</code>. <strong>§4 lock</strong>: URL projectID mismatch returns <code>policy_not_found</code>, NEVER <code>out_of_scope_policy</code>.</td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/projects/:projectID/policy-rules/:ruleID</code></td>
-<td><code>bearer + policy.author</code> scoped to projectID</td>
+<td><code>session + policy.author</code> scoped to projectID</td>
 <td>204 on success. URL projectID mismatch returns 404 <code>policy_not_found</code>. Platform NULL rule returns 403 <code>platform_policy_not_editable</code>.</td>
 </tr>
 </tbody>
@@ -3976,31 +3976,31 @@ posture R-follow-up #2 established for URL-key-wins).</p>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/teams/:teamID/policy-rules</code></td>
-<td><code>bearer + policy.author</code> scoped to teamID</td>
+<td><code>session + policy.author</code> scoped to teamID</td>
 <td>Author a team-scoped rule. Body: <code>{name, selector, priority, workflow_id, enabled}</code>. §1 C1 strict: selector MUST carry <code>environment_kind="non_prod"</code> and MUST NOT carry <code>project_id</code>, <code>environment_id</code>, or <code>team_id</code>. The 6-gate chain (coverage → team exists+active → priority &lt; live cap → selector consistency → workflow authorable → INSERT) runs server-side. Live <code>priority_cap</code> echoed in the envelope.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/teams/:teamID/policy-rules</code></td>
-<td><code>bearer + policy.author</code> scoped to teamID</td>
+<td><code>session + policy.author</code> scoped to teamID</td>
 <td>List team-own rules + inherited ancestor-team rules + inherited platform rules. Inherited rows carry <code>selector_keys</code> only (sanitized). Response envelope carries <code>priority_cap</code>.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/teams/:teamID/policy-rules/:ruleID</code></td>
-<td><code>bearer + policy.author</code> scoped to teamID</td>
+<td><code>session + policy.author</code> scoped to teamID</td>
 <td>Single rule with the same sanitization rules as the list. Mismatched anchor (project rule via team URL OR rule under a different team) returns 404 <code>policy_not_found</code> per §4 mismatch protection.</td>
 </tr>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/teams/:teamID/policy-rules/:ruleID</code></td>
-<td><code>bearer + policy.author</code> scoped to teamID</td>
+<td><code>session + policy.author</code> scoped to teamID</td>
 <td>Update team-scoped rule. R-follow-up #2 §3 critical pin preserved: priority revalidates against the LIVE cap on EVERY call (not only when priority is changing). §4 mismatch returns <code>policy_not_found</code>. Anchor is immutable post-create.</td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/teams/:teamID/policy-rules/:ruleID</code></td>
-<td><code>bearer + policy.author</code> scoped to teamID</td>
+<td><code>session + policy.author</code> scoped to teamID</td>
 <td>204 on success. URL teamID mismatch returns 404 <code>policy_not_found</code>. Platform NULL rule returns 403 <code>platform_policy_not_editable</code>.</td>
 </tr>
 </tbody>
@@ -4093,7 +4093,7 @@ URL; manage on the team's own page or via <code>/admin/policies</code>.</p>
 <p>NEW (R-follow-up #3, api#126). Returns the resolved team set from the
 api's <code>EffectiveTeamAccess(actor, policy.author)</code> helper: every team
 the actor's grants cover, subtree-expanded.</p>
-<p>Permission: bearer only. Exposes ONLY the caller's own coverage; not
+<p>Permission: session only. Exposes ONLY the caller's own coverage; not
 enumerable across other users.</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">"global"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
@@ -4145,19 +4145,19 @@ wire response carries <code>selector_keys</code> (set-based, sorted) and
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/projects/:projectID/policy-rules/:ruleID/history</code></td>
-<td><code>bearer + policy.author</code> covering projectID</td>
+<td><code>session + policy.author</code> covering projectID</td>
 <td>Scoped (project). 404 <code>policy_not_found</code> on missing rule OR anchor mismatch (silent, gate-order enumeration protection). After delete: 404.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/teams/:teamID/policy-rules/:ruleID/history</code></td>
-<td><code>bearer + policy.author</code> covering teamID</td>
+<td><code>session + policy.author</code> covering teamID</td>
 <td>Scoped (team). Coverage gate runs as a HANDLER helper (not middleware) so denial emits the same audit + counter signal as the rest of the gate chain (per R-follow-up #3 §3 C3). After delete: 404.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/policies/:ruleID/history</code></td>
-<td><code>bearer + policy.edit</code></td>
+<td><code>session + policy.edit</code></td>
 <td>Admin. <strong>Existence check via the audit chain, NOT <code>policyRepo.Get</code></strong>. Admin retains forensic visibility after delete if at least one event exists. NO anchor routing; admin sees regardless of anchor.</td>
 </tr>
 </tbody>
@@ -4299,19 +4299,19 @@ a 5-minute TTL backstop for missed messages.</p>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/platform-settings</code></td>
-<td><code>bearer + policy.edit</code></td>
+<td><code>session + policy.edit</code></td>
 <td>List all whitelisted rows. Non-whitelisted rows in the table (shouldn't exist in v1) are filtered out service-side.</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/platform-settings/:key</code></td>
-<td><code>bearer + policy.edit</code></td>
+<td><code>session + policy.edit</code></td>
 <td>One row. Unknown / non-whitelisted key → 404 <code>unknown_platform_setting</code>.</td>
 </tr>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/platform-settings/:key</code></td>
-<td><code>bearer + policy.edit</code></td>
+<td><code>session + policy.edit</code></td>
 <td>Update. Body: <code>{value: &lt;json&gt;}</code>. URL <code>:key</code> wins over any <code>key</code> in the body (defense against URL/body confusion). Transactional: BEGIN → SELECT FOR UPDATE → validate → UPDATE → INSERT audit → COMMIT → pub/sub publish AFTER commit.</td>
 </tr>
 </tbody>
@@ -4388,7 +4388,7 @@ posture).</p>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/permissions</code></td>
-<td>bearer</td>
+<td>session</td>
 <td>Canonical catalog of permission strings + descriptions; cached for 5 min</td>
 </tr>
 </tbody>

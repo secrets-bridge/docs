@@ -2196,18 +2196,6 @@
 <td>Key prefix</td>
 </tr>
 <tr>
-<td><code>SB_JWT_SECRET</code></td>
-<td><strong>yes</strong></td>
-<td></td>
-<td>32+ bytes, base64 or raw. Fails boot if too short.</td>
-</tr>
-<tr>
-<td><code>SB_JWT_TOKEN_TTL</code></td>
-<td>no</td>
-<td><code>8h</code></td>
-<td>Login session lifetime</td>
-</tr>
-<tr>
 <td><code>SB_WRAP_MASTER_KEY</code></td>
 <td>yes when <code>SB_KMS_BACKEND=local</code></td>
 <td></td>
@@ -2679,12 +2667,6 @@ sources.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>SB_JWT_SECRET</code></td>
-<td>HMAC key for HS256 login tokens</td>
-<td>api env / K8s Secret</td>
-<td>Operator-rotated (no rotation runbook yet, tracked)</td>
-</tr>
-<tr>
 <td><code>SB_WRAP_MASTER_KEY</code></td>
 <td>Master key for the <code>local</code> KMS backend</td>
 <td>api env / K8s Secret</td>
@@ -2760,7 +2742,7 @@ deployment, treat it as an incident.</p>
 <td><code>SB_ALLOW_INSECURE_HEADER_AUTH=true</code></td>
 <td>api</td>
 <td><code>false</code></td>
-<td>Accepts an <code>X-User-Id</code> header as the caller's identity when there is no session cookie or bearer token. Anyone who can reach the api can act as any user.</td>
+<td>Accepts an <code>X-User-Id</code> header as the caller's identity when there is no session cookie. Anyone who can reach the api can act as any user.</td>
 <td>Not tied to <code>SB_ENV</code>; WARN log at boot</td>
 </tr>
 <tr>

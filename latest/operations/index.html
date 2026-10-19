@@ -2035,8 +2035,8 @@ when a production image resolves to a mutable <code>:dev</code> or <code>:latest
 without a digest, or when the agent's control-plane endpoint is plain
 <code>http://</code>.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># 1. Pre-create the env Secret the chart reads (secrets.existingSecret,</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1">#    default name secrets-bridge-env): SB_JWT_SECRET, DATABASE_URL,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1">#    REDIS_URL and the SB_KMS_* settings for your backend. Deliver it with</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1">#    default name secrets-bridge-env): DATABASE_URL, REDIS_URL and the</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1">#    SB_KMS_* settings for your backend. Deliver it with</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1">#    External Secrets, sealed-secrets or similar; never commit it.</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># 2. Install the control plane. Production needs every image pinned.</span>
@@ -2065,8 +2065,6 @@ Each chart's README in the <code>charts</code> repo documents every value.</p>
 </ul>
 <h2 id="hardening-checklist-before-exposing-to-anyone">Hardening checklist (before exposing to anyone)<a class="headerlink" href="#hardening-checklist-before-exposing-to-anyone" title="Permanent link">&para;</a></h2>
 <ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>SB_JWT_SECRET</code> is from <code>crypto/rand</code> (32+ bytes), not
-  a memorable string</li>
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>SB_ENV</code> is <code>production</code> (the default), never <code>dev</code></li>
 <li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>SB_KMS_BACKEND</code> is <code>vault-transit</code> or <code>aws-kms</code>
   (<strong>never</strong> <code>local</code>)</li>
