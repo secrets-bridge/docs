@@ -41,8 +41,9 @@ The api logs both actions at INFO in its JSON log output:
 4. You land on the Dashboard with the `Agents Online` KPI showing
    `0 / 0`.
 
-The token is stored in React state only, **closing the tab
-signs you out** by design (BRD §15).
+The api keeps you signed in with an HttpOnly session cookie, which
+the SPA's scripts can't read. Sign out from the console to end the
+session.
 
 ## Rotating the admin password
 

@@ -68,4 +68,4 @@ runs each sweeper per tick, the others record `worker_scheduler_lock_skipped_tot
 | `REDIS_URL` | yes | - | Same Redis as the api |
 | `SB_WORKER_GITOPS_ENABLED` | no | `false` | Must match the api's `SB_GITOPS_ENABLED` for §26 to be active |
 | `SB_DISCOVER_TARGETS_JSON` | no | - | Array of `{agent_id, provider, config, scope}`; admin API replaces this |
-| Sweeper interval overrides | no | per-sweeper defaults | `SB_SWEEP_WRAPS_INTERVAL`, etc. |
+| Sweeper interval overrides | no | per-sweeper defaults | `SB_WORKER_WRAPS_EXPIRED_INTERVAL`, etc. See [Configuration reference](../operations/config.md#worker) |

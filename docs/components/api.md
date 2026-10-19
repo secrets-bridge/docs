@@ -16,7 +16,7 @@ outbound HTTPS).
 api/
 ├── cmd/api/                # main, config, server bootstrap
 ├── internal/
-│   ├── auth/               # JWT signer + permission catalog + auth.Require
+│   ├── auth/               # permission catalog, scope resolvers, auth.Require
 │   ├── handlers/           # HTTP layer (one file per aggregate)
 │   ├── middleware/         # Auth (session cookie), default-deny gate, RequestID, Logger, Recover
 │   ├── observability/      # slog JSON logger
@@ -66,7 +66,7 @@ and it must never be set on a deployment anyone else can reach. See
 | `GET /healthz` | Always 200. Liveness. |
 | `GET /readyz` | Aggregated readiness across `postgres` + `redis` checks (+ KMS at boot). 503 with per-check failure map on failure. |
 | `GET /metrics` | Prometheus exposition. |
-| `POST /api/v1/auth/login` | Email + password → HS256 JWT. |
+| `POST /api/v1/auth/login` | Email + password. Sets the `sb_session` cookie and returns `{expires_at, user}`. |
 
 See [HTTP API endpoints](../reference/api-endpoints.md) for the
 full surface.
@@ -96,7 +96,7 @@ exhaustive list, including the
 | The four request lifecycles (submit / approve / reject / cancel) | Stable |
 | Patch + read flows end-to-end against Vault + AWS SM | Stable |
 | Single-shot wrap consumption | Stable, race-tested (6 concurrent racers) |
-| JWT login + `auth.Require(perm)` gating on write endpoints | Stable since slice 7 |
+| Session-cookie login + `auth.Require(perm)` gating on write endpoints | Stable |
 | OIDC sign-in (PKCE, group-to-role mapping, back-channel logout) | Shipped; see [Authentication](../operations/authentication.md) |
 | Per-tenant KMS scoping | **Not shipped**, tracked as Piece 8c |
 | Login brute-force defence | Shipped: per-account lockout (5 wrong passwords, 15 minutes) plus per-IP rate limits on the auth routes and a per-agent heartbeat limit; see [Authentication](../operations/authentication.md) |

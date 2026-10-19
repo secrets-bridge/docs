@@ -14,7 +14,7 @@ that isn't possible, code review is the gate.
 | Secret values **never** appear in Redis | The `pkg/runtime` package doesn't expose a generic `Set(key, value)`: only idempotency tokens, locks, rate-limit windows, pub/sub messages |
 | Secret values **never** appear in audit metadata | Service layer audits `byte_length` + SHA-256 `content_hash` only; `TestWrap_AuditTrailHashesContentNotValue` scans the audit `metadata` column for the canary |
 | Secret values **never** appear in API responses | Wire shapes in `internal/handlers/*` deliberately omit value fields; the request response carries `target_keys` (names) only |
-| Secret values **never** persisted in the browser | `src/auth/AuthContext` keeps tokens in React state; `localStorage` / `sessionStorage` / cookies / IndexedDB are deliberately unused |
+| Secret values **never** persisted in the browser | The SPA writes nothing to `localStorage` / `sessionStorage` / IndexedDB. The only cookie is the HttpOnly `sb_session` cookie the api sets, which page scripts can't read |
 
 ### Provider credentials
 
@@ -48,7 +48,7 @@ that isn't possible, code review is the gate.
 | Agent secret comparisons are **constant-time** | `crypto/subtle.ConstantTimeCompare` on every heartbeat path |
 | User login is **constant-time-ish** even on unknown email | The auth service runs `bcrypt.CompareHashAndPassword` against a dummy hash when the email isn't found, so an attacker can't enumerate users by latency |
 | Generic 401 / 410 / 409 on every failure shape; the audit log carries the specifics | Login failures audit `actor=anonymous`, `error_kind=wrong_password` and `email_length` (never the email body; defends against audit-table spam) |
-| `alg=none` JWT downgrade is **impossible** | The JWT verifier compares the header byte-for-byte against the exact base64 of `{"alg":"HS256","typ":"JWT"}`: no parsing surface |
+| Users authenticate with the session cookie **only** | Login returns no token and the api ignores `Authorization: Bearer` for users. The `sb_session` cookie is HttpOnly and `SameSite=Strict` (and `Secure` outside `SB_ENV=dev`), and logout, session revocation or disabling the user ends it server-side |
 
 ## Threat model: what we defend against
 
@@ -62,7 +62,7 @@ that isn't possible, code review is the gate.
 | Concurrent claim race on a wrap | Two readers see the same value | Atomic `MarkConsumed` with row lock; second caller gets 410 Gone |
 | Replay of an already-consumed wrap | Re-fetch a leaked wrap | Schema CHECK enforces single-shot; storage-layer test asserts |
 | Timing oracle on login | Enumerate emails by response time | Dummy bcrypt on unknown-email path |
-| `alg=none` JWT | Forge a token with no signature | Header compared as exact base64 string; signer never accepts anything but HS256 |
+| Forged or stolen user token | Sign a token, or replay one copied from a script or log, to act as a user | There is no user token to forge: the api reads no bearer token for users. A session is a server-side row behind the HttpOnly cookie, so revoking it or disabling the user stops it on the next request |
 | Stale agent claiming after lease expired | Double-execution of a job | `WHERE claimed_by = $4 AND status = 'claimed'` on the complete UPDATE; owner mismatch returns 409 |
 | Brute force / credential stuffing on `/auth/login` | Guess a local user's password | Per-account lockout after 5 consecutive wrong passwords (15 minutes, independent of source IP, kept in Postgres) plus a per-IP limit of 30 attempts per 60s as anti-scan. The per-IP limiter fails open when Redis is unavailable; the lockout does not. See [Authentication](../operations/authentication.md). |
 | Operator deploys with `SB_KMS_BACKEND=local` in production | Storage envelope uses a key that lives in the api's own env | The api refuses to boot with `local` unless `SB_ENV=dev`, and `SB_ENV` defaults to `production`. The `secrets-bridge` chart refuses `kms.backend=local` with `env=production` at render time. |

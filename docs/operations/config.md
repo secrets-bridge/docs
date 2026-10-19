@@ -97,18 +97,27 @@ sources.
 | `REDIS_URL` | **yes** |  | Same Redis as the api |
 | `SB_WORKER_GITOPS_ENABLED` | no | `false` | Must match api's `SB_GITOPS_ENABLED` |
 | `SB_DISCOVER_TARGETS_JSON` | no |  | Periodic discovery targets (admin API tracked) |
-| `SB_SWEEP_WRAPS_INTERVAL` | no | `60s` | |
-| `SB_SWEEP_SECRETS_INTERVAL` | no | `5m` | |
-| `SB_SWEEP_SECRETS_STALE_AFTER` | no | `24h` | |
-| `SB_SWEEP_AGENTS_INTERVAL` | no | `60s` | |
-| `SB_SWEEP_AGENTS_STALE_AFTER` | no | `5m` | |
-| `SB_SWEEP_JOBS_INTERVAL` | no | `30s` | |
-| `SB_SWEEP_GITOPS_POLL_INTERVAL` | no | `15s` | |
-| `SB_SWEEP_GITOPS_TIMEOUT_INTERVAL` | no | `60s` | |
+| `SB_WORKER_LOCAL_ADDR` | no | `127.0.0.1:8091` | Local listen address |
+| `SB_WORKER_SHUTDOWN_GRACE` | no | `15s` | |
+| `SB_WORKER_WRAPS_EXPIRED_INTERVAL` | no | `1m` | |
+| `SB_WORKER_SECRETS_STALE_INTERVAL` | no | `5m` | |
+| `SB_WORKER_SECRETS_STALE_AFTER` | no | `24h` | |
+| `SB_WORKER_AGENTS_STALE_INTERVAL` | no | `1m` | |
+| `SB_WORKER_AGENTS_STALE_AFTER` | no | `5m` | |
+| `SB_WORKER_JOBS_RECOVERY_INTERVAL` | no | `30s` | |
+| `SB_WORKER_DISCOVER_INTERVAL` | no | `1h` | |
+| `SB_WORKER_REVEAL_SESSIONS_EXPIRED_INTERVAL` | no | `5s` | |
+| `SB_WORKER_CROSS_TEAM_FILL_EXPIRED_INTERVAL` | no | `30s` | |
+| `SB_WORKER_GITOPS_POLL_INTERVAL` | no | `15s` | |
+| `SB_WORKER_GITOPS_TIMEOUT_INTERVAL` | no | `1m` | |
+| `SB_WORKER_GITOPS_HTTP_TIMEOUT` | no | `15s` | Per-call ceiling for ArgoCD requests |
+| `SB_WORKER_GITOPS_BATCH_SIZE` | no | `20` | Observations per poll. At least `1` |
 | `SB_WORKER_WEBHOOK_URL` | no |  | Generic webhook. Also turns on the waiting-account message, which goes to this webhook only |
 | `SB_WORKER_WEBHOOK_SLACK_FORMAT` | no | `false` | Wraps payload in `{text: ...}` |
 | `SB_WORKER_USERS_PENDING_INTERVAL` | no | `1m` | How often the `users-pending` sweeper posts about accounts waiting for approval, at most one message per run. At least `30s`, or the worker refuses to start. See [Sign in with Google](google-sign-in.md#notify-admins-from-the-worker) |
 | `SB_PUBLIC_URL` | no |  | Same variable as the api's, used for the link in the waiting-account message. Unset, the address saved in the console is used. An invalid value stops the worker at boot |
+
+Every duration is a Go duration (`30s`, `5m`, `1h`) and must be greater than zero, or the worker refuses to start.
 
 ## controller
 
