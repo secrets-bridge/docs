@@ -34,7 +34,7 @@ replace them.
 | Repo | Status | Notes |
 |---|---|---|
 | [`core`](../components/core.md) | Shipped | Provider interface, Vault + AWS SM connectors, type-safe value redaction |
-| [`api`](../components/api.md) | Shipped | Fiber v3 Control Plane API, Postgres + Redis, RBAC catalog, JWT login |
+| [`api`](../components/api.md) | Shipped | Fiber v3 Control Plane API, Postgres + Redis, RBAC catalog, session-cookie login |
 | [`agent`](../components/agent.md) | Shipped | Outbound-only, claim → wrap → execute → complete loop, X25519 wire envelope |
 | [`worker`](../components/worker.md) | Shipped | Sweepers, scheduler, notifications, GitOps poller |
 | [`controller`](../components/controller.md) | Shipped | Kubernetes CRD reconciler ported from v0.1.0 |

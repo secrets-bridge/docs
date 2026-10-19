@@ -23,7 +23,7 @@ required to call it.
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| `POST` | `/api/v1/auth/login` | public | `{email, password}` → `{token, expires_at, user}` |
+| `POST` | `/api/v1/auth/login` | public | `{email, password}` → `{expires_at, user}`, and sets the `sb_session` cookie. No token in the body |
 | `GET` | `/api/v1/auth/providers` | public | Sign-in buttons for the login page: each enabled console provider, plus the env-var OIDC provider (`type: "oidc"`) when `SB_OIDC_ISSUER` is set. 120 a minute per IP |
 
 ## Sign in with Google

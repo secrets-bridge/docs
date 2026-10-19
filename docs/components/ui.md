@@ -27,13 +27,13 @@ routing: `/` → ui, `/api/v1/*` → api).
 | `/admin/workflows` | Workflows | TTL knobs, min approvers, allow self-approval, justification required |
 | `/admin/policies` | Policies | Selector → workflow priority-ordered list |
 | `/admin/integrations` | Integrations | ArgoCD endpoints + GitOps app mappings; feature-gated banner when §26 is off |
-| `/login` | Login | Real email + password against `POST /auth/login` (token in memory only) |
+| `/login` | Login | Real email + password against `POST /auth/login`, which sets the HttpOnly session cookie |
 
 ## Hard rules baked into the SPA
 
 | Rule | Where |
 |---|---|
-| Token in memory only, never localStorage / sessionStorage / IndexedDB / cookies | `src/auth/AuthContext.tsx` keeps it in React state; reload signs out |
+| No credential in page scripts, nothing in localStorage / sessionStorage / IndexedDB | The api sets an HttpOnly, `SameSite=Strict` session cookie and the api client sends it with `credentials: 'include'`. `src/auth/AuthContext.tsx` holds identity from `GET /users/me`, with no token field. A reload keeps the session |
 | HTTPS required on non-localhost | `src/api/client.ts` throws at module-load if `VITE_API_BASE_URL` is `http://` for non-loopback |
 | No SSR | Vite SPA build; nginx serves static assets only |
 | Strict CSP | `default-src 'self'; frame-ancestors 'none'` |

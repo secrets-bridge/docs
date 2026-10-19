@@ -47,7 +47,7 @@ flowchart LR
 
 | Component | What it holds | What it must never hold |
 |---|---|---|
-| **UI** | A short-lived JWT in React state | Any provider credential, any plaintext value beyond the reveal-once modal lifetime |
+| **UI** | Nothing that authenticates: the browser holds the HttpOnly `sb_session` cookie, which page scripts can't read | Any provider credential, any plaintext value beyond the reveal-once modal lifetime |
 | **API** | KMS-wrapped envelopes (single-shot, TTL'd), audit rows, policy rules, role catalogs | Raw plaintext values, provider master credentials |
 | **Postgres** | Hashes + envelopes + metadata + append-only audit | The decryption key, which lives in the KMS backend, *outside* Postgres |
 | **Redis** | Idempotency tokens, distributed locks, rate-limit windows, pub/sub messages | Any value-bearing payload (the `runtime` package doesn't even expose a generic `Set()` ) |
