@@ -29,11 +29,9 @@ these docs, an old compose file or another environment.
 
 ```bash
 export SB_WRAP_MASTER_KEY="$(openssl rand -base64 32)"   # master key for the local KMS backend
-export SB_JWT_SECRET="$(openssl rand -base64 32)"        # HMAC key for login tokens
 ```
 
-The api refuses to start without `SB_JWT_SECRET` (32 bytes or more), and the
-`local` KMS backend refuses to start without `SB_WRAP_MASTER_KEY`.
+The `local` KMS backend refuses to start without `SB_WRAP_MASTER_KEY`.
 
 ### 3. Run the api
 
@@ -63,8 +61,7 @@ one per user.
     `docker compose up -d --build` also builds the `api` service from the
     repo's Dockerfile and runs it on port 8080. Export the keys from step 2
     in the same shell first: the api container reads `SB_WRAP_MASTER_KEY`
-    and `SB_JWT_SECRET` from your environment and exits with an error when
-    either is unset. Older
+    from your environment and exits with an error when it is unset. Older
     copies of the compose file shipped a fixed dev master key instead; pull
     the latest `main` rather than reusing it.
 
@@ -102,25 +99,27 @@ docker exec -e VAULT_ADDR=http://127.0.0.1:8200 -e VAULT_TOKEN="$VAULT_DEV_TOKEN
 #    the dev Vault listens on http://, which provider connections refuse
 #    by default.
 
-# 3. Sign in as the seeded admin. The bearer token stays in this shell.
+# 3. Sign in as the seeded admin. The session cookie goes into a
+#    private cookie jar; every call below sends it with -b.
 CP=http://localhost:8080
+JAR=$(mktemp) && chmod 600 "$JAR"
 read -rp 'Admin email: ' SB_ADMIN_EMAIL
 read -rsp 'Admin password: ' SB_ADMIN_PASSWORD; echo
-TOKEN=$(jq -n --arg e "$SB_ADMIN_EMAIL" --arg p "$SB_ADMIN_PASSWORD" '{email:$e,password:$p}' \
-  | curl -fsS -X POST "$CP/api/v1/auth/login" -H 'Content-Type: application/json' --data-binary @- \
-  | jq -r .token)
+jq -n --arg e "$SB_ADMIN_EMAIL" --arg p "$SB_ADMIN_PASSWORD" '{email:$e,password:$p}' \
+  | curl -fsS -c "$JAR" -o /dev/null -X POST "$CP/api/v1/auth/login" \
+      -H 'Content-Type: application/json' --data-binary @-
 
 # 4. Register the Vault provider connection.
-CONN_ID=$(curl -fsS -X POST "$CP/api/v1/provider-connections" \
-  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+CONN_ID=$(curl -fsS -b "$JAR" -X POST "$CP/api/v1/provider-connections" \
+  -H 'Content-Type: application/json' \
   -d '{"name":"local-vault","type":"vault","auth_method":"token","cluster_name":"local",
        "scope":{"address":"http://127.0.0.1:8200","mount":"secret"},
        "discover_interval_seconds":3600}' \
   | jq -r .id)
 
 # 5. Create a one-time enrollment token for that connection (15 minutes by default).
-SB_ENROLLMENT_TOKEN=$(curl -fsS -X POST "$CP/api/v1/provider-connections/$CONN_ID/agent-enrollment-token" \
-  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+SB_ENROLLMENT_TOKEN=$(curl -fsS -b "$JAR" -X POST "$CP/api/v1/provider-connections/$CONN_ID/agent-enrollment-token" \
+  -H 'Content-Type: application/json' \
   -d '{"name":"local-agent","expected_cluster_name":"local","expected_provider_type":"vault"}' \
   | jq -j .enrollment_token)
 export SB_ENROLLMENT_TOKEN
@@ -141,7 +140,7 @@ SB_VAULT_KV_MOUNT=secret \
 
 # 7. After a few seconds the log shows "enrolled and persisted credential"
 #    and the agent is listed, `active`, against the connection.
-curl -fsS "$CP/api/v1/provider-connections/$CONN_ID/agents" -H "Authorization: Bearer $TOKEN" | jq
+curl -fsS -b "$JAR" "$CP/api/v1/provider-connections/$CONN_ID/agents" | jq
 ```
 
 The token is spent by step 6. The agent writes its identity to

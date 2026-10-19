@@ -206,8 +206,7 @@ With **Wait for approval** on, a new account starts waiting. Until it is
 approved it can only read `GET /users/me` and sign out. Every other route
 answers `403 account_pending_approval`, and the console sends the person to
 a **Waiting for approval** page with **Check again** and **Sign out**. This
-is enforced at session validation, at the bearer-token lookup and at
-sign-in. If a waiting account signs in through the env-var OIDC provider,
+is enforced at session validation and at sign-in. If a waiting account signs in through the env-var OIDC provider,
 its group mapping is skipped, so it gets no role from IdP groups either.
 
 Admins who can approve see:

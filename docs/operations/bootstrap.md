@@ -90,23 +90,25 @@ You need `agent.mint` (the seed `admin` role has it) and an active
 ```bash
 CP=https://secrets-bridge.example.com   # http://localhost:8080 for the local setup
 
-# Sign in. The password is read from the terminal, not typed on the command line.
+# Sign in. The password is read from the terminal, not typed on the
+# command line, and the session cookie goes into a private cookie jar.
+JAR=$(mktemp) && chmod 600 "$JAR"
 read -rp 'Admin email: ' SB_ADMIN_EMAIL
 read -rsp 'Admin password: ' SB_ADMIN_PASSWORD; echo
-TOKEN=$(jq -n --arg e "$SB_ADMIN_EMAIL" --arg p "$SB_ADMIN_PASSWORD" '{email:$e,password:$p}' \
-  | curl -fsS -X POST "$CP/api/v1/auth/login" -H 'Content-Type: application/json' --data-binary @- \
-  | jq -r .token)
+jq -n --arg e "$SB_ADMIN_EMAIL" --arg p "$SB_ADMIN_PASSWORD" '{email:$e,password:$p}' \
+  | curl -fsS -c "$JAR" -o /dev/null -X POST "$CP/api/v1/auth/login" \
+      -H 'Content-Type: application/json' --data-binary @-
 
 # Pick the provider connection the agent will serve.
-curl -fsS "$CP/api/v1/provider-connections" -H "Authorization: Bearer $TOKEN" \
+curl -fsS -b "$JAR" "$CP/api/v1/provider-connections" \
   | jq '.[] | {id, name, type, cluster_name, status}'
 CONN_ID=<provider-connection-id>
 
 # Create the one-time token and put it straight into a Kubernetes Secret
 # in the workload cluster, without printing it.
 kubectl create namespace secrets-bridge   # skip if it already exists
-curl -fsS -X POST "$CP/api/v1/provider-connections/$CONN_ID/agent-enrollment-token" \
-  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' \
+curl -fsS -b "$JAR" -X POST "$CP/api/v1/provider-connections/$CONN_ID/agent-enrollment-token" \
+  -H 'Content-Type: application/json' \
   -d '{"name":"cluster-a-agent","expected_cluster_name":"cluster-a","expected_provider_type":"vault"}' \
   | jq -j .enrollment_token \
   | kubectl -n secrets-bridge create secret generic secrets-bridge-agent-enrollment \
