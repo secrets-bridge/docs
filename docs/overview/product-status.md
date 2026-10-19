@@ -69,6 +69,14 @@ Being built now; not yet live or certified. Do not depend on these yet.
   All repos release together under one shared version; the first release
   has not been tagged yet. See
   [Verifying images and charts](../operations/verifying-releases.md).
+- **Sign in with Google, with admin approval**: an admin connects a Google
+  Workspace from the console. Accounts are bound by Google's issuer and
+  subject, the `hd` claim must be in the allowed domains, and new accounts
+  wait for an admin to approve them with a role and scope. Existing
+  accounts connect Google from their profile. The worker can post one
+  webhook message per run about waiting accounts. Merged in the api,
+  console and worker, not yet through QA. See
+  [Sign in with Google](../operations/google-sign-in.md).
 
 ## Live vs Roadmap
 

@@ -37,6 +37,79 @@ The `metadata.error_kind` tells you what's wrong:
 | `user_disabled` | `local_users.disabled = TRUE` |
 | `missing_fields` | Body shape wrong |
 
+### Google sign-in refused
+
+A refused Google sign-in always lands on `/login?error=sso` with "You
+couldn't be signed in with that account.", whatever the reason, so the page
+can't reveal which emails have accounts. An admin with `audit.read` finds
+the reason in the audit log:
+
+```bash
+curl -fsS "http://localhost:18080/api/v1/audit-events?action=auth.sso.callback" \
+  -H "Authorization: Bearer $TOKEN" \
+  | jq '.[] | select(.status=="denied") | {time:.occurred_at, kind:.metadata.error_kind, purpose:.metadata.purpose}'
+```
+
+The browser isn't signed in yet, so these events have the actor
+`anonymous` and no email. Match them to a person by time.
+
+| `error_kind` | Meaning | Fix |
+|---|---|---|
+| `hd_not_allowed` | The ID token has no `hd` claim (a personal Google account) or a Workspace domain that isn't allowed | Use a Workspace account, or add its domain under Admin → Sign-in |
+| `email_domain_not_allowed` | `hd` is allowed but the email's domain isn't | Add the email's domain too |
+| `email_unverified` | Google didn't mark the email as verified | Verify it at Google |
+| `email_has_account` | The email already belongs to an account here, which hasn't connected Google | The person signs in with their password and uses Connect Google on their profile |
+| `account_disabled` | The account was declined or disabled | A declined account can't be re-enabled from the console |
+| `provider_disabled` | Google is turned off, or `SB_OIDC_ISSUER` is Google | Turn it on, or use the env-var provider |
+| `no_public_url` | No public address is set | Set `SB_PUBLIC_URL` or save one under Admin → Sign-in |
+| `exchange_failed` | Google refused the code exchange, usually a wrong client ID or secret | Check the client in Google Cloud Console, replace the secret, run Test |
+| `id_token_invalid`, `claims_invalid`, `nonce_mismatch`, `missing_sub` | Google's answer couldn't be verified | Check the client ID, then Test |
+| `iat_invalid` | The ID token was too old or dated in the future | Check the api server's clock |
+| `no_code` | The person cancelled at Google, or Google returned an error | Try again |
+| `state_cookie`, `state_unknown`, `state_mismatch` | The round trip took longer than 5 minutes, or finished in another browser | Try again in one browser |
+
+Two other events explain refusals that aren't in `auth.sso.callback`:
+
+- **`user.pending_refused`**: the [waiting limit](google-sign-in.md#the-waiting-limit)
+  was reached. Approve or decline waiting accounts, or raise the limit. The
+  events are aggregated per 10-minute window, with `count`, `first` and
+  `last`.
+- **`sso_provider.default_role_refused`**: approval is off, but the default
+  role now holds a privileged permission, so the account was created
+  waiting for approval instead. Fix the role or pick another default.
+
+**Test** runs the same checks and shows the reason to the admin who ran it,
+which is the quickest way to check a setup.
+
+### Google shows "redirect_uri_mismatch"
+
+Google stops on its own error page and never comes back, so nothing is
+audited. The redirect URI registered on the OAuth client must match the one
+Secrets Bridge sends exactly:
+
+```text
+https://secrets.example.com/api/v1/auth/sso/google/callback
+```
+
+Copy it from **Admin → Sign-in → Google → Redirect URL**, and add it under
+**Authorized redirect URIs** in Google Cloud Console. The scheme, host,
+port and path must all match. If you change the public address, update the
+redirect URI at Google too.
+
+### No "Sign in with Google" button, or Turn on fails
+
+- **No public address.** The login page doesn't offer Google while neither
+  `SB_PUBLIC_URL` nor a saved address is set, and Turn on answers
+  `409 provider_not_ready` with `missing: ["public_url"]`. Set one of them.
+- **Missing secret or domains.** `missing` also lists `client_secret` or
+  `allowed_domains`.
+- **The env-var provider is Google.** With `SB_OIDC_ISSUER` set to
+  `https://accounts.google.com`, the console provider is never offered
+  (`409 env_provider_is_google`). Use one or the other.
+- **The api won't start** after setting `SB_PUBLIC_URL`: the value is
+  invalid. It must be `https`, with no user info, query or fragment, and
+  plain `http` only for `localhost` with `SB_ENV=dev`.
+
 ### Agent job fails immediately ("agent reported failure")
 
 Read the agent's log:

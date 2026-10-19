@@ -192,6 +192,7 @@ nav:
       - Bootstrap & first sign-in: operations/bootstrap.md
       - Agent onboarding: operations/agent-onboarding.md
       - Authentication: operations/authentication.md
+      - Sign in with Google: operations/google-sign-in.md
       - OIDC with Authentik: operations/oidc-authentik.md
       - Project environments: operations/project-environments.md
       - Policy templates: operations/policy-templates.md
