@@ -2154,7 +2154,7 @@ routing: <code>/</code> → ui, <code>/api/v1/*</code> → api).</p>
 <tr>
 <td><code>/login</code></td>
 <td>Login</td>
-<td>Real email + password against <code>POST /auth/login</code> (token in memory only)</td>
+<td>Real email + password against <code>POST /auth/login</code>, which sets the HttpOnly session cookie</td>
 </tr>
 </tbody>
 </table>
@@ -2168,8 +2168,8 @@ routing: <code>/</code> → ui, <code>/api/v1/*</code> → api).</p>
 </thead>
 <tbody>
 <tr>
-<td>Token in memory only, never localStorage / sessionStorage / IndexedDB / cookies</td>
-<td><code>src/auth/AuthContext.tsx</code> keeps it in React state; reload signs out</td>
+<td>No credential in page scripts, nothing in localStorage / sessionStorage / IndexedDB</td>
+<td>The api sets an HttpOnly, <code>SameSite=Strict</code> session cookie and the api client sends it with <code>credentials: 'include'</code>. <code>src/auth/AuthContext.tsx</code> holds identity from <code>GET /users/me</code>, with no token field. A reload keeps the session</td>
 </tr>
 <tr>
 <td>HTTPS required on non-localhost</td>

@@ -2838,7 +2838,7 @@ required to call it.</p>
 <td><code>POST</code></td>
 <td><code>/api/v1/auth/login</code></td>
 <td>public</td>
-<td><code>{email, password}</code> → <code>{token, expires_at, user}</code></td>
+<td><code>{email, password}</code> → <code>{expires_at, user}</code>, and sets the <code>sb_session</code> cookie. No token in the body</td>
 </tr>
 <tr>
 <td><code>GET</code></td>

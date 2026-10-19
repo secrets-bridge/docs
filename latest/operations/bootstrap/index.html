@@ -2197,8 +2197,9 @@ the bootstrap env vars are set:</p>
 <li>You land on the Dashboard with the <code>Agents Online</code> KPI showing
    <code>0 / 0</code>.</li>
 </ol>
-<p>The token is stored in React state only, <strong>closing the tab
-signs you out</strong> by design (BRD §15).</p>
+<p>The api keeps you signed in with an HttpOnly session cookie, which
+the SPA's scripts can't read. Sign out from the console to end the
+session.</p>
 <h2 id="rotating-the-admin-password">Rotating the admin password<a class="headerlink" href="#rotating-the-admin-password" title="Permanent link">&para;</a></h2>
 <p>There's no UI surface for this in the current slice. For now, use
 <code>psql</code> directly against the api's Postgres:</p>

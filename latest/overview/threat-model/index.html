@@ -2225,7 +2225,7 @@ that isn't possible, code review is the gate.</p>
 </tr>
 <tr>
 <td>Secret values <strong>never</strong> persisted in the browser</td>
-<td><code>src/auth/AuthContext</code> keeps tokens in React state; <code>localStorage</code> / <code>sessionStorage</code> / cookies / IndexedDB are deliberately unused</td>
+<td>The SPA writes nothing to <code>localStorage</code> / <code>sessionStorage</code> / IndexedDB. The only cookie is the HttpOnly <code>sb_session</code> cookie the api sets, which page scripts can't read</td>
 </tr>
 </tbody>
 </table>
@@ -2324,8 +2324,8 @@ that isn't possible, code review is the gate.</p>
 <td>Login failures audit <code>actor=anonymous</code>, <code>error_kind=wrong_password</code> and <code>email_length</code> (never the email body; defends against audit-table spam)</td>
 </tr>
 <tr>
-<td><code>alg=none</code> JWT downgrade is <strong>impossible</strong></td>
-<td>The JWT verifier compares the header byte-for-byte against the exact base64 of <code>{"alg":"HS256","typ":"JWT"}</code>: no parsing surface</td>
+<td>Users authenticate with the session cookie <strong>only</strong></td>
+<td>Login returns no token and the api ignores <code>Authorization: Bearer</code> for users. The <code>sb_session</code> cookie is HttpOnly and <code>SameSite=Strict</code> (and <code>Secure</code> outside <code>SB_ENV=dev</code>), and logout, session revocation or disabling the user ends it server-side</td>
 </tr>
 </tbody>
 </table>
@@ -2380,9 +2380,9 @@ that isn't possible, code review is the gate.</p>
 <td>Dummy bcrypt on unknown-email path</td>
 </tr>
 <tr>
-<td><code>alg=none</code> JWT</td>
-<td>Forge a token with no signature</td>
-<td>Header compared as exact base64 string; signer never accepts anything but HS256</td>
+<td>Forged or stolen user token</td>
+<td>Sign a token, or replay one copied from a script or log, to act as a user</td>
+<td>There is no user token to forge: the api reads no bearer token for users. A session is a server-side row behind the HttpOnly cookie, so revoking it or disabling the user stops it on the next request</td>
 </tr>
 <tr>
 <td>Stale agent claiming after lease expired</td>
