@@ -43,8 +43,8 @@ without a digest, or when the agent's control-plane endpoint is plain
 
 ```bash
 # 1. Pre-create the env Secret the chart reads (secrets.existingSecret,
-#    default name secrets-bridge-env): SB_JWT_SECRET, DATABASE_URL,
-#    REDIS_URL and the SB_KMS_* settings for your backend. Deliver it with
+#    default name secrets-bridge-env): DATABASE_URL, REDIS_URL and the
+#    SB_KMS_* settings for your backend. Deliver it with
 #    External Secrets, sealed-secrets or similar; never commit it.
 
 # 2. Install the control plane. Production needs every image pinned.
@@ -75,8 +75,6 @@ Around the charts you provide:
 
 ## Hardening checklist (before exposing to anyone)
 
-- [ ] `SB_JWT_SECRET` is from `crypto/rand` (32+ bytes), not
-  a memorable string
 - [ ] `SB_ENV` is `production` (the default), never `dev`
 - [ ] `SB_KMS_BACKEND` is `vault-transit` or `aws-kms`
   (**never** `local`)

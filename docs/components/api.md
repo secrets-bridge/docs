@@ -18,7 +18,7 @@ api/
 ├── internal/
 │   ├── auth/               # JWT signer + permission catalog + auth.Require
 │   ├── handlers/           # HTTP layer (one file per aggregate)
-│   ├── middleware/         # Auth (session cookie → bearer JWT), default-deny gate, RequestID, Logger, Recover
+│   ├── middleware/         # Auth (session cookie), default-deny gate, RequestID, Logger, Recover
 │   ├── observability/      # slog JSON logger
 │   └── services/           # business logic (one file per aggregate)
 └── pkg/
@@ -37,14 +37,17 @@ deliberately open because `worker` imports `pkg/storage` and
 
 `middleware.AuthWith` resolves the caller once per request, in this order:
 
-1. **Session cookie** (`sb_session`), issued by `/auth/login` and the OIDC
-   callback.
-2. **Bearer JWT** in `Authorization: Bearer <token>`, the HS256 token that
-   `/auth/login` also returns.
-3. Otherwise the caller is anonymous, and the default-deny gate on
+1. **Session cookie** (`sb_session`, HttpOnly), issued by `/auth/login`
+   and the sign-in callbacks. It is the only user credential: logout,
+   session revocation and disabling the user end it.
+2. Otherwise the caller is anonymous, and the default-deny gate on
    `/api/v1` answers `401` for every route that isn't explicitly public.
    Per-route `auth.Require(perm)` checks then run on top for authenticated
    callers.
+
+`Authorization: Bearer` is not read for users. Login returns no token, so
+scripts keep the session cookie in a cookie jar (`curl -c jar` to sign in,
+`-b jar` after).
 
 Agent routes under `/api/v1/agents/:id/` authenticate separately, with the
 agent's `X-Agent-Secret`. `POST /api/v1/agents/enroll` authenticates with the
@@ -52,7 +55,7 @@ one-time enrollment token in the body.
 
 The legacy `X-User-Id` header is **ignored** unless the api runs with
 `SB_ALLOW_INSECURE_HEADER_AUTH=true`, a dev-only switch that lets anyone
-claim any identity. It is checked only after the cookie and bearer token,
+claim any identity. It is checked only after the session cookie,
 and it must never be set on a deployment anyone else can reach. See
 [Insecure switches](../operations/config.md#insecure-switches-dev-only).
 
@@ -75,8 +78,6 @@ full surface.
 | `API_ADDR` | no | `:8080` | Listen address |
 | `DATABASE_URL` | yes | - | `postgres://...` |
 | `REDIS_URL` | yes | - | `redis://...` |
-| `SB_JWT_SECRET` | yes | - | 32+ bytes, base64 or raw. Fails boot if missing. |
-| `SB_JWT_TOKEN_TTL` | no | `8h` | Login session lifetime |
 | `SB_WRAP_MASTER_KEY` | yes when `SB_KMS_BACKEND=local` | - | base64 32 bytes |
 | `SB_KMS_BACKEND` | no | `local` | `local` / `vault-transit` / `aws-kms` |
 | `SB_KMS_VAULT_ADDR` / `SB_KMS_VAULT_TOKEN` / `SB_KMS_VAULT_KEY` | yes for `vault-transit` | - | |

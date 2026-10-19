@@ -22,9 +22,9 @@ ready, the response body lists which:
 Check the audit log:
 
 ```bash
-TOKEN=...  # need an admin token from another session
+JAR=...  # a cookie jar from an admin sign-in (see Bootstrap: curl -c "$JAR" on /auth/login)
 curl -fsS "http://localhost:18080/api/v1/audit-events?action=auth.login" \
-  -H "Authorization: Bearer $TOKEN" \
+  -b "$JAR" \
   | jq '.[] | select(.status=="denied")'
 ```
 
@@ -46,7 +46,7 @@ the reason in the audit log:
 
 ```bash
 curl -fsS "http://localhost:18080/api/v1/audit-events?action=auth.sso.callback" \
-  -H "Authorization: Bearer $TOKEN" \
+  -b "$JAR" \
   | jq '.[] | select(.status=="denied") | {time:.occurred_at, kind:.metadata.error_kind, purpose:.metadata.purpose}'
 ```
 
@@ -150,7 +150,7 @@ it; if you're a different user, an admin needs to grant you the
 ```bash
 # As admin:
 curl -fsS http://localhost:18080/api/v1/audit-events \
-  -H "Authorization: Bearer $TOKEN"
+  -b "$JAR"
 ```
 
 Expected: 200 with an array. If 403, your role doesn't carry
@@ -190,7 +190,7 @@ scope than the dev token. Adjust the policy in Vault.
 
 ```bash
 curl -fsS "http://localhost:18080/api/v1/audit-events?correlation_id=<uuid>" \
-  -H "Authorization: Bearer $TOKEN" | jq '.[] | {time:.occurred_at, actor, action, resource}'
+  -b "$JAR" | jq '.[] | {time:.occurred_at, actor, action, resource}'
 ```
 
 ### Find every login failure in the last hour
@@ -198,7 +198,7 @@ curl -fsS "http://localhost:18080/api/v1/audit-events?correlation_id=<uuid>" \
 ```bash
 SINCE=$(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%SZ)
 curl -fsS "http://localhost:18080/api/v1/audit-events?action=auth.login&since=$SINCE" \
-  -H "Authorization: Bearer $TOKEN" \
+  -b "$JAR" \
   | jq '.[] | select(.status=="denied")'
 ```
 
@@ -206,7 +206,7 @@ curl -fsS "http://localhost:18080/api/v1/audit-events?action=auth.login&since=$S
 
 ```bash
 curl -fsS "http://localhost:18080/api/v1/audit-events?action=wrap.retrieve" \
-  -H "Authorization: Bearer $TOKEN" \
+  -b "$JAR" \
   | jq '.[] | {time:.occurred_at, actor, resource, status}'
 ```
 

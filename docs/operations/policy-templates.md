@@ -618,7 +618,7 @@ gh api .../api/v1/workflows | jq '.[] | select(.name=="standard") | .id'
 
 # Flip the flag, Get-then-merge in the api preserves all other fields
 curl -X PUT /api/v1/workflows/<id> \
-  -H 'Authorization: Bearer <jwt>' \
+  -b "$JAR" \
   -H 'Content-Type: application/json' \
   -d '{"scoped_policy_authorable": true}'
 ```
@@ -716,7 +716,7 @@ catches dropped notifications.
 
 ```bash
 curl -X PUT /api/v1/platform-settings/platform_reserved_priority \
-  -H 'Authorization: Bearer <jwt>' \
+  -b "$JAR" \
   -H 'Content-Type: application/json' \
   -d '{"value": 10000}'
 ```

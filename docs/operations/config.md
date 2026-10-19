@@ -18,8 +18,6 @@ Every environment variable across `api` / `agent` / `worker` /
 | `REDIS_POOL_SIZE` | no | `10` | |
 | `REDIS_DIAL_TIMEOUT` | no | `5s` | |
 | `REDIS_NAMESPACE` | no | `secrets-bridge` | Key prefix |
-| `SB_JWT_SECRET` | **yes** |  | 32+ bytes, base64 or raw. Fails boot if too short. |
-| `SB_JWT_TOKEN_TTL` | no | `8h` | Login session lifetime |
 | `SB_WRAP_MASTER_KEY` | yes when `SB_KMS_BACKEND=local` |  | base64 32 bytes (`openssl rand -base64 32`) |
 | `SB_KMS_BACKEND` | no | `local` | `local` / `vault-transit` / `aws-kms`. `local` is refused at boot unless `SB_ENV=dev`, so production must set one of the other two. |
 | `SB_KMS_VAULT_ADDR` | yes for `vault-transit` |  | |
@@ -125,7 +123,6 @@ sources.
 
 | Material | What it is | Where it lives | Rotation |
 |---|---|---|---|
-| `SB_JWT_SECRET` | HMAC key for HS256 login tokens | api env / K8s Secret | Operator-rotated (no rotation runbook yet, tracked) |
 | `SB_WRAP_MASTER_KEY` | Master key for the `local` KMS backend | api env / K8s Secret | **Don't use in production**, use Vault Transit or AWS KMS |
 | `SB_KMS_VAULT_TOKEN` | Vault token for the `vault-transit` backend | api env / K8s Secret | Lease-tracked; refresh via Vault rotation |
 | Agent identity (`agent_id` + `agent_secret`) | Per-agent credential, sent as `X-Agent-Secret` | `SB_IDENTITY_FILE` on a persistent volume (or `SB_AGENT_ID` / `SB_AGENT_SECRET`) | Revoke the agent, create a new enrollment token, re-enroll with an empty identity file |
@@ -151,7 +148,7 @@ None of these should ever appear in:
 |---|---|---|---|---|
 | `SB_ENV=dev` | api | `production` | Allows the `local` KMS backend and `SB_MFA_DEV_ALLOW_PWD`, seeds three dev users with logged passwords on an empty database, and drops the `Secure` flag from session cookies | Unknown values fail boot; WARN log at boot |
 | `SB_KMS_BACKEND=local` (with `SB_WRAP_MASTER_KEY`) | api | `local` | Keeps the storage-envelope master key in the api's own environment, next to the data it protects | api refuses to boot unless `SB_ENV=dev`, so an unset backend fails closed in production; the `secrets-bridge` chart refuses `kms.backend=local` with `env=production` |
-| `SB_ALLOW_INSECURE_HEADER_AUTH=true` | api | `false` | Accepts an `X-User-Id` header as the caller's identity when there is no session cookie or bearer token. Anyone who can reach the api can act as any user. | Not tied to `SB_ENV`; WARN log at boot |
+| `SB_ALLOW_INSECURE_HEADER_AUTH=true` | api | `false` | Accepts an `X-User-Id` header as the caller's identity when there is no session cookie. Anyone who can reach the api can act as any user. | Not tied to `SB_ENV`; WARN log at boot |
 | `SB_ALLOW_DIRECT_AGENT_MINT=true` | api | `false` | Re-enables `POST /api/v1/agents`, which creates an agent and returns a long-lived `agent_secret` outside the enrollment flow | No boot-time WARN. While off, the route answers `403 direct_agent_mint_disabled` |
 | `SB_ALLOW_INSECURE_VAULT_ADDR=true` | api | `false` | Accepts `http://` Vault addresses on provider connections | WARN log at boot |
 | `SB_ALLOW_UNSEALED_WRAPS=true` | api | `false` | Hands wraps to an agent with no X25519 public key on file as plaintext over TLS, and accepts a plaintext `value` when an agent posts a wrap. Only for an agent that predates wire-envelope sealing. | WARN log at boot. While off, a keyless agent gets `409 agent_public_key_required` before the wrap is consumed and a `value` post gets `400 envelope_required`; both are audited |
