@@ -19,6 +19,7 @@ read-only ArgoCD observation poller (BRD §26).
 | `discover-scheduler` | 5m | Enqueue one discover job per configured target (env var today; admin API tracked) |
 | `gitops-poller` | 15s | Claim a queued observation → call ArgoCD → record `observed_state` → transition |
 | `gitops-timeout` | 60s | Flip observations past their `timeout_at` to `applied_unverified` |
+| `users-pending` | 1m | Post one webhook message about accounts newly [waiting for approval](../operations/google-sign-in.md#notify-admins-from-the-worker), by email only. Registered only when `SB_WORKER_WEBHOOK_URL` is set |
 
 ## Multi-replica safety
 
@@ -49,7 +50,10 @@ runs each sweeper per tick, the others record `worker_scheduler_lock_skipped_tot
 
 - Stateless (NFR-08): all state in Postgres + Redis
 - No secret values logged or notified. Sweeper errors carry
-  counts + cutoffs + sweeper names, never row contents
+  counts + cutoffs + sweeper names, never row contents. The one
+  exception is `users-pending`, whose message lists the emails of
+  waiting accounts. It goes to the webhook only, and the worker logs
+  counts only
 - No provider SDKs imported (worker doesn't fetch values; the
   agent does)
 - Multi-replica safe by construction

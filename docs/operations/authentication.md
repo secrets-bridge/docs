@@ -5,7 +5,7 @@ description: "Cookie-only session model, account lockout, OIDC sign-in, app-MFA 
 
 # Authentication
 
-Secrets Bridge ships **two ways to sign in** (OIDC for everyone, local-admin as break-glass) and gates Tier 2 operations (approve, reject, reveal) behind **fresh MFA**. This page explains the model end-to-end so an operator knows what's enforced where.
+Secrets Bridge has **three ways to sign in**: an OIDC provider set with `SB_OIDC_*` environment variables, [Google configured from the console](google-sign-in.md), and the local password, which stays available as break-glass. It gates Tier 2 operations (approve, reject, reveal) behind **fresh MFA**. This page explains the model end-to-end so an operator knows what's enforced where.
 
 ## The session model (Slices A2 + C)
 
@@ -49,6 +49,9 @@ The audit trail captures every state change:
 |---|---|---|
 | `POST /auth/login` | 30 | 60s |
 | `GET /auth/oidc/callback` | 60 | 60s |
+| `GET /auth/providers` | 120 | 60s |
+| `GET /auth/sso/google/start` | 30 | 60s |
+| `GET /auth/sso/google/callback` | 60 | 60s |
 | `POST /auth/oidc/{logout,backchannel}` | 60 | 60s |
 | `POST /agents/:id/heartbeat` | 6 per-agent | 60s |
 | `GET /requests/:id/wraps/:wrap_id` | 20 per-user | 60s |
@@ -57,7 +60,7 @@ The login / callback caps are **deliberately permissive** so users behind shared
 
 ## OIDC sign-in (Slices B + C + E)
 
-Single Identity Provider (architect Q4). The api refuses to mount the OIDC routes unless `SB_OIDC_ISSUER` is set; until then, only `/auth/login` (local admin) accepts sign-ins.
+One env-var Identity Provider (architect Q4). The api refuses to mount the `/auth/oidc/*` routes unless `SB_OIDC_ISSUER` is set; until then, only `/auth/login` (local password) and, when it is turned on, [Google from the console](google-sign-in.md) accept sign-ins.
 
 The flow:
 
@@ -106,6 +109,12 @@ This protects:
 3. Operator overrides during incident response.
 
 If you ever find yourself "cleaning up" this filter, **stop**. It is the security boundary, not an accident.
+
+## Google sign-in from the console
+
+Separate from the env-var provider above, an admin with `auth.sso.edit` can connect a Google Workspace under **Admin → Sign-in**, with no restart. Its accounts are bound by Google's issuer and subject rather than by email, the ID token's `hd` claim must be in the allowed Workspace domains, and new accounts wait for an admin's approval by default. Existing accounts connect Google from their profile after a fresh second factor. Both providers can be configured at once; the login page shows a button for each.
+
+See [Sign in with Google](google-sign-in.md) for setup, approvals and the audit events.
 
 ## MFA + step-up (Slices H + I, current model)
 

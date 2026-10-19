@@ -15,7 +15,7 @@ edit their permission lists but can't delete the rows.
 
 | Role | Permissions | Notes |
 |---|---|---|
-| `admin` | `role.edit`, `user_role.edit`, `workflow.edit`, `policy.edit`, `agent.mint`, `agent.revoke`, `secret.request`, `secret.approve`, `audit.read` | |
+| `admin` | `role.edit`, `user_role.edit`, `workflow.edit`, `policy.edit`, `agent.mint`, `agent.revoke`, `secret.request`, `secret.approve`, `audit.read`, `auth.sso.edit` | `auth.sso.edit` is added by migration 0043, so the bootstrap admin can connect Google from the console. |
 | `approver` | `secret.approve`, `audit.read` | |
 | `developer` | `secret.request`, `secret.reveal.direct`, `audit.read` | |
 | `value_provider` | `secret.value.provide` | Slice N seed, used for the [cross-team flow](../operations/cross-team-requests.md). Assignment **must** carry a `team_id` scope; the Assignments form gates global grants behind a type-to-confirm. |
@@ -30,7 +30,7 @@ edit their permission lists but can't delete the rows.
 | Permission | Description |
 |---|---|
 | `role.edit` | Create / update / delete roles. |
-| `user_role.edit` | Grant / revoke role assignments to users. |
+| `user_role.edit` | Grant / revoke role assignments to users. A **global** grant also lists, approves and declines accounts [waiting for approval](../operations/google-sign-in.md#approve-new-accounts) (`/users/pending`, `/users/:id/approve`, `/users/:id/decline`); a team-scoped grant gets 403 there. |
 
 ### Workflows
 
@@ -57,6 +57,14 @@ edit their permission lists but can't delete the rows.
 | `secret.reveal.direct` | (Slice L4) Eligibility for the auto-executed direct-reveal path. The matched `policy_rules` row MUST ALSO have `direct_reveal_allowed=true` AND the environment's `kind` must be `non_prod`. Without all three, the user is routed through the standard request flow. PROD direct-reveal is impossible by construction. |
 | `secret.value.provide` | (Slice N) Holder appears in the [cross-team inbox](../operations/cross-team-requests.md) for the team scoped on the grant and can fill cross-team requests targeting it. **Team-scoped**: the grant carries `team_id` in `user_roles.scope`. The SPA sidebar's Inbox entry is fail-closed on this permission. |
 | `secret.security.approve` | (Slice N) Holder can cast the security vote on cross-team requests where the bound workflow has `requires_security_approval=true`. **Global in v1**; per-project / per-environment scoping is deferred. Adding this permission to a role triggers a type-to-confirm gate in the SPA Roles editor. |
+
+### Authentication
+
+| Permission | Description |
+|---|---|
+| `auth.sso.edit` | Connect and manage sign-in providers such as [Google](../operations/google-sign-in.md), and set the install's public address and the waiting limit. **Global only**: a scoped grant gets 403. Every write, the secret replacement, Test, Turn on and Turn off also need a fresh second factor. Whoever holds it decides who can sign in, so grant it like an admin permission. |
+
+A sign-in provider's **default role** (used only when approval is off) may hold only `secret.list`, `secret.request` and `audit.read`. The api refuses a role with anything else, and refuses to widen a role that is in use as a default (`409 role_is_sso_default`).
 
 ### Observability
 
@@ -93,7 +101,7 @@ gating on each endpoint lands as part of
 The Roles admin page calls `GET /api/v1/permissions` on mount and
 hydrates the chip picker from the response. The catalog includes
 the group label so the chips render in the same RBAC / Workflows /
-Agents / Secrets / Observability / Integrations groupings.
+Agents / Secrets / Authentication / Observability / Integrations groupings.
 
 If a role contains a permission string the catalog doesn't know
 about (e.g. a legacy custom permission from before

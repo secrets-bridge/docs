@@ -33,6 +33,7 @@ Every environment variable across `api` / `agent` / `worker` /
 | `SB_BOOTSTRAP_ADMIN_PASSWORD` | recommended on first boot |  | |
 | `SB_BOOTSTRAP_ADMIN_USER_ID` | optional |  | Opaque user_id for pre-OIDC role assignment |
 | `SB_GITOPS_ENABLED` | no | `false` | BRD §26 ArgoCD endpoints + observation fan-out |
+| `SB_PUBLIC_URL` | no |  | The install's public address, for example `https://secrets.example.com`. Sign-in redirect URIs are built from it, never from request headers. When set, the console shows it read-only; unset, an admin saves it under Admin → Sign-in. Must be `https`, with no user info, query or fragment; plain `http` only for `localhost` or a loopback address with `SB_ENV=dev`. An invalid value stops the api at boot. See [Sign in with Google](google-sign-in.md#1-set-the-public-address) |
 | `SB_OBJECTSTORE_BUCKET` | no |  | Bucket for media (logos). Unset, with no other `SB_OBJECTSTORE_*` set, turns object storage off. See [Object storage](object-storage.md) |
 | `SB_OBJECTSTORE_REGION` | yes with a bucket |  | Bucket region |
 | `SB_OBJECTSTORE_ENDPOINT` | no |  | `http://` or `https://` endpoint override for S3-compatible servers such as MinIO, or a VPC endpoint (`https://s3.example.com`). Unset for AWS S3. |
@@ -106,8 +107,10 @@ sources.
 | `SB_SWEEP_JOBS_INTERVAL` | no | `30s` | |
 | `SB_SWEEP_GITOPS_POLL_INTERVAL` | no | `15s` | |
 | `SB_SWEEP_GITOPS_TIMEOUT_INTERVAL` | no | `60s` | |
-| `SB_NOTIFICATION_WEBHOOK_URL` | no |  | Generic webhook |
-| `SB_NOTIFICATION_WEBHOOK_FORMAT_SLACK` | no | `false` | Wraps payload in `{text: ...}` |
+| `SB_WORKER_WEBHOOK_URL` | no |  | Generic webhook. Also turns on the waiting-account message, which goes to this webhook only |
+| `SB_WORKER_WEBHOOK_SLACK_FORMAT` | no | `false` | Wraps payload in `{text: ...}` |
+| `SB_WORKER_USERS_PENDING_INTERVAL` | no | `1m` | How often the `users-pending` sweeper posts about accounts waiting for approval, at most one message per run. At least `30s`, or the worker refuses to start. See [Sign in with Google](google-sign-in.md#notify-admins-from-the-worker) |
+| `SB_PUBLIC_URL` | no |  | Same variable as the api's, used for the link in the waiting-account message. Unset, the address saved in the console is used. An invalid value stops the worker at boot |
 
 ## controller
 

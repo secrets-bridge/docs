@@ -24,6 +24,70 @@ required to call it.
 | Method | Path | Auth | Notes |
 |---|---|---|---|
 | `POST` | `/api/v1/auth/login` | public | `{email, password}` → `{token, expires_at, user}` |
+| `GET` | `/api/v1/auth/providers` | public | Sign-in buttons for the login page: each enabled console provider, plus the env-var OIDC provider (`type: "oidc"`) when `SB_OIDC_ISSUER` is set. 120 a minute per IP |
+
+## Sign in with Google
+
+Google configured from the console. See
+[Sign in with Google](../operations/google-sign-in.md) for the flow. "Fresh
+MFA" means the route also runs `RequireFreshMFA` and answers
+`401 step_up_required` on a stale session.
+
+### Sign-in round trip
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| `GET` | `/api/v1/auth/sso/google/start` | public | Redirects to Google. 30 a minute per IP |
+| `GET` | `/api/v1/auth/sso/google/callback` | public | Google returns here. On success, sets the session cookie and redirects to `return_to`. **Every refusal redirects to `/login?error=sso`**, whatever the reason; the reason is in the audit log as `auth.sso.callback` `error_kind`. 60 a minute per IP |
+| `POST` | `/api/v1/auth/sso/google/connect` | bearer + fresh MFA | Starts Connect Google for the caller's account. Returns `{redirect_url}`; the callback comes back to `/me#sso_ticket=…` |
+| `POST` | `/api/v1/auth/sso/google/finish` | bearer | `{ticket}`. Redeems a Connect or Test ticket, only on the session that started it (`403 sso_ticket_refused` otherwise). Returns `{purpose, result}` with `result` `linked`, `ok` or `failed` (and `reason` for a failed test). A refused link is `409 link_refused` with a `reason` such as `identity_taken` |
+| `GET` | `/api/v1/users/me/identities` | bearer | Connected accounts: `provider_type`, `email`, `linked_at` |
+| `DELETE` | `/api/v1/users/me/identities/google` | bearer + fresh MFA | Disconnect. `409 identity_required` when the Google sign-in created the account |
+
+### Sign-in providers and settings
+
+Every route needs a **global** `auth.sso.edit`.
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| `GET` | `/api/v1/sso/providers` | `bearer + auth.sso.edit` | List. Each provider has `redirect_url` (empty until a public address is set) and `client_secret_set`, never the secret |
+| `POST` | `/api/v1/sso/providers` | `bearer + auth.sso.edit` + fresh MFA | `{type: "google", display_name, client_id, client_secret, allowed_domains, require_approval, default_role_id}`. Created turned off. `require_approval` defaults to `true` |
+| `GET` | `/api/v1/sso/providers/:id` | `bearer + auth.sso.edit` | One provider |
+| `PUT` | `/api/v1/sso/providers/:id` | `bearer + auth.sso.edit` + fresh MFA | Edit everything except the secret and `enabled`. A `client_secret` field gets `400` |
+| `PUT` | `/api/v1/sso/providers/:id/secret` | `bearer + auth.sso.edit` + fresh MFA | `{client_secret}`. Replace the secret |
+| `POST` | `/api/v1/sso/providers/:id/enable` | `bearer + auth.sso.edit` + fresh MFA | `409 provider_not_ready` with `missing` (`public_url`, `client_secret`, `allowed_domains`) |
+| `POST` | `/api/v1/sso/providers/:id/disable` | `bearer + auth.sso.edit` + fresh MFA | |
+| `POST` | `/api/v1/sso/providers/:id/test` | `bearer + auth.sso.edit` + fresh MFA | Starts a Test round trip, also while the provider is off. Returns `{redirect_url}`; the callback comes back to `/admin/sign-in#sso_ticket=…` |
+| `DELETE` | `/api/v1/sso/providers/:id` | `bearer + auth.sso.edit` + fresh MFA | Remove |
+| `GET` | `/api/v1/sso/settings` | `bearer + auth.sso.edit` | `public_url`, `public_url_source` (`env`, `console` or empty) and `pending_cap` |
+| `PUT` | `/api/v1/sso/settings` | `bearer + auth.sso.edit` + fresh MFA | `{public_url, pending_cap}`; either may be left out. `409 public_url_from_env` when `SB_PUBLIC_URL` is set. `pending_cap` is 1 to 10,000 |
+
+Stable error codes on these routes:
+
+| Code | Status | Meaning |
+|---|---|---|
+| `invalid_input` | 400 | A field failed validation; `field` names it |
+| `default_role_privileged` | 400 | The default role holds something other than `secret.list`, `secret.request` or `audit.read` |
+| `default_role_needs_approval_off` | 400 | A default role was set with approval on |
+| `env_provider_is_google` | 409 | `SB_OIDC_ISSUER` is already Google |
+| `provider_exists` | 409 | A Google provider already exists |
+| `provider_not_ready` | 409 | Turn on is missing something; see `missing` |
+| `public_url_from_env` | 409 | The address is set by `SB_PUBLIC_URL` |
+
+### Accounts waiting for approval
+
+Every route needs a **global** `user_role.edit`.
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| `GET` | `/api/v1/users/pending` | `bearer + user_role.edit` | Waiting accounts, oldest first, at most 100, with `total` for the count |
+| `POST` | `/api/v1/users/:id/approve` | `bearer + user_role.edit` | `{role_id, scope}`. Grants the role and clears the waiting flag in one transaction. `scope` uses the `POST /user-roles` rules; a malformed one gets `400`. `409 user_not_pending` for an account that isn't waiting |
+| `POST` | `/api/v1/users/:id/decline` | `bearer + user_role.edit` | Disables a waiting account. `409 user_not_pending` for any other account |
+
+A waiting account may call only `GET /api/v1/users/me` (which includes
+`pending_approval: true`), `POST /api/v1/auth/logout` and
+`POST /api/v1/auth/oidc/logout`. Everything else answers
+`403 account_pending_approval`.
 
 ## Agents
 
@@ -131,7 +195,7 @@ guide.
 | `POST` | `/api/v1/roles` | `bearer + role.edit` |
 | `GET` | `/api/v1/roles` | bearer |
 | `GET` | `/api/v1/roles/:id` | bearer |
-| `PUT` | `/api/v1/roles/:id/permissions` | `bearer + role.edit` |
+| `PUT` | `/api/v1/roles/:id/permissions` | `bearer + role.edit` | `409 role_is_sso_default` when the role is a sign-in provider's default role and the change would add a privileged permission |
 | `DELETE` | `/api/v1/roles/:id` | `bearer + role.edit` |
 | `POST` | `/api/v1/user-roles` | `bearer + user_role.edit` |
 | `GET` | `/api/v1/user-roles` | bearer |
