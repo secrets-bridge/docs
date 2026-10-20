@@ -17,17 +17,16 @@ routing: `/` → ui, `/api/v1/*` → api).
 |---|---|---|
 | `/` | Dashboard | KPI cards, pending approvals (preview), recent audit activity (preview), providers health (preview), **agents** card (real), requests-this-week chart (preview) |
 | `/requests` | Requests | My-requests filter pills (All / Pending / Approved / Rejected / Executed × patch / read) + Approver queue with inline Approve / Reject (with-reason) |
-| `/requests/:id` | Request detail | Timeline, Approvals, **Wraps** (single-shot Reveal modal, read flow), the **Argo CD (observed by Gateway …)** panel with Gateway evidence, a read-only **GitOps observations** card listing rows the retired control-plane poller wrote before the [cutover](../operations/gateway-cutover.md) (hidden when there are none), Details, Approver actions, Cancel-own |
+| `/requests/:id` | Request detail | Timeline, Approvals, **Wraps** (single-shot Reveal modal, read flow), the **Argo CD (observed by Gateway …)** panel with Gateway evidence, a muted **Argo CD history (before the Gateway)** card with the rows the retired control-plane poller wrote before the [cutover](../operations/gateway-cutover.md), read from `GET /requests/:id/gitops` and shown by `history_status` with the label *context only* (requester only, hidden when there are none), Details, Approver actions, Cancel-own |
 | `/agents` | Agents | Revoke confirm, and a Mint drawer with a **reveal-once panel** for the agent secret. The drawer calls the legacy direct mint, which the api refuses (`403`) unless the dev-only `SB_ALLOW_DIRECT_AGENT_MINT` is on; onboard agents by [enrollment](../operations/bootstrap.md#enrolling-your-first-agent) |
 | `/secrets` | Discovered secrets | Filter strip (cluster / provider / ref prefix / status / label chips), two-pane (table + sticky details with provider_config JSON) |
 | `/audit` | Audit log | Filter strip + correlation drill-in chip on every row, sticky details with metadata JSON |
-| `/admin/projects` | Projects | Master-detail (340px project rail + envs panel); soft-delete via archive/restore |
+| `/admin/projects` | Projects | Master-detail (340px project rail + envs panel); soft-delete via archive/restore. The **Observation** column shows each environment's source (**Gateway** or **None**) to `gateway.list` holders; **Change…** appears only with `gateway.bind` |
 | `/admin/roles` | Roles | Permission chip picker hydrated from `GET /permissions` (canonical catalog) |
 | `/admin/assignments` | Assignments | User × role × scope table; scope chips with `=` separator |
 | `/admin/workflows` | Workflows | TTL knobs, min approvers, justification required |
 | `/admin/policies` | Policies | Selector → workflow priority-ordered list |
 | `/admin/gateways` | Gateways | Create, enroll, approve connectors, bind targets, disable, enable and revoke [Gateways](../operations/gateway.md) |
-| `/admin/integrations` | Integrations | Leftover page for the retired control-plane Argo CD endpoints and app mappings. The api no longer serves those routes, so the page shows its feature-off banner. Ignore its advice to set `SB_GITOPS_ENABLED`, which is a [retired setting](../operations/config.md#retired-settings). Argo CD is configured on the Gateway |
 | `/login` | Login | Real email + password against `POST /auth/login`, which sets the HttpOnly session cookie |
 
 ## Hard rules baked into the SPA

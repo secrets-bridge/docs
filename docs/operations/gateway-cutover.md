@@ -97,7 +97,8 @@ Migration `0049`:
   readable to the requester at `GET /api/v1/requests/:id/gitops`, each labelled
   `history_context_only` with a `history_status`
   ([API reference](../reference/api-endpoints.md#requests-access-requests)). The console shows
-  them in the read-only **GitOps observations** card on the request page.
+  them to the requester in the muted **Argo CD history (before the Gateway)**
+  card on the request page, which is hidden when a request has none.
 
 The migration is idempotent: a second run drops nothing, moves nothing and
 writes no audit row.
@@ -188,11 +189,11 @@ curl -fsS -b "$JAR" "$CP/api/v1/audit-events?actor=system:migration&action=envir
    The source is read when a request reaches `executed`, so requests executed
    before the switch get no tasks.
 
-7. **Ignore the leftover Argo CD integration page** in the console
-   (Admin → Integrations). The api no longer serves its routes, so it shows a
-   feature-off banner. Its advice to set `SB_GITOPS_ENABLED` does not apply.
-   The Observation dialog may still list **Control plane**; saving it answers
-   `source_retired`.
+7. **Use the console as it is now.** Admin → Integrations and its Argo CD
+   endpoint and app-mapping pages are gone. Argo CD is configured on the
+   Gateway (Admin → Gateways). On a project's **Environments** tab, the
+   **Observation** dialog offers **Gateway** and **None**; an environment with
+   no stored source shows **None**.
 
 ## Rollback
 

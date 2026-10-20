@@ -388,10 +388,12 @@ observer to fall back to. Switching away from `gateway` cancels the
 environment's open Gateway tasks with the reason `source_changed`. The requests
 themselves are not affected.
 
-In the console (needs `gateway.bind`), open **Admin → Projects**, select the
-project, and find the environment on the **Environments** tab. The
-**Observation** column shows the current source. Select **Change…**, choose
-**Gateway** in the **Observation for** dialog, and select **Save**.
+In the console, open **Admin → Projects**, select the project, and find the
+environment on the **Environments** tab. The **Observation** column shows the
+current source, **Gateway** or **None**, to anyone with `gateway.list`. With
+`gateway.bind`, select **Change…**, choose **Gateway** in the
+**Observation for** dialog, and select **Save**. The dialog offers only
+**Gateway** and **None**.
 
 With `curl`, the route needs `gateway.bind` and a fresh second factor (step 2).
 The body holds no secret, so it can go on the command line:
@@ -431,9 +433,9 @@ variable, so a value in the env Secret is overridden; the intervals are under
 
 The intervals and floors are in the
 [configuration reference](config.md#worker). Without the sweepers, a claim
-still takes over an expired lease, and reading a request's observations closes
-that request's overdue tasks. Tasks of requests nobody opens stay open past
-their deadline, and Gateways never turn `stale`.
+still takes over an expired lease, and a request's observations show an
+overdue task as timed out (`timed_out_at_read`) without closing it. The task
+row stays open past its deadline, and Gateways never turn `stale`.
 
 ## 10. Check a request
 
@@ -447,7 +449,8 @@ panel titled **Argo CD (observed by Gateway tenant-a-uat)**, marked
   of the request. The panel refreshes every 20 seconds while the rollup is
   pending, and when the window regains focus.
 - For each task, the Gateway, the verdict, the task state and its deadline or
-  closing time, and the reason in words, for example "Only Argo CD context was
+  closing time ("deadline passed" when the deadline is over but the sweeper
+  has not closed the task yet), and the reason in words, for example "Only Argo CD context was
   observed. Argo CD health and sync are operational state, never proof that
   the new value reached the app."
 - For the Argo CD stage, the outcome (**Observed** or **Not observed**), the

@@ -101,8 +101,10 @@ Being built now; not yet live or certified. Do not depend on these yet.
     - the cutover ([gateway#13](https://github.com/secrets-bridge/gateway/issues/13)):
       the Gateway is the only component that talks to Argo CD. The control
       plane's Argo CD poller, its endpoint and app-mapping routes and the
-      stored Argo CD tokens are removed, and `GET /requests/:id/gitops`
-      serves the old poller rows as read-only history. See
+      stored Argo CD tokens are removed, along with the console's
+      Integrations pages. `GET /requests/:id/gitops` serves the old poller
+      rows as read-only history, shown on the request page as context only.
+      See
       [Gateway cutover](../operations/gateway-cutover.md).
 
     Argo CD `Healthy` and `Synced` are operational state, never proof that a
