@@ -1,7 +1,7 @@
 # Configuration reference
 
 Every environment variable across `api` / `agent` / `worker` /
-`controller`. Defaults shown match the source tree as of v0.X.
+`controller` / `gateway`. Defaults shown match the source tree as of v0.X.
 
 ## api
 
@@ -128,6 +128,47 @@ Every duration is a Go duration (`30s`, `5m`, `1h`) and must be greater than zer
 | `METRICS_ADDR` | no | `:8080` | Prometheus exposition |
 | `WATCH_NAMESPACE` | no | "" (all) | Limit reconciliation scope |
 
+## gateway
+
+The [Gateway](../components/gateway.md) binary. Each variable also has a flag
+(`gateway -h`); a flag overrides its variable. A malformed value stops the boot
+instead of falling back to the default. The
+[`secrets-bridge-gateway` chart](https://github.com/secrets-bridge/charts/blob/main/gateway/README.md)
+sets these from its values, and the
+[gateway README](https://github.com/secrets-bridge/gateway#configuration) is the
+source for this table.
+
+| Env var | Required | Default | Notes |
+|---|---|---|---|
+| `SB_CP_ENDPOINT` | **yes** |  | `https://cp.example.com`. `https://` only, unless `SB_INSECURE_TRANSPORT=true`. No userinfo |
+| `SB_INSECURE_TRANSPORT` | no | `false` | Dev only: allows `http://` to the control plane and to every Argo CD `base_url`. See [Insecure switches](#insecure-switches-dev-only) |
+| `SB_CP_CA_FILE` | no |  | PEM bundle that replaces the system roots for the control plane |
+| `SB_CP_TLS_SERVER_NAME` | no |  | TLS server name override |
+| `SB_GATEWAY_IDENTITY_FILE` | no | `/etc/secrets-bridge/gateway/identity.json` | `{"gateway_id": "...", "gateway_secret": "..."}` from enrollment. Mode `0400`, `0600` or `0440` (what a Secret volume with `fsGroup` produces). Any bit for other users, or group write, is refused at boot |
+| `SB_GATEWAY_ID` / `SB_GATEWAY_SECRET` | no |  | Credential pair as env vars. When both are unset the identity file is read. The chart does not use them |
+| `SB_GATEWAY_LOCAL_ADDR` | no | `127.0.0.1:8091` | `/healthz`, `/readyz` and `/metrics`. Must be a literal loopback IP; `localhost` is refused |
+| `SB_GATEWAY_CONNECTORS_FILE` | no |  | JSON list of locally bound connectors. Empty binds none. The chart renders it into a ConfigMap |
+| `SB_GATEWAY_ENABLE_R2_CONNECTORS` | no | `false` | Binds the Release 2 `eso` and `rollout` kinds. Not supported for production: the Gateway logs a WARN at boot while it is on. When off, a connectors file that names either kind is refused. The chart never sets it |
+| `SB_GATEWAY_SHUTDOWN_GRACE` | no | `15s` | Half is spent waiting for passes in flight, then unfinished tasks are released |
+| `SB_GATEWAY_HEARTBEAT_INTERVAL` | no | `30s` | Used until the control plane suggests an interval |
+| `SB_GATEWAY_CLAIM_INTERVAL` | no | `5s` | Base claim interval, jittered between half and one and a half times |
+| `SB_GATEWAY_CLAIM_IDLE_MAX` | no | `30s` | Longest claim interval after empty polls. Not shorter than the claim interval |
+| `SB_GATEWAY_CLAIM_CONCURRENCY` | no | `1` | Observation passes in flight per replica, 1 to 16 |
+| `SB_GATEWAY_LEASE_MARGIN` | no | `3s` | A pass stops this long before its lease expires |
+| `SB_GATEWAY_PASS_TIMEOUT` | no | `30s` | Upper bound for one pass |
+| `SB_GATEWAY_CP_UNREACHABLE_AFTER` | no | `2m` | The Gateway turns not ready when no heartbeat has been accepted for this long |
+| `SB_LOG_LEVEL` | no | `info` | `debug`, `info`, `warn` or `error` |
+
+The Gateway ignores `HTTP_PROXY` and `HTTPS_PROXY` for every connection, so a
+bearer credential never reaches a proxy.
+
+Each entry in the connectors file has a `name` (a DNS label the control plane
+binds to), a `kind` and `settings`. For `argocd` the settings are `base_url`,
+`token_file` (an absolute path), optional `ca_file`, `tls_server_name` and
+`timeout` (1s to 60s, default 10s), `allowed_projects` (at least one AppProject)
+and `applications` (at least one `{id, name, app_namespace?}`). Unknown fields,
+unknown kinds and duplicate names are refused at load.
+
 ## Secret material, naming convention
 
 | Material | What it is | Where it lives | Rotation |
@@ -136,6 +177,9 @@ Every duration is a Go duration (`30s`, `5m`, `1h`) and must be greater than zer
 | `SB_KMS_VAULT_TOKEN` | Vault token for the `vault-transit` backend | api env / K8s Secret | Lease-tracked; refresh via Vault rotation |
 | Agent identity (`agent_id` + `agent_secret`) | Per-agent credential, sent as `X-Agent-Secret` | `SB_IDENTITY_FILE` on a persistent volume (or `SB_AGENT_ID` / `SB_AGENT_SECRET`) | Revoke the agent, create a new enrollment token, re-enroll with an empty identity file |
 | `SB_ENROLLMENT_TOKEN` | One-time enrollment token | K8s Secret, read on first boot | Single use; expires after 15 minutes by default |
+| Gateway identity (`gateway_id` + `gateway_secret`) | Per-Gateway credential, sent as `X-Gateway-Secret` | An existing K8s Secret, mounted read-only as `SB_GATEWAY_IDENTITY_FILE` | No rotation in Release 1: revoke the Gateway, create a new one, enroll it and update the Secret |
+| Gateway enrollment token | One-time token from `POST /api/v1/admin/gateways/:id/enrollment-token` | Used once from the operator's workstation, never stored in the cluster | Single use; expires after 15 minutes by default |
+| Argo CD token for the Gateway | Read-only token of a local Argo CD account (`applications, get`) | An existing K8s Secret, mounted as a file per connector | Update the Secret; the Gateway re-reads the file |
 | `SB_BOOTSTRAP_ADMIN_PASSWORD` | Seed admin password | api env at first boot | **Rotate immediately after first sign-in** |
 
 None of these should ever appear in:
@@ -164,6 +208,8 @@ None of these should ever appear in:
 | `SB_PROVIDER_CONN_REJECT_SECRETS=false` | api | `true` | Turns off the check that rejects secret-shaped values (AWS keys, Vault tokens, JWTs, OAuth tokens) in provider-connection scope. Credential-shaped key names are still refused. | WARN log at boot |
 | `SB_MFA_DEV_ALLOW_PWD=true` | api | `false` | Treats every live session as MFA-fresh, so step-up-gated actions (approve, reveal, role and provider edits) need only a password sign-in | api refuses to boot unless `SB_ENV=dev`; WARN log at boot |
 | `SB_INSECURE_TRANSPORT=true` | agent | `false` | Allows a plain `http://` control-plane endpoint, so the agent credential and job traffic cross the network unencrypted | WARN log at boot; the `agent` chart refuses an `http://` endpoint unless `cp.insecureTransport=true` |
+| `SB_INSECURE_TRANSPORT=true` | gateway | `false` | Allows plain `http://` to the control plane and to every Argo CD endpoint, so the Gateway credential and the Argo CD token cross the network unencrypted | WARN log at boot; the `secrets-bridge-gateway` chart refuses an `http://` URL unless `insecureTransport=true` |
+| `SB_GATEWAY_ENABLE_R2_CONNECTORS=true` | gateway | `false` | Binds the Release 2 `eso` and `rollout` connectors, which read the Kubernetes API. Not supported for production | WARN log at boot. The Kubernetes self-check still refuses any access to Secrets. The gateway chart never sets it |
 
 The [hardening checklist](index.md#hardening-checklist-before-exposing-to-anyone)
 checks each of these before a deployment is exposed.

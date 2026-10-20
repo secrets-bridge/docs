@@ -13,13 +13,14 @@ Everything you need to run Secrets Bridge.
 | [Bootstrap & first sign-in](bootstrap.md) | After the stack is up, how to sign in, enroll your first agent, run your first request |
 | [Sign in with Google](google-sign-in.md) | Connecting a Google Workspace from the console and approving new accounts (in progress) |
 | [Object storage](object-storage.md) | Setting up an S3 or S3-compatible bucket for media such as logos (in progress) |
+| [Gateway](gateway.md) | Installing and enrolling an optional Gateway for Argo CD observation (Release 1, in progress) |
 | [Verifying images and charts](verifying-releases.md) | Checking the cosign signature, SBOM and provenance of images and charts before you deploy them |
-| [Configuration reference](config.md) | Exhaustive env-var table for `api` / `agent` / `worker` / `controller`, plus the dev-only insecure switches |
+| [Configuration reference](config.md) | Exhaustive env-var table for `api` / `agent` / `worker` / `controller` / `gateway`, plus the dev-only insecure switches |
 | [Troubleshooting](troubleshooting.md) | When things go wrong, common pitfalls + how to read the audit log |
 
 ## Production deployment
 
-Install with the two Helm charts from the
+Install with the Helm charts from the
 [`charts`](https://github.com/secrets-bridge/charts) repo. Both publish as
 OCI artifacts on GHCR:
 
@@ -27,6 +28,7 @@ OCI artifacts on GHCR:
 |---|---|---|
 | `secrets-bridge` | `oci://ghcr.io/secrets-bridge/charts/secrets-bridge` | api, ui, worker and controller behind one Ingress, in the control-plane cluster |
 | `secrets-bridge-agent` | `oci://ghcr.io/secrets-bridge/charts/secrets-bridge-agent` | One outbound-only agent per workload cluster or account |
+| `secrets-bridge-gateway` | `oci://ghcr.io/secrets-bridge/charts/secrets-bridge-gateway` | Optional. One read-only Gateway per boundary for Argo CD observation ([Gateway](gateway.md), Release 1 in progress) |
 
 Images publish to `ghcr.io/secrets-bridge/` as well. Until the first
 `v0.1.0` release, chart versions look like `0.0.1-dev.<sha>`; pin an exact

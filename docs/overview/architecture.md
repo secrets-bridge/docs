@@ -3,6 +3,11 @@
 The platform splits into three loosely-coupled tiers and one
 metadata index. Each tier holds one type of trust: the Control
 Plane decides; the Agent executes; the Providers own the values.
+An optional [Gateway](../components/gateway.md) observes: it runs next to
+the workloads, reads Argo CD rollout state without changing anything, and
+reports metadata to the Control Plane over its own outbound connection.
+Release 1 of the Gateway is in progress; see
+[Product status](product-status.md#in-progress).
 
 ```mermaid
 flowchart LR
@@ -24,6 +29,8 @@ flowchart LR
 
     subgraph workload ["Workload network (per cluster)"]
         Agent["agent<br/>outbound only"]
+        Gateway["gateway (optional)<br/>outbound only, read-only"]
+        ArgoCD["Argo CD"]
         Vault[("HashiCorp Vault")]
         AWSSM[("AWS Secrets Manager")]
         AzureKV[("Azure Key Vault")]
@@ -41,6 +48,8 @@ flowchart LR
     Agent --> AWSSM
     Agent --> AzureKV
     Agent --> GCPSM
+    Gateway -->|"outbound HTTPS"| API
+    Gateway -->|"GET only"| ArgoCD
 ```
 
 ## Trust boundaries: what holds what
@@ -53,6 +62,7 @@ flowchart LR
 | **Redis** | Idempotency tokens, distributed locks, rate-limit windows, pub/sub messages | Any value-bearing payload (the `runtime` package doesn't even expose a generic `Set()` ) |
 | **Worker** | The same Postgres + Redis access as the API | Provider credentials, plaintext values |
 | **Agent** | Provider credentials *for its own network boundary*, plaintext values for the duration of one request | Anything from another cluster / account; no inbound listener; no Postgres / Redis client |
+| **Gateway** (optional) | Its own credential for the Control Plane and a read-only Argo CD token, both as read-only files in its own boundary | Secret values, provider credentials, Kubernetes RBAC on Secrets, any write access; no inbound listener except loopback health; no Postgres / Redis client; no path to the agent |
 | **Providers** | The actual secret values | n/a (these are unchanged systems) |
 
 ## The four request lifecycles
@@ -148,6 +158,15 @@ flowchart LR
     Off by default. Enable with `SB_GITOPS_ENABLED=true` on the api
     AND `SB_WORKER_GITOPS_ENABLED=true` on the worker.
 
+    This is today's path: the worker calls Argo CD from the Control
+    Plane with a KMS-wrapped token. The [Gateway](../components/gateway.md)
+    replaces it with observation from inside your boundary once its
+    observation tasks are merged
+    ([api#294](https://github.com/secrets-bridge/api/issues/294)) and the
+    cutover in [gateway#13](https://github.com/secrets-bridge/gateway/issues/13)
+    is done. Either way, `Healthy` and `Synced` are Argo CD operational
+    state, not proof that the workload picked up the new value.
+
     ```mermaid
     sequenceDiagram
         participant API
@@ -191,7 +210,7 @@ Storage envelope (Piece 8a)  - DB exfiltration, offline backup theft
 
 ## Why polyrepo
 
-Eight repositories, one product. The `core` library is infra-free
+Nine repositories, one product. The `core` library is infra-free
 (no Postgres driver, no Redis client, no Fiber import), so the
 `agent` and `controller` can depend on it without pulling in
 storage. The `api` and `worker` share Postgres/Redis but the worker

@@ -33,6 +33,14 @@ The collection of `api` + `worker` + `Postgres` + `Redis` + a `KMS`
 backend. Makes decisions, holds metadata, never holds plaintext
 values.
 
+#### Gateway
+An optional, outbound-only, read-only process that runs inside your
+boundary and reports Argo CD rollout state to the control plane as
+metadata. It never writes, never reads Kubernetes Secrets and has no
+path to the agent. Argo CD `Healthy` and `Synced` are operational
+state, not proof that a secret reached a workload. Release 1 is in
+progress; see [Gateway](../components/gateway.md).
+
 #### KMS backend
 The pluggable envelope-encryption layer. Three implementations ship:
 `local` (dev only, master key in `SB_WRAP_MASTER_KEY`),

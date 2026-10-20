@@ -77,6 +77,24 @@ Being built now; not yet live or certified. Do not depend on these yet.
   webhook message per run about waiting accounts. Merged in the api,
   console and worker, not yet through QA. See
   [Sign in with Google](../operations/google-sign-in.md).
+- **Gateway, Release 1 (Argo CD)**: an optional, outbound-only, read-only
+  component that runs in your boundary and reports Argo CD rollout state as
+  metadata. Merged: the Gateway binary (Argo CD connector only, signed image),
+  its Helm chart (no RBAC, no service-account token, egress-only
+  NetworkPolicy) and the control-plane registry (enrollment, heartbeat,
+  catalog, connector approval, bindings, revoke, `gateway.*` permissions).
+  Not merged: observation tasks and evidence
+  ([api#294](https://github.com/secrets-bridge/api/issues/294)), their
+  sweepers ([worker#38](https://github.com/secrets-bridge/worker/issues/38)),
+  the console page and the request-page display
+  ([ui#163](https://github.com/secrets-bridge/ui/issues/163)), and the cutover
+  that makes the Gateway the only Argo CD integration
+  ([gateway#13](https://github.com/secrets-bridge/gateway/issues/13)). Until
+  then a Gateway enrolls and reports its catalog but receives no observation
+  tasks, and Argo CD state on a request comes from the control plane's poller
+  (`SB_GITOPS_ENABLED`). Argo CD `Healthy` and `Synced` are operational state,
+  never proof that a secret reached a workload. See
+  [Gateway](../components/gateway.md).
 
 ## Live vs Roadmap
 
@@ -101,6 +119,11 @@ Being built now; not yet live or certified. Do not depend on these yet.
 - HashiCorp Vault advanced flows
 - Deeper Kubernetes External Secrets integration
 - Flux integration
+- Gateway Release 2: External Secrets Operator sync and Deployment rollout
+  observation (in the gateway code, off by default and not supported for
+  production)
+- Signed Gateway evidence ([gateway#7](https://github.com/secrets-bridge/gateway/issues/7)),
+  required before Gateway evidence is used as compliance evidence
 - Agent connection-scoped job claim
 - Richer agent fleet dashboard
 

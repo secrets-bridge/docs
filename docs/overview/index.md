@@ -39,7 +39,8 @@ replace them.
 | [`worker`](../components/worker.md) | Shipped | Sweepers, scheduler, notifications, GitOps poller |
 | [`controller`](../components/controller.md) | Shipped | Kubernetes CRD reconciler ported from v0.1.0 |
 | [`ui`](../components/ui.md) | Shipped | React SPA: dashboard, requests, agents, admin, audit, secrets |
-| [`charts`](https://github.com/secrets-bridge/charts) | Shipped | Hardened Helm charts for the control plane and the agent, published to GHCR |
+| [`gateway`](../components/gateway.md) | In progress | Release 1: read-only Argo CD observation. Binary, chart and control-plane registry merged; observation tasks not yet |
+| [`charts`](https://github.com/secrets-bridge/charts) | Shipped | Hardened Helm charts for the control plane and the agent, published to GHCR. The Gateway chart is part of Gateway Release 1 |
 | [`docs`](https://github.com/secrets-bridge/docs) | You're reading it | mkdocs-material |
 
 ## What's intentionally out of scope

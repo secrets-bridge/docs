@@ -5,8 +5,8 @@ description: Check the cosign signature, SBOM and build provenance of Secrets Br
 
 # Verifying images and charts
 
-Every container image (`api`, `ui`, `worker`, `agent`, `controller`) and
-both Helm charts are signed by the GitHub Actions workflow that built them,
+Every container image (`api`, `ui`, `worker`, `agent`, `controller`,
+`gateway`) and every Helm chart is signed by the GitHub Actions workflow that built them,
 using cosign keyless signing. Each image also carries an SPDX SBOM and SLSA
 build provenance. Verify them before you deploy, and pin images by digest
 in production, as the charts require.
@@ -22,8 +22,8 @@ in production, as the charts require.
 
 | Artifact | Where | Signed by | Attached |
 |---|---|---|---|
-| Images | `ghcr.io/secrets-bridge/<api\|ui\|worker\|agent\|controller>` | `https://github.com/secrets-bridge/<repo>/.github/workflows/docker-publish.yml@<ref>` | SPDX SBOM, SLSA provenance |
-| Charts | `oci://ghcr.io/secrets-bridge/charts/secrets-bridge` and `.../secrets-bridge-agent` | `https://github.com/secrets-bridge/charts/.github/workflows/chart-publish.yml@<ref>` | none |
+| Images | `ghcr.io/secrets-bridge/<api\|ui\|worker\|agent\|controller\|gateway>` | `https://github.com/secrets-bridge/<repo>/.github/workflows/docker-publish.yml@<ref>` | SPDX SBOM, SLSA provenance |
+| Charts | `oci://ghcr.io/secrets-bridge/charts/secrets-bridge`, `.../secrets-bridge-agent` and `.../secrets-bridge-gateway` | `https://github.com/secrets-bridge/charts/.github/workflows/chart-publish.yml@<ref>` | none |
 
 `<ref>` is `refs/tags/vX.Y.Z` for a release and `refs/heads/main` for a
 `main` build. The image signature covers the multi-arch index and each
