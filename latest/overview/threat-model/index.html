@@ -793,6 +793,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#gateway-release-1-in-progress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway (Release 1, in progress)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#authentication-authorization" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -896,6 +907,8 @@
       
         
           
+        
+      
         
       
         
@@ -1065,6 +1078,34 @@
     
   
     Controller (Kubernetes)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -1318,6 +1359,8 @@
       
         
           
+        
+      
         
       
         
@@ -1701,6 +1744,34 @@
     
   
     Provider connections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -2112,6 +2183,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#gateway-release-1-in-progress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway (Release 1, in progress)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#authentication-authorization" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2298,6 +2380,41 @@ that isn't possible, code review is the gate.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="gateway-release-1-in-progress">Gateway (Release 1, in progress)<a class="headerlink" href="#gateway-release-1-in-progress" title="Permanent link">&para;</a></h3>
+<p>The <a href="../../components/gateway/">Gateway</a> is optional and its observation path is
+not merged yet. These rules hold in the merged binary, chart and registry. The
+full STRIDE analysis is the
+<a href="https://github.com/secrets-bridge/gateway/blob/main/docs/design/threat-model.md">Gateway threat model</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>How it's enforced</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The Gateway changes nothing it observes</td>
+<td>Argo CD is read through a transport pinned to the configured origin that allows GET to two paths only; every other method, path and query key is refused before the request leaves the process. The control-plane client refuses any route outside the Gateway endpoints</td>
+</tr>
+<tr>
+<td>The Gateway never reads Kubernetes Secrets</td>
+<td>Release 1 has no Kubernetes access: the chart renders no Role and mounts no service-account token. The Release 2 Kubernetes connectors refuse to start if the service account can use any verb on <code>secrets</code> or a write verb on what they read, with no override</td>
+</tr>
+<tr>
+<td>The control plane cannot redirect the Gateway</td>
+<td>A task names a connector id and a target id only. Hosts, AppProjects and Applications come from the Gateway's local configuration</td>
+</tr>
+<tr>
+<td>Gateway and agent credentials are separate</td>
+<td>Own tables, <code>X-Gateway-Secret</code> header and <code>GatewayAuth</code> middleware. The secret is stored as a SHA-256 hash and compared in constant time</td>
+</tr>
+<tr>
+<td>Argo CD health is never proof of propagation</td>
+<td>The Argo CD connector reports at most <code>observed</code> with confidence <code>low</code> and attaches the caveat <code>argocd_health_not_proof</code>. The verdict rules in <a href="https://github.com/secrets-bridge/gateway/blob/main/docs/adr/0001-gateway-observation-plane.md">ADR 0001</a>, which arrive with <a href="https://github.com/secrets-bridge/api/issues/294">api#294</a>, never count that stage toward a verdict, and leave a request with no Gateway evidence unverified, never failed</td>
+</tr>
+</tbody>
+</table>
 <h3 id="authentication-authorization">Authentication &amp; authorization<a class="headerlink" href="#authentication-authorization" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -2430,6 +2547,11 @@ that isn't possible, code review is the gate.</p>
 <td>KMS master key rotation breaks the platform</td>
 <td>Operator can't rotate without downtime</td>
 <td><strong>Open</strong>: tested runbook is <a href="https://github.com/secrets-bridge/api/issues/31">api#31</a></td>
+</tr>
+<tr>
+<td>Customer admin who controls a Gateway</td>
+<td>Report false Argo CD state for their own requests</td>
+<td><strong>Accepted for Release 1</strong>: evidence is customer-side attestation, and the design labels it with the Gateway that observed it. Signed evidence is <a href="https://github.com/secrets-bridge/gateway/issues/7">gateway#7</a> and must ship before Gateway evidence is presented as compliance evidence</td>
 </tr>
 <tr>
 <td>DBA with direct Postgres access</td>

@@ -755,6 +755,8 @@
       
         
       
+        
+      
     
     
     
@@ -910,6 +912,34 @@
     
   
     Controller (Kubernetes)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -1165,6 +1195,8 @@
       
         
           
+        
+      
         
       
         
@@ -1549,6 +1581,34 @@
     
   
     Provider connections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -2094,8 +2154,8 @@
 
 
 <h1 id="verifying-images-and-charts">Verifying images and charts<a class="headerlink" href="#verifying-images-and-charts" title="Permanent link">&para;</a></h1>
-<p>Every container image (<code>api</code>, <code>ui</code>, <code>worker</code>, <code>agent</code>, <code>controller</code>) and
-both Helm charts are signed by the GitHub Actions workflow that built them,
+<p>Every container image (<code>api</code>, <code>ui</code>, <code>worker</code>, <code>agent</code>, <code>controller</code>,
+<code>gateway</code>) and every Helm chart is signed by the GitHub Actions workflow that built them,
 using cosign keyless signing. Each image also carries an SPDX SBOM and SLSA
 build provenance. Verify them before you deploy, and pin images by digest
 in production, as the charts require.</p>
@@ -2120,13 +2180,13 @@ the workflow running on <code>refs/heads/main</code>.</p>
 <tbody>
 <tr>
 <td>Images</td>
-<td><code>ghcr.io/secrets-bridge/&lt;api\|ui\|worker\|agent\|controller&gt;</code></td>
+<td><code>ghcr.io/secrets-bridge/&lt;api\|ui\|worker\|agent\|controller\|gateway&gt;</code></td>
 <td><code>https://github.com/secrets-bridge/&lt;repo&gt;/.github/workflows/docker-publish.yml@&lt;ref&gt;</code></td>
 <td>SPDX SBOM, SLSA provenance</td>
 </tr>
 <tr>
 <td>Charts</td>
-<td><code>oci://ghcr.io/secrets-bridge/charts/secrets-bridge</code> and <code>.../secrets-bridge-agent</code></td>
+<td><code>oci://ghcr.io/secrets-bridge/charts/secrets-bridge</code>, <code>.../secrets-bridge-agent</code> and <code>.../secrets-bridge-gateway</code></td>
 <td><code>https://github.com/secrets-bridge/charts/.github/workflows/chart-publish.yml@&lt;ref&gt;</code></td>
 <td>none</td>
 </tr>

@@ -7,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Eight repositories, one product. What each repo holds, what it deliberately doesn't, and the one-way dependency graph that keeps the agent infra-free.">
+        <meta name="description" content="Nine repositories, one product. What each repo holds, what it deliberately doesn't, and the one-way dependency graph that keeps the agent infra-free.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
@@ -84,7 +84,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Secrets Bridge" />
   <meta property="og:title" content="Components" />
-  <meta property="og:description" content="Eight repositories, one product. What each repo holds, what it deliberately doesn't, and the one-way dependency graph that keeps the agent infra-free." />
+  <meta property="og:description" content="Nine repositories, one product. What each repo holds, what it deliberately doesn't, and the one-way dependency graph that keeps the agent infra-free." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/components/" />
   <meta property="og:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
@@ -95,7 +95,7 @@
   
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Components" />
-  <meta name="twitter:description" content="Eight repositories, one product. What each repo holds, what it deliberately doesn't, and the one-way dependency graph that keeps the agent infra-free." />
+  <meta name="twitter:description" content="Nine repositories, one product. What each repo holds, what it deliberately doesn't, and the one-way dependency graph that keeps the agent infra-free." />
   <meta name="twitter:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   
@@ -117,7 +117,7 @@
     "@context": "https://schema.org",
     "@type": "TechArticle",
     "headline": "Components",
-    "description": "Eight repositories, one product. What each repo holds, what it deliberately doesn't, and the one-way dependency graph that keeps the agent infra-free.",
+    "description": "Nine repositories, one product. What each repo holds, what it deliberately doesn't, and the one-way dependency graph that keeps the agent infra-free.",
     "url": "https://secrets-bridge.io/latest/components/",
     "image": "https://secrets-bridge.io/latest/assets/og-banner.png",
     "publisher": {
@@ -757,6 +757,8 @@
       
         
       
+        
+      
     
     
     
@@ -913,6 +915,34 @@
     
   
     Controller (Kubernetes)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -1166,6 +1196,8 @@
       
         
           
+        
+      
         
       
         
@@ -1569,6 +1601,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../operations/gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../operations/object-storage/" class="md-nav__link">
         
   
@@ -1948,7 +2008,7 @@
 
 
 <h1 id="components">Components<a class="headerlink" href="#components" title="Permanent link">&para;</a></h1>
-<p>The project is split into eight repositories under the
+<p>The project is split into nine repositories under the
 <a href="https://github.com/secrets-bridge"><code>secrets-bridge</code></a> GitHub
 organisation. Each one has a single responsibility; the dependency
 direction is one-way and reviewable.</p>
@@ -1987,6 +2047,11 @@ direction is one-way and reviewable.</p>
 <td>Kubernetes CRD reconciler. Receives the v0.1.0 operator.</td>
 </tr>
 <tr>
+<td><a href="gateway/"><code>gateway</code></a></td>
+<td>Go</td>
+<td>Optional, outbound-only, read-only observation of Argo CD rollout state. <strong>No Postgres / Redis, no Kubernetes client in Release 1.</strong> Release 1 in progress.</td>
+</tr>
+<tr>
 <td><a href="ui/"><code>ui</code></a></td>
 <td>React + TS + Vite</td>
 <td>SPA dashboard. No SSR.</td>
@@ -1994,7 +2059,7 @@ direction is one-way and reviewable.</p>
 <tr>
 <td><a href="https://github.com/secrets-bridge/charts"><code>charts</code></a></td>
 <td>Helm / YAML</td>
-<td>Helm charts for the control plane and the agent (<a href="../operations/#production-deployment">production deployment</a>).</td>
+<td>Helm charts for the control plane, the agent and the Gateway (<a href="../operations/#production-deployment">production deployment</a>).</td>
 </tr>
 <tr>
 <td><code>docs</code></td>
@@ -2010,6 +2075,7 @@ direction is one-way and reviewable.</p>
     worker["worker&lt;br/&gt;sweepers + gitops"]
     agent["agent&lt;br/&gt;outbound only"]
     controller["controller&lt;br/&gt;K8s reconciler"]
+    gateway["gateway&lt;br/&gt;outbound only,&lt;br/&gt;read-only"]
     ui["ui&lt;br/&gt;React SPA"]
     charts["charts&lt;br/&gt;Helm bundle"]
 
@@ -2020,11 +2086,13 @@ direction is one-way and reviewable.</p>
     agent -.-&gt;|"HTTPS only"| api
     controller --&gt;|"imports"| core
     ui -.-&gt;|"HTTPS only"| api
+    gateway -.-&gt;|"HTTPS only"| api
     charts -.-&gt;|"deploys"| api
     charts -.-&gt;|"deploys"| worker
     charts -.-&gt;|"deploys"| agent
     charts -.-&gt;|"deploys"| controller
-    charts -.-&gt;|"deploys"| ui</code></pre>
+    charts -.-&gt;|"deploys"| ui
+    charts -.-&gt;|"deploys"| gateway</code></pre>
 <p>The forbidden edges:</p>
 <ul>
 <li><code>agent</code> → <code>api/internal/storage</code> (would pull Postgres into the
@@ -2032,6 +2100,8 @@ direction is one-way and reviewable.</p>
 <li><code>agent</code> → <code>api/internal/runtime</code> (would pull Redis)</li>
 <li><code>controller</code> → <code>api/pkg/storage</code> (same reasoning)</li>
 <li><code>core</code> → anything that imports <code>database/sql</code> / <code>redis/*</code></li>
+<li><code>gateway</code> → <code>api</code>, <code>worker</code>, <code>agent</code>, <code>controller</code>, any database,
+  Redis or KV driver, or <code>k8s.io/client-go</code></li>
 </ul>
 <p>CI in each repo greps <code>go.sum</code> to enforce these directions; the
 build fails if a forbidden module path appears.</p>

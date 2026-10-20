@@ -768,6 +768,8 @@
       
         
       
+        
+      
     
     
     
@@ -923,6 +925,34 @@
     
   
     Controller (Kubernetes)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -1176,6 +1206,8 @@
       
         
           
+        
+      
         
       
         
@@ -1559,6 +1591,34 @@
     
   
     Provider connections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -1966,6 +2026,13 @@ filter the whole table to that chain.</p>
 <p>The collection of <code>api</code> + <code>worker</code> + <code>Postgres</code> + <code>Redis</code> + a <code>KMS</code>
 backend. Makes decisions, holds metadata, never holds plaintext
 values.</p>
+<h4 id="gateway">Gateway<a class="headerlink" href="#gateway" title="Permanent link">&para;</a></h4>
+<p>An optional, outbound-only, read-only process that runs inside your
+boundary and reports Argo CD rollout state to the control plane as
+metadata. It never writes, never reads Kubernetes Secrets and has no
+path to the agent. Argo CD <code>Healthy</code> and <code>Synced</code> are operational
+state, not proof that a secret reached a workload. Release 1 is in
+progress; see <a href="../../components/gateway/">Gateway</a>.</p>
 <h4 id="kms-backend">KMS backend<a class="headerlink" href="#kms-backend" title="Permanent link">&para;</a></h4>
 <p>The pluggable envelope-encryption layer. Three implementations ship:
 <code>local</code> (dev only, master key in <code>SB_WRAP_MASTER_KEY</code>),

@@ -755,6 +755,8 @@
       
         
       
+        
+      
     
     
     
@@ -910,6 +912,34 @@
     
   
     Controller (Kubernetes)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -1165,6 +1195,8 @@
       
         
           
+        
+      
         
       
         
@@ -1569,6 +1601,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../object-storage/" class="md-nav__link">
         
   
@@ -1828,6 +1888,78 @@
     <span class="md-ellipsis">
       
         Vault read returns "permission denied"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gateway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Gateway">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gateway-pod-is-not-ready-or-exits-at-boot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway pod is not ready, or exits at boot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gateway-refuses-to-start-over-privileged" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway refuses to start: over-privileged
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connector-advertised-but-nothing-is-bound" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connector advertised but nothing is bound
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gateway-gets-401-from-the-control-plane" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway gets 401 from the control plane
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claim-failed-warnings-with-a-not-found-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        claim failed warnings with a not-found error
       
     </span>
   </a>
@@ -2277,6 +2409,78 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#gateway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Gateway">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gateway-pod-is-not-ready-or-exits-at-boot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway pod is not ready, or exits at boot
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gateway-refuses-to-start-over-privileged" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway refuses to start: over-privileged
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connector-advertised-but-nothing-is-bound" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connector advertised but nothing is bound
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gateway-gets-401-from-the-control-plane" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway gets 401 from the control plane
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claim-failed-warnings-with-a-not-found-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        claim failed warnings with a not-found error
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#useful-queries-against-the-audit-log" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2596,6 +2800,81 @@ to the secret path:</p>
 </span></code></pre></div>
 <p>If that works but the agent gets denied, the agent token has less
 scope than the dev token. Adjust the policy in Vault.</p>
+<h2 id="gateway">Gateway<a class="headerlink" href="#gateway" title="Permanent link">&para;</a></h2>
+<p>Install steps are in <a href="../gateway/">Gateway</a>. Start with the pod log
+(<code>kubectl -n tenant-a-uat logs deploy/secrets-bridge-gateway</code>) and the detail
+view (<code>GET /api/v1/admin/gateways/&lt;id&gt;</code>), which shows each replica's last
+heartbeat and each connector's health.</p>
+<h3 id="gateway-pod-is-not-ready-or-exits-at-boot">Gateway pod is not ready, or exits at boot<a class="headerlink" href="#gateway-pod-is-not-ready-or-exits-at-boot" title="Permanent link">&para;</a></h3>
+<p>Check the log for the first error:</p>
+<ul>
+<li><code>identity: ... has mode ...</code>: the identity file can be read by other
+  users or written by its group. The Gateway accepts <code>0400</code>, <code>0600</code> or <code>0440</code>.
+  The chart mounts the Secret with mode <code>0440</code> and <code>fsGroup</code>; a hand-written
+  manifest with <code>defaultMode: 0444</code> is refused. Fix the mode, and rotate the
+  Gateway secret (revoke, create, enroll) if other users could read it.</li>
+<li><code>identity: ... does not exist</code>: the Secret uses a key other than
+  <code>identity.key</code> (default <code>identity.json</code>). A pod whose Secret does not exist
+  at all stays in <code>ContainerCreating</code>.</li>
+<li><code>identity: ... is not a valid identity JSON object</code> or <code>... is missing
+  gateway_id or gateway_secret</code>: the file must hold exactly
+  <code>{"gateway_id": "...", "gateway_secret": "..."}</code>. Unknown fields are
+  refused, so storing the whole enrollment response does not work. The
+  <code>jq -ce '{gateway_id, gateway_secret}'</code> step in the install pipeline keeps
+  only those two fields.</li>
+<li><code>connector self-check did not pass; not ready until it does</code> with status
+  <code>unauthorized</code> or <code>unreachable</code>: the Argo CD token check
+  (<code>GET /api/v1/session/userinfo</code>) failed. Check that the token Secret holds a
+  valid token for the <code>sb-gateway</code> account, that <code>base_url</code> is right, and that
+  the connector's <code>egress</code> peer lets the pod reach Argo CD. The Gateway retries
+  before each heartbeat and turns ready once the check passes.</li>
+<li><code>connector kind is not enabled in Release 1</code>: the connectors file names
+  <code>eso</code> or <code>rollout</code>. Release 1 binds <code>argocd</code> only.</li>
+<li>No heartbeat accepted within <code>SB_GATEWAY_CP_UNREACHABLE_AFTER</code> (default
+  <code>2m</code>): the control plane is unreachable. Check <code>cp.endpoint</code>, the
+  <code>cp.egress.cidrs</code> NetworkPolicy peer and, for a private CA,
+  <code>cp.caExistingSecret</code>.</li>
+</ul>
+<h3 id="gateway-refuses-to-start-over-privileged">Gateway refuses to start: over-privileged<a class="headerlink" href="#gateway-refuses-to-start-over-privileged" title="Permanent link">&para;</a></h3>
+<p>A log line <code>refusing to start: connectors: credential is over-privileged</code> (or
+<code>self-check could not prove the credential cannot read secrets</code>) comes from the
+Kubernetes self-check. It runs only for the Release 2 <code>eso</code> and <code>rollout</code>
+connectors, which need <code>SB_GATEWAY_ENABLE_R2_CONNECTORS=true</code>; a Release 1
+Gateway built from the chart has no Kubernetes access and never runs it.</p>
+<p>The Gateway refuses to start when its service account can use any verb on
+<code>secrets</code>, or any write verb on a resource a connector reads, or when a review
+call fails. There is no override. Remove the grant from the RBAC bound to the
+Gateway's service account. When a recheck finds such a grant on a running
+Gateway, it reports <code>over_privileged</code> in a heartbeat before it stops, and the
+api records a <code>gateway.over_privileged</code> audit event.</p>
+<h3 id="connector-advertised-but-nothing-is-bound">Connector advertised but nothing is bound<a class="headerlink" href="#connector-advertised-but-nothing-is-bound" title="Permanent link">&para;</a></h3>
+<p>The Gateway reports its connectors and targets in the catalog, but an
+advertised connector does nothing until an admin approves it and binds a
+target. In the detail view, check the connector's <code>status</code>:</p>
+<ul>
+<li><code>advertised</code>: approve it with
+  <code>POST /api/v1/admin/gateways/&lt;id&gt;/connectors/&lt;connector-uuid&gt;/approve</code>.</li>
+<li><code>approved</code> but no entry under <code>bindings</code>: create a binding with
+  <code>POST /api/v1/admin/gateway-bindings</code>.</li>
+<li><code>missing</code>: the Gateway no longer advertises this connector. Check the
+  connector <code>name</code> in the chart values.</li>
+</ul>
+<p>A binding request that fails answers with a closed code. <code>target_not_advertised</code>
+means the <code>argocd_target_id</code> is not an application <code>id</code> in the connectors file,
+and <code>target_stale</code> means the Gateway advertised it once but no longer does.</p>
+<h3 id="gateway-gets-401-from-the-control-plane">Gateway gets 401 from the control plane<a class="headerlink" href="#gateway-gets-401-from-the-control-plane" title="Permanent link">&para;</a></h3>
+<p>The log shows <code>control plane refused this gateway; claiming stopped, staying up
+and not ready until restarted</code>. The pod stays up and not ready on purpose, so it
+does not restart-loop. The api records <code>gateway.auth.rejected</code>.</p>
+<p>The usual cause is a revoked Gateway (<code>status: "revoked"</code> in
+<code>GET /api/v1/admin/gateways</code>). There is no rotation in Release 1: create a new
+Gateway, mint a token, enroll, replace the identity Secret and restart the
+Deployment. If the Gateway is still <code>active</code>, the Secret holds a credential
+that does not belong to it, for example from an earlier enrollment.</p>
+<h3 id="claim-failed-warnings-with-a-not-found-error"><code>claim failed</code> warnings with a not-found error<a class="headerlink" href="#claim-failed-warnings-with-a-not-found-error" title="Permanent link">&para;</a></h3>
+<p>Expected until <a href="https://github.com/secrets-bridge/api/issues/294">api#294</a> is
+merged. The Gateway polls for observation tasks and the api does not serve that
+route yet. Readiness is not affected.</p>
 <h2 id="useful-queries-against-the-audit-log">Useful queries against the audit log<a class="headerlink" href="#useful-queries-against-the-audit-log" title="Permanent link">&para;</a></h2>
 <h3 id="find-every-action-for-one-request">Find every action for one request<a class="headerlink" href="#find-every-action-for-one-request" title="Permanent link">&para;</a></h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">"http://localhost:18080/api/v1/audit-events?correlation_id=&lt;uuid&gt;"</span><span class="w"> </span><span class="se">\</span>

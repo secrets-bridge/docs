@@ -755,6 +755,8 @@
       
         
       
+        
+      
     
     
     
@@ -910,6 +912,34 @@
     
   
     Controller (Kubernetes)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -1165,6 +1195,8 @@
       
         
           
+        
+      
         
       
         
@@ -1569,6 +1601,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../object-storage/" class="md-nav__link">
         
   
@@ -1722,6 +1782,17 @@
     <span class="md-ellipsis">
       
         controller
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gateway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gateway
       
     </span>
   </a>
@@ -2061,6 +2132,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#gateway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gateway
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#secret-material-naming-convention" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2117,7 +2199,7 @@
 
 <h1 id="configuration-reference">Configuration reference<a class="headerlink" href="#configuration-reference" title="Permanent link">&para;</a></h1>
 <p>Every environment variable across <code>api</code> / <code>agent</code> / <code>worker</code> /
-<code>controller</code>. Defaults shown match the source tree as of v0.X.</p>
+<code>controller</code> / <code>gateway</code>. Defaults shown match the source tree as of v0.X.</p>
 <h2 id="api">api<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -2698,6 +2780,142 @@ sources.</p>
 </tr>
 </tbody>
 </table>
+<h2 id="gateway">gateway<a class="headerlink" href="#gateway" title="Permanent link">&para;</a></h2>
+<p>The <a href="../../components/gateway/">Gateway</a> binary. Each variable also has a flag
+(<code>gateway -h</code>); a flag overrides its variable. A malformed value stops the boot
+instead of falling back to the default. The
+<a href="https://github.com/secrets-bridge/charts/blob/main/gateway/README.md"><code>secrets-bridge-gateway</code> chart</a>
+sets these from its values, and the
+<a href="https://github.com/secrets-bridge/gateway#configuration">gateway README</a> is the
+source for this table.</p>
+<table>
+<thead>
+<tr>
+<th>Env var</th>
+<th>Required</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SB_CP_ENDPOINT</code></td>
+<td><strong>yes</strong></td>
+<td></td>
+<td><code>https://cp.example.com</code>. <code>https://</code> only, unless <code>SB_INSECURE_TRANSPORT=true</code>. No userinfo</td>
+</tr>
+<tr>
+<td><code>SB_INSECURE_TRANSPORT</code></td>
+<td>no</td>
+<td><code>false</code></td>
+<td>Dev only: allows <code>http://</code> to the control plane and to every Argo CD <code>base_url</code>. See <a href="#insecure-switches-dev-only">Insecure switches</a></td>
+</tr>
+<tr>
+<td><code>SB_CP_CA_FILE</code></td>
+<td>no</td>
+<td></td>
+<td>PEM bundle that replaces the system roots for the control plane</td>
+</tr>
+<tr>
+<td><code>SB_CP_TLS_SERVER_NAME</code></td>
+<td>no</td>
+<td></td>
+<td>TLS server name override</td>
+</tr>
+<tr>
+<td><code>SB_GATEWAY_IDENTITY_FILE</code></td>
+<td>no</td>
+<td><code>/etc/secrets-bridge/gateway/identity.json</code></td>
+<td><code>{"gateway_id": "...", "gateway_secret": "..."}</code> from enrollment. Mode <code>0400</code>, <code>0600</code> or <code>0440</code> (what a Secret volume with <code>fsGroup</code> produces). Any bit for other users, or group write, is refused at boot</td>
+</tr>
+<tr>
+<td><code>SB_GATEWAY_ID</code> / <code>SB_GATEWAY_SECRET</code></td>
+<td>no</td>
+<td></td>
+<td>Credential pair as env vars. When both are unset the identity file is read. The chart does not use them</td>
+</tr>
+<tr>
+<td><code>SB_GATEWAY_LOCAL_ADDR</code></td>
+<td>no</td>
+<td><code>127.0.0.1:8091</code></td>
+<td><code>/healthz</code>, <code>/readyz</code> and <code>/metrics</code>. Must be a literal loopback IP; <code>localhost</code> is refused</td>
+</tr>
+<tr>
+<td><code>SB_GATEWAY_CONNECTORS_FILE</code></td>
+<td>no</td>
+<td></td>
+<td>JSON list of locally bound connectors. Empty binds none. The chart renders it into a ConfigMap</td>
+</tr>
+<tr>
+<td><code>SB_GATEWAY_ENABLE_R2_CONNECTORS</code></td>
+<td>no</td>
+<td><code>false</code></td>
+<td>Binds the Release 2 <code>eso</code> and <code>rollout</code> kinds. Not supported for production: the Gateway logs a WARN at boot while it is on. When off, a connectors file that names either kind is refused. The chart never sets it</td>
+</tr>
+<tr>
+<td><code>SB_GATEWAY_SHUTDOWN_GRACE</code></td>
+<td>no</td>
+<td><code>15s</code></td>
+<td>Half is spent waiting for passes in flight, then unfinished tasks are released</td>
+</tr>
+<tr>
+<td><code>SB_GATEWAY_HEARTBEAT_INTERVAL</code></td>
+<td>no</td>
+<td><code>30s</code></td>
+<td>Used until the control plane suggests an interval</td>
+</tr>
+<tr>
+<td><code>SB_GATEWAY_CLAIM_INTERVAL</code></td>
+<td>no</td>
+<td><code>5s</code></td>
+<td>Base claim interval, jittered between half and one and a half times</td>
+</tr>
+<tr>
+<td><code>SB_GATEWAY_CLAIM_IDLE_MAX</code></td>
+<td>no</td>
+<td><code>30s</code></td>
+<td>Longest claim interval after empty polls. Not shorter than the claim interval</td>
+</tr>
+<tr>
+<td><code>SB_GATEWAY_CLAIM_CONCURRENCY</code></td>
+<td>no</td>
+<td><code>1</code></td>
+<td>Observation passes in flight per replica, 1 to 16</td>
+</tr>
+<tr>
+<td><code>SB_GATEWAY_LEASE_MARGIN</code></td>
+<td>no</td>
+<td><code>3s</code></td>
+<td>A pass stops this long before its lease expires</td>
+</tr>
+<tr>
+<td><code>SB_GATEWAY_PASS_TIMEOUT</code></td>
+<td>no</td>
+<td><code>30s</code></td>
+<td>Upper bound for one pass</td>
+</tr>
+<tr>
+<td><code>SB_GATEWAY_CP_UNREACHABLE_AFTER</code></td>
+<td>no</td>
+<td><code>2m</code></td>
+<td>The Gateway turns not ready when no heartbeat has been accepted for this long</td>
+</tr>
+<tr>
+<td><code>SB_LOG_LEVEL</code></td>
+<td>no</td>
+<td><code>info</code></td>
+<td><code>debug</code>, <code>info</code>, <code>warn</code> or <code>error</code></td>
+</tr>
+</tbody>
+</table>
+<p>The Gateway ignores <code>HTTP_PROXY</code> and <code>HTTPS_PROXY</code> for every connection, so a
+bearer credential never reaches a proxy.</p>
+<p>Each entry in the connectors file has a <code>name</code> (a DNS label the control plane
+binds to), a <code>kind</code> and <code>settings</code>. For <code>argocd</code> the settings are <code>base_url</code>,
+<code>token_file</code> (an absolute path), optional <code>ca_file</code>, <code>tls_server_name</code> and
+<code>timeout</code> (1s to 60s, default 10s), <code>allowed_projects</code> (at least one AppProject)
+and <code>applications</code> (at least one <code>{id, name, app_namespace?}</code>). Unknown fields,
+unknown kinds and duplicate names are refused at load.</p>
 <h2 id="secret-material-naming-convention">Secret material, naming convention<a class="headerlink" href="#secret-material-naming-convention" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -2732,6 +2950,24 @@ sources.</p>
 <td>One-time enrollment token</td>
 <td>K8s Secret, read on first boot</td>
 <td>Single use; expires after 15 minutes by default</td>
+</tr>
+<tr>
+<td>Gateway identity (<code>gateway_id</code> + <code>gateway_secret</code>)</td>
+<td>Per-Gateway credential, sent as <code>X-Gateway-Secret</code></td>
+<td>An existing K8s Secret, mounted read-only as <code>SB_GATEWAY_IDENTITY_FILE</code></td>
+<td>No rotation in Release 1: revoke the Gateway, create a new one, enroll it and update the Secret</td>
+</tr>
+<tr>
+<td>Gateway enrollment token</td>
+<td>One-time token from <code>POST /api/v1/admin/gateways/:id/enrollment-token</code></td>
+<td>Used once from the operator's workstation, never stored in the cluster</td>
+<td>Single use; expires after 15 minutes by default</td>
+</tr>
+<tr>
+<td>Argo CD token for the Gateway</td>
+<td>Read-only token of a local Argo CD account (<code>applications, get</code>)</td>
+<td>An existing K8s Secret, mounted as a file per connector</td>
+<td>Update the Secret; the Gateway re-reads the file</td>
 </tr>
 <tr>
 <td><code>SB_BOOTSTRAP_ADMIN_PASSWORD</code></td>
@@ -2829,6 +3065,20 @@ deployment, treat it as an incident.</p>
 <td><code>false</code></td>
 <td>Allows a plain <code>http://</code> control-plane endpoint, so the agent credential and job traffic cross the network unencrypted</td>
 <td>WARN log at boot; the <code>agent</code> chart refuses an <code>http://</code> endpoint unless <code>cp.insecureTransport=true</code></td>
+</tr>
+<tr>
+<td><code>SB_INSECURE_TRANSPORT=true</code></td>
+<td>gateway</td>
+<td><code>false</code></td>
+<td>Allows plain <code>http://</code> to the control plane and to every Argo CD endpoint, so the Gateway credential and the Argo CD token cross the network unencrypted</td>
+<td>WARN log at boot; the <code>secrets-bridge-gateway</code> chart refuses an <code>http://</code> URL unless <code>insecureTransport=true</code></td>
+</tr>
+<tr>
+<td><code>SB_GATEWAY_ENABLE_R2_CONNECTORS=true</code></td>
+<td>gateway</td>
+<td><code>false</code></td>
+<td>Binds the Release 2 <code>eso</code> and <code>rollout</code> connectors, which read the Kubernetes API. Not supported for production</td>
+<td>WARN log at boot. The Kubernetes self-check still refuses any access to Secrets. The gateway chart never sets it</td>
 </tr>
 </tbody>
 </table>

@@ -849,6 +849,8 @@
       
         
       
+        
+      
     
     
     
@@ -1004,6 +1006,34 @@
     
   
     Controller (Kubernetes)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -1257,6 +1287,8 @@
       
         
           
+        
+      
         
       
         
@@ -1640,6 +1672,34 @@
     
   
     Provider connections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -2074,7 +2134,12 @@
 <h1 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h1>
 <p>The platform splits into three loosely-coupled tiers and one
 metadata index. Each tier holds one type of trust: the Control
-Plane decides; the Agent executes; the Providers own the values.</p>
+Plane decides; the Agent executes; the Providers own the values.
+An optional <a href="../../components/gateway/">Gateway</a> observes: it runs next to
+the workloads, reads Argo CD rollout state without changing anything, and
+reports metadata to the Control Plane over its own outbound connection.
+Release 1 of the Gateway is in progress; see
+<a href="../product-status/#in-progress">Product status</a>.</p>
 <pre class="mermaid"><code>flowchart LR
     subgraph user_plane ["User / Dev plane"]
         UI["UI SPA"]
@@ -2094,6 +2159,8 @@ Plane decides; the Agent executes; the Providers own the values.</p>
 
     subgraph workload ["Workload network (per cluster)"]
         Agent["agent&lt;br/&gt;outbound only"]
+        Gateway["gateway (optional)&lt;br/&gt;outbound only, read-only"]
+        ArgoCD["Argo CD"]
         Vault[("HashiCorp Vault")]
         AWSSM[("AWS Secrets Manager")]
         AzureKV[("Azure Key Vault")]
@@ -2110,7 +2177,9 @@ Plane decides; the Agent executes; the Providers own the values.</p>
     Agent --&gt; Vault
     Agent --&gt; AWSSM
     Agent --&gt; AzureKV
-    Agent --&gt; GCPSM</code></pre>
+    Agent --&gt; GCPSM
+    Gateway --&gt;|"outbound HTTPS"| API
+    Gateway --&gt;|"GET only"| ArgoCD</code></pre>
 <h2 id="trust-boundaries-what-holds-what">Trust boundaries: what holds what<a class="headerlink" href="#trust-boundaries-what-holds-what" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -2150,6 +2219,11 @@ Plane decides; the Agent executes; the Providers own the values.</p>
 <td><strong>Agent</strong></td>
 <td>Provider credentials <em>for its own network boundary</em>, plaintext values for the duration of one request</td>
 <td>Anything from another cluster / account; no inbound listener; no Postgres / Redis client</td>
+</tr>
+<tr>
+<td><strong>Gateway</strong> (optional)</td>
+<td>Its own credential for the Control Plane and a read-only Argo CD token, both as read-only files in its own boundary</td>
+<td>Secret values, provider credentials, Kubernetes RBAC on Secrets, any write access; no inbound listener except loopback health; no Postgres / Redis client; no path to the agent</td>
 </tr>
 <tr>
 <td><strong>Providers</strong></td>
@@ -2241,6 +2315,14 @@ Plane decides; the Agent executes; the Providers own the values.</p>
 <div class="tabbed-block">
 <p>Off by default. Enable with <code>SB_GITOPS_ENABLED=true</code> on the api
 AND <code>SB_WORKER_GITOPS_ENABLED=true</code> on the worker.</p>
+<p>This is today's path: the worker calls Argo CD from the Control
+Plane with a KMS-wrapped token. The <a href="../../components/gateway/">Gateway</a>
+replaces it with observation from inside your boundary once its
+observation tasks are merged
+(<a href="https://github.com/secrets-bridge/api/issues/294">api#294</a>) and the
+cutover in <a href="https://github.com/secrets-bridge/gateway/issues/13">gateway#13</a>
+is done. Either way, <code>Healthy</code> and <code>Synced</code> are Argo CD operational
+state, not proof that the workload picked up the new value.</p>
 <pre class="mermaid"><code>sequenceDiagram
     participant API
     participant Worker
@@ -2295,7 +2377,7 @@ AND <code>SB_WORKER_GITOPS_ENABLED=true</code> on the worker.</p>
 </tbody>
 </table>
 <h2 id="why-polyrepo">Why polyrepo<a class="headerlink" href="#why-polyrepo" title="Permanent link">&para;</a></h2>
-<p>Eight repositories, one product. The <code>core</code> library is infra-free
+<p>Nine repositories, one product. The <code>core</code> library is infra-free
 (no Postgres driver, no Redis client, no Fiber import), so the
 <code>agent</code> and <code>controller</code> can depend on it without pulling in
 storage. The <code>api</code> and <code>worker</code> share Postgres/Redis but the worker

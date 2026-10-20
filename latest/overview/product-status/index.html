@@ -899,6 +899,8 @@
       
         
       
+        
+      
     
     
     
@@ -1054,6 +1056,34 @@
     
   
     Controller (Kubernetes)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -1307,6 +1337,8 @@
       
         
           
+        
+      
         
       
         
@@ -1690,6 +1722,34 @@
     
   
     Provider connections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -2303,6 +2363,24 @@ release / demo candidate. "PASS" means verified end-to-end, not merely merged.</
   webhook message per run about waiting accounts. Merged in the api,
   console and worker, not yet through QA. See
   <a href="../../operations/google-sign-in/">Sign in with Google</a>.</li>
+<li><strong>Gateway, Release 1 (Argo CD)</strong>: an optional, outbound-only, read-only
+  component that runs in your boundary and reports Argo CD rollout state as
+  metadata. Merged: the Gateway binary (Argo CD connector only, signed image),
+  its Helm chart (no RBAC, no service-account token, egress-only
+  NetworkPolicy) and the control-plane registry (enrollment, heartbeat,
+  catalog, connector approval, bindings, revoke, <code>gateway.*</code> permissions).
+  Not merged: observation tasks and evidence
+  (<a href="https://github.com/secrets-bridge/api/issues/294">api#294</a>), their
+  sweepers (<a href="https://github.com/secrets-bridge/worker/issues/38">worker#38</a>),
+  the console page and the request-page display
+  (<a href="https://github.com/secrets-bridge/ui/issues/163">ui#163</a>), and the cutover
+  that makes the Gateway the only Argo CD integration
+  (<a href="https://github.com/secrets-bridge/gateway/issues/13">gateway#13</a>). Until
+  then a Gateway enrolls and reports its catalog but receives no observation
+  tasks, and Argo CD state on a request comes from the control plane's poller
+  (<code>SB_GITOPS_ENABLED</code>). Argo CD <code>Healthy</code> and <code>Synced</code> are operational state,
+  never proof that a secret reached a workload. See
+  <a href="../../components/gateway/">Gateway</a>.</li>
 </ul>
 <h2 id="live-vs-roadmap">Live vs Roadmap<a class="headerlink" href="#live-vs-roadmap" title="Permanent link">&para;</a></h2>
 <h3 id="live-implemented">Live / implemented<a class="headerlink" href="#live-implemented" title="Permanent link">&para;</a></h3>
@@ -2325,6 +2403,11 @@ release / demo candidate. "PASS" means verified end-to-end, not merely merged.</
 <li>HashiCorp Vault advanced flows</li>
 <li>Deeper Kubernetes External Secrets integration</li>
 <li>Flux integration</li>
+<li>Gateway Release 2: External Secrets Operator sync and Deployment rollout
+  observation (in the gateway code, off by default and not supported for
+  production)</li>
+<li>Signed Gateway evidence (<a href="https://github.com/secrets-bridge/gateway/issues/7">gateway#7</a>),
+  required before Gateway evidence is used as compliance evidence</li>
 <li>Agent connection-scoped job claim</li>
 <li>Richer agent fleet dashboard</li>
 </ul>

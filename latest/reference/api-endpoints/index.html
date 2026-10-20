@@ -755,6 +755,8 @@
       
         
       
+        
+      
     
     
     
@@ -910,6 +912,34 @@
     
   
     Controller (Kubernetes)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../components/gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -1163,6 +1193,8 @@
       
         
           
+        
+      
         
       
         
@@ -1566,6 +1598,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../operations/gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../operations/object-storage/" class="md-nav__link">
         
   
@@ -1924,6 +1984,45 @@
     <span class="md-ellipsis">
       
         Agent data plane (X-Agent-Secret)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gateways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateways
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Gateways">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gateway-machine-routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway machine routes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gateway-admin-routes-session-auth-permission" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway admin routes (session auth + permission)
       
     </span>
   </a>
@@ -2450,6 +2549,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#gateways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateways
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Gateways">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gateway-machine-routes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway machine routes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gateway-admin-routes-session-auth-permission" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway admin routes (session auth + permission)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#requests-access-requests" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2785,6 +2923,10 @@ required to call it.</p>
 <tr>
 <td><code>agent</code></td>
 <td>An agent's <code>X-Agent-Secret</code> header (validated by <code>AgentAuth</code> middleware)</td>
+</tr>
+<tr>
+<td><code>gateway</code></td>
+<td>A Gateway's <code>X-Gateway-Secret</code> header (validated by <code>GatewayAuth</code> middleware)</td>
 </tr>
 <tr>
 <td><code>user_id</code></td>
@@ -3206,6 +3348,128 @@ enabled as a break-glass admin action.</p>
 <li><strong>Prefer the admin/provider projections.</strong> <code>GET /api/v1/agents</code> remains a thin list. New integrations should use <code>GET /api/v1/admin/agents</code>, <code>GET /api/v1/admin/agents/:id</code>, or <code>GET /api/v1/provider-connections/:id/agents</code> (richer projection incl. <code>provider_connection_id</code>).</li>
 </ul>
 </div>
+<h2 id="gateways">Gateways<a class="headerlink" href="#gateways" title="Permanent link">&para;</a></h2>
+<p>Release 1 of the <a href="../../components/gateway/">Gateway</a> registry. Install steps are
+in <a href="../../operations/gateway/">Gateway</a>. The task routes (claim, lease, release,
+result) are not served yet; they come with
+<a href="https://github.com/secrets-bridge/api/issues/294">api#294</a>.</p>
+<h3 id="gateway-machine-routes">Gateway machine routes<a class="headerlink" href="#gateway-machine-routes" title="Permanent link">&para;</a></h3>
+<p>The <code>/api/v1/gateways/</code> prefix is exempt from the session gate. Enrollment is
+authenticated by the one-time token only; every other route needs
+<code>X-Gateway-Secret</code> and is rate limited per authenticated Gateway. Errors are
+<code>{"error": "&lt;code&gt;"}</code> from a closed list and never echo request content.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/gateways/enroll</code></td>
+<td>enrollment token</td>
+<td><code>{enrollment_token, cluster_name?}</code> → <code>201 {gateway_id, gateway_secret, heartbeat_interval_seconds, claim_poll_seconds}</code>. The secret is returned once. Refused over plain <code>http</code> outside <code>SB_ENV=dev</code> (<code>403 https_required</code>). 10 a minute per IP</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/gateways/:id/heartbeat</code></td>
+<td>gateway</td>
+<td><code>{replica_id, gateway_version, contract_versions, status, in_flight, catalog_version?, connectors?}</code> → <code>{status, server_time, next_heartbeat_seconds, claim_poll_seconds, contract_version, catalog_version}</code>. <code>429 replica_limit</code> past <code>max_replicas</code>. A replica that reports <code>over_privileged</code> is audited as <code>gateway.over_privileged</code></td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/api/v1/gateways/:id/catalog</code></td>
+<td>gateway</td>
+<td>Full replace of advertised connectors and targets → <code>{accepted, targets_stale, catalog_version}</code>. Never approves or binds anything. A target no longer advertised stays, marked stale</td>
+</tr>
+</tbody>
+</table>
+<p>A revoked Gateway gets <code>401</code> on heartbeat and catalog.</p>
+<h3 id="gateway-admin-routes-session-auth-permission">Gateway admin routes (session auth + permission)<a class="headerlink" href="#gateway-admin-routes-session-auth-permission" title="Permanent link">&para;</a></h3>
+<p>Every write also needs a fresh second factor.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/admin/gateways</code></td>
+<td><code>session + gateway.mint</code> + fresh MFA</td>
+<td><code>{name, boundary, environment_id?, max_replicas?, max_inflight_tasks?}</code> → <code>201</code>, status <code>pending</code>. <code>409 gateway_name_taken</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/admin/gateways</code></td>
+<td><code>session + gateway.list</code></td>
+<td><code>{items: [...]}</code> with status (<code>pending</code>, <code>active</code>, <code>stale</code>, <code>disabled</code>, <code>revoked</code>), versions, last heartbeat and replica count. Never credentials</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/admin/gateways/:id</code></td>
+<td><code>session + gateway.list</code></td>
+<td><code>{gateway, replicas, connectors, bindings, enrollment_tokens}</code>, metadata only</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/admin/gateways/:id/enrollment-token</code></td>
+<td><code>session + gateway.mint</code> + fresh MFA</td>
+<td><code>{expires_in_seconds?, expected_cluster_name?}</code> → <code>201 {id, gateway_id, enrollment_token, expires_at}</code>. The token is returned once. Default TTL 900s, clamped to 60 to 86400. <code>409 gateway_not_pending</code> once enrolled</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/admin/gateway-enrollment-tokens/:id/revoke</code></td>
+<td><code>session + gateway.mint</code> + fresh MFA</td>
+<td>Revoke an unused token. <code>204</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/admin/gateways/:id/revoke</code></td>
+<td><code>session + gateway.revoke</code> + fresh MFA</td>
+<td><code>{reason?}</code> → the Gateway, status <code>revoked</code>. <code>409 gateway_already_revoked</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/admin/gateways/:id/connectors/:cid/approve</code></td>
+<td><code>session + gateway.bind</code> + fresh MFA</td>
+<td><code>:cid</code> is the connector's <code>id</code>. <code>409 connector_not_advertised</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/admin/gateway-bindings</code></td>
+<td><code>session + gateway.bind</code> + fresh MFA</td>
+<td><code>{gateway_id, environment_id, project_id?, secret_id \| (provider_connection_id + secret_ref), argocd_connector_id, argocd_target_id, observation_timeout_seconds?}</code> → <code>201</code>. Argo CD targets only in Release 1</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/admin/gateway-bindings</code></td>
+<td><code>session + gateway.bind</code></td>
+<td>Optional <code>?gateway_id=</code></td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/admin/gateway-bindings/:id</code></td>
+<td><code>session + gateway.bind</code> + fresh MFA</td>
+<td><code>204</code></td>
+</tr>
+</tbody>
+</table>
+<p>Audit actions, all with ids, enums and counts only: <code>gateway.create</code>,
+<code>gateway.enrollment_token.create</code>, <code>gateway.enrollment_token.revoke</code>,
+<code>gateway.enroll</code>, <code>gateway.revoke</code>, <code>gateway.auth.rejected</code>,
+<code>gateway.replica_limit</code>, <code>gateway.over_privileged</code>, <code>gateway.catalog.updated</code>,
+<code>gateway.connector.missing</code>, <code>gateway.connector.approval_reset</code>,
+<code>gateway.connector.approved</code>, <code>gateway.binding.create</code> and
+<code>gateway.binding.delete</code>.</p>
 <h2 id="requests-access-requests">Requests (access requests)<a class="headerlink" href="#requests-access-requests" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

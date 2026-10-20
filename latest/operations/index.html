@@ -755,6 +755,8 @@
       
         
       
+        
+      
     
     
     
@@ -910,6 +912,34 @@
     
   
     Controller (Kubernetes)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../components/gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -1165,6 +1195,8 @@
       
         
           
+        
+      
         
       
         
@@ -1549,6 +1581,34 @@
     
   
     Provider connections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="gateway/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway
   
 
     
@@ -1985,12 +2045,16 @@
 <td>Setting up an S3 or S3-compatible bucket for media such as logos (in progress)</td>
 </tr>
 <tr>
+<td><a href="gateway/">Gateway</a></td>
+<td>Installing and enrolling an optional Gateway for Argo CD observation (Release 1, in progress)</td>
+</tr>
+<tr>
 <td><a href="verifying-releases/">Verifying images and charts</a></td>
 <td>Checking the cosign signature, SBOM and provenance of images and charts before you deploy them</td>
 </tr>
 <tr>
 <td><a href="config/">Configuration reference</a></td>
-<td>Exhaustive env-var table for <code>api</code> / <code>agent</code> / <code>worker</code> / <code>controller</code>, plus the dev-only insecure switches</td>
+<td>Exhaustive env-var table for <code>api</code> / <code>agent</code> / <code>worker</code> / <code>controller</code> / <code>gateway</code>, plus the dev-only insecure switches</td>
 </tr>
 <tr>
 <td><a href="troubleshooting/">Troubleshooting</a></td>
@@ -1999,7 +2063,7 @@
 </tbody>
 </table>
 <h2 id="production-deployment">Production deployment<a class="headerlink" href="#production-deployment" title="Permanent link">&para;</a></h2>
-<p>Install with the two Helm charts from the
+<p>Install with the Helm charts from the
 <a href="https://github.com/secrets-bridge/charts"><code>charts</code></a> repo. Both publish as
 OCI artifacts on GHCR:</p>
 <table>
@@ -2020,6 +2084,11 @@ OCI artifacts on GHCR:</p>
 <td><code>secrets-bridge-agent</code></td>
 <td><code>oci://ghcr.io/secrets-bridge/charts/secrets-bridge-agent</code></td>
 <td>One outbound-only agent per workload cluster or account</td>
+</tr>
+<tr>
+<td><code>secrets-bridge-gateway</code></td>
+<td><code>oci://ghcr.io/secrets-bridge/charts/secrets-bridge-gateway</code></td>
+<td>Optional. One read-only Gateway per boundary for Argo CD observation (<a href="gateway/">Gateway</a>, Release 1 in progress)</td>
 </tr>
 </tbody>
 </table>
