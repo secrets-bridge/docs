@@ -27,7 +27,7 @@ replace them.
 | **Read** | provider → user | Developer requests a value; workflow approves; agent fetches; CP stores a single-use KMS-wrapped envelope; UI reveals it once. |
 | **Patch** | user → provider | Developer submits a new value through the form; workflow approves; agent GET-merge-PUTs to the provider so untouched keys survive. |
 | **Discovery** | provider → CP catalog | Admin enqueues a discover job; agent calls `ListMetadata`; CP upserts to the `secrets` table with native provider labels preserved verbatim (Vault `custom_metadata`, AWS Tags, GCP labels, Azure tags). |
-| **GitOps observation** (BRD §26) | ArgoCD → CP | After an approved patch reaches the provider, the worker polls ArgoCD to confirm whether the workload actually picked up the new value. Strictly read-only. Off by default. |
+| **Gateway observation** | Argo CD → Gateway → CP | After an approved change reaches the provider, an optional [Gateway](../components/gateway.md) inside your boundary reads Argo CD rollout state and reports it as metadata. Strictly read-only, off unless an environment's observation source is `gateway`. The CP itself never talks to Argo CD. Argo CD health is context, not proof the workload picked up the new value. |
 
 ## What ships today
 
@@ -36,10 +36,10 @@ replace them.
 | [`core`](../components/core.md) | Shipped | Provider interface, Vault + AWS SM connectors, type-safe value redaction |
 | [`api`](../components/api.md) | Shipped | Fiber v3 Control Plane API, Postgres + Redis, RBAC catalog, session-cookie login |
 | [`agent`](../components/agent.md) | Shipped | Outbound-only, claim → wrap → execute → complete loop, X25519 wire envelope |
-| [`worker`](../components/worker.md) | Shipped | Sweepers, scheduler, notifications, GitOps poller |
+| [`worker`](../components/worker.md) | Shipped | Sweepers, scheduler, notifications, Gateway observation sweepers |
 | [`controller`](../components/controller.md) | Shipped | Kubernetes CRD reconciler ported from v0.1.0 |
 | [`ui`](../components/ui.md) | Shipped | React SPA: dashboard, requests, agents, admin, audit, secrets |
-| [`gateway`](../components/gateway.md) | In progress | Release 1: read-only Argo CD observation. Binary, chart and control-plane registry merged; observation tasks not yet |
+| [`gateway`](../components/gateway.md) | In progress | Release 1: read-only Argo CD observation. Binary, chart, registry, observation tasks, console and the cutover from the control-plane poller merged; not yet through QA |
 | [`charts`](https://github.com/secrets-bridge/charts) | Shipped | Hardened Helm charts for the control plane and the agent, published to GHCR. The Gateway chart is part of Gateway Release 1 |
 | [`docs`](https://github.com/secrets-bridge/docs) | You're reading it | mkdocs-material |
 

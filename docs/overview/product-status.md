@@ -90,23 +90,26 @@ Being built now; not yet live or certified. Do not depend on these yet.
       Gateway claims, leases and answers with metadata-only evidence that the
       control plane checks against the task's target before it computes the
       verdict;
-    - the per-environment observation source (`control_plane`, `gateway`,
-      `none`) and the request's evidence at
+    - the per-environment observation source (`gateway` or `none`, the
+      default) and the request's evidence at
       `GET /requests/:id/observations`;
     - the worker sweepers for leases, deadlines, stale Gateways and old
       replica rows (`SB_WORKER_GATEWAY_SWEEPERS_ENABLED`);
     - the console: Admin → Gateways, the Observation column on a project's
       environments, and the Argo CD panel on the request page.
 
-    Not done: the cutover that makes the Gateway the only Argo CD integration
-    ([gateway#13](https://github.com/secrets-bridge/gateway/issues/13)). Until
-    it ships, the control plane's own poller (`SB_GITOPS_ENABLED`) still
-    exists and observes environments whose source is `control_plane`. Each
-    environment uses one source at a time. Argo CD `Healthy` and `Synced` are
-    operational state, never proof that a secret reached a workload: a
-    Release 1 task ends `unverified` (`context_only`), never `verified`, and a
-    Gateway that is offline or late leaves it `pending` and then `timed_out`,
-    never failed. See [Gateway](../components/gateway.md).
+    - the cutover ([gateway#13](https://github.com/secrets-bridge/gateway/issues/13)):
+      the Gateway is the only component that talks to Argo CD. The control
+      plane's Argo CD poller, its endpoint and app-mapping routes and the
+      stored Argo CD tokens are removed, and `GET /requests/:id/gitops`
+      serves the old poller rows as read-only history. See
+      [Gateway cutover](../operations/gateway-cutover.md).
+
+    Argo CD `Healthy` and `Synced` are operational state, never proof that a
+    secret reached a workload: a Release 1 task ends `unverified`
+    (`context_only`), never `verified`, and a Gateway that is offline or late
+    leaves it `pending` and then `timed_out`, never failed. See
+    [Gateway](../components/gateway.md).
 
 ## Live vs Roadmap
 
@@ -121,6 +124,13 @@ Being built now; not yet live or certified. Do not depend on these yet.
 - Agent revoke / list / status
 - Non-prod reveal protection
 - Prod reveal refusal (audited)
+
+### Retired
+
+- Control-plane Argo CD observation (the worker's GitOps poller,
+  `SB_GITOPS_ENABLED`, Argo CD endpoints and app mappings). Argo CD state now
+  comes only from a [Gateway](../components/gateway.md). Old observations stay
+  readable as history, labelled context only.
 
 ### Roadmap / coming later
 

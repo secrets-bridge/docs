@@ -280,8 +280,10 @@ curl -fsS -b "$JAR" "$CP/api/v1/requests/<request-id>/observations" \
 `rollup: "none"` means no task exists. Check `observation_source` and the
 audit events with the `correlation_id` of the job that executed the change:
 
-- `observation_source` is `control_plane` or `none`: the environment is not
-  set to `gateway`, so no task was created. With `none`, the audit log has
+- `observation_source` is `none`: the environment is not set to `gateway`, so
+  no task was created. `none` is the default, and environments that used the
+  retired control-plane poller were moved to it at the
+  [cutover](gateway-cutover.md). With `none`, the audit log has
   `request.observation_skipped` with reason `source_none`. The source is read
   when the request reaches `executed`, so switching it later does not add tasks
   to earlier requests. See

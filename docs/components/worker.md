@@ -5,8 +5,9 @@ Repo: [`secrets-bridge/worker`](https://github.com/secrets-bridge/worker)
 `replace` directive) + Prometheus client
 · Container: `golang:1.25-alpine` → `distroless/static:nonroot`
 
-Background workhorse for the platform's lifecycle hygiene + the
-read-only ArgoCD observation poller (BRD §26).
+Background workhorse for the platform's lifecycle hygiene and the Gateway
+observation sweepers. The worker never talks to Argo CD and holds no KMS
+access; Argo CD state comes only from a [Gateway](gateway.md).
 
 ## Sweepers shipped today
 
@@ -17,8 +18,6 @@ read-only ArgoCD observation poller (BRD §26).
 | `agents-stale` | 60s | Flip agents whose `last_seen_at < cutoff` to `status='stale'` |
 | `jobs-recovery` | 30s | Mark `sync_jobs` rows whose claim lease expired without a complete as `status='expired'` |
 | `discover-scheduler` | 5m | Enqueue one discover job per configured target (env var today; admin API tracked) |
-| `gitops-poller` | 15s | Claim a queued observation → call ArgoCD → record `observed_state` → transition |
-| `gitops-timeout` | 60s | Flip observations past their `timeout_at` to `applied_unverified` |
 | `observation-leases` | 30s | Put Gateway observation tasks whose lease ran out back to `queued`. Opt-in with `SB_WORKER_GATEWAY_SWEEPERS_ENABLED` |
 | `observation-deadlines` | 30s | Close open observation tasks past their deadline as `timed_out` (`deadline_reached` or `gateway_unavailable`), never failed. Opt-in |
 | `gateways-stale` | 1m | Flip Gateways with no heartbeat for `SB_WORKER_GATEWAYS_STALE_AFTER` (2m) from `active` to `stale`. Opt-in |
@@ -60,6 +59,9 @@ runs each sweeper per tick, the others record `worker_scheduler_lock_skipped_tot
   counts only
 - No provider SDKs imported (worker doesn't fetch values; the
   agent does)
+- No Argo CD client and no KMS backend. The `internal/archguard` test fails
+  the build if non-test code imports a package path containing `argocd`,
+  `argoproj` or `argo-cd`, or builds an Argo CD API path
 - Multi-replica safe by construction
 - Fails loud on misconfig at boot (e.g. `SB_DISCOVER_TARGETS_JSON`
   parse error → exit 1)
@@ -70,7 +72,10 @@ runs each sweeper per tick, the others record `worker_scheduler_lock_skipped_tot
 |---|---|---|---|
 | `DATABASE_URL` | yes | - | Same Postgres as the api |
 | `REDIS_URL` | yes | - | Same Redis as the api |
-| `SB_WORKER_GITOPS_ENABLED` | no | `false` | Must match the api's `SB_GITOPS_ENABLED` for §26 to be active |
 | `SB_WORKER_GATEWAY_SWEEPERS_ENABLED` | no | `false` | Turns on the four Gateway observation sweepers. Their intervals are in the [Configuration reference](../operations/config.md#worker) |
 | `SB_DISCOVER_TARGETS_JSON` | no | - | Array of `{agent_id, provider, config, scope}`; admin API replaces this |
 | Sweeper interval overrides | no | per-sweeper defaults | `SB_WORKER_WRAPS_EXPIRED_INTERVAL`, etc. See [Configuration reference](../operations/config.md#worker) |
+
+The `SB_WORKER_GITOPS_*` settings are retired: if set, the worker logs their
+names once at startup and ignores them. See
+[Retired settings](../operations/config.md#retired-settings).

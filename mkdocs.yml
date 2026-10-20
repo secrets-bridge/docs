@@ -201,6 +201,7 @@ nav:
       - Cross-team requests: operations/cross-team-requests.md
       - Provider connections: operations/provider-connections.md
       - Gateway: operations/gateway.md
+      - Gateway cutover: operations/gateway-cutover.md
       - Object storage: operations/object-storage.md
       - Verifying images and charts: operations/verifying-releases.md
       - Configuration reference: operations/config.md

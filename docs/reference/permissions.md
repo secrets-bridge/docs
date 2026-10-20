@@ -87,7 +87,7 @@ A sign-in provider's **default role** (used only when approval is off) may hold 
 
 | Permission | Description |
 |---|---|
-| `integration.edit` | Create / update / delete ArgoCD endpoints + GitOps app mappings + Provider connections (EPIC P, api#92). One permission, three surfaces. It does **not** auto-cover `integration.bind` server-side; the SPA's capability helper unifies them in the UI but the api treats each endpoint family strictly. |
+| `integration.edit` | Manage the provider connection lifecycle: create, update, delete, discover now and bindings (EPIC P, api#92). Argo CD is configured on a [Gateway](../operations/gateway.md) under the `gateway.*` permissions, not here. It does **not** auto-cover `integration.bind` server-side; the SPA's capability helper unifies them in the UI but the api treats each endpoint family strictly. |
 | `integration.bind` | Bind / unbind self-service-bindable provider connections on projects + environments you cover (EPIC Q, api#99). Scoped via the existing team-aware resolver. Never auto-covered by `integration.edit`; grant explicitly via the `provider_connection_binder` system role (or any custom role carrying this permission). Refuses prod envs, disabled connections, and connections without `self_service_bindable=true`. |
 
 ## Scoped permissions (today)

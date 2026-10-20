@@ -14,7 +14,7 @@ direction is one-way and reviewable.
 |---|---|---|
 | [`core`](core.md) | Go | Provider interface + connectors, shared types. **Infra-free: no Postgres, no Redis.** |
 | [`api`](api.md) | Go (Fiber v3) | Control Plane API. Owns Postgres + Redis + the workflow/RBAC domain. |
-| [`worker`](worker.md) | Go | Background sweepers, the GitOps observation poller, periodic discovery scheduler. |
+| [`worker`](worker.md) | Go | Background sweepers (including the Gateway observation sweepers), periodic discovery scheduler. No Argo CD client. |
 | [`agent`](agent.md) | Go | Outbound-only execution agent. **No Postgres / Redis dependency.** |
 | [`controller`](controller.md) | Go (kubebuilder) | Kubernetes CRD reconciler. Receives the v0.1.0 operator. |
 | [`gateway`](gateway.md) | Go | Optional, outbound-only, read-only observation of Argo CD rollout state. **No Postgres / Redis, no Kubernetes client in Release 1.** Release 1 in progress. |
@@ -28,7 +28,7 @@ direction is one-way and reviewable.
 flowchart LR
     core["core<br/>provider interface +<br/>shared types"]
     api["api<br/>Postgres + Redis<br/>workflow + audit"]
-    worker["worker<br/>sweepers + gitops"]
+    worker["worker<br/>sweepers"]
     agent["agent<br/>outbound only"]
     controller["controller<br/>K8s reconciler"]
     gateway["gateway<br/>outbound only,<br/>read-only"]

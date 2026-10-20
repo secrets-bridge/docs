@@ -16,11 +16,11 @@ Each control-plane step can be done in the console (Admin → Gateways) or with
 straight into a Kubernetes Secret.
 
 !!! warning "Release 1 is in progress"
-    Everything on this page is merged and has not passed QA. The control
-    plane's own Argo CD poller (`SB_GITOPS_ENABLED`) still exists until the
-    cutover in [gateway#13](https://github.com/secrets-bridge/gateway/issues/13)
-    ships. An environment uses one observation source at a time, so a request
-    gets Argo CD state from either the poller or the Gateway, never both.
+    Everything on this page is merged and has not passed QA. The Gateway is
+    the only component that reads Argo CD: the control plane has no Argo CD
+    client and stores no Argo CD token. If you are upgrading an install that
+    used the old control-plane poller, follow
+    [Gateway cutover](gateway-cutover.md) first.
 
 ```mermaid
 sequenceDiagram
@@ -48,10 +48,12 @@ sequenceDiagram
 
 ## Before you start
 
-- The api from `main`, with migrations `0046` to `0048` applied. Migration
+- The api from `main`, with migrations `0046` to `0049` applied. Migration
   `0047` adds `gateway.mint`, `gateway.revoke`, `gateway.list` and
   `gateway.bind` to the seed `admin` role. Migration `0048` adds the
-  observation tables and each environment's observation source.
+  observation tables and each environment's observation source. Migration
+  `0049` removes the control-plane Argo CD integration; see
+  [Gateway cutover](gateway-cutover.md).
 - The worker from `main`, so the Gateway sweepers can be turned on (step 9).
 - An account that holds those permissions and has a second factor enrolled at
   `/me/mfa`. Every admin write on a Gateway needs a fresh second factor. The
@@ -378,12 +380,11 @@ and only an environment set to `gateway` gets Gateway tasks:
 
 | Source | What observes a change executed in the environment |
 |---|---|
-| `control_plane` (default) | The control plane's own Argo CD poller, when `SB_GITOPS_ENABLED` and `SB_WORKER_GITOPS_ENABLED` are on. Otherwise nothing |
-| `gateway` | The Gateways bound to the environment. The control-plane poller is skipped for these requests |
-| `none` | Nothing |
+| `gateway` | The Gateways bound to the environment |
+| `none` (default) | Nothing. The request page shows no Argo CD state |
 
-The source is read once when a request reaches `executed`, so a request is
-observed by one of them, never both. Switching away from `gateway` cancels the
+The source is read once when a request reaches `executed`. There is no other
+observer to fall back to. Switching away from `gateway` cancels the
 environment's open Gateway tasks with the reason `source_changed`. The requests
 themselves are not affected.
 
@@ -405,7 +406,8 @@ curl -fsS -b "$JAR" -X PUT "$CP/api/v1/admin/environments/$ENV_ID/observation-so
   | jq '{observation_source, previous_observation_source, tasks_cancelled}'
 ```
 
-A value other than `control_plane`, `gateway` or `none` answers
+`control_plane`, the source of the retired control-plane poller, answers
+`400 source_retired`. Any other value besides `gateway` and `none` answers
 `400 invalid_observation_source`, and an unknown environment
 `404 environment_not_found`. The change is audited as
 `environment.observation_source.update`.
