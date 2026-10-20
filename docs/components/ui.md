@@ -24,7 +24,7 @@ routing: `/` → ui, `/api/v1/*` → api).
 | `/admin/projects` | Projects | Master-detail (340px project rail + envs panel); soft-delete via archive/restore |
 | `/admin/roles` | Roles | Permission chip picker hydrated from `GET /permissions` (canonical catalog) |
 | `/admin/assignments` | Assignments | User × role × scope table; scope chips with `=` separator |
-| `/admin/workflows` | Workflows | TTL knobs, min approvers, allow self-approval, justification required |
+| `/admin/workflows` | Workflows | TTL knobs, min approvers, justification required |
 | `/admin/policies` | Policies | Selector → workflow priority-ordered list |
 | `/admin/integrations` | Integrations | ArgoCD endpoints + GitOps app mappings; feature-gated banner when §26 is off |
 | `/login` | Login | Real email + password against `POST /auth/login`, which sets the HttpOnly session cookie |

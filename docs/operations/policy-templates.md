@@ -61,7 +61,6 @@ Matching workflow (`min_approvers: 0`):
 {
   "name": "uat-fast-track",
   "min_approvers": 0,
-  "allow_self_approval": true,
   "wrap_ttl_created_seconds": 86400,
   "wrap_ttl_approved_seconds": 3600,
   "wrap_ttl_claimed_seconds": 300,
@@ -109,7 +108,6 @@ Matching workflow:
 {
   "name": "prod-single",
   "min_approvers": 1,
-  "allow_self_approval": false,
   "wrap_ttl_created_seconds": 86400,
   "wrap_ttl_approved_seconds": 1800,
   "wrap_ttl_claimed_seconds": 120,
@@ -153,7 +151,6 @@ Matching workflow:
 {
   "name": "prod-multi",
   "min_approvers": 2,
-  "allow_self_approval": false,
   "wrap_ttl_created_seconds": 86400,
   "wrap_ttl_approved_seconds": 1800,
   "wrap_ttl_claimed_seconds": 120,
