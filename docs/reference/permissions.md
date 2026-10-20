@@ -55,9 +55,9 @@ Added with the [Gateway](../components/gateway.md) registry (migration 0047).
 | Permission | Description |
 |---|---|
 | `gateway.mint` | Create a Gateway record and create or revoke its one-time enrollment tokens. Every change also needs a fresh second factor. |
-| `gateway.revoke` | Revoke a Gateway. Its heartbeats and catalog uploads are refused from then on. Needs a fresh second factor. |
-| `gateway.list` | List Gateways with their replicas, advertised connectors and targets, bindings and token metadata. Never credentials. |
-| `gateway.bind` | Approve a Gateway's advertised connectors and create or delete bindings from a secret scope to an advertised target. Does not imply `integration.bind`, and `integration.bind` does not imply it. Needs a fresh second factor for writes. |
+| `gateway.revoke` | Revoke a Gateway, or disable and enable it. Its heartbeats, catalog uploads and task calls are refused while it is revoked or disabled. Needs a fresh second factor. |
+| `gateway.list` | List Gateways with their replicas, advertised connectors and targets, bindings, token metadata and observation tasks. Never credentials. |
+| `gateway.bind` | Approve a Gateway's advertised connectors, create or delete bindings from a secret scope to an advertised target, and read or set an environment's observation source. Does not imply `integration.bind`, and `integration.bind` does not imply it. Needs a fresh second factor for writes. |
 
 ### Secrets
 

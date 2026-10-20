@@ -79,22 +79,34 @@ Being built now; not yet live or certified. Do not depend on these yet.
   [Sign in with Google](../operations/google-sign-in.md).
 - **Gateway, Release 1 (Argo CD)**: an optional, outbound-only, read-only
   component that runs in your boundary and reports Argo CD rollout state as
-  metadata. Merged: the Gateway binary (Argo CD connector only, signed image),
-  its Helm chart (no RBAC, no service-account token, egress-only
-  NetworkPolicy) and the control-plane registry (enrollment, heartbeat,
-  catalog, connector approval, bindings, revoke, `gateway.*` permissions).
-  Not merged: observation tasks and evidence
-  ([api#294](https://github.com/secrets-bridge/api/issues/294)), their
-  sweepers ([worker#38](https://github.com/secrets-bridge/worker/issues/38)),
-  the console page and the request-page display
-  ([ui#163](https://github.com/secrets-bridge/ui/issues/163)), and the cutover
-  that makes the Gateway the only Argo CD integration
-  ([gateway#13](https://github.com/secrets-bridge/gateway/issues/13)). Until
-  then a Gateway enrolls and reports its catalog but receives no observation
-  tasks, and Argo CD state on a request comes from the control plane's poller
-  (`SB_GITOPS_ENABLED`). Argo CD `Healthy` and `Synced` are operational state,
-  never proof that a secret reached a workload. See
-  [Gateway](../components/gateway.md).
+  metadata. Merged, not yet through QA:
+    - the Gateway binary (Argo CD connector only, signed image) and its Helm
+      chart (no RBAC, no service-account token, egress-only NetworkPolicy);
+    - the control-plane registry: enrollment, heartbeat, catalog, connector
+      approval, bindings, disable, enable, revoke and the `gateway.*`
+      permissions;
+    - observation tasks: a change that reaches `executed` in an environment
+      whose observation source is `gateway` gets a task per binding, which the
+      Gateway claims, leases and answers with metadata-only evidence that the
+      control plane checks against the task's target before it computes the
+      verdict;
+    - the per-environment observation source (`control_plane`, `gateway`,
+      `none`) and the request's evidence at
+      `GET /requests/:id/observations`;
+    - the worker sweepers for leases, deadlines, stale Gateways and old
+      replica rows (`SB_WORKER_GATEWAY_SWEEPERS_ENABLED`);
+    - the console: Admin → Gateways, the Observation column on a project's
+      environments, and the Argo CD panel on the request page.
+
+    Not done: the cutover that makes the Gateway the only Argo CD integration
+    ([gateway#13](https://github.com/secrets-bridge/gateway/issues/13)). Until
+    it ships, the control plane's own poller (`SB_GITOPS_ENABLED`) still
+    exists and observes environments whose source is `control_plane`. Each
+    environment uses one source at a time. Argo CD `Healthy` and `Synced` are
+    operational state, never proof that a secret reached a workload: a
+    Release 1 task ends `unverified` (`context_only`), never `verified`, and a
+    Gateway that is offline or late leaves it `pending` and then `timed_out`,
+    never failed. See [Gateway](../components/gateway.md).
 
 ## Live vs Roadmap
 

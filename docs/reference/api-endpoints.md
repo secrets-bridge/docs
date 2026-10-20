@@ -131,10 +131,10 @@ enabled as a break-glass admin action.
 
 ## Gateways
 
-Release 1 of the [Gateway](../components/gateway.md) registry. Install steps are
-in [Gateway](../operations/gateway.md). The task routes (claim, lease, release,
-result) are not served yet; they come with
-[api#294](https://github.com/secrets-bridge/api/issues/294).
+Release 1 of the [Gateway](../components/gateway.md): the registry and the
+observation tasks. Install steps are in [Gateway](../operations/gateway.md). The
+flow behind the task routes is in
+[Observation flow](../components/gateway.md#observation-flow).
 
 ### Gateway machine routes
 
@@ -148,8 +148,30 @@ authenticated by the one-time token only; every other route needs
 | `POST` | `/api/v1/gateways/enroll` | enrollment token | `{enrollment_token, cluster_name?}` → `201 {gateway_id, gateway_secret, heartbeat_interval_seconds, claim_poll_seconds}`. The secret is returned once. Refused over plain `http` outside `SB_ENV=dev` (`403 https_required`). 10 a minute per IP |
 | `POST` | `/api/v1/gateways/:id/heartbeat` | gateway | `{replica_id, gateway_version, contract_versions, status, in_flight, catalog_version?, connectors?}` → `{status, server_time, next_heartbeat_seconds, claim_poll_seconds, contract_version, catalog_version}`. `429 replica_limit` past `max_replicas`. A replica that reports `over_privileged` is audited as `gateway.over_privileged` |
 | `PUT` | `/api/v1/gateways/:id/catalog` | gateway | Full replace of advertised connectors and targets → `{accepted, targets_stale, catalog_version}`. Never approves or binds anything. A target no longer advertised stays, marked stale |
+| `POST` | `/api/v1/gateways/:id/tasks/claim` | gateway | E4. `{replica_id, max_tasks: 1}` → `200` with one task (`task_id`, `attempt_id`, `attempt_count`, `lease_expires_at`, `deadline_at`, `request_id`, `correlation_id`, `skew_margin_seconds`, `gateway_scope`, `connector_refs`, `expected_change`, `rollout_baseline`), or `204` with `Retry-After: 5` when nothing is claimable or no heartbeat has negotiated a contract version yet. Scoped to the authenticated Gateway. `429 inflight_limit` with `Retry-After` when the Gateway is at `max_inflight_tasks` or the replica already holds a task. `409 contract_version_unsupported`. 2400 a minute |
+| `POST` | `/api/v1/gateways/:id/tasks/:task_id/lease` | gateway | E5. `{replica_id, attempt_id}` → `{lease_expires_at}`. Extends the lease by 60s, capped at the deadline. 1200 a minute |
+| `POST` | `/api/v1/gateways/:id/tasks/:task_id/release` | gateway | E6. `{replica_id, attempt_id, reason}` with `reason` one of `shutdown`, `over_capacity`, `connector_unavailable` → `204`. The task goes back to the queue. Never counts as a failure. 1200 a minute |
+| `POST` | `/api/v1/gateways/:id/tasks/:task_id/result` | gateway | E7. A closed-schema evidence result (`schema_version`, `task_id`, `attempt_id`, `gateway_id`, `replica_id`, `gateway_version`, `started_at`, `finished_at`, `attempt_status`, `refusal_reason?`, `stages`, `clock`) → `{status, task_state, verdict, next}`. `status` is `accepted`, or `duplicate` for the same body sent again for the same attempt. `next` is `none` or `rescheduled`. Body limit 64 KiB. 1200 a minute |
 
-A revoked Gateway gets `401` on heartbeat and catalog.
+A revoked or disabled Gateway gets `401` on every route above. The E4 to E7
+rate limits fail closed: without Redis they answer `503`, which the Gateway
+treats as transient. The claim, lease and release bodies are limited to 4 KiB.
+
+Task route error codes:
+
+| Status | Code | Meaning |
+|---|---|---|
+| `400` | `invalid_request` | Malformed body, unknown field, or ids that do not match the path |
+| `401` | `unauthorized` | The Gateway is not live (revoked or disabled) |
+| `404` | `not_found` | Unknown task, or a task of another Gateway |
+| `409` | `attempt_superseded` | The attempt is not the task's current one: its lease ran out and the task was claimed again, it was released, or the Gateway was revoked or disabled while it held the lease |
+| `409` | `lease_expired` | The lease ended before the call |
+| `409` | `task_closed` | The task is closed (`done`, `dead`, `cancelled`), or its deadline passed and this call closed it as `timed_out` |
+| `409` | `result_conflict` | A different body for an attempt whose result was already accepted |
+| `409` | `contract_version_unsupported` | None of the Gateway's contract versions is the one tasks are written in |
+| `422` | `schema_violation` | The result is outside the closed schema, names a stage the task does not expect, or fails the evidence binding |
+| `422` | `evidence_out_of_window` | `started_at`, `finished_at` or `observed_at` is outside the attempt, allowing for clock skew |
+| `429` | `inflight_limit` | Claim only: the Gateway or the replica is at its in-flight limit |
 
 ### Gateway admin routes (session auth + permission)
 
@@ -166,15 +188,30 @@ Every write also needs a fresh second factor.
 | `POST` | `/api/v1/admin/gateways/:id/connectors/:cid/approve` | `session + gateway.bind` + fresh MFA | `:cid` is the connector's `id`. `409 connector_not_advertised` |
 | `POST` | `/api/v1/admin/gateway-bindings` | `session + gateway.bind` + fresh MFA | `{gateway_id, environment_id, project_id?, secret_id \| (provider_connection_id + secret_ref), argocd_connector_id, argocd_target_id, observation_timeout_seconds?}` → `201`. Argo CD targets only in Release 1 |
 | `GET` | `/api/v1/admin/gateway-bindings` | `session + gateway.bind` | Optional `?gateway_id=` |
-| `DELETE` | `/api/v1/admin/gateway-bindings/:id` | `session + gateway.bind` + fresh MFA | `204` |
+| `DELETE` | `/api/v1/admin/gateway-bindings/:id` | `session + gateway.bind` + fresh MFA | `204`. Cancels the binding's open tasks (`binding_removed`) |
+| `PUT` | `/api/v1/admin/gateways/:id/enabled` | `session + gateway.revoke` + fresh MFA | `{enabled}` → the Gateway. Disable refuses its calls with `401` and moves its leased tasks back to `queued`. Enable returns it to `active`, or `pending` if it never enrolled. `409 gateway_revoked` |
+| `GET` | `/api/v1/admin/gateways/:id/tasks` | `session + gateway.list` | `{items, counts}`. Optional `?state=` (`queued`, `leased`, `done`, `dead`, `cancelled`) and `?limit=` (1 to 500, default 100). Each item has `state`, `verdict`, `verdict_reason`, `attempt_count`, `failure_count`, `not_before`, `deadline_at` and ids, never secret values |
+| `GET` | `/api/v1/admin/environments/:id/observation-source` | `session + gateway.bind` | `{environment_id, observation_source}`. `404 environment_not_found` |
+| `PUT` | `/api/v1/admin/environments/:id/observation-source` | `session + gateway.bind` + fresh MFA | `{observation_source}` with `control_plane`, `gateway` or `none` → `{environment_id, observation_source, previous_observation_source, tasks_cancelled}`. Leaving `gateway` cancels the environment's open tasks (`source_changed`). `400 invalid_observation_source` |
 
 Audit actions, all with ids, enums and counts only: `gateway.create`,
 `gateway.enrollment_token.create`, `gateway.enrollment_token.revoke`,
 `gateway.enroll`, `gateway.revoke`, `gateway.auth.rejected`,
 `gateway.replica_limit`, `gateway.over_privileged`, `gateway.catalog.updated`,
 `gateway.connector.missing`, `gateway.connector.approval_reset`,
-`gateway.connector.approved`, `gateway.binding.create` and
-`gateway.binding.delete`.
+`gateway.connector.approved`, `gateway.binding.create`,
+`gateway.binding.delete`, `gateway.enable`, `gateway.disable` and
+`environment.observation_source.update`.
+
+Observation audit actions: `observation.task.created`,
+`observation.task.claimed`, `observation.task.released`,
+`observation.task.lease_expired`, `observation.evidence.accepted`,
+`observation.evidence.rejected` (with a `reason`),
+`gateway.evidence.outcome_mismatch`, `observation.task.verdict`,
+`observation.task.dead`, `observation.task.timed_out`,
+`observation.task.superseded`, `observation.task.cancelled` and
+`request.observation_skipped` (with a `reason` such as `no_gateway_binding` or
+`source_none`).
 
 ## Requests (access requests)
 
@@ -190,6 +227,7 @@ Audit actions, all with ids, enums and counts only: `gateway.create`,
 | `GET` | `/api/v1/requests/:id/wraps` | user_id | List value-free wrap summaries |
 | `GET` | `/api/v1/requests/:id/wraps/:wrap_id` | user_id | Single-shot retrieve (consumes) |
 | `GET` | `/api/v1/requests/:id/gitops` | user_id | BRD §26 observation list (404 when feature is off) |
+| `GET` | `/api/v1/requests/:id/observations` | session | Gateway evidence for the request, behind the same read check as `GET /requests/:id`: `{observation_source, rollup, label, tasks}`. `rollup` is `none` (no task), `pending`, `verified`, `partially_observed`, `unverified` or `timed_out`. `label` is always `observed_operational_state`. Each task has `gateway_name`, `state`, `verdict`, `verdict_reason`, `deadline_at` and `stages`; each stage has `outcome`, `reported_outcome`, `observed_at`, `connector_id`, `target_id`, `caveats` and `facts`. Argo CD stages always carry `argocd_health_not_proof`. Resource names are not included. Tasks past their deadline are closed as `timed_out` before the read |
 
 ## Cross-team requests
 

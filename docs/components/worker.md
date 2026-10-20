@@ -19,6 +19,10 @@ read-only ArgoCD observation poller (BRD §26).
 | `discover-scheduler` | 5m | Enqueue one discover job per configured target (env var today; admin API tracked) |
 | `gitops-poller` | 15s | Claim a queued observation → call ArgoCD → record `observed_state` → transition |
 | `gitops-timeout` | 60s | Flip observations past their `timeout_at` to `applied_unverified` |
+| `observation-leases` | 30s | Put Gateway observation tasks whose lease ran out back to `queued`. Opt-in with `SB_WORKER_GATEWAY_SWEEPERS_ENABLED` |
+| `observation-deadlines` | 30s | Close open observation tasks past their deadline as `timed_out` (`deadline_reached` or `gateway_unavailable`), never failed. Opt-in |
+| `gateways-stale` | 1m | Flip Gateways with no heartbeat for `SB_WORKER_GATEWAYS_STALE_AFTER` (2m) from `active` to `stale`. Opt-in |
+| `gateway-replicas-prune` | 1h | Delete Gateway replica rows not seen for 24h. Opt-in |
 | `users-pending` | 1m | Post one webhook message about accounts newly [waiting for approval](../operations/google-sign-in.md#notify-admins-from-the-worker), by email only. Registered only when `SB_WORKER_WEBHOOK_URL` is set |
 
 ## Multi-replica safety
@@ -67,5 +71,6 @@ runs each sweeper per tick, the others record `worker_scheduler_lock_skipped_tot
 | `DATABASE_URL` | yes | - | Same Postgres as the api |
 | `REDIS_URL` | yes | - | Same Redis as the api |
 | `SB_WORKER_GITOPS_ENABLED` | no | `false` | Must match the api's `SB_GITOPS_ENABLED` for §26 to be active |
+| `SB_WORKER_GATEWAY_SWEEPERS_ENABLED` | no | `false` | Turns on the four Gateway observation sweepers. Their intervals are in the [Configuration reference](../operations/config.md#worker) |
 | `SB_DISCOVER_TARGETS_JSON` | no | - | Array of `{agent_id, provider, config, scope}`; admin API replaces this |
 | Sweeper interval overrides | no | per-sweeper defaults | `SB_WORKER_WRAPS_EXPIRED_INTERVAL`, etc. See [Configuration reference](../operations/config.md#worker) |
