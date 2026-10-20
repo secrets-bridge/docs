@@ -184,6 +184,94 @@ docker exec secrets-bridge-vault-1 sh -c \
 If that works but the agent gets denied, the agent token has less
 scope than the dev token. Adjust the policy in Vault.
 
+## Gateway
+
+Install steps are in [Gateway](gateway.md). Start with the pod log
+(`kubectl -n tenant-a-uat logs deploy/secrets-bridge-gateway`) and the detail
+view (`GET /api/v1/admin/gateways/<id>`), which shows each replica's last
+heartbeat and each connector's health.
+
+### Gateway pod is not ready, or exits at boot
+
+Check the log for the first error:
+
+- `identity: ... has mode ...`: the identity file can be read by other
+  users or written by its group. The Gateway accepts `0400`, `0600` or `0440`.
+  The chart mounts the Secret with mode `0440` and `fsGroup`; a hand-written
+  manifest with `defaultMode: 0444` is refused. Fix the mode, and rotate the
+  Gateway secret (revoke, create, enroll) if other users could read it.
+- `identity: ... does not exist`: the Secret uses a key other than
+  `identity.key` (default `identity.json`). A pod whose Secret does not exist
+  at all stays in `ContainerCreating`.
+- `identity: ... is not a valid identity JSON object` or `... is missing
+  gateway_id or gateway_secret`: the file must hold exactly
+  `{"gateway_id": "...", "gateway_secret": "..."}`. Unknown fields are
+  refused, so storing the whole enrollment response does not work. The
+  `jq -ce '{gateway_id, gateway_secret}'` step in the install pipeline keeps
+  only those two fields.
+- `connector self-check did not pass; not ready until it does` with status
+  `unauthorized` or `unreachable`: the Argo CD token check
+  (`GET /api/v1/session/userinfo`) failed. Check that the token Secret holds a
+  valid token for the `sb-gateway` account, that `base_url` is right, and that
+  the connector's `egress` peer lets the pod reach Argo CD. The Gateway retries
+  before each heartbeat and turns ready once the check passes.
+- `connector kind is not enabled in Release 1`: the connectors file names
+  `eso` or `rollout`. Release 1 binds `argocd` only.
+- No heartbeat accepted within `SB_GATEWAY_CP_UNREACHABLE_AFTER` (default
+  `2m`): the control plane is unreachable. Check `cp.endpoint`, the
+  `cp.egress.cidrs` NetworkPolicy peer and, for a private CA,
+  `cp.caExistingSecret`.
+
+### Gateway refuses to start: over-privileged
+
+A log line `refusing to start: connectors: credential is over-privileged` (or
+`self-check could not prove the credential cannot read secrets`) comes from the
+Kubernetes self-check. It runs only for the Release 2 `eso` and `rollout`
+connectors, which need `SB_GATEWAY_ENABLE_R2_CONNECTORS=true`; a Release 1
+Gateway built from the chart has no Kubernetes access and never runs it.
+
+The Gateway refuses to start when its service account can use any verb on
+`secrets`, or any write verb on a resource a connector reads, or when a review
+call fails. There is no override. Remove the grant from the RBAC bound to the
+Gateway's service account. When a recheck finds such a grant on a running
+Gateway, it reports `over_privileged` in a heartbeat before it stops, and the
+api records a `gateway.over_privileged` audit event.
+
+### Connector advertised but nothing is bound
+
+The Gateway reports its connectors and targets in the catalog, but an
+advertised connector does nothing until an admin approves it and binds a
+target. In the detail view, check the connector's `status`:
+
+- `advertised`: approve it with
+  `POST /api/v1/admin/gateways/<id>/connectors/<connector-uuid>/approve`.
+- `approved` but no entry under `bindings`: create a binding with
+  `POST /api/v1/admin/gateway-bindings`.
+- `missing`: the Gateway no longer advertises this connector. Check the
+  connector `name` in the chart values.
+
+A binding request that fails answers with a closed code. `target_not_advertised`
+means the `argocd_target_id` is not an application `id` in the connectors file,
+and `target_stale` means the Gateway advertised it once but no longer does.
+
+### Gateway gets 401 from the control plane
+
+The log shows `control plane refused this gateway; claiming stopped, staying up
+and not ready until restarted`. The pod stays up and not ready on purpose, so it
+does not restart-loop. The api records `gateway.auth.rejected`.
+
+The usual cause is a revoked Gateway (`status: "revoked"` in
+`GET /api/v1/admin/gateways`). There is no rotation in Release 1: create a new
+Gateway, mint a token, enroll, replace the identity Secret and restart the
+Deployment. If the Gateway is still `active`, the Secret holds a credential
+that does not belong to it, for example from an earlier enrollment.
+
+### `claim failed` warnings with a not-found error
+
+Expected until [api#294](https://github.com/secrets-bridge/api/issues/294) is
+merged. The Gateway polls for observation tasks and the api does not serve that
+route yet. Readiness is not affected.
+
 ## Useful queries against the audit log
 
 ### Find every action for one request

@@ -40,6 +40,21 @@ that isn't possible, code review is the gate.
 | `core` stays infra-free | Same `go.sum` audit on the `core` repo; no `database/sql`, no `redis/go-redis` |
 | Plain `http://` to the Control Plane is refused by default | Agent's `validateEndpoint` rejects non-https schemes unless `SB_INSECURE_TRANSPORT=true` is set; loud WARN log at startup if the flag is on |
 
+### Gateway (Release 1, in progress)
+
+The [Gateway](../components/gateway.md) is optional and its observation path is
+not merged yet. These rules hold in the merged binary, chart and registry. The
+full STRIDE analysis is the
+[Gateway threat model](https://github.com/secrets-bridge/gateway/blob/main/docs/design/threat-model.md).
+
+| Rule | How it's enforced |
+|---|---|
+| The Gateway changes nothing it observes | Argo CD is read through a transport pinned to the configured origin that allows GET to two paths only; every other method, path and query key is refused before the request leaves the process. The control-plane client refuses any route outside the Gateway endpoints |
+| The Gateway never reads Kubernetes Secrets | Release 1 has no Kubernetes access: the chart renders no Role and mounts no service-account token. The Release 2 Kubernetes connectors refuse to start if the service account can use any verb on `secrets` or a write verb on what they read, with no override |
+| The control plane cannot redirect the Gateway | A task names a connector id and a target id only. Hosts, AppProjects and Applications come from the Gateway's local configuration |
+| Gateway and agent credentials are separate | Own tables, `X-Gateway-Secret` header and `GatewayAuth` middleware. The secret is stored as a SHA-256 hash and compared in constant time |
+| Argo CD health is never proof of propagation | The Argo CD connector reports at most `observed` with confidence `low` and attaches the caveat `argocd_health_not_proof`. The verdict rules in [ADR 0001](https://github.com/secrets-bridge/gateway/blob/main/docs/adr/0001-gateway-observation-plane.md), which arrive with [api#294](https://github.com/secrets-bridge/api/issues/294), never count that stage toward a verdict, and leave a request with no Gateway evidence unverified, never failed |
+
 ### Authentication & authorization
 
 | Rule | How it's enforced |
@@ -75,6 +90,7 @@ that isn't possible, code review is the gate.
 |---|---|---|
 | Compromised host running the agent | Steal the agent credential (the identity file or `SB_AGENT_SECRET`) | **Open**: the credential is a long-lived bearer secret. Workload identity (SPIFFE / IRSA) and rotation are [agent#12](https://github.com/secrets-bridge/agent/issues/12) + [api#28](https://github.com/secrets-bridge/api/issues/28) |
 | KMS master key rotation breaks the platform | Operator can't rotate without downtime | **Open**: tested runbook is [api#31](https://github.com/secrets-bridge/api/issues/31) |
+| Customer admin who controls a Gateway | Report false Argo CD state for their own requests | **Accepted for Release 1**: evidence is customer-side attestation, and the design labels it with the Gateway that observed it. Signed evidence is [gateway#7](https://github.com/secrets-bridge/gateway/issues/7) and must ship before Gateway evidence is presented as compliance evidence |
 | DBA with direct Postgres access | Drop the audit triggers | **Acknowledged**: the schema is a defense; database-level RBAC and audit-log shipping to a separate system are deployment-side responsibilities |
 
 Remaining findings from the 2026-09 security assessment are tracked in

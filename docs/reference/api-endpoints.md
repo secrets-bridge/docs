@@ -9,6 +9,7 @@ required to call it.
 | `session` | A signed-in session: the `sb_session` cookie from `/auth/login` or a sign-in callback. There are no bearer tokens; scripts keep the cookie in a jar (`curl -c jar`, then `-b jar`) |
 | `session + perm` | A session + the named permission via `auth.Require(perm)` |
 | `agent` | An agent's `X-Agent-Secret` header (validated by `AgentAuth` middleware) |
+| `gateway` | A Gateway's `X-Gateway-Secret` header (validated by `GatewayAuth` middleware) |
 | `user_id` | A `?user_id=<uuid>` query param matching the request's requester (stop-gap until OIDC) |
 
 ## Probes
@@ -127,6 +128,53 @@ enabled as a break-glass admin action.
     - **Heartbeat response shape.** A heartbeat *with a body* now returns **200** `{status, server_time, next_heartbeat_seconds}`. A **bodyless** heartbeat keeps the original empty **204**. Existing agents are unaffected.
     - **Revoke audit action.** New revocations emit `agent.revoked` (metadata: `agent_id`, `provider_connection_id`, `reason`). Legacy audit rows may still carry the older `agent.revoke` action, so dashboards should alias both.
     - **Prefer the admin/provider projections.** `GET /api/v1/agents` remains a thin list. New integrations should use `GET /api/v1/admin/agents`, `GET /api/v1/admin/agents/:id`, or `GET /api/v1/provider-connections/:id/agents` (richer projection incl. `provider_connection_id`).
+
+## Gateways
+
+Release 1 of the [Gateway](../components/gateway.md) registry. Install steps are
+in [Gateway](../operations/gateway.md). The task routes (claim, lease, release,
+result) are not served yet; they come with
+[api#294](https://github.com/secrets-bridge/api/issues/294).
+
+### Gateway machine routes
+
+The `/api/v1/gateways/` prefix is exempt from the session gate. Enrollment is
+authenticated by the one-time token only; every other route needs
+`X-Gateway-Secret` and is rate limited per authenticated Gateway. Errors are
+`{"error": "<code>"}` from a closed list and never echo request content.
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| `POST` | `/api/v1/gateways/enroll` | enrollment token | `{enrollment_token, cluster_name?}` → `201 {gateway_id, gateway_secret, heartbeat_interval_seconds, claim_poll_seconds}`. The secret is returned once. Refused over plain `http` outside `SB_ENV=dev` (`403 https_required`). 10 a minute per IP |
+| `POST` | `/api/v1/gateways/:id/heartbeat` | gateway | `{replica_id, gateway_version, contract_versions, status, in_flight, catalog_version?, connectors?}` → `{status, server_time, next_heartbeat_seconds, claim_poll_seconds, contract_version, catalog_version}`. `429 replica_limit` past `max_replicas`. A replica that reports `over_privileged` is audited as `gateway.over_privileged` |
+| `PUT` | `/api/v1/gateways/:id/catalog` | gateway | Full replace of advertised connectors and targets → `{accepted, targets_stale, catalog_version}`. Never approves or binds anything. A target no longer advertised stays, marked stale |
+
+A revoked Gateway gets `401` on heartbeat and catalog.
+
+### Gateway admin routes (session auth + permission)
+
+Every write also needs a fresh second factor.
+
+| Method | Path | Auth | Notes |
+|---|---|---|---|
+| `POST` | `/api/v1/admin/gateways` | `session + gateway.mint` + fresh MFA | `{name, boundary, environment_id?, max_replicas?, max_inflight_tasks?}` → `201`, status `pending`. `409 gateway_name_taken` |
+| `GET` | `/api/v1/admin/gateways` | `session + gateway.list` | `{items: [...]}` with status (`pending`, `active`, `stale`, `disabled`, `revoked`), versions, last heartbeat and replica count. Never credentials |
+| `GET` | `/api/v1/admin/gateways/:id` | `session + gateway.list` | `{gateway, replicas, connectors, bindings, enrollment_tokens}`, metadata only |
+| `POST` | `/api/v1/admin/gateways/:id/enrollment-token` | `session + gateway.mint` + fresh MFA | `{expires_in_seconds?, expected_cluster_name?}` → `201 {id, gateway_id, enrollment_token, expires_at}`. The token is returned once. Default TTL 900s, clamped to 60 to 86400. `409 gateway_not_pending` once enrolled |
+| `POST` | `/api/v1/admin/gateway-enrollment-tokens/:id/revoke` | `session + gateway.mint` + fresh MFA | Revoke an unused token. `204` |
+| `POST` | `/api/v1/admin/gateways/:id/revoke` | `session + gateway.revoke` + fresh MFA | `{reason?}` → the Gateway, status `revoked`. `409 gateway_already_revoked` |
+| `POST` | `/api/v1/admin/gateways/:id/connectors/:cid/approve` | `session + gateway.bind` + fresh MFA | `:cid` is the connector's `id`. `409 connector_not_advertised` |
+| `POST` | `/api/v1/admin/gateway-bindings` | `session + gateway.bind` + fresh MFA | `{gateway_id, environment_id, project_id?, secret_id \| (provider_connection_id + secret_ref), argocd_connector_id, argocd_target_id, observation_timeout_seconds?}` → `201`. Argo CD targets only in Release 1 |
+| `GET` | `/api/v1/admin/gateway-bindings` | `session + gateway.bind` | Optional `?gateway_id=` |
+| `DELETE` | `/api/v1/admin/gateway-bindings/:id` | `session + gateway.bind` + fresh MFA | `204` |
+
+Audit actions, all with ids, enums and counts only: `gateway.create`,
+`gateway.enrollment_token.create`, `gateway.enrollment_token.revoke`,
+`gateway.enroll`, `gateway.revoke`, `gateway.auth.rejected`,
+`gateway.replica_limit`, `gateway.over_privileged`, `gateway.catalog.updated`,
+`gateway.connector.missing`, `gateway.connector.approval_reset`,
+`gateway.connector.approved`, `gateway.binding.create` and
+`gateway.binding.delete`.
 
 ## Requests (access requests)
 

@@ -179,6 +179,7 @@ nav:
       - Agent: components/agent.md
       - Worker: components/worker.md
       - Controller (Kubernetes): components/controller.md
+      - Gateway: components/gateway.md
       - UI (SPA): components/ui.md
       - Core (shared library): components/core.md
   - Design system:
@@ -199,6 +200,7 @@ nav:
       - Reveal sessions: operations/reveal-sessions.md
       - Cross-team requests: operations/cross-team-requests.md
       - Provider connections: operations/provider-connections.md
+      - Gateway: operations/gateway.md
       - Object storage: operations/object-storage.md
       - Verifying images and charts: operations/verifying-releases.md
       - Configuration reference: operations/config.md

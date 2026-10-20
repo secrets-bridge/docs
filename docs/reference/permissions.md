@@ -15,7 +15,7 @@ edit their permission lists but can't delete the rows.
 
 | Role | Permissions | Notes |
 |---|---|---|
-| `admin` | `role.edit`, `user_role.edit`, `workflow.edit`, `policy.edit`, `agent.mint`, `agent.revoke`, `secret.request`, `secret.approve`, `audit.read`, `auth.sso.edit` | `auth.sso.edit` is added by migration 0043, so the bootstrap admin can connect Google from the console. |
+| `admin` | `role.edit`, `user_role.edit`, `workflow.edit`, `policy.edit`, `agent.mint`, `agent.revoke`, `secret.request`, `secret.approve`, `audit.read`, `auth.sso.edit`, `gateway.mint`, `gateway.revoke`, `gateway.list`, `gateway.bind` | `auth.sso.edit` is added by migration 0043, so the bootstrap admin can connect Google from the console. The four `gateway.*` permissions are added by migration 0047 and go to no other seed role. |
 | `approver` | `secret.approve`, `audit.read` | |
 | `developer` | `secret.request`, `secret.reveal.direct`, `audit.read` | |
 | `value_provider` | `secret.value.provide` | Slice N seed, used for the [cross-team flow](../operations/cross-team-requests.md). Assignment **must** carry a `team_id` scope; the Assignments form gates global grants behind a type-to-confirm. |
@@ -47,6 +47,17 @@ edit their permission lists but can't delete the rows.
 | `agent.mint` | Create one-time agent enrollment tokens for a provider connection, and revoke unused ones. Also gates the legacy direct mint (`POST /api/v1/agents`), which stays disabled unless the dev-only `SB_ALLOW_DIRECT_AGENT_MINT` is on. |
 | `agent.revoke` | Revoke an agent. Heartbeats stop being accepted. |
 | `agent.list` | (Reserved) List agents in the projection. Today this is open to any signed-in user. |
+
+### Gateways
+
+Added with the [Gateway](../components/gateway.md) registry (migration 0047).
+
+| Permission | Description |
+|---|---|
+| `gateway.mint` | Create a Gateway record and create or revoke its one-time enrollment tokens. Every change also needs a fresh second factor. |
+| `gateway.revoke` | Revoke a Gateway. Its heartbeats and catalog uploads are refused from then on. Needs a fresh second factor. |
+| `gateway.list` | List Gateways with their replicas, advertised connectors and targets, bindings and token metadata. Never credentials. |
+| `gateway.bind` | Approve a Gateway's advertised connectors and create or delete bindings from a secret scope to an advertised target. Does not imply `integration.bind`, and `integration.bind` does not imply it. Needs a fresh second factor for writes. |
 
 ### Secrets
 
