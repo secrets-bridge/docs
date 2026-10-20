@@ -1997,9 +1997,10 @@ data-encryption key the agent zeroes after one AES-GCM operation.
 Even a TLS-terminating proxy sees only ciphertext.</p>
 <h4 id="workflow">Workflow<a class="headerlink" href="#workflow" title="Permanent link">&para;</a></h4>
 <p>A reusable approval template: minimum approver count, justification
-required, self-approval allowed, TTLs for the various wrap
-lifecycle phases. Captured at request submit time so policy edits
-don't retroactively change in-flight requests.</p>
+required, TTLs for the various wrap lifecycle phases. There is no
+self-approval setting: a requester can never approve their own
+request. The policy match picks the workflow at submit; approval
+reads the workflow's current approver count when the vote is cast.</p>
 <h4 id="wrap-summary">Wrap summary<a class="headerlink" href="#wrap-summary" title="Permanent link">&para;</a></h4>
 <p>The value-free metadata projection of a wrap (id, key_name,
 consumed flag, expires_at). Lets the UI render the Wraps card on

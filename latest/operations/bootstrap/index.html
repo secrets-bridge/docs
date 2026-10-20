@@ -2314,13 +2314,11 @@ configured for it:</p>
    number</li>
 <li><strong>Submit</strong> → you're navigated to the request detail page</li>
 </ol>
-<p>Then either:</p>
-<ul>
-<li>Sign in as a second user (with <code>secret.approve</code> permission)
-  and approve from the Requests page's Approver queue, or</li>
-<li>Enable <code>allow_self_approval</code> on the workflow used by the request
-  and approve from the detail page's Approver actions card.</li>
-</ul>
+<p>Then sign in as a second user with the <code>secret.approve</code> permission
+and approve from the Requests page's Approver queue. The requester
+can never approve or reject their own request, whatever their role
+(admin included) or the workflow says: the api answers
+<code>403 separation_of_duties_violated</code> and audits the attempt.</p>
 <p>Once approved → agent claims → fetches → posts wrap → request →
 <code>executed</code>. Refresh the detail page; the Wraps card now shows
 <code>DB_PASSWORD</code> with the <strong>Reveal (one-time)</strong> button. Click it,
