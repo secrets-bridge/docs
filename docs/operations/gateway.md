@@ -95,15 +95,16 @@ changes, so you can rotate it by updating the Secret.
 ## 2. Sign in and step up
 
 The api uses a session cookie, so keep it in a private cookie jar. The password
-and the TOTP code are read from the terminal.
+and the TOTP code are read from the terminal and passed to `jq` on stdin, so
+they never appear on a command line or in the process list.
 
 ```bash
 CP=https://cp.example.com
 
 JAR=$(mktemp) && chmod 600 "$JAR"
 read -rp 'Admin email: ' SB_ADMIN_EMAIL
-read -rsp 'Admin password: ' SB_ADMIN_PASSWORD; echo
-jq -n --arg e "$SB_ADMIN_EMAIL" --arg p "$SB_ADMIN_PASSWORD" '{email:$e,password:$p}' \
+IFS= read -rsp 'Admin password: ' SB_ADMIN_PASSWORD; echo
+printf '%s\n%s\n' "$SB_ADMIN_EMAIL" "$SB_ADMIN_PASSWORD" | jq -Rn '{email: input, password: input}' \
   | curl -fsS -c "$JAR" -o /dev/null -X POST "$CP/api/v1/auth/login" \
       -H 'Content-Type: application/json' --data-binary @-
 unset SB_ADMIN_PASSWORD
@@ -113,11 +114,12 @@ FACTOR_ID=$(curl -fsS -b "$JAR" "$CP/api/v1/users/me/mfa/factors" \
   | jq -r 'map(select(.kind == "totp"))[0].id')
 CHALLENGE_ID=$(curl -fsS -b "$JAR" -X POST "$CP/api/v1/auth/mfa/challenge" \
   -H 'Content-Type: application/json' -d '{"kind":"totp"}' | jq -r .challenge_id)
-read -rp 'TOTP code: ' SB_TOTP_CODE
-jq -n --arg c "$CHALLENGE_ID" --arg f "$FACTOR_ID" --arg code "$SB_TOTP_CODE" \
-    '{challenge_id:$c, factor_id:$f, code:$code}' \
+IFS= read -rsp 'TOTP code: ' SB_TOTP_CODE; echo
+printf '%s\n%s\n%s\n' "$CHALLENGE_ID" "$FACTOR_ID" "$SB_TOTP_CODE" \
+  | jq -Rn '{challenge_id: input, factor_id: input, code: input}' \
   | curl -fsS -b "$JAR" -o /dev/null -X POST "$CP/api/v1/auth/mfa/verify" \
       -H 'Content-Type: application/json' --data-binary @-
+unset SB_TOTP_CODE
 ```
 
 If a later write answers `401` with `WWW-Authenticate: step-up`, the 15 minutes
@@ -168,7 +170,7 @@ and the secret never appear on a command line, in shell history or on disk.
 
 ```bash
 # Skip this read if you minted the token in this shell in step 3.
-read -rsp 'Enrollment token: ' SB_GATEWAY_ENROLL_TOKEN; echo
+IFS= read -rsp 'Enrollment token: ' SB_GATEWAY_ENROLL_TOKEN; echo
 
 printf '%s' "$SB_GATEWAY_ENROLL_TOKEN" \
   | jq -Rs '{enrollment_token: ., cluster_name: "tenant-a-uat"}' \
