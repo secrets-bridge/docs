@@ -110,7 +110,7 @@ sources.
 | `SB_WORKER_WEBHOOK_SLACK_FORMAT` | no | `false` | Wraps payload in `{text: ...}` |
 | `SB_WORKER_USERS_PENDING_INTERVAL` | no | `1m` | How often the `users-pending` sweeper posts about accounts waiting for approval, at most one message per run. At least `30s`, or the worker refuses to start. See [Sign in with Google](google-sign-in.md#notify-admins-from-the-worker) |
 | `SB_PUBLIC_URL` | no |  | Same variable as the api's, used for the link in the waiting-account message. Unset, the address saved in the console is used. An invalid value stops the worker at boot |
-| `SB_WORKER_GATEWAY_SWEEPERS_ENABLED` | no | `false` | Turns on the four [Gateway](gateway.md#9-turn-on-the-worker-sweepers) sweepers below. Off, the worker never reads the Gateway and observation tables |
+| `SB_WORKER_GATEWAY_SWEEPERS_ENABLED` | no | `false` | Turns on the four [Gateway](gateway.md#9-turn-on-the-worker-sweepers) sweepers below. Off, the worker never reads the Gateway and observation tables. In the `secrets-bridge` chart, set `worker.config.gatewaySweepers.enabled` (and the intervals under `worker.config.gatewaySweepers`); the chart always renders this variable, so a value in the env Secret is overridden |
 | `SB_WORKER_OBSERVATION_LEASES_INTERVAL` | no | `30s` | Tick of `observation-leases`, which puts tasks whose lease ran out back in the queue. At least `5s` |
 | `SB_WORKER_OBSERVATION_DEADLINES_INTERVAL` | no | `30s` | Tick of `observation-deadlines`, which closes open tasks past their deadline as `timed_out`. At least `5s` |
 | `SB_WORKER_OBSERVATION_BATCH_SIZE` | no | `200` | Tasks per statement. A tick runs up to 10 batches. 1 to 1000 |
@@ -129,7 +129,10 @@ access to the KMS key; the api is the only component that uses it.
 These settings are no longer read. If one is set, the component logs its name
 at startup, never its value, and carries on. No value turns the old behaviour
 back on, and a value that used to fail validation no longer stops the boot.
-Remove them from your environment and chart values.
+Remove them from your env Secret. The `secrets-bridge` chart no longer renders
+them, and its old `api.config.gitopsEnabled`, `worker.config.gitopsEnabled` and
+`worker.config.gitops*` values were removed; delete them from your values
+files.
 
 | Env var | Component | What it used to do |
 |---|---|---|

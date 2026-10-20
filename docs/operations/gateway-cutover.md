@@ -14,7 +14,7 @@ This page is for installs that used the old control-plane poller
 (`SB_GITOPS_ENABLED` on the api and `SB_WORKER_GITOPS_ENABLED` on the worker)
 and are upgrading to an api that includes migration `0049`. If you never turned
 the poller on, the upgrade only changes the default observation source to
-`none`. Skip to [After upgrading](#after-upgrading), steps 3 to 5.
+`none`. Skip to [After upgrading](#after-upgrading), steps 3 to 6.
 
 !!! danger "Action required: rotate the Argo CD account token"
     The token you gave the control plane sat in its Postgres as a KMS
@@ -48,9 +48,14 @@ every environment to a Gateway before the poller goes away.
 3. **Approve the connector and bind each application** that had a mapping to
    the same secret scope, in the same environment
    ([step 7](gateway.md#7-approve-the-connector-and-bind-a-target)).
-4. **Turn on the worker's Gateway sweepers** with
-   `SB_WORKER_GATEWAY_SWEEPERS_ENABLED=true`
-   ([step 9](gateway.md#9-turn-on-the-worker-sweepers)).
+4. **Turn on the worker's Gateway sweepers**
+   ([step 9](gateway.md#9-turn-on-the-worker-sweepers)). With the
+   `secrets-bridge` chart, set `worker.config.gatewaySweepers.enabled=true`.
+   The chart always renders `SB_WORKER_GATEWAY_SWEEPERS_ENABLED`, and the
+   rendered value wins over one in the env Secret. If the chart version you
+   run today has no `gatewaySweepers` values, set
+   `SB_WORKER_GATEWAY_SWEEPERS_ENABLED=true` in the env Secret for now and
+   move it to the chart value when you upgrade the chart.
 5. **Check parity on one environment.** Switch it to `gateway`
    ([step 8](gateway.md#8-switch-the-environment-to-gateway-observation)),
    submit and approve a change to a bound secret, and open the request page.
@@ -60,16 +65,16 @@ every environment to a Gateway before the poller goes away.
    operational state and carries the caveat that Argo CD health is not proof
    the new value reached the app. The api's parity test checks the same thing.
 6. Repeat step 5 for every environment that used the poller, or move them in
-   one go after the upgrade (step 5 after upgrading).
+   one go after the upgrade (step 6 after upgrading).
 
 An environment that has no Gateway when you upgrade still works. Its requests
 run as before and show no Argo CD state until a Gateway observes them.
 
 ## What the upgrade does
 
-Upgrade the api and the worker in the same release. The api applies migration
-`0049` when it starts. An older worker with the poller still on would read
-tables that the migration drops.
+Upgrade the api, the worker and the `secrets-bridge` chart in the same
+release. The api applies migration `0049` when it starts. An older worker with
+the poller still on would read tables that the migration drops.
 
 Migration `0049`:
 
@@ -121,40 +126,69 @@ curl -fsS -b "$JAR" "$CP/api/v1/audit-events?actor=system:migration&action=envir
     Backups taken before the upgrade keep the old ciphertext until they age
     out. Rotating the token makes it worthless.
 
-2. **Remove Argo CD egress from the api and the worker.** If you added
-   NetworkPolicy rules (in the `secrets-bridge` chart,
+2. **Remove Argo CD egress from the api and the worker.** Delete any rule you
+   added so the control plane could reach Argo CD: entries in
    `api.networkPolicy.egress.extraRules` and
-   `worker.networkPolicy.egress.extraRules`) or
-   firewall rules so the control plane could reach Argo CD, delete them. Only
-   the Gateway's egress needs to reach Argo CD.
+   `worker.networkPolicy.egress.extraRules` of the `secrets-bridge` chart, and
+   any firewall rule outside the cluster. Only the Gateway reaches Argo CD,
+   through the NetworkPolicy of its own chart.
 
-3. **Remove the retired settings.** `SB_GITOPS_ENABLED`,
-   `SB_ALLOW_INSECURE_ARGOCD_ADDR` and `SB_WORKER_GITOPS_*` switch nothing. If
-   one is still set, the api or worker logs its name at startup, never its
-   value. Remove them from your environment Secret and chart values
-   (`api.config.gitopsEnabled`, `worker.config.gitopsEnabled` and the
-   `worker.config.gitops*` intervals). The chart may still render
-   `SB_GITOPS_ENABLED` and `SB_WORKER_GITOPS_ENABLED` from those values; the
-   startup notice is then expected and harmless. See
-   [Retired settings](config.md#retired-settings).
+3. **Remove the retired values and settings.** The `secrets-bridge` chart no
+   longer has these values, and Helm ignores them if they are left in a values
+   file. Delete them from your values files:
+
+    ```yaml
+    api:
+      config:
+        gitopsEnabled: false        # remove
+    worker:
+      config:
+        gitopsEnabled: false        # remove
+        gitopsPollInterval: 15s     # remove
+        gitopsTimeoutInterval: 1m   # remove
+        gitopsHttpTimeout: 15s      # remove
+        gitopsBatchSize: 20         # remove
+    ```
+
+    The chart no longer renders `SB_GITOPS_ENABLED`,
+    `SB_ALLOW_INSECURE_ARGOCD_ADDR` or `SB_WORKER_GITOPS_*`. If one of them is
+    still in your env Secret, the api or the worker logs its name once at
+    startup, never its value, and ignores it. Remove it from the Secret. See
+    [Retired settings](config.md#retired-settings).
 
 4. **Remove the worker's KMS access.** The worker opened the KMS backend only
-   to unwrap stored Argo CD tokens, and it no longer reads `SB_KMS_*`. Take the
-   worker's identity out of the KMS key policy or IAM role (`aws-kms`) or the
-   Vault transit policy (`vault-transit`). If the worker shares the api's
-   environment Secret, it still receives the KMS credentials there. Give the
-   worker its own Secret without them when your deployment allows it, and drop
-   any worker egress rule that exists only for the KMS endpoint. The api still
-   needs KMS for wraps and its other envelopes.
+   to unwrap stored Argo CD tokens. It no longer reads `SB_KMS_*`, and the
+   chart no longer sets them on the worker. Take the KMS permissions off the
+   worker's identity: its IAM role (`worker.serviceAccount.annotations`) for
+   `aws-kms`, or its Vault policy for `vault-transit`. Drop any worker egress
+   rule that exists only for the KMS endpoint. Leave the api's KMS access
+   alone: it still needs it for wraps and its other envelopes.
 
-5. **Set each environment's observation source to `gateway`** once a Gateway
+    The chart still mounts the shared env Secret (`secrets.existingSecret`)
+    into the worker through `envFrom`, and the chart has no separate Secret for
+    the worker. Any KMS credential stored in that Secret, such as
+    `SB_KMS_VAULT_TOKEN`, is therefore still in the worker's environment,
+    although the worker ignores it. With `aws-kms`, give the KMS permissions
+    to the api's IRSA role (`api.serviceAccount.annotations`) so no KMS
+    credential sits in the shared Secret. With `vault-transit`, the Vault
+    token in the shared Secret still reaches the worker's environment.
+
+5. **Keep the Gateway sweepers on.** Check that
+   `worker.config.gatewaySweepers.enabled` is `true` in your values. If you
+   set `SB_WORKER_GATEWAY_SWEEPERS_ENABLED` in the env Secret before the
+   upgrade, move it to this value: the chart now renders the variable, and
+   the rendered value (`false` by default) wins over the Secret. The interval
+   values are listed in the
+   [configuration reference](config.md#worker).
+
+6. **Set each environment's observation source to `gateway`** once a Gateway
    is bound for it
    ([step 8](gateway.md#8-switch-the-environment-to-gateway-observation)).
    Environments the migration moved to `none` stay unobserved until you do.
    The source is read when a request reaches `executed`, so requests executed
    before the switch get no tasks.
 
-6. **Ignore the leftover Argo CD integration page** in the console
+7. **Ignore the leftover Argo CD integration page** in the console
    (Admin → Integrations). The api no longer serves its routes, so it shows a
    feature-off banner. Its advice to set `SB_GITOPS_ENABLED` does not apply.
    The Observation dialog may still list **Control plane**; saving it answers

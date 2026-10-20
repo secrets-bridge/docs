@@ -415,7 +415,10 @@ curl -fsS -b "$JAR" -X PUT "$CP/api/v1/admin/environments/$ENV_ID/observation-so
 ## 9. Turn on the worker sweepers
 
 The worker runs four Gateway sweepers when `SB_WORKER_GATEWAY_SWEEPERS_ENABLED`
-is `true` (default `false`):
+is `true` (default `false`). With the `secrets-bridge` chart, set
+`worker.config.gatewaySweepers.enabled=true`. The chart always renders the
+variable, so a value in the env Secret is overridden; the intervals are under
+`worker.config.gatewaySweepers` too:
 
 - `observation-leases` puts tasks whose lease ran out back in the queue.
 - `observation-deadlines` closes open tasks past their deadline as
