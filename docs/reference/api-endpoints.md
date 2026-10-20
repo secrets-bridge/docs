@@ -191,8 +191,8 @@ Every write also needs a fresh second factor.
 | `DELETE` | `/api/v1/admin/gateway-bindings/:id` | `session + gateway.bind` + fresh MFA | `204`. Cancels the binding's open tasks (`binding_removed`) |
 | `PUT` | `/api/v1/admin/gateways/:id/enabled` | `session + gateway.revoke` + fresh MFA | `{enabled}` → the Gateway. Disable refuses its calls with `401` and moves its leased tasks back to `queued`. Enable returns it to `active`, or `pending` if it never enrolled. `409 gateway_revoked` |
 | `GET` | `/api/v1/admin/gateways/:id/tasks` | `session + gateway.list` | `{items, counts}`. Optional `?state=` (`queued`, `leased`, `done`, `dead`, `cancelled`) and `?limit=` (1 to 500, default 100). Each item has `state`, `verdict`, `verdict_reason`, `attempt_count`, `failure_count`, `not_before`, `deadline_at` and ids, never secret values |
-| `GET` | `/api/v1/admin/environments/:id/observation-source` | `session + gateway.bind` | `{environment_id, observation_source}`. `404 environment_not_found` |
-| `PUT` | `/api/v1/admin/environments/:id/observation-source` | `session + gateway.bind` + fresh MFA | `{observation_source}` with `control_plane`, `gateway` or `none` → `{environment_id, observation_source, previous_observation_source, tasks_cancelled}`. Leaving `gateway` cancels the environment's open tasks (`source_changed`). `400 invalid_observation_source` |
+| `GET` | `/api/v1/admin/environments/:id/observation-source` | `session + gateway.bind` | `{environment_id, observation_source}`, either `gateway` or `none`. A stored value that is not one of them reads as `none`. `404 environment_not_found` |
+| `PUT` | `/api/v1/admin/environments/:id/observation-source` | `session + gateway.bind` + fresh MFA | `{observation_source}` with `gateway` or `none` → `{environment_id, observation_source, previous_observation_source, tasks_cancelled}`. Leaving `gateway` cancels the environment's open tasks (`source_changed`). `400 source_retired` for `control_plane`, `400 invalid_observation_source` for any other value |
 
 Audit actions, all with ids, enums and counts only: `gateway.create`,
 `gateway.enrollment_token.create`, `gateway.enrollment_token.revoke`,
@@ -226,8 +226,8 @@ Observation audit actions: `observation.task.created`,
 | `POST` | `/api/v1/requests/:id/cancel` | session | `{actor_id}` (only the requester) |
 | `GET` | `/api/v1/requests/:id/wraps` | user_id | List value-free wrap summaries |
 | `GET` | `/api/v1/requests/:id/wraps/:wrap_id` | user_id | Single-shot retrieve (consumes) |
-| `GET` | `/api/v1/requests/:id/gitops` | user_id | BRD §26 observation list (404 when feature is off) |
-| `GET` | `/api/v1/requests/:id/observations` | session | Gateway evidence for the request, behind the same read check as `GET /requests/:id`: `{observation_source, rollup, label, tasks}`. `rollup` is `none` (no task), `pending`, `verified`, `partially_observed`, `unverified` or `timed_out`. `label` is always `observed_operational_state`. Each task has `gateway_name`, `state`, `verdict`, `verdict_reason`, `deadline_at` and `stages`; each stage has `outcome`, `reported_outcome`, `observed_at`, `connector_id`, `target_id`, `caveats` and `facts`. Argo CD stages always carry `argocd_health_not_proof`. Resource names are not included. Tasks past their deadline are closed as `timed_out` before the read |
+| `GET` | `/api/v1/requests/:id/gitops` | session, requester only | Read-only history of the retired control-plane Argo CD poller. Rows are never written or rewritten. Each row has `id`, `application_name`, `application_namespace`, `polling_state` (repeated as `status`), `history: true`, `label: history_context_only`, `history_status` and filtered `observed_state`, plus `polls_count`, `last_polled_at`, `timeout_at`, `terminal_at` and `last_error` as a class. `history_status` is `argocd_healthy_synced_context_only`, `timed_out_unverified`, `failed` or `not_completed_poller_removed` (rows the poller never finished). None of them is proof that a value reached a workload. `403` for anyone but the requester. Live Argo CD state is in `/observations` |
+| `GET` | `/api/v1/requests/:id/observations` | session | Gateway evidence for the request, behind the same read check as `GET /requests/:id`: `{observation_source, rollup, label, tasks}`. `rollup` is `none` (no task), `pending`, `verified`, `partially_observed`, `unverified` or `timed_out`. `label` is always `observed_operational_state`. Each task has `gateway_name`, `state`, `verdict`, `verdict_reason`, `deadline_at` and `stages`; each stage has `outcome`, `reported_outcome`, `observed_at`, `connector_id`, `target_id`, `caveats` and `facts`. Argo CD stages always carry `argocd_health_not_proof`. Resource names are not included. A task past its deadline that the worker has not closed yet is shown as `timed_out` with `timed_out_at_read: true`; the read writes nothing |
 
 ## Cross-team requests
 
@@ -325,19 +325,6 @@ guide.
 | Method | Path | Auth |
 |---|---|---|
 | `POST` | `/api/v1/jobs` | session |
-
-## Integrations (BRD §26, gated by `SB_GITOPS_ENABLED`)
-
-| Method | Path | Auth |
-|---|---|---|
-| `POST` | `/api/v1/argocd-endpoints` | `session + integration.edit` |
-| `GET` | `/api/v1/argocd-endpoints` | session |
-| `GET` | `/api/v1/argocd-endpoints/:id/discovered-apps` | session |
-| `PUT` | `/api/v1/argocd-endpoints/:id/enabled` | `session + integration.edit` |
-| `DELETE` | `/api/v1/argocd-endpoints/:id` | `session + integration.edit` |
-| `POST` | `/api/v1/gitops-app-mappings` | `session + integration.edit` |
-| `GET` | `/api/v1/gitops-app-mappings` | session |
-| `DELETE` | `/api/v1/gitops-app-mappings/:id` | `session + integration.edit` |
 
 ## Provider connections
 

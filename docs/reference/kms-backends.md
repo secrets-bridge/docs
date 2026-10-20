@@ -1,7 +1,8 @@
 # KMS backends
 
-Secrets Bridge uses **envelope encryption** for every wrap and
-every ArgoCD token: a per-row data key (DEK) wraps the value with
+Secrets Bridge uses **envelope encryption** for every wrap and for
+the api's other stored secrets, such as MFA factors and sign-in
+client secrets: a per-row data key (DEK) wraps the value with
 AES-256-GCM; the DEK itself is wrapped by a KMS-managed master
 key. The KMS backend is pluggable behind one env var.
 

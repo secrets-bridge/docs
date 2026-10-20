@@ -22,13 +22,10 @@ control plane as metadata. It never changes anything, and it is optional.
     observation path (tasks, leases, results, evidence, verdicts, the worker
     sweepers and the console pages) are merged. Release 1 has not passed QA.
 
-    The control plane's own Argo CD poller (`SB_GITOPS_ENABLED` on the api and
-    `SB_WORKER_GITOPS_ENABLED` on the worker, see
-    [GitOps observation](../overview/architecture.md#the-four-request-lifecycles))
-    still exists until the cutover in
-    [gateway#13](https://github.com/secrets-bridge/gateway/issues/13) ships.
-    Each environment uses one observation source at a time: the control
-    plane's poller, the Gateway, or none.
+    The Gateway is the only Secrets Bridge component that talks to Argo CD.
+    The control plane holds no Argo CD credentials and has no Argo CD client.
+    Installs that used the old control-plane poller follow the
+    [Gateway cutover](../operations/gateway-cutover.md) runbook.
 
 ## Where it sits
 
@@ -119,10 +116,10 @@ control plane recomputes every outcome from the reported facts):
 
 ## Observation flow
 
-Each environment has an observation source: `control_plane` (the default),
-`gateway` or `none`. When a change reaches `executed`, the control plane reads
-that source once and starts exactly one observer. A request never gets both a
-control-plane GitOps observation and a Gateway task.
+Each environment has an observation source: `gateway` or `none` (the
+default). When a change reaches `executed`, the control plane reads that source
+once. For `gateway` it creates Gateway tasks; for `none` nothing observes the
+change. There is no fallback to any other observer.
 
 ```mermaid
 sequenceDiagram

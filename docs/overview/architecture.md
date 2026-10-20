@@ -23,7 +23,7 @@ flowchart LR
         API["api (Fiber v3)"]
         Postgres[("Postgres<br/>append-only audit")]
         Redis[("Redis<br/>locks, cache,<br/>rate limit")]
-        Worker["worker<br/>sweepers + gitops"]
+        Worker["worker<br/>sweepers"]
         KMS["KMS backend<br/>local / vault-transit / aws-kms"]
     end
 
@@ -153,42 +153,32 @@ flowchart LR
         API-->>Admin: filtered list (GIN index)
     ```
 
-=== "GitOps observation"
+=== "Gateway observation"
 
-    Off by default. Enable with `SB_GITOPS_ENABLED=true` on the api
-    AND `SB_WORKER_GITOPS_ENABLED=true` on the worker.
-
-    This path has the worker call Argo CD from the Control Plane with a
-    KMS-wrapped token. It runs only for environments whose observation
-    source is `control_plane`, the default. An environment set to
-    `gateway` is observed by a [Gateway](../components/gateway.md) from
-    inside your boundary instead, and never by this poller. The poller
-    stays until the cutover in
-    [gateway#13](https://github.com/secrets-bridge/gateway/issues/13)
-    ships. Either way, `Healthy` and `Synced` are Argo CD operational
-    state, not proof that the workload picked up the new value.
+    The Control Plane never connects to Argo CD and holds no Argo CD
+    credential. When a change reaches `executed` in an environment whose
+    observation source is `gateway`, the api queues a task for each matching
+    binding. A [Gateway](../components/gateway.md) inside your boundary
+    claims it, reads Argo CD with its own read-only token, and posts the
+    result. In an environment set to `none`, the default, nothing observes
+    the change. `Healthy` and `Synced` are Argo CD operational state, not
+    proof that the workload picked up the new value, so the verdict is at
+    most `unverified`.
 
     ```mermaid
     sequenceDiagram
         participant API
-        participant Worker
+        participant Gateway
         participant ArgoCD
 
         Note over API: Patch request transitions to executed
-        API->>API: Fan out observations for every<br/>app mapping bound to this secret
-        loop Every 15s
-            Worker->>API: Claim next observation
-            Worker->>ArgoCD: GET /api/v1/applications/:name/resource-tree<br/>read-only transport, no POST
-            ArgoCD-->>Worker: app status (filtered)
-            Worker->>API: Update observed_state
-            alt Healthy AND Synced
-                Worker->>API: Transition to applied
-            else OperationPhase failed
-                Worker->>API: Transition to failed
-            else timeout_at reached
-                Worker->>API: Transition to applied_unverified
-            end
-        end
+        API->>API: Queue one task per binding<br/>that covers this secret
+        Gateway->>API: POST /gateways/:id/tasks/claim
+        API-->>Gateway: task, attempt_id, lease, deadline
+        Gateway->>ArgoCD: GET /api/v1/applications/:name<br/>GET-only transport
+        ArgoCD-->>Gateway: sync, health, operation phase, revision
+        Gateway->>API: POST /tasks/:task_id/result
+        API->>API: Check attempt and binding<br/>recompute stage outcome and verdict
     ```
 
 ## Defense-in-depth on the wire

@@ -30,7 +30,6 @@ Every environment variable across `api` / `agent` / `worker` /
 | `SB_BOOTSTRAP_ADMIN_EMAIL` | recommended on first boot |  | See [Bootstrap](bootstrap.md) |
 | `SB_BOOTSTRAP_ADMIN_PASSWORD` | recommended on first boot |  | |
 | `SB_BOOTSTRAP_ADMIN_USER_ID` | optional |  | Opaque user_id for pre-OIDC role assignment |
-| `SB_GITOPS_ENABLED` | no | `false` | BRD §26 ArgoCD endpoints + observation fan-out. The control-plane poller observes only environments whose observation source is `control_plane`; see [Gateway](gateway.md#8-switch-the-environment-to-gateway-observation) |
 | `SB_PUBLIC_URL` | no |  | The install's public address, for example `https://secrets.example.com`. Sign-in redirect URIs are built from it, never from request headers. When set, the console shows it read-only; unset, an admin saves it under Admin → Sign-in. Must be `https`, with no user info, query or fragment; plain `http` only for `localhost` or a loopback address with `SB_ENV=dev`. An invalid value stops the api at boot. See [Sign in with Google](google-sign-in.md#1-set-the-public-address) |
 | `SB_OBJECTSTORE_BUCKET` | no |  | Bucket for media (logos). Unset, with no other `SB_OBJECTSTORE_*` set, turns object storage off. See [Object storage](object-storage.md) |
 | `SB_OBJECTSTORE_REGION` | yes with a bucket |  | Bucket region |
@@ -95,7 +94,6 @@ sources.
 |---|---|---|---|
 | `DATABASE_URL` | **yes** |  | Same Postgres as the api |
 | `REDIS_URL` | **yes** |  | Same Redis as the api |
-| `SB_WORKER_GITOPS_ENABLED` | no | `false` | Must match api's `SB_GITOPS_ENABLED` |
 | `SB_DISCOVER_TARGETS_JSON` | no |  | Periodic discovery targets (admin API tracked) |
 | `SB_WORKER_LOCAL_ADDR` | no | `127.0.0.1:8091` | Local listen address |
 | `SB_WORKER_SHUTDOWN_GRACE` | no | `15s` | |
@@ -108,15 +106,11 @@ sources.
 | `SB_WORKER_DISCOVER_INTERVAL` | no | `1h` | |
 | `SB_WORKER_REVEAL_SESSIONS_EXPIRED_INTERVAL` | no | `5s` | |
 | `SB_WORKER_CROSS_TEAM_FILL_EXPIRED_INTERVAL` | no | `30s` | |
-| `SB_WORKER_GITOPS_POLL_INTERVAL` | no | `15s` | |
-| `SB_WORKER_GITOPS_TIMEOUT_INTERVAL` | no | `1m` | |
-| `SB_WORKER_GITOPS_HTTP_TIMEOUT` | no | `15s` | Per-call ceiling for ArgoCD requests |
-| `SB_WORKER_GITOPS_BATCH_SIZE` | no | `20` | Observations per poll. At least `1` |
 | `SB_WORKER_WEBHOOK_URL` | no |  | Generic webhook. Also turns on the waiting-account message, which goes to this webhook only |
 | `SB_WORKER_WEBHOOK_SLACK_FORMAT` | no | `false` | Wraps payload in `{text: ...}` |
 | `SB_WORKER_USERS_PENDING_INTERVAL` | no | `1m` | How often the `users-pending` sweeper posts about accounts waiting for approval, at most one message per run. At least `30s`, or the worker refuses to start. See [Sign in with Google](google-sign-in.md#notify-admins-from-the-worker) |
 | `SB_PUBLIC_URL` | no |  | Same variable as the api's, used for the link in the waiting-account message. Unset, the address saved in the console is used. An invalid value stops the worker at boot |
-| `SB_WORKER_GATEWAY_SWEEPERS_ENABLED` | no | `false` | Turns on the four [Gateway](gateway.md#9-turn-on-the-worker-sweepers) sweepers below. Off, the worker never reads the Gateway and observation tables |
+| `SB_WORKER_GATEWAY_SWEEPERS_ENABLED` | no | `false` | Turns on the four [Gateway](gateway.md#9-turn-on-the-worker-sweepers) sweepers below. Off, the worker never reads the Gateway and observation tables. In the `secrets-bridge` chart, set `worker.config.gatewaySweepers.enabled` (and the intervals under `worker.config.gatewaySweepers`); the chart always renders this variable, so a value in the env Secret is overridden |
 | `SB_WORKER_OBSERVATION_LEASES_INTERVAL` | no | `30s` | Tick of `observation-leases`, which puts tasks whose lease ran out back in the queue. At least `5s` |
 | `SB_WORKER_OBSERVATION_DEADLINES_INTERVAL` | no | `30s` | Tick of `observation-deadlines`, which closes open tasks past their deadline as `timed_out`. At least `5s` |
 | `SB_WORKER_OBSERVATION_BATCH_SIZE` | no | `200` | Tasks per statement. A tick runs up to 10 batches. 1 to 1000 |
@@ -126,6 +120,34 @@ sources.
 | `SB_WORKER_GATEWAY_REPLICAS_RETENTION` | no | `24h` | Replica rows not seen for this long are deleted. At least `10m`, the api's replica-limit window |
 
 Every duration is a Go duration (`30s`, `5m`, `1h`) and must be greater than zero, or the worker refuses to start. The Gateway values must also be at or above their floors. The floors are checked even while the Gateway sweepers are off, so a bad value stops the boot with an error naming the variable.
+
+The worker has no KMS settings. It does not read `SB_KMS_*` and needs no
+access to the KMS key; the api is the only component that uses it.
+
+## Retired settings
+
+These settings are no longer read. If one is set, the component logs its name
+at startup, never its value, and carries on. No value turns the old behaviour
+back on, and a value that used to fail validation no longer stops the boot.
+Remove them from your env Secret. The `secrets-bridge` chart no longer renders
+them, and its old `api.config.gitopsEnabled`, `worker.config.gitopsEnabled` and
+`worker.config.gitops*` values were removed; delete them from your values
+files.
+
+| Env var | Component | What it used to do |
+|---|---|---|
+| `SB_JWT_SECRET` | api | Signed the login bearer token. Sign-in is cookie-session only |
+| `SB_JWT_TOKEN_TTL` | api | Lifetime of the login bearer token |
+| `SB_GITOPS_ENABLED` | api | Turned on the control-plane Argo CD integration (endpoints, app mappings, poller). The Gateway is the only Argo CD client |
+| `SB_ALLOW_INSECURE_ARGOCD_ADDR` | api | Allowed `http://` Argo CD endpoints on the control plane |
+| `SB_WORKER_GITOPS_ENABLED` | worker | Turned on the control-plane Argo CD poller |
+| `SB_WORKER_GITOPS_POLL_INTERVAL` | worker | Poller tick |
+| `SB_WORKER_GITOPS_TIMEOUT_INTERVAL` | worker | Poller timeout sweeper tick |
+| `SB_WORKER_GITOPS_BATCH_SIZE` | worker | Observations per poll |
+| `SB_WORKER_GITOPS_HTTP_TIMEOUT` | worker | Per-call ceiling for Argo CD requests |
+
+The Argo CD settings were retired when the control plane stopped talking to
+Argo CD. See [Gateway cutover](gateway-cutover.md).
 
 ## controller
 

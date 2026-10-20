@@ -25,13 +25,20 @@ api/
     ├── storage/            # Postgres repositories + migrations (embed.FS)
     ├── runtime/            # Redis primitives (locks, idempotency, rate limit, pub/sub)
     ├── keymgmt/            # KMS backends (local / vault-transit / aws-kms)
-    ├── sealing/            # X25519 + HKDF + AES-GCM for wire envelope
-    └── argocd/             # read-only ArgoCD client (BRD §26)
+    └── sealing/            # X25519 + HKDF + AES-GCM for wire envelope
 ```
 
 The `internal/` boundary is closed; the `pkg/` boundary is
 deliberately open because `worker` imports `pkg/storage` and
-`pkg/keymgmt`.
+`pkg/runtime`.
+
+The api has no Argo CD client. `internal/archguard` fails the build if
+non-test code imports a package path containing `argocd`, `argoproj` or
+`argo-cd`, or contains `/api/v1/applications` or
+`/api/v1/stream/applications`. A router test fails if any route path
+contains `gitops`, `argocd` or `argo-cd`, except the read-only history route
+`GET /api/v1/requests/:id/gitops`. Argo CD state reaches the api only as
+[Gateway](gateway.md) evidence.
 
 ## How a request gets its identity
 
@@ -83,11 +90,12 @@ full surface.
 | `SB_KMS_VAULT_ADDR` / `SB_KMS_VAULT_TOKEN` / `SB_KMS_VAULT_KEY` | yes for `vault-transit` | - | |
 | `SB_KMS_AWS_REGION` / `SB_KMS_AWS_KEY_ID` | yes for `aws-kms` | - | Alias OK; ARN stored in audit |
 | `SB_BOOTSTRAP_ADMIN_EMAIL` / `SB_BOOTSTRAP_ADMIN_PASSWORD` | recommended on first boot | - | Seeds local-admin user; idempotent |
-| `SB_GITOPS_ENABLED` | no | `false` | Mounts BRD §26 ArgoCD endpoints when true |
 
 See [Configuration reference](../operations/config.md) for the
 exhaustive list, including the
-[dev-only insecure switches](../operations/config.md#insecure-switches-dev-only).
+[dev-only insecure switches](../operations/config.md#insecure-switches-dev-only)
+and the [retired settings](../operations/config.md#retired-settings) such as
+`SB_GITOPS_ENABLED`, which are logged by name and switch nothing on.
 
 ## What's stable, what isn't
 

@@ -14,6 +14,7 @@ Everything you need to run Secrets Bridge.
 | [Sign in with Google](google-sign-in.md) | Connecting a Google Workspace from the console and approving new accounts (in progress) |
 | [Object storage](object-storage.md) | Setting up an S3 or S3-compatible bucket for media such as logos (in progress) |
 | [Gateway](gateway.md) | Installing and enrolling an optional Gateway for Argo CD observation (Release 1, in progress) |
+| [Gateway cutover](gateway-cutover.md) | Upgrading an install that used the control-plane Argo CD poller: bind Gateways first, rotate the Argo CD token afterwards |
 | [Verifying images and charts](verifying-releases.md) | Checking the cosign signature, SBOM and provenance of images and charts before you deploy them |
 | [Configuration reference](config.md) | Exhaustive env-var table for `api` / `agent` / `worker` / `controller` / `gateway`, plus the dev-only insecure switches |
 | [Troubleshooting](troubleshooting.md) | When things go wrong, common pitfalls + how to read the audit log |
