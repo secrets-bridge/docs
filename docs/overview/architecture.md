@@ -158,13 +158,14 @@ flowchart LR
     Off by default. Enable with `SB_GITOPS_ENABLED=true` on the api
     AND `SB_WORKER_GITOPS_ENABLED=true` on the worker.
 
-    This is today's path: the worker calls Argo CD from the Control
-    Plane with a KMS-wrapped token. The [Gateway](../components/gateway.md)
-    replaces it with observation from inside your boundary once its
-    observation tasks are merged
-    ([api#294](https://github.com/secrets-bridge/api/issues/294)) and the
-    cutover in [gateway#13](https://github.com/secrets-bridge/gateway/issues/13)
-    is done. Either way, `Healthy` and `Synced` are Argo CD operational
+    This path has the worker call Argo CD from the Control Plane with a
+    KMS-wrapped token. It runs only for environments whose observation
+    source is `control_plane`, the default. An environment set to
+    `gateway` is observed by a [Gateway](../components/gateway.md) from
+    inside your boundary instead, and never by this poller. The poller
+    stays until the cutover in
+    [gateway#13](https://github.com/secrets-bridge/gateway/issues/13)
+    ships. Either way, `Healthy` and `Synced` are Argo CD operational
     state, not proof that the workload picked up the new value.
 
     ```mermaid

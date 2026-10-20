@@ -263,14 +263,93 @@ does not restart-loop. The api records `gateway.auth.rejected`.
 The usual cause is a revoked Gateway (`status: "revoked"` in
 `GET /api/v1/admin/gateways`). There is no rotation in Release 1: create a new
 Gateway, mint a token, enroll, replace the identity Secret and restart the
-Deployment. If the Gateway is still `active`, the Secret holds a credential
+Deployment. A `disabled` Gateway gets the same `401`: enable it again
+(**Enable…** on its detail panel, or `PUT /api/v1/admin/gateways/<id>/enabled`)
+and restart the Deployment. If the Gateway is still `active`, the Secret holds a credential
 that does not belong to it, for example from an earlier enrollment.
 
-### `claim failed` warnings with a not-found error
+### Observation stays pending, or shows "No observation configured"
 
-Expected until [api#294](https://github.com/secrets-bridge/api/issues/294) is
-merged. The Gateway polls for observation tasks and the api does not serve that
-route yet. Readiness is not affected.
+Check the request's observations first:
+
+```bash
+curl -fsS -b "$JAR" "$CP/api/v1/requests/<request-id>/observations" \
+  | jq '{observation_source, rollup, tasks: [.tasks[] | {gateway_name, state, verdict, attempt_count, deadline_at}]}'
+```
+
+`rollup: "none"` means no task exists. Check `observation_source` and the
+audit events with the `correlation_id` of the job that executed the change:
+
+- `observation_source` is `control_plane` or `none`: the environment is not
+  set to `gateway`, so no task was created. With `none`, the audit log has
+  `request.observation_skipped` with reason `source_none`. The source is read
+  when the request reaches `executed`, so switching it later does not add tasks
+  to earlier requests. See
+  [Switch the environment](gateway.md#8-switch-the-environment-to-gateway-observation).
+- `request.observation_skipped` with reason `no_gateway_binding`: no enabled
+  binding covers the secret in that environment, or the binding's Gateway is
+  revoked or disabled, or its connector is not approved.
+- No skip event and no task: the binding exists, but the Gateway no longer
+  advertises its target (`target_stale`), so it was skipped.
+- `scope_not_resolved`, `request_type_not_observed` or
+  `provider_type_not_supported`: only patch and cross-team requests on
+  `aws-sm` or `vault` secrets in an environment are observed.
+
+`rollup: "pending"` with a task in `queued` that never moves:
+
+- **Not yet claimable.** The first claim is allowed 10 seconds after
+  `executed`, and a result that left the stage `not_observed` reschedules the
+  task 15, 30, 60 and then 120 seconds later. Argo CD that stays
+  `Progressing` or `OutOfSync` keeps the task in that loop until the deadline.
+- **The Gateway is not claiming.** Check its status in **Admin → Gateways**. A
+  `stale` Gateway has missed its heartbeats; check the pods and their route to
+  the control plane. A Gateway pauses claiming while the control plane is
+  unreachable, its catalog is not accepted or a connector self-check fails
+  (see [Runtime behaviour](../components/gateway.md#runtime-behaviour)). A
+  Gateway that has never had a heartbeat accepted gets `204` on every claim.
+- **The connector or binding changed.** A task is claimable only while its
+  binding is enabled and its connector approved.
+
+A pending task never fails the request. At its deadline it ends `timed_out`.
+
+### Observation timed out with `gateway_unavailable`
+
+The deadline passed and the Gateway had not been seen since the task was
+created, or was not `active` (stale, disabled or revoked). Check the Gateway's
+status and its pod logs. A task is never handed to another Gateway, so the
+request stays `timed_out`; the next change to the secret gets a new task.
+`deadline_reached` instead means the Gateway was up but the stage was not
+observed in time.
+
+`timed_out` is not a failure of the request or of the deployment. Without the
+worker sweepers (`SB_WORKER_GATEWAY_SWEEPERS_ENABLED`), an overdue task is
+closed only when someone opens the request.
+
+### Result rejected with `attempt_superseded` or `task_closed`
+
+The Gateway log shows `result dropped: attempt superseded`, `result dropped:
+lease expired` or `result dropped: task closed`, and the api records
+`observation.evidence.rejected` with a `reason`:
+
+- `attempt_superseded` (`stale_attempt`, `unknown_attempt`): the attempt is
+  not the task's current one. Its lease ran out and the task was claimed again,
+  it was released, or the Gateway was disabled or revoked while it held the
+  lease. The newer attempt carries on. Frequent cases mean the Gateway works
+  past its 60-second lease; check Argo CD latency.
+- `task_closed`: the task is already closed. A later change to the same secret
+  (`superseded_by_later_write`), a source change (`source_changed`), a deleted
+  binding (`binding_removed`) or the deadline closed it first.
+
+Neither needs action on its own. The verdict comes from the result that was
+accepted, or from the reason the task closed.
+
+### Claim answers `429 inflight_limit`
+
+The Gateway already holds `max_inflight_tasks` live leases (default 20), or the
+replica asking already holds one, which is the limit per replica. The Gateway
+backs off for the `Retry-After` time. Raise `max_inflight_tasks` when you create
+the Gateway, or add replicas, if tasks wait too long. The claim rate limit
+(2400 a minute per Gateway) answers `429` too.
 
 ## Useful queries against the audit log
 

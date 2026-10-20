@@ -30,7 +30,7 @@ Every environment variable across `api` / `agent` / `worker` /
 | `SB_BOOTSTRAP_ADMIN_EMAIL` | recommended on first boot |  | See [Bootstrap](bootstrap.md) |
 | `SB_BOOTSTRAP_ADMIN_PASSWORD` | recommended on first boot |  | |
 | `SB_BOOTSTRAP_ADMIN_USER_ID` | optional |  | Opaque user_id for pre-OIDC role assignment |
-| `SB_GITOPS_ENABLED` | no | `false` | BRD §26 ArgoCD endpoints + observation fan-out |
+| `SB_GITOPS_ENABLED` | no | `false` | BRD §26 ArgoCD endpoints + observation fan-out. The control-plane poller observes only environments whose observation source is `control_plane`; see [Gateway](gateway.md#8-switch-the-environment-to-gateway-observation) |
 | `SB_PUBLIC_URL` | no |  | The install's public address, for example `https://secrets.example.com`. Sign-in redirect URIs are built from it, never from request headers. When set, the console shows it read-only; unset, an admin saves it under Admin → Sign-in. Must be `https`, with no user info, query or fragment; plain `http` only for `localhost` or a loopback address with `SB_ENV=dev`. An invalid value stops the api at boot. See [Sign in with Google](google-sign-in.md#1-set-the-public-address) |
 | `SB_OBJECTSTORE_BUCKET` | no |  | Bucket for media (logos). Unset, with no other `SB_OBJECTSTORE_*` set, turns object storage off. See [Object storage](object-storage.md) |
 | `SB_OBJECTSTORE_REGION` | yes with a bucket |  | Bucket region |
@@ -116,8 +116,16 @@ sources.
 | `SB_WORKER_WEBHOOK_SLACK_FORMAT` | no | `false` | Wraps payload in `{text: ...}` |
 | `SB_WORKER_USERS_PENDING_INTERVAL` | no | `1m` | How often the `users-pending` sweeper posts about accounts waiting for approval, at most one message per run. At least `30s`, or the worker refuses to start. See [Sign in with Google](google-sign-in.md#notify-admins-from-the-worker) |
 | `SB_PUBLIC_URL` | no |  | Same variable as the api's, used for the link in the waiting-account message. Unset, the address saved in the console is used. An invalid value stops the worker at boot |
+| `SB_WORKER_GATEWAY_SWEEPERS_ENABLED` | no | `false` | Turns on the four [Gateway](gateway.md#9-turn-on-the-worker-sweepers) sweepers below. Off, the worker never reads the Gateway and observation tables |
+| `SB_WORKER_OBSERVATION_LEASES_INTERVAL` | no | `30s` | Tick of `observation-leases`, which puts tasks whose lease ran out back in the queue. At least `5s` |
+| `SB_WORKER_OBSERVATION_DEADLINES_INTERVAL` | no | `30s` | Tick of `observation-deadlines`, which closes open tasks past their deadline as `timed_out`. At least `5s` |
+| `SB_WORKER_OBSERVATION_BATCH_SIZE` | no | `200` | Tasks per statement. A tick runs up to 10 batches. 1 to 1000 |
+| `SB_WORKER_GATEWAYS_STALE_INTERVAL` | no | `1m` | Tick of `gateways-stale`. At least `10s` |
+| `SB_WORKER_GATEWAYS_STALE_AFTER` | no | `2m` | An `active` Gateway with no heartbeat for this long turns `stale` (four missed 30s heartbeats). At least `1m` |
+| `SB_WORKER_GATEWAY_REPLICAS_PRUNE_INTERVAL` | no | `1h` | Tick of `gateway-replicas-prune`. At least `1m` |
+| `SB_WORKER_GATEWAY_REPLICAS_RETENTION` | no | `24h` | Replica rows not seen for this long are deleted. At least `10m`, the api's replica-limit window |
 
-Every duration is a Go duration (`30s`, `5m`, `1h`) and must be greater than zero, or the worker refuses to start.
+Every duration is a Go duration (`30s`, `5m`, `1h`) and must be greater than zero, or the worker refuses to start. The Gateway values must also be at or above their floors. The floors are checked even while the Gateway sweepers are off, so a bad value stops the boot with an error naming the variable.
 
 ## controller
 

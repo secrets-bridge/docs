@@ -1,6 +1,6 @@
 ---
 title: Gateway
-description: "Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, then connector approval and a binding."
+description: "Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, connector approval, a binding, and switching an environment to Gateway observation."
 ---
 
 # Gateway
@@ -8,18 +8,19 @@ description: "Install and enroll a Release 1 Gateway: a read-only Argo CD accoun
 This page installs a [Gateway](../components/gateway.md) for Release 1, which
 observes Argo CD only. You create a read-only Argo CD account, create the
 Gateway in the control plane, enroll it once from your workstation, install the
-chart, and then approve its connector and bind an Argo CD Application to a
-secret.
+chart, approve its connector, bind an Argo CD Application to a secret, and
+switch the environment's observation source to the Gateway.
 
-!!! warning "Observation is not live yet"
-    Everything on this page works against the api on `main`. The last step,
-    where the Gateway claims observation tasks and its results appear on a
-    request, comes with the next release
-    ([api#294](https://github.com/secrets-bridge/api/issues/294),
-    [worker#38](https://github.com/secrets-bridge/worker/issues/38),
-    [ui#163](https://github.com/secrets-bridge/ui/issues/163)). Until then the
-    Gateway enrolls, heartbeats and reports its catalog, and Argo CD state on a
-    request still comes from the control plane's poller (`SB_GITOPS_ENABLED`).
+Each control-plane step can be done in the console (Admin → Gateways) or with
+`curl`. Enrollment always runs from a shell, because the credential goes
+straight into a Kubernetes Secret.
+
+!!! warning "Release 1 is in progress"
+    Everything on this page is merged and has not passed QA. The control
+    plane's own Argo CD poller (`SB_GITOPS_ENABLED`) still exists until the
+    cutover in [gateway#13](https://github.com/secrets-bridge/gateway/issues/13)
+    ships. An environment uses one observation source at a time, so a request
+    gets Argo CD state from either the poller or the Gateway, never both.
 
 ```mermaid
 sequenceDiagram
@@ -41,19 +42,21 @@ sequenceDiagram
     GW->>Argo: GET /api/v1/session/userinfo
     GW->>CP: heartbeat and catalog
     Admin->>CP: approve connector, create binding
-    Note over GW,CP: observation tasks come with api#294
+    Admin->>CP: set the environment's observation source to gateway
+    GW->>CP: claim task, post result
 ```
 
 ## Before you start
 
-- The api from `main`, with migrations `0046` and `0047` applied. Migration
+- The api from `main`, with migrations `0046` to `0048` applied. Migration
   `0047` adds `gateway.mint`, `gateway.revoke`, `gateway.list` and
-  `gateway.bind` to the seed `admin` role.
-- An account that holds those permissions and has a TOTP factor enrolled at
+  `gateway.bind` to the seed `admin` role. Migration `0048` adds the
+  observation tables and each environment's observation source.
+- The worker from `main`, so the Gateway sweepers can be turned on (step 9).
+- An account that holds those permissions and has a second factor enrolled at
   `/me/mfa`. Every admin write on a Gateway needs a fresh second factor. The
-  console page for Gateways is coming in
-  [ui#163](https://github.com/secrets-bridge/ui/issues/163), so this page uses
-  `curl`, and the TOTP path is the one you can complete from a shell.
+  console asks for it when needed. For the `curl` path, the TOTP factor is the
+  one you can complete from a shell.
 - `kubectl`, `helm`, `jq`, `curl` and the `argocd` CLI.
 - A namespace for the Gateway. The examples use `tenant-a-uat`.
 
@@ -126,9 +129,29 @@ If a later write answers `401` with `WWW-Authenticate: step-up`, the 15 minutes
 have passed. Run the step-up block again. See
 [Authentication](authentication.md#step-up-ceremony) for the model.
 
+In the console you skip this step: sign in, and the console runs the step-up
+dialog on the first write that needs it.
+
 ## 3. Create the Gateway and mint an enrollment token
 
-Create the Gateway record. `name` is a lower-case DNS-style label of up to 63
+In the console:
+
+1. Open **Admin → Gateways** (needs `gateway.list`) and select
+   **Create gateway**.
+2. Fill in **Name**, **Boundary** and, if you want, **Environment
+   (optional)**, **Max replicas** and **Max tasks in flight**. Select
+   **Create gateway**.
+3. The **Create enrollment token** panel opens next. Pick a **Token
+   lifetime** (15 minutes, 1 hour or 24 hours) and, if you want, a **Cluster
+   name (optional)**, then select **Create token**. For a Gateway that is
+   still pending you can also open it from the list and select **Create
+   enrollment token**.
+4. The token is masked and shown once. Use **Copy token**, paste it at the
+   silent prompt in step 4, and close the panel. The console keeps the token
+   in memory only, and closing the panel clears the clipboard if it still
+   holds the token.
+
+With `curl`, create the Gateway record. `name` is a lower-case DNS-style label of up to 63
 characters. `boundary` is a free label of up to 128 characters that says where
 the Gateway runs. `environment_id` is optional; when it is set, every binding
 for this Gateway must use that environment.
@@ -161,6 +184,8 @@ the Gateway is `pending`, and you can revoke an unused one with
 
 If someone else enrolls the Gateway, give them the token over a channel you
 would trust with a password. They read it at a silent prompt in step 4.
+Revoke an unused token from the Gateway's **Enrollment tokens** list in the
+console, or with the route above.
 
 ## 4. Enroll and store the identity
 
@@ -269,8 +294,10 @@ kubectl -n tenant-a-uat logs deploy/secrets-bridge-gateway
 
 In the log, look for `identity loaded` and `connectors bound`.
 
-Then check the control plane. `GET /api/v1/admin/gateways` needs
-`gateway.list` and no step-up:
+Then check the control plane. In the console, **Admin → Gateways** shows the
+status, replicas and last heartbeat in UTC. Select the Gateway's name to see its
+replicas and **Advertised connectors**. With `curl`,
+`GET /api/v1/admin/gateways` needs `gateway.list` and no step-up:
 
 ```bash
 curl -fsS -b "$JAR" "$CP/api/v1/admin/gateways" \
@@ -285,16 +312,31 @@ The Gateway shows `status: "active"`, each replica appears with a recent
 `last_seen_at`, and the connector `argocd-main` is listed with status
 `advertised` and the target `payments-api`.
 
-!!! note "Expected log line until the next release"
-    The Gateway already polls for observation tasks, and the api does not
-    serve that route yet. Each poll logs `claim failed` at WARN level with a
-    not-found error, backing off to once every 30 seconds
-    (`SB_GATEWAY_CLAIM_IDLE_MAX`). It does not affect readiness.
+Until a task is queued for it, each claim answers `204` and the Gateway backs
+off up to once every 30 seconds (`SB_GATEWAY_CLAIM_IDLE_MAX`). That is normal
+and does not affect readiness.
 
 ## 7. Approve the connector and bind a target
 
 Advertising a connector approves nothing. An admin with `gateway.bind` approves
-it, using the connector's `id` (a UUID) from the detail call above:
+it and binds a target.
+
+In the console, open the Gateway from **Admin → Gateways**:
+
+1. Under **Advertised connectors**, select **Approve…** next to
+   `argocd-main`, then **Approve connector**. Approving grants the Gateway
+   nothing in Argo CD.
+2. Select **Bind a target**. Choose the **Argo CD target**, the **Project**
+   and **Environment**, and a **Secret scope**: either **A catalog secret
+   bound to the project** (then **Secret**) or **A provider connection and a
+   secret path** (then **Provider connection** and **Secret path**).
+3. Pick an **Observation deadline** (15 minutes to 6 hours, 30 minutes by
+   default) and select **Create binding**.
+
+The binding appears under **Bindings**, where **Delete…** removes it.
+
+With `curl`, approve the connector using its `id` (a UUID) from the detail call
+above:
 
 ```bash
 CONNECTOR_ID=$(curl -fsS -b "$JAR" "$CP/api/v1/admin/gateways/$GW_ID" \
@@ -326,20 +368,122 @@ with a closed code, for example `connector_not_approved`,
 `target_not_advertised`, `target_stale` (the Gateway no longer advertises it),
 `environment_outside_gateway`, `secret_not_in_project` or `binding_exists`.
 `GET /api/v1/admin/gateway-bindings?gateway_id=<id>` lists bindings and
-`DELETE /api/v1/admin/gateway-bindings/:id` removes one.
+`DELETE /api/v1/admin/gateway-bindings/:id` removes one, and cancels its open
+tasks with the reason `binding_removed`.
 
-## 8. Observation (next release)
+## 8. Switch the environment to Gateway observation
 
-With [api#294](https://github.com/secrets-bridge/api/issues/294) the control
-plane creates an observation task for each binding when a request reaches
-`executed`, and an environment setting chooses its observation source: the
-control plane's poller, the Gateway, or none. The Gateway claims those tasks,
-reads the bound Application and posts metadata-only evidence.
-[ui#163](https://github.com/secrets-bridge/ui/issues/163) shows it on the request
-page as observed operational state, labelled with the Gateway that observed it.
-This page will cover that step once it is merged.
+A binding alone creates no tasks. Each environment has an observation source,
+and only an environment set to `gateway` gets Gateway tasks:
 
-## Revoke a Gateway
+| Source | What observes a change executed in the environment |
+|---|---|
+| `control_plane` (default) | The control plane's own Argo CD poller, when `SB_GITOPS_ENABLED` and `SB_WORKER_GITOPS_ENABLED` are on. Otherwise nothing |
+| `gateway` | The Gateways bound to the environment. The control-plane poller is skipped for these requests |
+| `none` | Nothing |
+
+The source is read once when a request reaches `executed`, so a request is
+observed by one of them, never both. Switching away from `gateway` cancels the
+environment's open Gateway tasks with the reason `source_changed`. The requests
+themselves are not affected.
+
+In the console (needs `gateway.bind`), open **Admin → Projects**, select the
+project, and find the environment on the **Environments** tab. The
+**Observation** column shows the current source. Select **Change…**, choose
+**Gateway** in the **Observation for** dialog, and select **Save**.
+
+With `curl`, the route needs `gateway.bind` and a fresh second factor (step 2).
+The body holds no secret, so it can go on the command line:
+
+```bash
+ENV_ID=<environment-id>
+
+curl -fsS -b "$JAR" "$CP/api/v1/admin/environments/$ENV_ID/observation-source" | jq
+
+curl -fsS -b "$JAR" -X PUT "$CP/api/v1/admin/environments/$ENV_ID/observation-source" \
+  -H 'Content-Type: application/json' -d '{"observation_source":"gateway"}' \
+  | jq '{observation_source, previous_observation_source, tasks_cancelled}'
+```
+
+A value other than `control_plane`, `gateway` or `none` answers
+`400 invalid_observation_source`, and an unknown environment
+`404 environment_not_found`. The change is audited as
+`environment.observation_source.update`.
+
+## 9. Turn on the worker sweepers
+
+The worker runs four Gateway sweepers when `SB_WORKER_GATEWAY_SWEEPERS_ENABLED`
+is `true` (default `false`):
+
+- `observation-leases` puts tasks whose lease ran out back in the queue.
+- `observation-deadlines` closes open tasks past their deadline as
+  `timed_out`, with the reason `gateway_unavailable` or `deadline_reached`.
+- `gateways-stale` moves a Gateway from `active` to `stale` after
+  `SB_WORKER_GATEWAYS_STALE_AFTER` (default `2m`) without a heartbeat. The
+  next accepted heartbeat moves it back to `active`.
+- `gateway-replicas-prune` deletes replica rows not seen within
+  `SB_WORKER_GATEWAY_REPLICAS_RETENTION` (default `24h`).
+
+The intervals and floors are in the
+[configuration reference](config.md#worker). Without the sweepers, a claim
+still takes over an expired lease, and reading a request's observations closes
+that request's overdue tasks. Tasks of requests nobody opens stay open past
+their deadline, and Gateways never turn `stale`.
+
+## 10. Check a request
+
+Submit and approve a change to the bound secret in that environment. When the
+agent has written it and the request is `executed`, the request page shows a
+panel titled **Argo CD (observed by Gateway tenant-a-uat)**, marked
+**Observed operational state · times in UTC**. It shows:
+
+- The rollup: **Pending**, **Unverified**, **Timed out** or, when no binding
+  covers the change, **No observation configured**. None of these is a failure
+  of the request. The panel refreshes every 20 seconds while the rollup is
+  pending, and when the window regains focus.
+- For each task, the Gateway, the verdict, the task state and its deadline or
+  closing time, and the reason in words, for example "Only Argo CD context was
+  observed. Argo CD health and sync are operational state, never proof that
+  the new value reached the app."
+- For the Argo CD stage, the outcome (**Observed** or **Not observed**), the
+  observed time, the **Sync**, **Health**, **Last operation**, **Revision**,
+  **Operation finished** and **Reconciled** facts, and the caveat "Argo CD
+  reports Healthy and Synced. This is the operational state, not proof the new
+  value reached the app." **Evidence details** lists the connector, target,
+  confidence, linkage, Gateway, replica and attempt ids.
+
+The same data comes from `GET /api/v1/requests/<id>/observations`, behind the
+same read check as the request itself:
+
+```bash
+curl -fsS -b "$JAR" "$CP/api/v1/requests/<request-id>/observations" \
+  | jq '{observation_source, rollup, label,
+         tasks: [.tasks[] | {gateway_name, state, verdict, verdict_reason,
+                             stages: [.stages[] | {stage, outcome, observed_at, caveats, facts}]}]}'
+```
+
+On the Gateway's detail panel, **Recent tasks** lists the latest 25 tasks with
+their state, verdict and attempts. With `curl`,
+`GET /api/v1/admin/gateways/$GW_ID/tasks` (needs `gateway.list`) takes
+`?state=` and `?limit=` (1 to 500, default 100).
+
+## Disable, enable or revoke a Gateway
+
+Disabling is reversible. A disabled Gateway's calls are refused with `401`, its
+leased tasks go back to the queue, and their old attempts can no longer post a
+result. It keeps its credential, and enabling it returns it to `active` (or
+`pending` if it never enrolled). In the console, open the Gateway and select
+**Disable…** or **Enable…**. With `curl` (needs `gateway.revoke` and a fresh
+second factor):
+
+```bash
+curl -fsS -b "$JAR" -X PUT "$CP/api/v1/admin/gateways/$GW_ID/enabled" \
+  -H 'Content-Type: application/json' -d '{"enabled":false}' | jq '{status}'
+```
+
+A revoked Gateway answers `409 gateway_revoked`.
+
+Revoking is final. In the console, select **Revoke…**, or:
 
 ```bash
 # Needs gateway.revoke and a fresh second factor.
@@ -348,7 +492,9 @@ curl -fsS -b "$JAR" -X POST "$CP/api/v1/admin/gateways/$GW_ID/revoke" \
 ```
 
 `reason` is optional, a lower-case code of up to 64 characters. The next
-heartbeat or catalog upload gets `401`. The pods stay up and not ready with the
+heartbeat, catalog upload or task call gets `401`, and leased tasks go back to
+the queue. A task belongs to one Gateway, so its open tasks end `timed_out`
+with the reason `gateway_unavailable` at their deadline. The pods stay up and not ready with the
 reason in their logs. There is no credential rotation in Release 1: to replace a
 credential, revoke the Gateway, create a new one, enroll it and update the
 identity Secret.
