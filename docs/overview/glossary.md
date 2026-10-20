@@ -70,9 +70,10 @@ Even a TLS-terminating proxy sees only ciphertext.
 
 #### Workflow
 A reusable approval template: minimum approver count, justification
-required, self-approval allowed, TTLs for the various wrap
-lifecycle phases. Captured at request submit time so policy edits
-don't retroactively change in-flight requests.
+required, TTLs for the various wrap lifecycle phases. There is no
+self-approval setting: a requester can never approve their own
+request. The policy match picks the workflow at submit; approval
+reads the workflow's current approver count when the vote is cast.
 
 #### Wrap summary
 The value-free metadata projection of a wrap (id, key_name,
