@@ -2477,15 +2477,15 @@ edit their permission lists but can't delete the rows.</p>
 </tr>
 <tr>
 <td><code>gateway.revoke</code></td>
-<td>Revoke a Gateway. Its heartbeats and catalog uploads are refused from then on. Needs a fresh second factor.</td>
+<td>Revoke a Gateway, or disable and enable it. Its heartbeats, catalog uploads and task calls are refused while it is revoked or disabled. Needs a fresh second factor.</td>
 </tr>
 <tr>
 <td><code>gateway.list</code></td>
-<td>List Gateways with their replicas, advertised connectors and targets, bindings and token metadata. Never credentials.</td>
+<td>List Gateways with their replicas, advertised connectors and targets, bindings, token metadata and observation tasks. Never credentials.</td>
 </tr>
 <tr>
 <td><code>gateway.bind</code></td>
-<td>Approve a Gateway's advertised connectors and create or delete bindings from a secret scope to an advertised target. Does not imply <code>integration.bind</code>, and <code>integration.bind</code> does not imply it. Needs a fresh second factor for writes.</td>
+<td>Approve a Gateway's advertised connectors, create or delete bindings from a secret scope to an advertised target, and read or set an environment's observation source. Does not imply <code>integration.bind</code>, and <code>integration.bind</code> does not imply it. Needs a fresh second factor for writes.</td>
 </tr>
 </tbody>
 </table>

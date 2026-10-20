@@ -1956,10 +1956,43 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#claim-failed-warnings-with-a-not-found-error" class="md-nav__link">
+  <a href="#observation-stays-pending-or-shows-no-observation-configured" class="md-nav__link">
     <span class="md-ellipsis">
       
-        claim failed warnings with a not-found error
+        Observation stays pending, or shows "No observation configured"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observation-timed-out-with-gateway_unavailable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation timed out with gateway_unavailable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#result-rejected-with-attempt_superseded-or-task_closed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result rejected with attempt_superseded or task_closed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claim-answers-429-inflight_limit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Claim answers 429 inflight_limit
       
     </span>
   </a>
@@ -2465,10 +2498,43 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#claim-failed-warnings-with-a-not-found-error" class="md-nav__link">
+  <a href="#observation-stays-pending-or-shows-no-observation-configured" class="md-nav__link">
     <span class="md-ellipsis">
       
-        claim failed warnings with a not-found error
+        Observation stays pending, or shows "No observation configured"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observation-timed-out-with-gateway_unavailable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation timed out with gateway_unavailable
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#result-rejected-with-attempt_superseded-or-task_closed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Result rejected with attempt_superseded or task_closed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#claim-answers-429-inflight_limit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Claim answers 429 inflight_limit
       
     </span>
   </a>
@@ -2869,27 +2935,96 @@ does not restart-loop. The api records <code>gateway.auth.rejected</code>.</p>
 <p>The usual cause is a revoked Gateway (<code>status: "revoked"</code> in
 <code>GET /api/v1/admin/gateways</code>). There is no rotation in Release 1: create a new
 Gateway, mint a token, enroll, replace the identity Secret and restart the
-Deployment. If the Gateway is still <code>active</code>, the Secret holds a credential
+Deployment. A <code>disabled</code> Gateway gets the same <code>401</code>: enable it again
+(<strong>Enable…</strong> on its detail panel, or <code>PUT /api/v1/admin/gateways/&lt;id&gt;/enabled</code>)
+and restart the Deployment. If the Gateway is still <code>active</code>, the Secret holds a credential
 that does not belong to it, for example from an earlier enrollment.</p>
-<h3 id="claim-failed-warnings-with-a-not-found-error"><code>claim failed</code> warnings with a not-found error<a class="headerlink" href="#claim-failed-warnings-with-a-not-found-error" title="Permanent link">&para;</a></h3>
-<p>Expected until <a href="https://github.com/secrets-bridge/api/issues/294">api#294</a> is
-merged. The Gateway polls for observation tasks and the api does not serve that
-route yet. Readiness is not affected.</p>
+<h3 id="observation-stays-pending-or-shows-no-observation-configured">Observation stays pending, or shows "No observation configured"<a class="headerlink" href="#observation-stays-pending-or-shows-no-observation-configured" title="Permanent link">&para;</a></h3>
+<p>Check the request's observations first:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/requests/&lt;request-id&gt;/observations"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'{observation_source, rollup, tasks: [.tasks[] | {gateway_name, state, verdict, attempt_count, deadline_at}]}'</span>
+</span></code></pre></div>
+<p><code>rollup: "none"</code> means no task exists. Check <code>observation_source</code> and the
+audit events with the <code>correlation_id</code> of the job that executed the change:</p>
+<ul>
+<li><code>observation_source</code> is <code>control_plane</code> or <code>none</code>: the environment is not
+  set to <code>gateway</code>, so no task was created. With <code>none</code>, the audit log has
+  <code>request.observation_skipped</code> with reason <code>source_none</code>. The source is read
+  when the request reaches <code>executed</code>, so switching it later does not add tasks
+  to earlier requests. See
+  <a href="../gateway/#8-switch-the-environment-to-gateway-observation">Switch the environment</a>.</li>
+<li><code>request.observation_skipped</code> with reason <code>no_gateway_binding</code>: no enabled
+  binding covers the secret in that environment, or the binding's Gateway is
+  revoked or disabled, or its connector is not approved.</li>
+<li>No skip event and no task: the binding exists, but the Gateway no longer
+  advertises its target (<code>target_stale</code>), so it was skipped.</li>
+<li><code>scope_not_resolved</code>, <code>request_type_not_observed</code> or
+  <code>provider_type_not_supported</code>: only patch and cross-team requests on
+  <code>aws-sm</code> or <code>vault</code> secrets in an environment are observed.</li>
+</ul>
+<p><code>rollup: "pending"</code> with a task in <code>queued</code> that never moves:</p>
+<ul>
+<li><strong>Not yet claimable.</strong> The first claim is allowed 10 seconds after
+  <code>executed</code>, and a result that left the stage <code>not_observed</code> reschedules the
+  task 15, 30, 60 and then 120 seconds later. Argo CD that stays
+  <code>Progressing</code> or <code>OutOfSync</code> keeps the task in that loop until the deadline.</li>
+<li><strong>The Gateway is not claiming.</strong> Check its status in <strong>Admin → Gateways</strong>. A
+  <code>stale</code> Gateway has missed its heartbeats; check the pods and their route to
+  the control plane. A Gateway pauses claiming while the control plane is
+  unreachable, its catalog is not accepted or a connector self-check fails
+  (see <a href="../../components/gateway/#runtime-behaviour">Runtime behaviour</a>). A
+  Gateway that has never had a heartbeat accepted gets <code>204</code> on every claim.</li>
+<li><strong>The connector or binding changed.</strong> A task is claimable only while its
+  binding is enabled and its connector approved.</li>
+</ul>
+<p>A pending task never fails the request. At its deadline it ends <code>timed_out</code>.</p>
+<h3 id="observation-timed-out-with-gateway_unavailable">Observation timed out with <code>gateway_unavailable</code><a class="headerlink" href="#observation-timed-out-with-gateway_unavailable" title="Permanent link">&para;</a></h3>
+<p>The deadline passed and the Gateway had not been seen since the task was
+created, or was not <code>active</code> (stale, disabled or revoked). Check the Gateway's
+status and its pod logs. A task is never handed to another Gateway, so the
+request stays <code>timed_out</code>; the next change to the secret gets a new task.
+<code>deadline_reached</code> instead means the Gateway was up but the stage was not
+observed in time.</p>
+<p><code>timed_out</code> is not a failure of the request or of the deployment. Without the
+worker sweepers (<code>SB_WORKER_GATEWAY_SWEEPERS_ENABLED</code>), an overdue task is
+closed only when someone opens the request.</p>
+<h3 id="result-rejected-with-attempt_superseded-or-task_closed">Result rejected with <code>attempt_superseded</code> or <code>task_closed</code><a class="headerlink" href="#result-rejected-with-attempt_superseded-or-task_closed" title="Permanent link">&para;</a></h3>
+<p>The Gateway log shows <code>result dropped: attempt superseded</code>, <code>result dropped:
+lease expired</code> or <code>result dropped: task closed</code>, and the api records
+<code>observation.evidence.rejected</code> with a <code>reason</code>:</p>
+<ul>
+<li><code>attempt_superseded</code> (<code>stale_attempt</code>, <code>unknown_attempt</code>): the attempt is
+  not the task's current one. Its lease ran out and the task was claimed again,
+  it was released, or the Gateway was disabled or revoked while it held the
+  lease. The newer attempt carries on. Frequent cases mean the Gateway works
+  past its 60-second lease; check Argo CD latency.</li>
+<li><code>task_closed</code>: the task is already closed. A later change to the same secret
+  (<code>superseded_by_later_write</code>), a source change (<code>source_changed</code>), a deleted
+  binding (<code>binding_removed</code>) or the deadline closed it first.</li>
+</ul>
+<p>Neither needs action on its own. The verdict comes from the result that was
+accepted, or from the reason the task closed.</p>
+<h3 id="claim-answers-429-inflight_limit">Claim answers <code>429 inflight_limit</code><a class="headerlink" href="#claim-answers-429-inflight_limit" title="Permanent link">&para;</a></h3>
+<p>The Gateway already holds <code>max_inflight_tasks</code> live leases (default 20), or the
+replica asking already holds one, which is the limit per replica. The Gateway
+backs off for the <code>Retry-After</code> time. Raise <code>max_inflight_tasks</code> when you create
+the Gateway, or add replicas, if tasks wait too long. The claim rate limit
+(2400 a minute per Gateway) answers <code>429</code> too.</p>
 <h2 id="useful-queries-against-the-audit-log">Useful queries against the audit log<a class="headerlink" href="#useful-queries-against-the-audit-log" title="Permanent link">&para;</a></h2>
 <h3 id="find-every-action-for-one-request">Find every action for one request<a class="headerlink" href="#find-every-action-for-one-request" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">"http://localhost:18080/api/v1/audit-events?correlation_id=&lt;uuid&gt;"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[] | {time:.occurred_at, actor, action, resource}'</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">"http://localhost:18080/api/v1/audit-events?correlation_id=&lt;uuid&gt;"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[] | {time:.occurred_at, actor, action, resource}'</span>
 </span></code></pre></div>
 <h3 id="find-every-login-failure-in-the-last-hour">Find every login failure in the last hour<a class="headerlink" href="#find-every-login-failure-in-the-last-hour" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">SINCE</span><span class="o">=</span><span class="k">$(</span>date<span class="w"> </span>-u<span class="w"> </span>-d<span class="w"> </span><span class="s1">'1 hour ago'</span><span class="w"> </span>+%Y-%m-%dT%H:%M:%SZ<span class="k">)</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">"http://localhost:18080/api/v1/audit-events?action=auth.login&amp;since=</span><span class="nv">$SINCE</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[] | select(.status=="denied")'</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nv">SINCE</span><span class="o">=</span><span class="k">$(</span>date<span class="w"> </span>-u<span class="w"> </span>-d<span class="w"> </span><span class="s1">'1 hour ago'</span><span class="w"> </span>+%Y-%m-%dT%H:%M:%SZ<span class="k">)</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">"http://localhost:18080/api/v1/audit-events?action=auth.login&amp;since=</span><span class="nv">$SINCE</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[] | select(.status=="denied")'</span>
 </span></code></pre></div>
 <h3 id="find-every-wrap-retrieval-who-saw-which-value-when">Find every wrap retrieval (who saw which value when)<a class="headerlink" href="#find-every-wrap-retrieval-who-saw-which-value-when" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">"http://localhost:18080/api/v1/audit-events?action=wrap.retrieve"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[] | {time:.occurred_at, actor, resource, status}'</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span><span class="s2">"http://localhost:18080/api/v1/audit-events?action=wrap.retrieve"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[] | {time:.occurred_at, actor, resource, status}'</span>
 </span></code></pre></div>
 <p>This is the SOC2-friendly query, every plaintext reveal across
 the platform, append-only, with the actor and timestamp.</p>

@@ -2353,7 +2353,7 @@
 <td><code>SB_GITOPS_ENABLED</code></td>
 <td>no</td>
 <td><code>false</code></td>
-<td>BRD §26 ArgoCD endpoints + observation fan-out</td>
+<td>BRD §26 ArgoCD endpoints + observation fan-out. The control-plane poller observes only environments whose observation source is <code>control_plane</code>; see <a href="../gateway/#8-switch-the-environment-to-gateway-observation">Gateway</a></td>
 </tr>
 <tr>
 <td><code>SB_PUBLIC_URL</code></td>
@@ -2740,9 +2740,57 @@ sources.</p>
 <td></td>
 <td>Same variable as the api's, used for the link in the waiting-account message. Unset, the address saved in the console is used. An invalid value stops the worker at boot</td>
 </tr>
+<tr>
+<td><code>SB_WORKER_GATEWAY_SWEEPERS_ENABLED</code></td>
+<td>no</td>
+<td><code>false</code></td>
+<td>Turns on the four <a href="../gateway/#9-turn-on-the-worker-sweepers">Gateway</a> sweepers below. Off, the worker never reads the Gateway and observation tables</td>
+</tr>
+<tr>
+<td><code>SB_WORKER_OBSERVATION_LEASES_INTERVAL</code></td>
+<td>no</td>
+<td><code>30s</code></td>
+<td>Tick of <code>observation-leases</code>, which puts tasks whose lease ran out back in the queue. At least <code>5s</code></td>
+</tr>
+<tr>
+<td><code>SB_WORKER_OBSERVATION_DEADLINES_INTERVAL</code></td>
+<td>no</td>
+<td><code>30s</code></td>
+<td>Tick of <code>observation-deadlines</code>, which closes open tasks past their deadline as <code>timed_out</code>. At least <code>5s</code></td>
+</tr>
+<tr>
+<td><code>SB_WORKER_OBSERVATION_BATCH_SIZE</code></td>
+<td>no</td>
+<td><code>200</code></td>
+<td>Tasks per statement. A tick runs up to 10 batches. 1 to 1000</td>
+</tr>
+<tr>
+<td><code>SB_WORKER_GATEWAYS_STALE_INTERVAL</code></td>
+<td>no</td>
+<td><code>1m</code></td>
+<td>Tick of <code>gateways-stale</code>. At least <code>10s</code></td>
+</tr>
+<tr>
+<td><code>SB_WORKER_GATEWAYS_STALE_AFTER</code></td>
+<td>no</td>
+<td><code>2m</code></td>
+<td>An <code>active</code> Gateway with no heartbeat for this long turns <code>stale</code> (four missed 30s heartbeats). At least <code>1m</code></td>
+</tr>
+<tr>
+<td><code>SB_WORKER_GATEWAY_REPLICAS_PRUNE_INTERVAL</code></td>
+<td>no</td>
+<td><code>1h</code></td>
+<td>Tick of <code>gateway-replicas-prune</code>. At least <code>1m</code></td>
+</tr>
+<tr>
+<td><code>SB_WORKER_GATEWAY_REPLICAS_RETENTION</code></td>
+<td>no</td>
+<td><code>24h</code></td>
+<td>Replica rows not seen for this long are deleted. At least <code>10m</code>, the api's replica-limit window</td>
+</tr>
 </tbody>
 </table>
-<p>Every duration is a Go duration (<code>30s</code>, <code>5m</code>, <code>1h</code>) and must be greater than zero, or the worker refuses to start.</p>
+<p>Every duration is a Go duration (<code>30s</code>, <code>5m</code>, <code>1h</code>) and must be greater than zero, or the worker refuses to start. The Gateway values must also be at or above their floors. The floors are checked even while the Gateway sweepers are off, so a bad value stops the boot with an error naming the variable.</p>
 <h2 id="controller">controller<a class="headerlink" href="#controller" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

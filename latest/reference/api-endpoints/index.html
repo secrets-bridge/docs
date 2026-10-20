@@ -3349,10 +3349,10 @@ enabled as a break-glass admin action.</p>
 </ul>
 </div>
 <h2 id="gateways">Gateways<a class="headerlink" href="#gateways" title="Permanent link">&para;</a></h2>
-<p>Release 1 of the <a href="../../components/gateway/">Gateway</a> registry. Install steps are
-in <a href="../../operations/gateway/">Gateway</a>. The task routes (claim, lease, release,
-result) are not served yet; they come with
-<a href="https://github.com/secrets-bridge/api/issues/294">api#294</a>.</p>
+<p>Release 1 of the <a href="../../components/gateway/">Gateway</a>: the registry and the
+observation tasks. Install steps are in <a href="../../operations/gateway/">Gateway</a>. The
+flow behind the task routes is in
+<a href="../../components/gateway/#observation-flow">Observation flow</a>.</p>
 <h3 id="gateway-machine-routes">Gateway machine routes<a class="headerlink" href="#gateway-machine-routes" title="Permanent link">&para;</a></h3>
 <p>The <code>/api/v1/gateways/</code> prefix is exempt from the session gate. Enrollment is
 authenticated by the one-time token only; every other route needs
@@ -3386,9 +3386,102 @@ authenticated by the one-time token only; every other route needs
 <td>gateway</td>
 <td>Full replace of advertised connectors and targets → <code>{accepted, targets_stale, catalog_version}</code>. Never approves or binds anything. A target no longer advertised stays, marked stale</td>
 </tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/gateways/:id/tasks/claim</code></td>
+<td>gateway</td>
+<td>E4. <code>{replica_id, max_tasks: 1}</code> → <code>200</code> with one task (<code>task_id</code>, <code>attempt_id</code>, <code>attempt_count</code>, <code>lease_expires_at</code>, <code>deadline_at</code>, <code>request_id</code>, <code>correlation_id</code>, <code>skew_margin_seconds</code>, <code>gateway_scope</code>, <code>connector_refs</code>, <code>expected_change</code>, <code>rollout_baseline</code>), or <code>204</code> with <code>Retry-After: 5</code> when nothing is claimable or no heartbeat has negotiated a contract version yet. Scoped to the authenticated Gateway. <code>429 inflight_limit</code> with <code>Retry-After</code> when the Gateway is at <code>max_inflight_tasks</code> or the replica already holds a task. <code>409 contract_version_unsupported</code>. 2400 a minute</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/gateways/:id/tasks/:task_id/lease</code></td>
+<td>gateway</td>
+<td>E5. <code>{replica_id, attempt_id}</code> → <code>{lease_expires_at}</code>. Extends the lease by 60s, capped at the deadline. 1200 a minute</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/gateways/:id/tasks/:task_id/release</code></td>
+<td>gateway</td>
+<td>E6. <code>{replica_id, attempt_id, reason}</code> with <code>reason</code> one of <code>shutdown</code>, <code>over_capacity</code>, <code>connector_unavailable</code> → <code>204</code>. The task goes back to the queue. Never counts as a failure. 1200 a minute</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/gateways/:id/tasks/:task_id/result</code></td>
+<td>gateway</td>
+<td>E7. A closed-schema evidence result (<code>schema_version</code>, <code>task_id</code>, <code>attempt_id</code>, <code>gateway_id</code>, <code>replica_id</code>, <code>gateway_version</code>, <code>started_at</code>, <code>finished_at</code>, <code>attempt_status</code>, <code>refusal_reason?</code>, <code>stages</code>, <code>clock</code>) → <code>{status, task_state, verdict, next}</code>. <code>status</code> is <code>accepted</code>, or <code>duplicate</code> for the same body sent again for the same attempt. <code>next</code> is <code>none</code> or <code>rescheduled</code>. Body limit 64 KiB. 1200 a minute</td>
+</tr>
 </tbody>
 </table>
-<p>A revoked Gateway gets <code>401</code> on heartbeat and catalog.</p>
+<p>A revoked or disabled Gateway gets <code>401</code> on every route above. The E4 to E7
+rate limits fail closed: without Redis they answer <code>503</code>, which the Gateway
+treats as transient. The claim, lease and release bodies are limited to 4 KiB.</p>
+<p>Task route error codes:</p>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>400</code></td>
+<td><code>invalid_request</code></td>
+<td>Malformed body, unknown field, or ids that do not match the path</td>
+</tr>
+<tr>
+<td><code>401</code></td>
+<td><code>unauthorized</code></td>
+<td>The Gateway is not live (revoked or disabled)</td>
+</tr>
+<tr>
+<td><code>404</code></td>
+<td><code>not_found</code></td>
+<td>Unknown task, or a task of another Gateway</td>
+</tr>
+<tr>
+<td><code>409</code></td>
+<td><code>attempt_superseded</code></td>
+<td>The attempt is not the task's current one: its lease ran out and the task was claimed again, it was released, or the Gateway was revoked or disabled while it held the lease</td>
+</tr>
+<tr>
+<td><code>409</code></td>
+<td><code>lease_expired</code></td>
+<td>The lease ended before the call</td>
+</tr>
+<tr>
+<td><code>409</code></td>
+<td><code>task_closed</code></td>
+<td>The task is closed (<code>done</code>, <code>dead</code>, <code>cancelled</code>), or its deadline passed and this call closed it as <code>timed_out</code></td>
+</tr>
+<tr>
+<td><code>409</code></td>
+<td><code>result_conflict</code></td>
+<td>A different body for an attempt whose result was already accepted</td>
+</tr>
+<tr>
+<td><code>409</code></td>
+<td><code>contract_version_unsupported</code></td>
+<td>None of the Gateway's contract versions is the one tasks are written in</td>
+</tr>
+<tr>
+<td><code>422</code></td>
+<td><code>schema_violation</code></td>
+<td>The result is outside the closed schema, names a stage the task does not expect, or fails the evidence binding</td>
+</tr>
+<tr>
+<td><code>422</code></td>
+<td><code>evidence_out_of_window</code></td>
+<td><code>started_at</code>, <code>finished_at</code> or <code>observed_at</code> is outside the attempt, allowing for clock skew</td>
+</tr>
+<tr>
+<td><code>429</code></td>
+<td><code>inflight_limit</code></td>
+<td>Claim only: the Gateway or the replica is at its in-flight limit</td>
+</tr>
+</tbody>
+</table>
 <h3 id="gateway-admin-routes-session-auth-permission">Gateway admin routes (session auth + permission)<a class="headerlink" href="#gateway-admin-routes-session-auth-permission" title="Permanent link">&para;</a></h3>
 <p>Every write also needs a fresh second factor.</p>
 <table>
@@ -3459,7 +3552,31 @@ authenticated by the one-time token only; every other route needs
 <td><code>DELETE</code></td>
 <td><code>/api/v1/admin/gateway-bindings/:id</code></td>
 <td><code>session + gateway.bind</code> + fresh MFA</td>
-<td><code>204</code></td>
+<td><code>204</code>. Cancels the binding's open tasks (<code>binding_removed</code>)</td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/api/v1/admin/gateways/:id/enabled</code></td>
+<td><code>session + gateway.revoke</code> + fresh MFA</td>
+<td><code>{enabled}</code> → the Gateway. Disable refuses its calls with <code>401</code> and moves its leased tasks back to <code>queued</code>. Enable returns it to <code>active</code>, or <code>pending</code> if it never enrolled. <code>409 gateway_revoked</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/admin/gateways/:id/tasks</code></td>
+<td><code>session + gateway.list</code></td>
+<td><code>{items, counts}</code>. Optional <code>?state=</code> (<code>queued</code>, <code>leased</code>, <code>done</code>, <code>dead</code>, <code>cancelled</code>) and <code>?limit=</code> (1 to 500, default 100). Each item has <code>state</code>, <code>verdict</code>, <code>verdict_reason</code>, <code>attempt_count</code>, <code>failure_count</code>, <code>not_before</code>, <code>deadline_at</code> and ids, never secret values</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/admin/environments/:id/observation-source</code></td>
+<td><code>session + gateway.bind</code></td>
+<td><code>{environment_id, observation_source}</code>. <code>404 environment_not_found</code></td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/api/v1/admin/environments/:id/observation-source</code></td>
+<td><code>session + gateway.bind</code> + fresh MFA</td>
+<td><code>{observation_source}</code> with <code>control_plane</code>, <code>gateway</code> or <code>none</code> → <code>{environment_id, observation_source, previous_observation_source, tasks_cancelled}</code>. Leaving <code>gateway</code> cancels the environment's open tasks (<code>source_changed</code>). <code>400 invalid_observation_source</code></td>
 </tr>
 </tbody>
 </table>
@@ -3468,8 +3585,18 @@ authenticated by the one-time token only; every other route needs
 <code>gateway.enroll</code>, <code>gateway.revoke</code>, <code>gateway.auth.rejected</code>,
 <code>gateway.replica_limit</code>, <code>gateway.over_privileged</code>, <code>gateway.catalog.updated</code>,
 <code>gateway.connector.missing</code>, <code>gateway.connector.approval_reset</code>,
-<code>gateway.connector.approved</code>, <code>gateway.binding.create</code> and
-<code>gateway.binding.delete</code>.</p>
+<code>gateway.connector.approved</code>, <code>gateway.binding.create</code>,
+<code>gateway.binding.delete</code>, <code>gateway.enable</code>, <code>gateway.disable</code> and
+<code>environment.observation_source.update</code>.</p>
+<p>Observation audit actions: <code>observation.task.created</code>,
+<code>observation.task.claimed</code>, <code>observation.task.released</code>,
+<code>observation.task.lease_expired</code>, <code>observation.evidence.accepted</code>,
+<code>observation.evidence.rejected</code> (with a <code>reason</code>),
+<code>gateway.evidence.outcome_mismatch</code>, <code>observation.task.verdict</code>,
+<code>observation.task.dead</code>, <code>observation.task.timed_out</code>,
+<code>observation.task.superseded</code>, <code>observation.task.cancelled</code> and
+<code>request.observation_skipped</code> (with a <code>reason</code> such as <code>no_gateway_binding</code> or
+<code>source_none</code>).</p>
 <h2 id="requests-access-requests">Requests (access requests)<a class="headerlink" href="#requests-access-requests" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -3540,6 +3667,12 @@ authenticated by the one-time token only; every other route needs
 <td><code>/api/v1/requests/:id/gitops</code></td>
 <td>user_id</td>
 <td>BRD §26 observation list (404 when feature is off)</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/requests/:id/observations</code></td>
+<td>session</td>
+<td>Gateway evidence for the request, behind the same read check as <code>GET /requests/:id</code>: <code>{observation_source, rollup, label, tasks}</code>. <code>rollup</code> is <code>none</code> (no task), <code>pending</code>, <code>verified</code>, <code>partially_observed</code>, <code>unverified</code> or <code>timed_out</code>. <code>label</code> is always <code>observed_operational_state</code>. Each task has <code>gateway_name</code>, <code>state</code>, <code>verdict</code>, <code>verdict_reason</code>, <code>deadline_at</code> and <code>stages</code>; each stage has <code>outcome</code>, <code>reported_outcome</code>, <code>observed_at</code>, <code>connector_id</code>, <code>target_id</code>, <code>caveats</code> and <code>facts</code>. Argo CD stages always carry <code>argocd_health_not_proof</code>. Resource names are not included. Tasks past their deadline are closed as <code>timed_out</code> before the read</td>
 </tr>
 </tbody>
 </table>

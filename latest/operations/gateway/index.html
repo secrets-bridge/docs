@@ -7,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, then connector approval and a binding.">
+        <meta name="description" content="Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, connector approval, a binding, and switching an environment to Gateway observation.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
@@ -84,7 +84,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Secrets Bridge" />
   <meta property="og:title" content="Gateway" />
-  <meta property="og:description" content="Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, then connector approval and a binding." />
+  <meta property="og:description" content="Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, connector approval, a binding, and switching an environment to Gateway observation." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/operations/gateway/" />
   <meta property="og:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
@@ -95,7 +95,7 @@
   
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Gateway" />
-  <meta name="twitter:description" content="Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, then connector approval and a binding." />
+  <meta name="twitter:description" content="Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, connector approval, a binding, and switching an environment to Gateway observation." />
   <meta name="twitter:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   
@@ -117,7 +117,7 @@
     "@context": "https://schema.org",
     "@type": "TechArticle",
     "headline": "Gateway",
-    "description": "Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, then connector approval and a binding.",
+    "description": "Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, connector approval, a binding, and switching an environment to Gateway observation.",
     "url": "https://secrets-bridge.io/latest/operations/gateway/",
     "image": "https://secrets-bridge.io/latest/assets/og-banner.png",
     "publisher": {
@@ -1749,10 +1749,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-observation-next-release" class="md-nav__link">
+  <a href="#8-switch-the-environment-to-gateway-observation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8. Observation (next release)
+        8. Switch the environment to Gateway observation
       
     </span>
   </a>
@@ -1760,10 +1760,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#revoke-a-gateway" class="md-nav__link">
+  <a href="#9-turn-on-the-worker-sweepers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Revoke a Gateway
+        9. Turn on the worker sweepers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-check-a-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Check a request
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#disable-enable-or-revoke-a-gateway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disable, enable or revoke a Gateway
       
     </span>
   </a>
@@ -2209,10 +2231,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-observation-next-release" class="md-nav__link">
+  <a href="#8-switch-the-environment-to-gateway-observation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8. Observation (next release)
+        8. Switch the environment to Gateway observation
       
     </span>
   </a>
@@ -2220,10 +2242,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#revoke-a-gateway" class="md-nav__link">
+  <a href="#9-turn-on-the-worker-sweepers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Revoke a Gateway
+        9. Turn on the worker sweepers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-check-a-request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Check a request
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#disable-enable-or-revoke-a-gateway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disable, enable or revoke a Gateway
       
     </span>
   </a>
@@ -2267,18 +2311,18 @@
 <p>This page installs a <a href="../../components/gateway/">Gateway</a> for Release 1, which
 observes Argo CD only. You create a read-only Argo CD account, create the
 Gateway in the control plane, enroll it once from your workstation, install the
-chart, and then approve its connector and bind an Argo CD Application to a
-secret.</p>
+chart, approve its connector, bind an Argo CD Application to a secret, and
+switch the environment's observation source to the Gateway.</p>
+<p>Each control-plane step can be done in the console (Admin → Gateways) or with
+<code>curl</code>. Enrollment always runs from a shell, because the credential goes
+straight into a Kubernetes Secret.</p>
 <div class="admonition warning">
-<p class="admonition-title">Observation is not live yet</p>
-<p>Everything on this page works against the api on <code>main</code>. The last step,
-where the Gateway claims observation tasks and its results appear on a
-request, comes with the next release
-(<a href="https://github.com/secrets-bridge/api/issues/294">api#294</a>,
-<a href="https://github.com/secrets-bridge/worker/issues/38">worker#38</a>,
-<a href="https://github.com/secrets-bridge/ui/issues/163">ui#163</a>). Until then the
-Gateway enrolls, heartbeats and reports its catalog, and Argo CD state on a
-request still comes from the control plane's poller (<code>SB_GITOPS_ENABLED</code>).</p>
+<p class="admonition-title">Release 1 is in progress</p>
+<p>Everything on this page is merged and has not passed QA. The control
+plane's own Argo CD poller (<code>SB_GITOPS_ENABLED</code>) still exists until the
+cutover in <a href="https://github.com/secrets-bridge/gateway/issues/13">gateway#13</a>
+ships. An environment uses one observation source at a time, so a request
+gets Argo CD state from either the poller or the Gateway, never both.</p>
 </div>
 <pre class="mermaid"><code>sequenceDiagram
     autonumber
@@ -2299,17 +2343,19 @@ request still comes from the control plane's poller (<code>SB_GITOPS_ENABLED</co
     GW-&gt;&gt;Argo: GET /api/v1/session/userinfo
     GW-&gt;&gt;CP: heartbeat and catalog
     Admin-&gt;&gt;CP: approve connector, create binding
-    Note over GW,CP: observation tasks come with api#294</code></pre>
+    Admin-&gt;&gt;CP: set the environment's observation source to gateway
+    GW-&gt;&gt;CP: claim task, post result</code></pre>
 <h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
 <ul>
-<li>The api from <code>main</code>, with migrations <code>0046</code> and <code>0047</code> applied. Migration
+<li>The api from <code>main</code>, with migrations <code>0046</code> to <code>0048</code> applied. Migration
   <code>0047</code> adds <code>gateway.mint</code>, <code>gateway.revoke</code>, <code>gateway.list</code> and
-  <code>gateway.bind</code> to the seed <code>admin</code> role.</li>
-<li>An account that holds those permissions and has a TOTP factor enrolled at
+  <code>gateway.bind</code> to the seed <code>admin</code> role. Migration <code>0048</code> adds the
+  observation tables and each environment's observation source.</li>
+<li>The worker from <code>main</code>, so the Gateway sweepers can be turned on (step 9).</li>
+<li>An account that holds those permissions and has a second factor enrolled at
   <code>/me/mfa</code>. Every admin write on a Gateway needs a fresh second factor. The
-  console page for Gateways is coming in
-  <a href="https://github.com/secrets-bridge/ui/issues/163">ui#163</a>, so this page uses
-  <code>curl</code>, and the TOTP path is the one you can complete from a shell.</li>
+  console asks for it when needed. For the <code>curl</code> path, the TOTP factor is the
+  one you can complete from a shell.</li>
 <li><code>kubectl</code>, <code>helm</code>, <code>jq</code>, <code>curl</code> and the <code>argocd</code> CLI.</li>
 <li>A namespace for the Gateway. The examples use <code>tenant-a-uat</code>.</li>
 </ul>
@@ -2365,8 +2411,27 @@ they never appear on a command line or in the process list.</p>
 <p>If a later write answers <code>401</code> with <code>WWW-Authenticate: step-up</code>, the 15 minutes
 have passed. Run the step-up block again. See
 <a href="../authentication/#step-up-ceremony">Authentication</a> for the model.</p>
+<p>In the console you skip this step: sign in, and the console runs the step-up
+dialog on the first write that needs it.</p>
 <h2 id="3-create-the-gateway-and-mint-an-enrollment-token">3. Create the Gateway and mint an enrollment token<a class="headerlink" href="#3-create-the-gateway-and-mint-an-enrollment-token" title="Permanent link">&para;</a></h2>
-<p>Create the Gateway record. <code>name</code> is a lower-case DNS-style label of up to 63
+<p>In the console:</p>
+<ol>
+<li>Open <strong>Admin → Gateways</strong> (needs <code>gateway.list</code>) and select
+   <strong>Create gateway</strong>.</li>
+<li>Fill in <strong>Name</strong>, <strong>Boundary</strong> and, if you want, <strong>Environment
+   (optional)</strong>, <strong>Max replicas</strong> and <strong>Max tasks in flight</strong>. Select
+   <strong>Create gateway</strong>.</li>
+<li>The <strong>Create enrollment token</strong> panel opens next. Pick a <strong>Token
+   lifetime</strong> (15 minutes, 1 hour or 24 hours) and, if you want, a <strong>Cluster
+   name (optional)</strong>, then select <strong>Create token</strong>. For a Gateway that is
+   still pending you can also open it from the list and select <strong>Create
+   enrollment token</strong>.</li>
+<li>The token is masked and shown once. Use <strong>Copy token</strong>, paste it at the
+   silent prompt in step 4, and close the panel. The console keeps the token
+   in memory only, and closing the panel clears the clipboard if it still
+   holds the token.</li>
+</ol>
+<p>With <code>curl</code>, create the Gateway record. <code>name</code> is a lower-case DNS-style label of up to 63
 characters. <code>boundary</code> is a free label of up to 128 characters that says where
 the Gateway runs. <code>environment_id</code> is optional; when it is set, every binding
 for this Gateway must use that environment.</p>
@@ -2390,7 +2455,9 @@ send the same <code>cluster_name</code> or it is refused. You can mint a token o
 the Gateway is <code>pending</code>, and you can revoke an unused one with
 <code>POST /api/v1/admin/gateway-enrollment-tokens/:id/revoke</code>.</p>
 <p>If someone else enrolls the Gateway, give them the token over a channel you
-would trust with a password. They read it at a silent prompt in step 4.</p>
+would trust with a password. They read it at a silent prompt in step 4.
+Revoke an unused token from the Gateway's <strong>Enrollment tokens</strong> list in the
+console, or with the route above.</p>
 <h2 id="4-enroll-and-store-the-identity">4. Enroll and store the identity<a class="headerlink" href="#4-enroll-and-store-the-identity" title="Permanent link">&para;</a></h2>
 <p>The pod never enrolls. You exchange the token for the Gateway credential once,
 from your workstation, and write the result straight into a Secret. The token
@@ -2506,8 +2573,10 @@ and the catalog and the Argo CD token check has passed.</p>
 </span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>kubectl<span class="w"> </span>-n<span class="w"> </span>tenant-a-uat<span class="w"> </span>logs<span class="w"> </span>deploy/secrets-bridge-gateway
 </span></code></pre></div>
 <p>In the log, look for <code>identity loaded</code> and <code>connectors bound</code>.</p>
-<p>Then check the control plane. <code>GET /api/v1/admin/gateways</code> needs
-<code>gateway.list</code> and no step-up:</p>
+<p>Then check the control plane. In the console, <strong>Admin → Gateways</strong> shows the
+status, replicas and last heartbeat in UTC. Select the Gateway's name to see its
+replicas and <strong>Advertised connectors</strong>. With <code>curl</code>,
+<code>GET /api/v1/admin/gateways</code> needs <code>gateway.list</code> and no step-up:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/admin/gateways"</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.items[] | {id, name, status, last_seen_at, replicas_seen, catalog_version}'</span>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
@@ -2518,16 +2587,27 @@ and the catalog and the Argo CD token check has passed.</p>
 <p>The Gateway shows <code>status: "active"</code>, each replica appears with a recent
 <code>last_seen_at</code>, and the connector <code>argocd-main</code> is listed with status
 <code>advertised</code> and the target <code>payments-api</code>.</p>
-<div class="admonition note">
-<p class="admonition-title">Expected log line until the next release</p>
-<p>The Gateway already polls for observation tasks, and the api does not
-serve that route yet. Each poll logs <code>claim failed</code> at WARN level with a
-not-found error, backing off to once every 30 seconds
-(<code>SB_GATEWAY_CLAIM_IDLE_MAX</code>). It does not affect readiness.</p>
-</div>
+<p>Until a task is queued for it, each claim answers <code>204</code> and the Gateway backs
+off up to once every 30 seconds (<code>SB_GATEWAY_CLAIM_IDLE_MAX</code>). That is normal
+and does not affect readiness.</p>
 <h2 id="7-approve-the-connector-and-bind-a-target">7. Approve the connector and bind a target<a class="headerlink" href="#7-approve-the-connector-and-bind-a-target" title="Permanent link">&para;</a></h2>
 <p>Advertising a connector approves nothing. An admin with <code>gateway.bind</code> approves
-it, using the connector's <code>id</code> (a UUID) from the detail call above:</p>
+it and binds a target.</p>
+<p>In the console, open the Gateway from <strong>Admin → Gateways</strong>:</p>
+<ol>
+<li>Under <strong>Advertised connectors</strong>, select <strong>Approve…</strong> next to
+   <code>argocd-main</code>, then <strong>Approve connector</strong>. Approving grants the Gateway
+   nothing in Argo CD.</li>
+<li>Select <strong>Bind a target</strong>. Choose the <strong>Argo CD target</strong>, the <strong>Project</strong>
+   and <strong>Environment</strong>, and a <strong>Secret scope</strong>: either <strong>A catalog secret
+   bound to the project</strong> (then <strong>Secret</strong>) or <strong>A provider connection and a
+   secret path</strong> (then <strong>Provider connection</strong> and <strong>Secret path</strong>).</li>
+<li>Pick an <strong>Observation deadline</strong> (15 minutes to 6 hours, 30 minutes by
+   default) and select <strong>Create binding</strong>.</li>
+</ol>
+<p>The binding appears under <strong>Bindings</strong>, where <strong>Delete…</strong> removes it.</p>
+<p>With <code>curl</code>, approve the connector using its <code>id</code> (a UUID) from the detail call
+above:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">CONNECTOR_ID</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/admin/gateways/</span><span class="nv">$GW_ID</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">'.connectors[] | select(.connector_id == "argocd-main") | .id'</span><span class="k">)</span>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
@@ -2553,23 +2633,125 @@ with a closed code, for example <code>connector_not_approved</code>,
 <code>target_not_advertised</code>, <code>target_stale</code> (the Gateway no longer advertises it),
 <code>environment_outside_gateway</code>, <code>secret_not_in_project</code> or <code>binding_exists</code>.
 <code>GET /api/v1/admin/gateway-bindings?gateway_id=&lt;id&gt;</code> lists bindings and
-<code>DELETE /api/v1/admin/gateway-bindings/:id</code> removes one.</p>
-<h2 id="8-observation-next-release">8. Observation (next release)<a class="headerlink" href="#8-observation-next-release" title="Permanent link">&para;</a></h2>
-<p>With <a href="https://github.com/secrets-bridge/api/issues/294">api#294</a> the control
-plane creates an observation task for each binding when a request reaches
-<code>executed</code>, and an environment setting chooses its observation source: the
-control plane's poller, the Gateway, or none. The Gateway claims those tasks,
-reads the bound Application and posts metadata-only evidence.
-<a href="https://github.com/secrets-bridge/ui/issues/163">ui#163</a> shows it on the request
-page as observed operational state, labelled with the Gateway that observed it.
-This page will cover that step once it is merged.</p>
-<h2 id="revoke-a-gateway">Revoke a Gateway<a class="headerlink" href="#revoke-a-gateway" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Needs gateway.revoke and a fresh second factor.</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/admin/gateways/</span><span class="nv">$GW_ID</span><span class="s2">/revoke"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">'{"reason":"decommissioned"}'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'{status, revoked_at}'</span>
+<code>DELETE /api/v1/admin/gateway-bindings/:id</code> removes one, and cancels its open
+tasks with the reason <code>binding_removed</code>.</p>
+<h2 id="8-switch-the-environment-to-gateway-observation">8. Switch the environment to Gateway observation<a class="headerlink" href="#8-switch-the-environment-to-gateway-observation" title="Permanent link">&para;</a></h2>
+<p>A binding alone creates no tasks. Each environment has an observation source,
+and only an environment set to <code>gateway</code> gets Gateway tasks:</p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>What observes a change executed in the environment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>control_plane</code> (default)</td>
+<td>The control plane's own Argo CD poller, when <code>SB_GITOPS_ENABLED</code> and <code>SB_WORKER_GITOPS_ENABLED</code> are on. Otherwise nothing</td>
+</tr>
+<tr>
+<td><code>gateway</code></td>
+<td>The Gateways bound to the environment. The control-plane poller is skipped for these requests</td>
+</tr>
+<tr>
+<td><code>none</code></td>
+<td>Nothing</td>
+</tr>
+</tbody>
+</table>
+<p>The source is read once when a request reaches <code>executed</code>, so a request is
+observed by one of them, never both. Switching away from <code>gateway</code> cancels the
+environment's open Gateway tasks with the reason <code>source_changed</code>. The requests
+themselves are not affected.</p>
+<p>In the console (needs <code>gateway.bind</code>), open <strong>Admin → Projects</strong>, select the
+project, and find the environment on the <strong>Environments</strong> tab. The
+<strong>Observation</strong> column shows the current source. Select <strong>Change…</strong>, choose
+<strong>Gateway</strong> in the <strong>Observation for</strong> dialog, and select <strong>Save</strong>.</p>
+<p>With <code>curl</code>, the route needs <code>gateway.bind</code> and a fresh second factor (step 2).
+The body holds no secret, so it can go on the command line:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nv">ENV_ID</span><span class="o">=</span>&lt;environment-id&gt;
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/admin/environments/</span><span class="nv">$ENV_ID</span><span class="s2">/observation-source"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/admin/environments/</span><span class="nv">$ENV_ID</span><span class="s2">/observation-source"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">'{"observation_source":"gateway"}'</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'{observation_source, previous_observation_source, tasks_cancelled}'</span>
+</span></code></pre></div>
+<p>A value other than <code>control_plane</code>, <code>gateway</code> or <code>none</code> answers
+<code>400 invalid_observation_source</code>, and an unknown environment
+<code>404 environment_not_found</code>. The change is audited as
+<code>environment.observation_source.update</code>.</p>
+<h2 id="9-turn-on-the-worker-sweepers">9. Turn on the worker sweepers<a class="headerlink" href="#9-turn-on-the-worker-sweepers" title="Permanent link">&para;</a></h2>
+<p>The worker runs four Gateway sweepers when <code>SB_WORKER_GATEWAY_SWEEPERS_ENABLED</code>
+is <code>true</code> (default <code>false</code>):</p>
+<ul>
+<li><code>observation-leases</code> puts tasks whose lease ran out back in the queue.</li>
+<li><code>observation-deadlines</code> closes open tasks past their deadline as
+  <code>timed_out</code>, with the reason <code>gateway_unavailable</code> or <code>deadline_reached</code>.</li>
+<li><code>gateways-stale</code> moves a Gateway from <code>active</code> to <code>stale</code> after
+  <code>SB_WORKER_GATEWAYS_STALE_AFTER</code> (default <code>2m</code>) without a heartbeat. The
+  next accepted heartbeat moves it back to <code>active</code>.</li>
+<li><code>gateway-replicas-prune</code> deletes replica rows not seen within
+  <code>SB_WORKER_GATEWAY_REPLICAS_RETENTION</code> (default <code>24h</code>).</li>
+</ul>
+<p>The intervals and floors are in the
+<a href="../config/#worker">configuration reference</a>. Without the sweepers, a claim
+still takes over an expired lease, and reading a request's observations closes
+that request's overdue tasks. Tasks of requests nobody opens stay open past
+their deadline, and Gateways never turn <code>stale</code>.</p>
+<h2 id="10-check-a-request">10. Check a request<a class="headerlink" href="#10-check-a-request" title="Permanent link">&para;</a></h2>
+<p>Submit and approve a change to the bound secret in that environment. When the
+agent has written it and the request is <code>executed</code>, the request page shows a
+panel titled <strong>Argo CD (observed by Gateway tenant-a-uat)</strong>, marked
+<strong>Observed operational state · times in UTC</strong>. It shows:</p>
+<ul>
+<li>The rollup: <strong>Pending</strong>, <strong>Unverified</strong>, <strong>Timed out</strong> or, when no binding
+  covers the change, <strong>No observation configured</strong>. None of these is a failure
+  of the request. The panel refreshes every 20 seconds while the rollup is
+  pending, and when the window regains focus.</li>
+<li>For each task, the Gateway, the verdict, the task state and its deadline or
+  closing time, and the reason in words, for example "Only Argo CD context was
+  observed. Argo CD health and sync are operational state, never proof that
+  the new value reached the app."</li>
+<li>For the Argo CD stage, the outcome (<strong>Observed</strong> or <strong>Not observed</strong>), the
+  observed time, the <strong>Sync</strong>, <strong>Health</strong>, <strong>Last operation</strong>, <strong>Revision</strong>,
+  <strong>Operation finished</strong> and <strong>Reconciled</strong> facts, and the caveat "Argo CD
+  reports Healthy and Synced. This is the operational state, not proof the new
+  value reached the app." <strong>Evidence details</strong> lists the connector, target,
+  confidence, linkage, Gateway, replica and attempt ids.</li>
+</ul>
+<p>The same data comes from <code>GET /api/v1/requests/&lt;id&gt;/observations</code>, behind the
+same read check as the request itself:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/requests/&lt;request-id&gt;/observations"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'{observation_source, rollup, label,</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="s1">         tasks: [.tasks[] | {gateway_name, state, verdict, verdict_reason,</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="s1">                             stages: [.stages[] | {stage, outcome, observed_at, caveats, facts}]}]}'</span>
+</span></code></pre></div>
+<p>On the Gateway's detail panel, <strong>Recent tasks</strong> lists the latest 25 tasks with
+their state, verdict and attempts. With <code>curl</code>,
+<code>GET /api/v1/admin/gateways/$GW_ID/tasks</code> (needs <code>gateway.list</code>) takes
+<code>?state=</code> and <code>?limit=</code> (1 to 500, default 100).</p>
+<h2 id="disable-enable-or-revoke-a-gateway">Disable, enable or revoke a Gateway<a class="headerlink" href="#disable-enable-or-revoke-a-gateway" title="Permanent link">&para;</a></h2>
+<p>Disabling is reversible. A disabled Gateway's calls are refused with <code>401</code>, its
+leased tasks go back to the queue, and their old attempts can no longer post a
+result. It keeps its credential, and enabling it returns it to <code>active</code> (or
+<code>pending</code> if it never enrolled). In the console, open the Gateway and select
+<strong>Disable…</strong> or <strong>Enable…</strong>. With <code>curl</code> (needs <code>gateway.revoke</code> and a fresh
+second factor):</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/admin/gateways/</span><span class="nv">$GW_ID</span><span class="s2">/enabled"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">'{"enabled":false}'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'{status}'</span>
+</span></code></pre></div>
+<p>A revoked Gateway answers <code>409 gateway_revoked</code>.</p>
+<p>Revoking is final. In the console, select <strong>Revoke…</strong>, or:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Needs gateway.revoke and a fresh second factor.</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/admin/gateways/</span><span class="nv">$GW_ID</span><span class="s2">/revoke"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">'{"reason":"decommissioned"}'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'{status, revoked_at}'</span>
 </span></code></pre></div>
 <p><code>reason</code> is optional, a lower-case code of up to 64 characters. The next
-heartbeat or catalog upload gets <code>401</code>. The pods stay up and not ready with the
+heartbeat, catalog upload or task call gets <code>401</code>, and leased tasks go back to
+the queue. A task belongs to one Gateway, so its open tasks end <code>timed_out</code>
+with the reason <code>gateway_unavailable</code> at their deadline. The pods stay up and not ready with the
 reason in their logs. There is no credential rotation in Release 1: to replace a
 credential, revoke the Gateway, create a new one, enroll it and update the
 identity Secret.</p>

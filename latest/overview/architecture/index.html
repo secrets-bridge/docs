@@ -2315,13 +2315,14 @@ Release 1 of the Gateway is in progress; see
 <div class="tabbed-block">
 <p>Off by default. Enable with <code>SB_GITOPS_ENABLED=true</code> on the api
 AND <code>SB_WORKER_GITOPS_ENABLED=true</code> on the worker.</p>
-<p>This is today's path: the worker calls Argo CD from the Control
-Plane with a KMS-wrapped token. The <a href="../../components/gateway/">Gateway</a>
-replaces it with observation from inside your boundary once its
-observation tasks are merged
-(<a href="https://github.com/secrets-bridge/api/issues/294">api#294</a>) and the
-cutover in <a href="https://github.com/secrets-bridge/gateway/issues/13">gateway#13</a>
-is done. Either way, <code>Healthy</code> and <code>Synced</code> are Argo CD operational
+<p>This path has the worker call Argo CD from the Control Plane with a
+KMS-wrapped token. It runs only for environments whose observation
+source is <code>control_plane</code>, the default. An environment set to
+<code>gateway</code> is observed by a <a href="../../components/gateway/">Gateway</a> from
+inside your boundary instead, and never by this poller. The poller
+stays until the cutover in
+<a href="https://github.com/secrets-bridge/gateway/issues/13">gateway#13</a>
+ships. Either way, <code>Healthy</code> and <code>Synced</code> are Argo CD operational
 state, not proof that the workload picked up the new value.</p>
 <pre class="mermaid"><code>sequenceDiagram
     participant API

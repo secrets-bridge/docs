@@ -1039,6 +1039,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#observation-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#security-model" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2132,6 +2143,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#observation-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#security-model" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2210,20 +2232,16 @@ Applications you list in its local configuration, and reports that state to the
 control plane as metadata. It never changes anything, and it is optional.</p>
 <div class="admonition warning">
 <p class="admonition-title">Release 1 is in progress</p>
-<p>The Gateway binary, its Helm chart and the control-plane registry
-(enrollment, heartbeat, catalog, connector approval, bindings, revoke)
-are merged. Observation tasks, results and evidence are not:
-<a href="https://github.com/secrets-bridge/api/issues/294">api#294</a>,
-<a href="https://github.com/secrets-bridge/worker/issues/38">worker#38</a> and
-<a href="https://github.com/secrets-bridge/ui/issues/163">ui#163</a> are still open.</p>
-<p>Until they land, a Gateway enrolls, heartbeats and reports its catalog of
-connectors and targets, but it receives no observation tasks and nothing
-it reads shows up on a request. Argo CD state on a request still comes
-from the control plane's own poller (<code>SB_GITOPS_ENABLED</code> on the api and
+<p>The Gateway binary, its Helm chart, the control-plane registry and the
+observation path (tasks, leases, results, evidence, verdicts, the worker
+sweepers and the console pages) are merged. Release 1 has not passed QA.</p>
+<p>The control plane's own Argo CD poller (<code>SB_GITOPS_ENABLED</code> on the api and
 <code>SB_WORKER_GITOPS_ENABLED</code> on the worker, see
-<a href="../../overview/architecture/#the-four-request-lifecycles">GitOps observation</a>).
-Making the Gateway the only Secrets Bridge component that talks to Argo CD
-is tracked in <a href="https://github.com/secrets-bridge/gateway/issues/13">gateway#13</a>.</p>
+<a href="../../overview/architecture/#the-four-request-lifecycles">GitOps observation</a>)
+still exists until the cutover in
+<a href="https://github.com/secrets-bridge/gateway/issues/13">gateway#13</a> ships.
+Each environment uses one observation source at a time: the control
+plane's poller, the Gateway, or none.</p>
 </div>
 <h2 id="where-it-sits">Where it sits<a class="headerlink" href="#where-it-sits" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>flowchart LR
@@ -2289,10 +2307,13 @@ are not proof that a new secret value reached a running workload: a secret
 change does not change Git, so an Application can be healthy and synced while
 its pods still hold the old value. The Argo CD connector reports at most
 <code>observed</code> with confidence <code>low</code>, attaches the caveat <code>argocd_health_not_proof</code>
-to every observation that is not an error, and never counts toward a verdict.</p>
+to every observation that is not an error. The control plane never turns it
+into a <code>verified</code> verdict: a task that saw only Argo CD <code>Healthy</code> and <code>Synced</code>
+ends <code>unverified</code> with the reason <code>context_only</code>.</p>
 <p>A Gateway that is offline, not deployed or not yet bound means the observation
-is pending, and later unverified. It never means the deployment is healthy, and
-it never fails the request. Execution and approvals do not wait for it.</p>
+is <code>pending</code>, and <code>timed_out</code> once the deadline passes. It never means the
+deployment is healthy, and it never fails the request. There is no <code>failed</code>
+verdict. Execution and approvals do not wait for it.</p>
 <p>The Gateway is not an execution path. It does not call the agent, receive
 values or wraps, or hold provider credentials.</p>
 <h2 id="release-1-scope">Release 1 scope<a class="headerlink" href="#release-1-scope" title="Permanent link">&para;</a></h2>
@@ -2341,6 +2362,127 @@ control plane recomputes every outcome from the reported facts):</p>
 </tr>
 </tbody>
 </table>
+<h2 id="observation-flow">Observation flow<a class="headerlink" href="#observation-flow" title="Permanent link">&para;</a></h2>
+<p>Each environment has an observation source: <code>control_plane</code> (the default),
+<code>gateway</code> or <code>none</code>. When a change reaches <code>executed</code>, the control plane reads
+that source once and starts exactly one observer. A request never gets both a
+control-plane GitOps observation and a Gateway task.</p>
+<pre class="mermaid"><code>sequenceDiagram
+    autonumber
+    participant Agent
+    participant CP as Control plane
+    participant GW as Gateway
+    participant Argo as Argo CD
+    participant UI as Request page
+    Agent-&gt;&gt;CP: job complete, request reaches executed
+    CP-&gt;&gt;CP: environment source is gateway
+    CP-&gt;&gt;CP: one task per matching binding, queued
+    Note over CP: first claim allowed 10s later (not_before)
+    GW-&gt;&gt;CP: POST /gateways/:id/tasks/claim
+    CP--&gt;&gt;GW: task with attempt_id, lease 60s, deadline
+    GW-&gt;&gt;Argo: GET /api/v1/applications/{name}
+    Argo--&gt;&gt;GW: sync, health, operation, reconcile time
+    opt work takes longer than the lease
+        GW-&gt;&gt;CP: POST /tasks/:task_id/lease
+    end
+    GW-&gt;&gt;CP: POST /tasks/:task_id/result
+    CP-&gt;&gt;CP: check attempt, lease, schema, binding, time window
+    CP-&gt;&gt;CP: recompute stage outcome, compute verdict
+    CP--&gt;&gt;GW: accepted, task_state, verdict, next
+    UI-&gt;&gt;CP: GET /requests/:id/observations
+    CP--&gt;&gt;UI: rollup and stages, observed operational state</code></pre>
+<ol>
+<li><strong>Task.</strong> A patch or cross-team request that reaches <code>executed</code> in an
+   environment whose source is <code>gateway</code> gets one task for each enabled
+   binding that covers its secret scope, where the Gateway is not revoked or
+   disabled, the Argo CD connector is approved and the bound target is still
+   advertised. Release 1 tasks carry one stage, <code>argocd_context</code>. The first
+   claim is allowed 10 seconds after <code>executed</code>. The deadline is the binding's
+   <code>observation_timeout_seconds</code> (default 1800), raised to cover the target's
+   advertised refresh interval and progress deadline plus 5 minutes, and never
+   more than 24 hours. With no matching binding, no task is created and the
+   request shows "No observation configured".</li>
+<li><strong>Claim.</strong> The Gateway claims for itself only. The task is chosen by the
+   authenticated Gateway id, never by anything in the body. A claim leases one
+   task to one replica with a new <code>attempt_id</code> and a 60-second lease (capped
+   at the deadline). Each replica holds at most one task, and the Gateway at
+   most <code>max_inflight_tasks</code> (default 20). Nothing to claim answers <code>204</code>
+   with <code>Retry-After: 5</code>.</li>
+<li><strong>Lease.</strong> The Gateway renews the lease while it works, or releases the
+   task early with a reason (<code>shutdown</code>, <code>over_capacity</code>,
+   <code>connector_unavailable</code>). A release is never a failure. A lease that runs
+   out puts the task back in the queue, and the old <code>attempt_id</code> can no longer
+   renew, release or post a result.</li>
+<li><strong>Result.</strong> The result is accepted only for the attempt the control plane
+   dispatched to that Gateway, while its lease is live and before the
+   deadline. The evidence must name the connector and target in the task, that
+   connector must be approved and belong to the Gateway, the binding must still
+   be live in the request's own environment and project, and the reported
+   Application must be the object the target advertises. The schema is closed:
+   unknown or duplicate keys are refused. Timestamps must fall inside the
+   attempt, allowing for clock skew. A repeated result with the same body
+   returns the stored answer (<code>duplicate</code>); a different body for the same
+   attempt is a conflict.</li>
+<li><strong>Verdict.</strong> The control plane recomputes the stage outcome from the
+   reported facts and does not take the Gateway's word for it. Evidence, the
+   task state, the verdict and the audit events are written in one
+   transaction. A stage that is not yet <code>observed</code> puts the task back in the
+   queue with a backoff of 15, 30, 60 and then 120 seconds until the deadline.</li>
+</ol>
+<p>What the verdicts mean in Release 1:</p>
+<table>
+<thead>
+<tr>
+<th>Verdict</th>
+<th>Reason</th>
+<th>When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pending</code></td>
+<td></td>
+<td>The task is open (<code>queued</code> or <code>leased</code>)</td>
+</tr>
+<tr>
+<td><code>unverified</code></td>
+<td><code>context_only</code></td>
+<td>Argo CD was <code>Healthy</code> and <code>Synced</code>, idle or <code>Succeeded</code>, and reconciled after the change. This is observed operational state, so the verdict stays unverified</td>
+</tr>
+<tr>
+<td><code>unverified</code></td>
+<td><code>no_stage_observed</code></td>
+<td>The stage ended <code>unverifiable</code>, for example an Application outside the allowed AppProjects</td>
+</tr>
+<tr>
+<td><code>unverified</code></td>
+<td><code>gateway_errors</code></td>
+<td>Five Gateway-reported errors or refused attempts. The task is <code>dead</code></td>
+</tr>
+<tr>
+<td><code>unverified</code></td>
+<td><code>superseded_by_later_write</code>, <code>source_changed</code>, <code>binding_removed</code></td>
+<td>A later change to the same secret, a change of the environment's source away from <code>gateway</code>, or a deleted binding cancelled the open task</td>
+</tr>
+<tr>
+<td><code>timed_out</code></td>
+<td><code>gateway_unavailable</code></td>
+<td>The deadline passed and the Gateway was not seen since the task was created, or is not <code>active</code></td>
+</tr>
+<tr>
+<td><code>timed_out</code></td>
+<td><code>deadline_reached</code></td>
+<td>The deadline passed while the Gateway was up, for example while Argo CD stayed <code>Progressing</code> or <code>OutOfSync</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>verified</code> and <code>partially_observed</code> exist in the schema for the Release 2
+stages (<code>eso_sync</code>, <code>workload_rollout</code>). A Release 1 task never reaches them.
+There is no <code>failed</code> verdict, so a Gateway that is offline or late leaves the
+request <code>pending</code> and then <code>timed_out</code>, never failed.</p>
+<p>Revoking or disabling a Gateway moves its leased tasks back to <code>queued</code> and
+refuses the old attempts. A disabled Gateway can be enabled again; a revoked
+one cannot. Tasks it can no longer claim end <code>timed_out</code> at their deadline.</p>
 <h2 id="security-model">Security model<a class="headerlink" href="#security-model" title="Permanent link">&para;</a></h2>
 <p>The Gateway fails closed. Where it cannot prove a rule holds, it refuses to
 start, stops claiming, or stays not ready.</p>

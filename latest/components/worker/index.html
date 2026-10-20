@@ -2206,6 +2206,26 @@ read-only ArgoCD observation poller (BRD §26).</p>
 <td>Flip observations past their <code>timeout_at</code> to <code>applied_unverified</code></td>
 </tr>
 <tr>
+<td><code>observation-leases</code></td>
+<td>30s</td>
+<td>Put Gateway observation tasks whose lease ran out back to <code>queued</code>. Opt-in with <code>SB_WORKER_GATEWAY_SWEEPERS_ENABLED</code></td>
+</tr>
+<tr>
+<td><code>observation-deadlines</code></td>
+<td>30s</td>
+<td>Close open observation tasks past their deadline as <code>timed_out</code> (<code>deadline_reached</code> or <code>gateway_unavailable</code>), never failed. Opt-in</td>
+</tr>
+<tr>
+<td><code>gateways-stale</code></td>
+<td>1m</td>
+<td>Flip Gateways with no heartbeat for <code>SB_WORKER_GATEWAYS_STALE_AFTER</code> (2m) from <code>active</code> to <code>stale</code>. Opt-in</td>
+</tr>
+<tr>
+<td><code>gateway-replicas-prune</code></td>
+<td>1h</td>
+<td>Delete Gateway replica rows not seen for 24h. Opt-in</td>
+</tr>
+<tr>
 <td><code>users-pending</code></td>
 <td>1m</td>
 <td>Post one webhook message about accounts newly <a href="../../operations/google-sign-in/#notify-admins-from-the-worker">waiting for approval</a>, by email only. Registered only when <code>SB_WORKER_WEBHOOK_URL</code> is set</td>
@@ -2305,6 +2325,12 @@ runs each sweeper per tick, the others record <code>worker_scheduler_lock_skippe
 <td>no</td>
 <td><code>false</code></td>
 <td>Must match the api's <code>SB_GITOPS_ENABLED</code> for §26 to be active</td>
+</tr>
+<tr>
+<td><code>SB_WORKER_GATEWAY_SWEEPERS_ENABLED</code></td>
+<td>no</td>
+<td><code>false</code></td>
+<td>Turns on the four Gateway observation sweepers. Their intervals are in the <a href="../../operations/config/#worker">Configuration reference</a></td>
 </tr>
 <tr>
 <td><code>SB_DISCOVER_TARGETS_JSON</code></td>

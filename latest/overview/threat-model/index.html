@@ -2411,7 +2411,7 @@ full STRIDE analysis is the
 </tr>
 <tr>
 <td>Argo CD health is never proof of propagation</td>
-<td>The Argo CD connector reports at most <code>observed</code> with confidence <code>low</code> and attaches the caveat <code>argocd_health_not_proof</code>. The verdict rules in <a href="https://github.com/secrets-bridge/gateway/blob/main/docs/adr/0001-gateway-observation-plane.md">ADR 0001</a>, which arrive with <a href="https://github.com/secrets-bridge/api/issues/294">api#294</a>, never count that stage toward a verdict, and leave a request with no Gateway evidence unverified, never failed</td>
+<td>The Argo CD connector reports at most <code>observed</code> with confidence <code>low</code> and attaches the caveat <code>argocd_health_not_proof</code>. The control plane recomputes every stage outcome from the reported facts, following <a href="https://github.com/secrets-bridge/gateway/blob/main/docs/adr/0001-gateway-observation-plane.md">ADR 0001</a>: a task that saw only Argo CD <code>Healthy</code> and <code>Synced</code> ends <code>unverified</code> with reason <code>context_only</code>, never <code>verified</code>. There is no <code>failed</code> verdict; missing or late evidence ends <code>pending</code> and then <code>timed_out</code></td>
 </tr>
 </tbody>
 </table>
