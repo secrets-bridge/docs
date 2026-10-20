@@ -1332,6 +1332,8 @@
       
         
       
+        
+      
     
     
     
@@ -1711,6 +1713,34 @@
     
   
     Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/gateway-cutover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway cutover
   
 
     
@@ -2158,8 +2188,9 @@
 · Stack: Go 1.25 + <code>api/pkg/storage</code> + <code>api/pkg/runtime</code> (via local
 <code>replace</code> directive) + Prometheus client
 · Container: <code>golang:1.25-alpine</code> → <code>distroless/static:nonroot</code></p>
-<p>Background workhorse for the platform's lifecycle hygiene + the
-read-only ArgoCD observation poller (BRD §26).</p>
+<p>Background workhorse for the platform's lifecycle hygiene and the Gateway
+observation sweepers. The worker never talks to Argo CD and holds no KMS
+access; Argo CD state comes only from a <a href="../gateway/">Gateway</a>.</p>
 <h2 id="sweepers-shipped-today">Sweepers shipped today<a class="headerlink" href="#sweepers-shipped-today" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -2194,16 +2225,6 @@ read-only ArgoCD observation poller (BRD §26).</p>
 <td><code>discover-scheduler</code></td>
 <td>5m</td>
 <td>Enqueue one discover job per configured target (env var today; admin API tracked)</td>
-</tr>
-<tr>
-<td><code>gitops-poller</code></td>
-<td>15s</td>
-<td>Claim a queued observation → call ArgoCD → record <code>observed_state</code> → transition</td>
-</tr>
-<tr>
-<td><code>gitops-timeout</code></td>
-<td>60s</td>
-<td>Flip observations past their <code>timeout_at</code> to <code>applied_unverified</code></td>
 </tr>
 <tr>
 <td><code>observation-leases</code></td>
@@ -2293,6 +2314,9 @@ runs each sweeper per tick, the others record <code>worker_scheduler_lock_skippe
   counts only</li>
 <li>No provider SDKs imported (worker doesn't fetch values; the
   agent does)</li>
+<li>No Argo CD client and no KMS backend. The <code>internal/archguard</code> test fails
+  the build if non-test code imports a package path containing <code>argocd</code>,
+  <code>argoproj</code> or <code>argo-cd</code>, or builds an Argo CD API path</li>
 <li>Multi-replica safe by construction</li>
 <li>Fails loud on misconfig at boot (e.g. <code>SB_DISCOVER_TARGETS_JSON</code>
   parse error → exit 1)</li>
@@ -2321,12 +2345,6 @@ runs each sweeper per tick, the others record <code>worker_scheduler_lock_skippe
 <td>Same Redis as the api</td>
 </tr>
 <tr>
-<td><code>SB_WORKER_GITOPS_ENABLED</code></td>
-<td>no</td>
-<td><code>false</code></td>
-<td>Must match the api's <code>SB_GITOPS_ENABLED</code> for §26 to be active</td>
-</tr>
-<tr>
 <td><code>SB_WORKER_GATEWAY_SWEEPERS_ENABLED</code></td>
 <td>no</td>
 <td><code>false</code></td>
@@ -2346,6 +2364,9 @@ runs each sweeper per tick, the others record <code>worker_scheduler_lock_skippe
 </tr>
 </tbody>
 </table>
+<p>The <code>SB_WORKER_GITOPS_*</code> settings are retired: if set, the worker logs their
+names once at startup and ignores them. See
+<a href="../../operations/config/#retired-settings">Retired settings</a>.</p>
 
 
 

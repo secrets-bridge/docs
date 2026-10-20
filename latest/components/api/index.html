@@ -1332,6 +1332,8 @@
       
         
       
+        
+      
     
     
     
@@ -1711,6 +1713,34 @@
     
   
     Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/gateway-cutover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway cutover
   
 
     
@@ -2175,12 +2205,18 @@ outbound HTTPS).</p>
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    ├── storage/            # Postgres repositories + migrations (embed.FS)
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    ├── runtime/            # Redis primitives (locks, idempotency, rate limit, pub/sub)
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    ├── keymgmt/            # KMS backends (local / vault-transit / aws-kms)
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    ├── sealing/            # X25519 + HKDF + AES-GCM for wire envelope
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    └── argocd/             # read-only ArgoCD client (BRD §26)
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    └── sealing/            # X25519 + HKDF + AES-GCM for wire envelope
 </span></code></pre></div>
 <p>The <code>internal/</code> boundary is closed; the <code>pkg/</code> boundary is
 deliberately open because <code>worker</code> imports <code>pkg/storage</code> and
-<code>pkg/keymgmt</code>.</p>
+<code>pkg/runtime</code>.</p>
+<p>The api has no Argo CD client. <code>internal/archguard</code> fails the build if
+non-test code imports a package path containing <code>argocd</code>, <code>argoproj</code> or
+<code>argo-cd</code>, or contains <code>/api/v1/applications</code> or
+<code>/api/v1/stream/applications</code>. A router test fails if any route path
+contains <code>gitops</code>, <code>argocd</code> or <code>argo-cd</code>, except the read-only history route
+<code>GET /api/v1/requests/:id/gitops</code>. Argo CD state reaches the api only as
+<a href="../gateway/">Gateway</a> evidence.</p>
 <h2 id="how-a-request-gets-its-identity">How a request gets its identity<a class="headerlink" href="#how-a-request-gets-its-identity" title="Permanent link">&para;</a></h2>
 <p><code>middleware.AuthWith</code> resolves the caller once per request, in this order:</p>
 <ol>
@@ -2291,17 +2327,13 @@ full surface.</p>
 <td>-</td>
 <td>Seeds local-admin user; idempotent</td>
 </tr>
-<tr>
-<td><code>SB_GITOPS_ENABLED</code></td>
-<td>no</td>
-<td><code>false</code></td>
-<td>Mounts BRD §26 ArgoCD endpoints when true</td>
-</tr>
 </tbody>
 </table>
 <p>See <a href="../../operations/config/">Configuration reference</a> for the
 exhaustive list, including the
-<a href="../../operations/config/#insecure-switches-dev-only">dev-only insecure switches</a>.</p>
+<a href="../../operations/config/#insecure-switches-dev-only">dev-only insecure switches</a>
+and the <a href="../../operations/config/#retired-settings">retired settings</a> such as
+<code>SB_GITOPS_ENABLED</code>, which are logged by name and switch nothing on.</p>
 <h2 id="whats-stable-what-isnt">What's stable, what isn't<a class="headerlink" href="#whats-stable-what-isnt" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

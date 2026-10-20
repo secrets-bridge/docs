@@ -1321,6 +1321,8 @@
       
         
       
+        
+      
     
     
     
@@ -1700,6 +1702,34 @@
     
   
     Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/gateway-cutover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway cutover
   
 
     
@@ -2153,7 +2183,7 @@ Release 1 of the Gateway is in progress; see
         API["api (Fiber v3)"]
         Postgres[("Postgres&lt;br/&gt;append-only audit")]
         Redis[("Redis&lt;br/&gt;locks, cache,&lt;br/&gt;rate limit")]
-        Worker["worker&lt;br/&gt;sweepers + gitops"]
+        Worker["worker&lt;br/&gt;sweepers"]
         KMS["KMS backend&lt;br/&gt;local / vault-transit / aws-kms"]
     end
 
@@ -2233,7 +2263,7 @@ Release 1 of the Gateway is in progress; see
 </tbody>
 </table>
 <h2 id="the-four-request-lifecycles">The four request lifecycles<a class="headerlink" href="#the-four-request-lifecycles" title="Permanent link">&para;</a></h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Read</label><label for="__tabbed_1_2">Patch</label><label for="__tabbed_1_3">Discovery</label><label for="__tabbed_1_4">GitOps observation</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Read</label><label for="__tabbed_1_2">Patch</label><label for="__tabbed_1_3">Discovery</label><label for="__tabbed_1_4">Gateway observation</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <pre class="mermaid"><code>sequenceDiagram
@@ -2313,37 +2343,28 @@ Release 1 of the Gateway is in progress; see
     API--&gt;&gt;Admin: filtered list (GIN index)</code></pre>
 </div>
 <div class="tabbed-block">
-<p>Off by default. Enable with <code>SB_GITOPS_ENABLED=true</code> on the api
-AND <code>SB_WORKER_GITOPS_ENABLED=true</code> on the worker.</p>
-<p>This path has the worker call Argo CD from the Control Plane with a
-KMS-wrapped token. It runs only for environments whose observation
-source is <code>control_plane</code>, the default. An environment set to
-<code>gateway</code> is observed by a <a href="../../components/gateway/">Gateway</a> from
-inside your boundary instead, and never by this poller. The poller
-stays until the cutover in
-<a href="https://github.com/secrets-bridge/gateway/issues/13">gateway#13</a>
-ships. Either way, <code>Healthy</code> and <code>Synced</code> are Argo CD operational
-state, not proof that the workload picked up the new value.</p>
+<p>The Control Plane never connects to Argo CD and holds no Argo CD
+credential. When a change reaches <code>executed</code> in an environment whose
+observation source is <code>gateway</code>, the api queues a task for each matching
+binding. A <a href="../../components/gateway/">Gateway</a> inside your boundary
+claims it, reads Argo CD with its own read-only token, and posts the
+result. In an environment set to <code>none</code>, the default, nothing observes
+the change. <code>Healthy</code> and <code>Synced</code> are Argo CD operational state, not
+proof that the workload picked up the new value, so the verdict is at
+most <code>unverified</code>.</p>
 <pre class="mermaid"><code>sequenceDiagram
     participant API
-    participant Worker
+    participant Gateway
     participant ArgoCD
 
     Note over API: Patch request transitions to executed
-    API-&gt;&gt;API: Fan out observations for every&lt;br/&gt;app mapping bound to this secret
-    loop Every 15s
-        Worker-&gt;&gt;API: Claim next observation
-        Worker-&gt;&gt;ArgoCD: GET /api/v1/applications/:name/resource-tree&lt;br/&gt;read-only transport, no POST
-        ArgoCD--&gt;&gt;Worker: app status (filtered)
-        Worker-&gt;&gt;API: Update observed_state
-        alt Healthy AND Synced
-            Worker-&gt;&gt;API: Transition to applied
-        else OperationPhase failed
-            Worker-&gt;&gt;API: Transition to failed
-        else timeout_at reached
-            Worker-&gt;&gt;API: Transition to applied_unverified
-        end
-    end</code></pre>
+    API-&gt;&gt;API: Queue one task per binding&lt;br/&gt;that covers this secret
+    Gateway-&gt;&gt;API: POST /gateways/:id/tasks/claim
+    API--&gt;&gt;Gateway: task, attempt_id, lease, deadline
+    Gateway-&gt;&gt;ArgoCD: GET /api/v1/applications/:name&lt;br/&gt;GET-only transport
+    ArgoCD--&gt;&gt;Gateway: sync, health, operation phase, revision
+    Gateway-&gt;&gt;API: POST /tasks/:task_id/result
+    API-&gt;&gt;API: Check attempt and binding&lt;br/&gt;recompute stage outcome and verdict</code></pre>
 </div>
 </div>
 </div>

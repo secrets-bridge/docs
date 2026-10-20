@@ -1227,6 +1227,8 @@
       
         
       
+        
+      
     
     
     
@@ -1606,6 +1608,34 @@
     
   
     Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/gateway-cutover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway cutover
   
 
     
@@ -2122,17 +2152,6 @@
     <span class="md-ellipsis">
       
         Jobs (admin)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#integrations-brd-26-gated-by-sb_gitops_enabled" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Integrations (BRD §26, gated by SB_GITOPS_ENABLED)
       
     </span>
   </a>
@@ -2675,17 +2694,6 @@
     <span class="md-ellipsis">
       
         Jobs (admin)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#integrations-brd-26-gated-by-sb_gitops_enabled" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Integrations (BRD §26, gated by SB_GITOPS_ENABLED)
       
     </span>
   </a>
@@ -3570,13 +3578,13 @@ treats as transient. The claim, lease and release bodies are limited to 4 KiB.</
 <td><code>GET</code></td>
 <td><code>/api/v1/admin/environments/:id/observation-source</code></td>
 <td><code>session + gateway.bind</code></td>
-<td><code>{environment_id, observation_source}</code>. <code>404 environment_not_found</code></td>
+<td><code>{environment_id, observation_source}</code>, either <code>gateway</code> or <code>none</code>. A stored value that is not one of them reads as <code>none</code>. <code>404 environment_not_found</code></td>
 </tr>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/admin/environments/:id/observation-source</code></td>
 <td><code>session + gateway.bind</code> + fresh MFA</td>
-<td><code>{observation_source}</code> with <code>control_plane</code>, <code>gateway</code> or <code>none</code> → <code>{environment_id, observation_source, previous_observation_source, tasks_cancelled}</code>. Leaving <code>gateway</code> cancels the environment's open tasks (<code>source_changed</code>). <code>400 invalid_observation_source</code></td>
+<td><code>{observation_source}</code> with <code>gateway</code> or <code>none</code> → <code>{environment_id, observation_source, previous_observation_source, tasks_cancelled}</code>. Leaving <code>gateway</code> cancels the environment's open tasks (<code>source_changed</code>). <code>400 source_retired</code> for <code>control_plane</code>, <code>400 invalid_observation_source</code> for any other value</td>
 </tr>
 </tbody>
 </table>
@@ -3665,14 +3673,14 @@ treats as transient. The claim, lease and release bodies are limited to 4 KiB.</
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/requests/:id/gitops</code></td>
-<td>user_id</td>
-<td>BRD §26 observation list (404 when feature is off)</td>
+<td>session, requester only</td>
+<td>Read-only history of the retired control-plane Argo CD poller. Rows are never written or rewritten. Each row has <code>id</code>, <code>application_name</code>, <code>application_namespace</code>, <code>polling_state</code> (repeated as <code>status</code>), <code>history: true</code>, <code>label: history_context_only</code>, <code>history_status</code> and filtered <code>observed_state</code>, plus <code>polls_count</code>, <code>last_polled_at</code>, <code>timeout_at</code>, <code>terminal_at</code> and <code>last_error</code> as a class. <code>history_status</code> is <code>argocd_healthy_synced_context_only</code>, <code>timed_out_unverified</code>, <code>failed</code> or <code>not_completed_poller_removed</code> (rows the poller never finished). None of them is proof that a value reached a workload. <code>403</code> for anyone but the requester. Live Argo CD state is in <code>/observations</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/requests/:id/observations</code></td>
 <td>session</td>
-<td>Gateway evidence for the request, behind the same read check as <code>GET /requests/:id</code>: <code>{observation_source, rollup, label, tasks}</code>. <code>rollup</code> is <code>none</code> (no task), <code>pending</code>, <code>verified</code>, <code>partially_observed</code>, <code>unverified</code> or <code>timed_out</code>. <code>label</code> is always <code>observed_operational_state</code>. Each task has <code>gateway_name</code>, <code>state</code>, <code>verdict</code>, <code>verdict_reason</code>, <code>deadline_at</code> and <code>stages</code>; each stage has <code>outcome</code>, <code>reported_outcome</code>, <code>observed_at</code>, <code>connector_id</code>, <code>target_id</code>, <code>caveats</code> and <code>facts</code>. Argo CD stages always carry <code>argocd_health_not_proof</code>. Resource names are not included. Tasks past their deadline are closed as <code>timed_out</code> before the read</td>
+<td>Gateway evidence for the request, behind the same read check as <code>GET /requests/:id</code>: <code>{observation_source, rollup, label, tasks}</code>. <code>rollup</code> is <code>none</code> (no task), <code>pending</code>, <code>verified</code>, <code>partially_observed</code>, <code>unverified</code> or <code>timed_out</code>. <code>label</code> is always <code>observed_operational_state</code>. Each task has <code>gateway_name</code>, <code>state</code>, <code>verdict</code>, <code>verdict_reason</code>, <code>deadline_at</code> and <code>stages</code>; each stage has <code>outcome</code>, <code>reported_outcome</code>, <code>observed_at</code>, <code>connector_id</code>, <code>target_id</code>, <code>caveats</code> and <code>facts</code>. Argo CD stages always carry <code>argocd_health_not_proof</code>. Resource names are not included. A task past its deadline that the worker has not closed yet is shown as <code>timed_out</code> with <code>timed_out_at_read: true</code>; the read writes nothing</td>
 </tr>
 </tbody>
 </table>
@@ -4020,58 +4028,6 @@ guide.</p>
 <td><code>POST</code></td>
 <td><code>/api/v1/jobs</code></td>
 <td>session</td>
-</tr>
-</tbody>
-</table>
-<h2 id="integrations-brd-26-gated-by-sb_gitops_enabled">Integrations (BRD §26, gated by <code>SB_GITOPS_ENABLED</code>)<a class="headerlink" href="#integrations-brd-26-gated-by-sb_gitops_enabled" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Method</th>
-<th>Path</th>
-<th>Auth</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>POST</code></td>
-<td><code>/api/v1/argocd-endpoints</code></td>
-<td><code>session + integration.edit</code></td>
-</tr>
-<tr>
-<td><code>GET</code></td>
-<td><code>/api/v1/argocd-endpoints</code></td>
-<td>session</td>
-</tr>
-<tr>
-<td><code>GET</code></td>
-<td><code>/api/v1/argocd-endpoints/:id/discovered-apps</code></td>
-<td>session</td>
-</tr>
-<tr>
-<td><code>PUT</code></td>
-<td><code>/api/v1/argocd-endpoints/:id/enabled</code></td>
-<td><code>session + integration.edit</code></td>
-</tr>
-<tr>
-<td><code>DELETE</code></td>
-<td><code>/api/v1/argocd-endpoints/:id</code></td>
-<td><code>session + integration.edit</code></td>
-</tr>
-<tr>
-<td><code>POST</code></td>
-<td><code>/api/v1/gitops-app-mappings</code></td>
-<td><code>session + integration.edit</code></td>
-</tr>
-<tr>
-<td><code>GET</code></td>
-<td><code>/api/v1/gitops-app-mappings</code></td>
-<td>session</td>
-</tr>
-<tr>
-<td><code>DELETE</code></td>
-<td><code>/api/v1/gitops-app-mappings/:id</code></td>
-<td><code>session + integration.edit</code></td>
 </tr>
 </tbody>
 </table>

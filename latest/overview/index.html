@@ -1230,6 +1230,8 @@
       
         
       
+        
+      
     
     
     
@@ -1609,6 +1611,34 @@
     
   
     Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../operations/gateway-cutover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway cutover
   
 
     
@@ -2078,9 +2108,9 @@ replace them.</p>
 <td>Admin enqueues a discover job; agent calls <code>ListMetadata</code>; CP upserts to the <code>secrets</code> table with native provider labels preserved verbatim (Vault <code>custom_metadata</code>, AWS Tags, GCP labels, Azure tags).</td>
 </tr>
 <tr>
-<td><strong>GitOps observation</strong> (BRD §26)</td>
-<td>ArgoCD → CP</td>
-<td>After an approved patch reaches the provider, the worker polls ArgoCD to confirm whether the workload actually picked up the new value. Strictly read-only. Off by default.</td>
+<td><strong>Gateway observation</strong></td>
+<td>Argo CD → Gateway → CP</td>
+<td>After an approved change reaches the provider, an optional <a href="../components/gateway/">Gateway</a> inside your boundary reads Argo CD rollout state and reports it as metadata. Strictly read-only, off unless an environment's observation source is <code>gateway</code>. The CP itself never talks to Argo CD. Argo CD health is context, not proof the workload picked up the new value.</td>
 </tr>
 </tbody>
 </table>
@@ -2112,7 +2142,7 @@ replace them.</p>
 <tr>
 <td><a href="../components/worker/"><code>worker</code></a></td>
 <td>Shipped</td>
-<td>Sweepers, scheduler, notifications, GitOps poller</td>
+<td>Sweepers, scheduler, notifications, Gateway observation sweepers</td>
 </tr>
 <tr>
 <td><a href="../components/controller/"><code>controller</code></a></td>
@@ -2127,7 +2157,7 @@ replace them.</p>
 <tr>
 <td><a href="../components/gateway/"><code>gateway</code></a></td>
 <td>In progress</td>
-<td>Release 1: read-only Argo CD observation. Binary, chart and control-plane registry merged; observation tasks not yet</td>
+<td>Release 1: read-only Argo CD observation. Binary, chart, registry, observation tasks, console and the cutover from the control-plane poller merged; not yet through QA</td>
 </tr>
 <tr>
 <td><a href="https://github.com/secrets-bridge/charts"><code>charts</code></a></td>

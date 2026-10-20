@@ -1365,6 +1365,8 @@
       
         
       
+        
+      
     
     
     
@@ -1744,6 +1746,34 @@
     
   
     Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/gateway-cutover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway cutover
   
 
     
@@ -2235,13 +2265,10 @@ control plane as metadata. It never changes anything, and it is optional.</p>
 <p>The Gateway binary, its Helm chart, the control-plane registry and the
 observation path (tasks, leases, results, evidence, verdicts, the worker
 sweepers and the console pages) are merged. Release 1 has not passed QA.</p>
-<p>The control plane's own Argo CD poller (<code>SB_GITOPS_ENABLED</code> on the api and
-<code>SB_WORKER_GITOPS_ENABLED</code> on the worker, see
-<a href="../../overview/architecture/#the-four-request-lifecycles">GitOps observation</a>)
-still exists until the cutover in
-<a href="https://github.com/secrets-bridge/gateway/issues/13">gateway#13</a> ships.
-Each environment uses one observation source at a time: the control
-plane's poller, the Gateway, or none.</p>
+<p>The Gateway is the only Secrets Bridge component that talks to Argo CD.
+The control plane holds no Argo CD credentials and has no Argo CD client.
+Installs that used the old control-plane poller follow the
+<a href="../../operations/gateway-cutover/">Gateway cutover</a> runbook.</p>
 </div>
 <h2 id="where-it-sits">Where it sits<a class="headerlink" href="#where-it-sits" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>flowchart LR
@@ -2363,10 +2390,10 @@ control plane recomputes every outcome from the reported facts):</p>
 </tbody>
 </table>
 <h2 id="observation-flow">Observation flow<a class="headerlink" href="#observation-flow" title="Permanent link">&para;</a></h2>
-<p>Each environment has an observation source: <code>control_plane</code> (the default),
-<code>gateway</code> or <code>none</code>. When a change reaches <code>executed</code>, the control plane reads
-that source once and starts exactly one observer. A request never gets both a
-control-plane GitOps observation and a Gateway task.</p>
+<p>Each environment has an observation source: <code>gateway</code> or <code>none</code> (the
+default). When a change reaches <code>executed</code>, the control plane reads that source
+once. For <code>gateway</code> it creates Gateway tasks; for <code>none</code> nothing observes the
+change. There is no fallback to any other observer.</p>
 <pre class="mermaid"><code>sequenceDiagram
     autonumber
     participant Agent

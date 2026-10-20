@@ -1227,6 +1227,8 @@
       
         
       
+        
+      
     
     
     
@@ -1606,6 +1608,34 @@
     
   
     Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/gateway-cutover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway cutover
   
 
     
@@ -2332,8 +2362,9 @@
 
 
 <h1 id="kms-backends">KMS backends<a class="headerlink" href="#kms-backends" title="Permanent link">&para;</a></h1>
-<p>Secrets Bridge uses <strong>envelope encryption</strong> for every wrap and
-every ArgoCD token: a per-row data key (DEK) wraps the value with
+<p>Secrets Bridge uses <strong>envelope encryption</strong> for every wrap and for
+the api's other stored secrets, such as MFA factors and sign-in
+client secrets: a per-row data key (DEK) wraps the value with
 AES-256-GCM; the DEK itself is wrapped by a KMS-managed master
 key. The KMS backend is pluggable behind one env var.</p>
 <table>

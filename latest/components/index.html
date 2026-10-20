@@ -1230,6 +1230,8 @@
       
         
       
+        
+      
     
     
     
@@ -1609,6 +1611,34 @@
     
   
     Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../operations/gateway-cutover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway cutover
   
 
     
@@ -2034,7 +2064,7 @@ direction is one-way and reviewable.</p>
 <tr>
 <td><a href="worker/"><code>worker</code></a></td>
 <td>Go</td>
-<td>Background sweepers, the GitOps observation poller, periodic discovery scheduler.</td>
+<td>Background sweepers (including the Gateway observation sweepers), periodic discovery scheduler. No Argo CD client.</td>
 </tr>
 <tr>
 <td><a href="agent/"><code>agent</code></a></td>
@@ -2072,7 +2102,7 @@ direction is one-way and reviewable.</p>
 <pre class="mermaid"><code>flowchart LR
     core["core&lt;br/&gt;provider interface +&lt;br/&gt;shared types"]
     api["api&lt;br/&gt;Postgres + Redis&lt;br/&gt;workflow + audit"]
-    worker["worker&lt;br/&gt;sweepers + gitops"]
+    worker["worker&lt;br/&gt;sweepers"]
     agent["agent&lt;br/&gt;outbound only"]
     controller["controller&lt;br/&gt;K8s reconciler"]
     gateway["gateway&lt;br/&gt;outbound only,&lt;br/&gt;read-only"]

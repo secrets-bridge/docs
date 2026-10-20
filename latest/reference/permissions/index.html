@@ -1225,6 +1225,8 @@
       
         
       
+        
+      
     
     
     
@@ -1604,6 +1606,34 @@
     
   
     Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/gateway-cutover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway cutover
   
 
     
@@ -2562,7 +2592,7 @@ edit their permission lists but can't delete the rows.</p>
 <tbody>
 <tr>
 <td><code>integration.edit</code></td>
-<td>Create / update / delete ArgoCD endpoints + GitOps app mappings + Provider connections (EPIC P, api#92). One permission, three surfaces. It does <strong>not</strong> auto-cover <code>integration.bind</code> server-side; the SPA's capability helper unifies them in the UI but the api treats each endpoint family strictly.</td>
+<td>Manage the provider connection lifecycle: create, update, delete, discover now and bindings (EPIC P, api#92). Argo CD is configured on a <a href="../../operations/gateway/">Gateway</a> under the <code>gateway.*</code> permissions, not here. It does <strong>not</strong> auto-cover <code>integration.bind</code> server-side; the SPA's capability helper unifies them in the UI but the api treats each endpoint family strictly.</td>
 </tr>
 <tr>
 <td><code>integration.bind</code></td>

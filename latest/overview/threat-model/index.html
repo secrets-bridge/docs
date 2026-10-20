@@ -1393,6 +1393,8 @@
       
         
       
+        
+      
     
     
     
@@ -1772,6 +1774,34 @@
     
   
     Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/gateway-cutover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway cutover
   
 
     
@@ -2329,8 +2359,8 @@ that isn't possible, code review is the gate.</p>
 <td>The UI talks <strong>only</strong> to the Control Plane API; there's no provider SDK in the SPA's dependency tree</td>
 </tr>
 <tr>
-<td>ArgoCD tokens (for §26 observation) are KMS-wrapped at rest</td>
-<td>Stored in <code>argocd_endpoints.token_ciphertext</code> (BYTEA) via the same <code>KeyManager</code> used for <code>secret_wraps</code>; canary scan returns zero hits</td>
+<td>The Control Plane holds <strong>no</strong> Argo CD credentials</td>
+<td>The api and worker have no Argo CD client: an <code>archguard</code> test in the api, worker and core repos fails the build if non-test code imports a package path containing <code>argocd</code>, <code>argoproj</code> or <code>argo-cd</code>, or builds an Argo CD API path, and it runs against seeded bad files so it can't pass vacuously. A router test fails if any route other than the read-only <code>GET /requests/:id/gitops</code> history mentions <code>gitops</code> or <code>argocd</code>. Migration 0049 dropped the table that held the old KMS-wrapped tokens; its test scans every text, bytea and jsonb column for canary token bytes. The Argo CD token lives only in the Gateway's own boundary</td>
 </tr>
 </tbody>
 </table>

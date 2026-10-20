@@ -1321,6 +1321,8 @@
       
         
       
+        
+      
     
     
     
@@ -1700,6 +1702,34 @@
     
   
     Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/gateway-cutover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway cutover
   
 
     
@@ -2164,7 +2194,7 @@ routing: <code>/</code> → ui, <code>/api/v1/*</code> → api).</p>
 <tr>
 <td><code>/requests/:id</code></td>
 <td>Request detail</td>
-<td>Timeline, Approvals, <strong>Wraps</strong> (single-shot Reveal modal, read flow), GitOps observations (disabled banner when §26 is off), Details, Approver actions, Cancel-own</td>
+<td>Timeline, Approvals, <strong>Wraps</strong> (single-shot Reveal modal, read flow), the <strong>Argo CD (observed by Gateway …)</strong> panel with Gateway evidence, a muted <strong>Argo CD history (before the Gateway)</strong> card with the rows the retired control-plane poller wrote before the <a href="../../operations/gateway-cutover/">cutover</a>, read from <code>GET /requests/:id/gitops</code> and shown by <code>history_status</code> with the label <em>context only</em> (requester only, hidden when there are none), Details, Approver actions, Cancel-own</td>
 </tr>
 <tr>
 <td><code>/agents</code></td>
@@ -2184,7 +2214,7 @@ routing: <code>/</code> → ui, <code>/api/v1/*</code> → api).</p>
 <tr>
 <td><code>/admin/projects</code></td>
 <td>Projects</td>
-<td>Master-detail (340px project rail + envs panel); soft-delete via archive/restore</td>
+<td>Master-detail (340px project rail + envs panel); soft-delete via archive/restore. The <strong>Observation</strong> column shows each environment's source (<strong>Gateway</strong> or <strong>None</strong>) to <code>gateway.list</code> holders; <strong>Change…</strong> appears only with <code>gateway.bind</code></td>
 </tr>
 <tr>
 <td><code>/admin/roles</code></td>
@@ -2207,9 +2237,9 @@ routing: <code>/</code> → ui, <code>/api/v1/*</code> → api).</p>
 <td>Selector → workflow priority-ordered list</td>
 </tr>
 <tr>
-<td><code>/admin/integrations</code></td>
-<td>Integrations</td>
-<td>ArgoCD endpoints + GitOps app mappings; feature-gated banner when §26 is off</td>
+<td><code>/admin/gateways</code></td>
+<td>Gateways</td>
+<td>Create, enroll, approve connectors, bind targets, disable, enable and revoke <a href="../../operations/gateway/">Gateways</a></td>
 </tr>
 <tr>
 <td><code>/login</code></td>

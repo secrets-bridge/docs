@@ -709,6 +709,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#retired" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retired
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#roadmap-coming-later" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1371,6 +1382,8 @@
       
         
       
+        
+      
     
     
     
@@ -1750,6 +1763,34 @@
     
   
     Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operations/gateway-cutover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway cutover
   
 
     
@@ -2161,6 +2202,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#retired" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Retired
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#roadmap-coming-later" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2378,23 +2430,31 @@ release / demo candidate. "PASS" means verified end-to-end, not merely merged.</
   Gateway claims, leases and answers with metadata-only evidence that the
   control plane checks against the task's target before it computes the
   verdict;</li>
-<li>the per-environment observation source (<code>control_plane</code>, <code>gateway</code>,
-  <code>none</code>) and the request's evidence at
+<li>the per-environment observation source (<code>gateway</code> or <code>none</code>, the
+  default) and the request's evidence at
   <code>GET /requests/:id/observations</code>;</li>
 <li>the worker sweepers for leases, deadlines, stale Gateways and old
   replica rows (<code>SB_WORKER_GATEWAY_SWEEPERS_ENABLED</code>);</li>
-<li>the console: Admin → Gateways, the Observation column on a project's
-  environments, and the Argo CD panel on the request page.</li>
+<li>
+<p>the console: Admin → Gateways, the Observation column on a project's
+  environments, and the Argo CD panel on the request page.</p>
+</li>
+<li>
+<p>the cutover (<a href="https://github.com/secrets-bridge/gateway/issues/13">gateway#13</a>):
+  the Gateway is the only component that talks to Argo CD. The control
+  plane's Argo CD poller, its endpoint and app-mapping routes and the
+  stored Argo CD tokens are removed, along with the console's
+  Integrations pages. <code>GET /requests/:id/gitops</code> serves the old poller
+  rows as read-only history, shown on the request page as context only.
+  See
+  <a href="../../operations/gateway-cutover/">Gateway cutover</a>.</p>
+</li>
 </ul>
-<p>Not done: the cutover that makes the Gateway the only Argo CD integration
-(<a href="https://github.com/secrets-bridge/gateway/issues/13">gateway#13</a>). Until
-it ships, the control plane's own poller (<code>SB_GITOPS_ENABLED</code>) still
-exists and observes environments whose source is <code>control_plane</code>. Each
-environment uses one source at a time. Argo CD <code>Healthy</code> and <code>Synced</code> are
-operational state, never proof that a secret reached a workload: a
-Release 1 task ends <code>unverified</code> (<code>context_only</code>), never <code>verified</code>, and a
-Gateway that is offline or late leaves it <code>pending</code> and then <code>timed_out</code>,
-never failed. See <a href="../../components/gateway/">Gateway</a>.</p>
+<p>Argo CD <code>Healthy</code> and <code>Synced</code> are operational state, never proof that a
+secret reached a workload: a Release 1 task ends <code>unverified</code>
+(<code>context_only</code>), never <code>verified</code>, and a Gateway that is offline or late
+leaves it <code>pending</code> and then <code>timed_out</code>, never failed. See
+<a href="../../components/gateway/">Gateway</a>.</p>
 </li>
 </ul>
 <h2 id="live-vs-roadmap">Live vs Roadmap<a class="headerlink" href="#live-vs-roadmap" title="Permanent link">&para;</a></h2>
@@ -2409,6 +2469,13 @@ never failed. See <a href="../../components/gateway/">Gateway</a>.</p>
 <li>Agent revoke / list / status</li>
 <li>Non-prod reveal protection</li>
 <li>Prod reveal refusal (audited)</li>
+</ul>
+<h3 id="retired">Retired<a class="headerlink" href="#retired" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Control-plane Argo CD observation (the worker's GitOps poller,
+  <code>SB_GITOPS_ENABLED</code>, Argo CD endpoints and app mappings). Argo CD state now
+  comes only from a <a href="../../components/gateway/">Gateway</a>. Old observations stay
+  readable as history, labelled context only.</li>
 </ul>
 <h3 id="roadmap-coming-later">Roadmap / coming later<a class="headerlink" href="#roadmap-coming-later" title="Permanent link">&para;</a></h3>
 <p><em>Listed here because they are <strong>not</strong> live yet. Do not read these as shipped.</em></p>

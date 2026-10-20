@@ -19,7 +19,7 @@
         <link rel="prev" href="../provider-connections/">
       
       
-        <link rel="next" href="../object-storage/">
+        <link rel="next" href="../gateway-cutover/">
       
       
         
@@ -1229,6 +1229,8 @@
       
         
       
+        
+      
     
     
     
@@ -1808,6 +1810,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../gateway-cutover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway cutover
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../object-storage/" class="md-nav__link">
         
   
@@ -2318,11 +2348,11 @@ switch the environment's observation source to the Gateway.</p>
 straight into a Kubernetes Secret.</p>
 <div class="admonition warning">
 <p class="admonition-title">Release 1 is in progress</p>
-<p>Everything on this page is merged and has not passed QA. The control
-plane's own Argo CD poller (<code>SB_GITOPS_ENABLED</code>) still exists until the
-cutover in <a href="https://github.com/secrets-bridge/gateway/issues/13">gateway#13</a>
-ships. An environment uses one observation source at a time, so a request
-gets Argo CD state from either the poller or the Gateway, never both.</p>
+<p>Everything on this page is merged and has not passed QA. The Gateway is
+the only component that reads Argo CD: the control plane has no Argo CD
+client and stores no Argo CD token. If you are upgrading an install that
+used the old control-plane poller, follow
+<a href="../gateway-cutover/">Gateway cutover</a> first.</p>
 </div>
 <pre class="mermaid"><code>sequenceDiagram
     autonumber
@@ -2347,10 +2377,12 @@ gets Argo CD state from either the poller or the Gateway, never both.</p>
     GW-&gt;&gt;CP: claim task, post result</code></pre>
 <h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
 <ul>
-<li>The api from <code>main</code>, with migrations <code>0046</code> to <code>0048</code> applied. Migration
+<li>The api from <code>main</code>, with migrations <code>0046</code> to <code>0049</code> applied. Migration
   <code>0047</code> adds <code>gateway.mint</code>, <code>gateway.revoke</code>, <code>gateway.list</code> and
   <code>gateway.bind</code> to the seed <code>admin</code> role. Migration <code>0048</code> adds the
-  observation tables and each environment's observation source.</li>
+  observation tables and each environment's observation source. Migration
+  <code>0049</code> removes the control-plane Argo CD integration; see
+  <a href="../gateway-cutover/">Gateway cutover</a>.</li>
 <li>The worker from <code>main</code>, so the Gateway sweepers can be turned on (step 9).</li>
 <li>An account that holds those permissions and has a second factor enrolled at
   <code>/me/mfa</code>. Every admin write on a Gateway needs a fresh second factor. The
@@ -2647,27 +2679,25 @@ and only an environment set to <code>gateway</code> gets Gateway tasks:</p>
 </thead>
 <tbody>
 <tr>
-<td><code>control_plane</code> (default)</td>
-<td>The control plane's own Argo CD poller, when <code>SB_GITOPS_ENABLED</code> and <code>SB_WORKER_GITOPS_ENABLED</code> are on. Otherwise nothing</td>
-</tr>
-<tr>
 <td><code>gateway</code></td>
-<td>The Gateways bound to the environment. The control-plane poller is skipped for these requests</td>
+<td>The Gateways bound to the environment</td>
 </tr>
 <tr>
-<td><code>none</code></td>
-<td>Nothing</td>
+<td><code>none</code> (default)</td>
+<td>Nothing. The request page shows no Argo CD state</td>
 </tr>
 </tbody>
 </table>
-<p>The source is read once when a request reaches <code>executed</code>, so a request is
-observed by one of them, never both. Switching away from <code>gateway</code> cancels the
+<p>The source is read once when a request reaches <code>executed</code>. There is no other
+observer to fall back to. Switching away from <code>gateway</code> cancels the
 environment's open Gateway tasks with the reason <code>source_changed</code>. The requests
 themselves are not affected.</p>
-<p>In the console (needs <code>gateway.bind</code>), open <strong>Admin → Projects</strong>, select the
-project, and find the environment on the <strong>Environments</strong> tab. The
-<strong>Observation</strong> column shows the current source. Select <strong>Change…</strong>, choose
-<strong>Gateway</strong> in the <strong>Observation for</strong> dialog, and select <strong>Save</strong>.</p>
+<p>In the console, open <strong>Admin → Projects</strong>, select the project, and find the
+environment on the <strong>Environments</strong> tab. The <strong>Observation</strong> column shows the
+current source, <strong>Gateway</strong> or <strong>None</strong>, to anyone with <code>gateway.list</code>. With
+<code>gateway.bind</code>, select <strong>Change…</strong>, choose <strong>Gateway</strong> in the
+<strong>Observation for</strong> dialog, and select <strong>Save</strong>. The dialog offers only
+<strong>Gateway</strong> and <strong>None</strong>.</p>
 <p>With <code>curl</code>, the route needs <code>gateway.bind</code> and a fresh second factor (step 2).
 The body holds no secret, so it can go on the command line:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nv">ENV_ID</span><span class="o">=</span>&lt;environment-id&gt;
@@ -2678,13 +2708,17 @@ The body holds no secret, so it can go on the command line:</p>
 </span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">'{"observation_source":"gateway"}'</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'{observation_source, previous_observation_source, tasks_cancelled}'</span>
 </span></code></pre></div>
-<p>A value other than <code>control_plane</code>, <code>gateway</code> or <code>none</code> answers
+<p><code>control_plane</code>, the source of the retired control-plane poller, answers
+<code>400 source_retired</code>. Any other value besides <code>gateway</code> and <code>none</code> answers
 <code>400 invalid_observation_source</code>, and an unknown environment
 <code>404 environment_not_found</code>. The change is audited as
 <code>environment.observation_source.update</code>.</p>
 <h2 id="9-turn-on-the-worker-sweepers">9. Turn on the worker sweepers<a class="headerlink" href="#9-turn-on-the-worker-sweepers" title="Permanent link">&para;</a></h2>
 <p>The worker runs four Gateway sweepers when <code>SB_WORKER_GATEWAY_SWEEPERS_ENABLED</code>
-is <code>true</code> (default <code>false</code>):</p>
+is <code>true</code> (default <code>false</code>). With the <code>secrets-bridge</code> chart, set
+<code>worker.config.gatewaySweepers.enabled=true</code>. The chart always renders the
+variable, so a value in the env Secret is overridden; the intervals are under
+<code>worker.config.gatewaySweepers</code> too:</p>
 <ul>
 <li><code>observation-leases</code> puts tasks whose lease ran out back in the queue.</li>
 <li><code>observation-deadlines</code> closes open tasks past their deadline as
@@ -2697,9 +2731,9 @@ is <code>true</code> (default <code>false</code>):</p>
 </ul>
 <p>The intervals and floors are in the
 <a href="../config/#worker">configuration reference</a>. Without the sweepers, a claim
-still takes over an expired lease, and reading a request's observations closes
-that request's overdue tasks. Tasks of requests nobody opens stay open past
-their deadline, and Gateways never turn <code>stale</code>.</p>
+still takes over an expired lease, and a request's observations show an
+overdue task as timed out (<code>timed_out_at_read</code>) without closing it. The task
+row stays open past its deadline, and Gateways never turn <code>stale</code>.</p>
 <h2 id="10-check-a-request">10. Check a request<a class="headerlink" href="#10-check-a-request" title="Permanent link">&para;</a></h2>
 <p>Submit and approve a change to the bound secret in that environment. When the
 agent has written it and the request is <code>executed</code>, the request page shows a
@@ -2711,7 +2745,8 @@ panel titled <strong>Argo CD (observed by Gateway tenant-a-uat)</strong>, marked
   of the request. The panel refreshes every 20 seconds while the rollup is
   pending, and when the window regains focus.</li>
 <li>For each task, the Gateway, the verdict, the task state and its deadline or
-  closing time, and the reason in words, for example "Only Argo CD context was
+  closing time ("deadline passed" when the deadline is over but the sweeper
+  has not closed the task yet), and the reason in words, for example "Only Argo CD context was
   observed. Argo CD health and sync are operational state, never proof that
   the new value reached the app."</li>
 <li>For the Argo CD stage, the outcome (<strong>Observed</strong> or <strong>Not observed</strong>), the

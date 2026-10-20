@@ -1229,6 +1229,8 @@
       
         
       
+        
+      
     
     
     
@@ -1609,6 +1611,34 @@
     
   
     Gateway
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gateway-cutover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gateway cutover
   
 
     
@@ -2947,8 +2977,10 @@ that does not belong to it, for example from an earlier enrollment.</p>
 <p><code>rollup: "none"</code> means no task exists. Check <code>observation_source</code> and the
 audit events with the <code>correlation_id</code> of the job that executed the change:</p>
 <ul>
-<li><code>observation_source</code> is <code>control_plane</code> or <code>none</code>: the environment is not
-  set to <code>gateway</code>, so no task was created. With <code>none</code>, the audit log has
+<li><code>observation_source</code> is <code>none</code>: the environment is not set to <code>gateway</code>, so
+  no task was created. <code>none</code> is the default, and environments that used the
+  retired control-plane poller were moved to it at the
+  <a href="../gateway-cutover/">cutover</a>. With <code>none</code>, the audit log has
   <code>request.observation_skipped</code> with reason <code>source_none</code>. The source is read
   when the request reaches <code>executed</code>, so switching it later does not add tasks
   to earlier requests. See
