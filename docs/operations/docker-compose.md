@@ -99,13 +99,14 @@ docker exec -e VAULT_ADDR=http://127.0.0.1:8200 -e VAULT_TOKEN="$VAULT_DEV_TOKEN
 #    the dev Vault listens on http://, which provider connections refuse
 #    by default.
 
-# 3. Sign in as the seeded admin. The session cookie goes into a
+# 3. Sign in as the seeded admin. The password goes to jq on stdin, so
+#    it never shows in the process list. The session cookie goes into a
 #    private cookie jar; every call below sends it with -b.
 CP=http://localhost:8080
 JAR=$(mktemp) && chmod 600 "$JAR"
 read -rp 'Admin email: ' SB_ADMIN_EMAIL
-read -rsp 'Admin password: ' SB_ADMIN_PASSWORD; echo
-jq -n --arg e "$SB_ADMIN_EMAIL" --arg p "$SB_ADMIN_PASSWORD" '{email:$e,password:$p}' \
+IFS= read -rsp 'Admin password: ' SB_ADMIN_PASSWORD; echo
+printf '%s\n%s\n' "$SB_ADMIN_EMAIL" "$SB_ADMIN_PASSWORD" | jq -Rn '{email: input, password: input}' \
   | curl -fsS -c "$JAR" -o /dev/null -X POST "$CP/api/v1/auth/login" \
       -H 'Content-Type: application/json' --data-binary @-
 

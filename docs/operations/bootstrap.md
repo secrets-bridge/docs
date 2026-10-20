@@ -91,12 +91,14 @@ You need `agent.mint` (the seed `admin` role has it) and an active
 ```bash
 CP=https://secrets-bridge.example.com   # http://localhost:8080 for the local setup
 
-# Sign in. The password is read from the terminal, not typed on the
-# command line, and the session cookie goes into a private cookie jar.
+# Sign in. The password is read from the terminal and handed to jq on
+# stdin (printf is a shell builtin), so it is never in a command line,
+# the shell history or the process list. The session cookie goes into a
+# private cookie jar.
 JAR=$(mktemp) && chmod 600 "$JAR"
 read -rp 'Admin email: ' SB_ADMIN_EMAIL
-read -rsp 'Admin password: ' SB_ADMIN_PASSWORD; echo
-jq -n --arg e "$SB_ADMIN_EMAIL" --arg p "$SB_ADMIN_PASSWORD" '{email:$e,password:$p}' \
+IFS= read -rsp 'Admin password: ' SB_ADMIN_PASSWORD; echo
+printf '%s\n%s\n' "$SB_ADMIN_EMAIL" "$SB_ADMIN_PASSWORD" | jq -Rn '{email: input, password: input}' \
   | curl -fsS -c "$JAR" -o /dev/null -X POST "$CP/api/v1/auth/login" \
       -H 'Content-Type: application/json' --data-binary @-
 
