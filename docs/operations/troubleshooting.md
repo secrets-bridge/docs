@@ -392,6 +392,7 @@ The interesting ones:
 | `worker_scheduler_runs_total{task,outcome}` | Per-sweeper success / failure / skipped_lock counter |
 | `worker_scheduler_run_duration_seconds{task}` | Sweeper latency histogram |
 | `worker_scheduler_lock_skipped_total{task}` | Leader-election losses (expected for N-1 of N replicas) |
+| `redis_call_timeouts_total{site}` | api Redis calls that hit their deadline: `auth_cache` (agent and Gateway auth, revoke, 300ms) and `rate_limit` (500ms). A rise means Redis is slow before it is down: limiters start failing open, and revokes may answer `503 revoked_cache_unconfirmed` |
 
 For HTTP-side latency, log-derived metrics are the source today;
 a future PR adds explicit histograms.
