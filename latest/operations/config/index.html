@@ -2288,6 +2288,12 @@
 <td><code>production</code> or <code>dev</code>; anything else fails boot. <code>dev</code> allows the <code>local</code> KMS backend, seeds three dev users on an empty database and drops the <code>Secure</code> cookie flag. Never <code>dev</code> outside a laptop.</td>
 </tr>
 <tr>
+<td><code>SB_REQUIRE_MFA_AT_LOGIN</code></td>
+<td>no</td>
+<td><code>true</code>, or <code>false</code> when <code>SB_ENV=dev</code></td>
+<td>Login-time MFA: every authenticated route needs a session verified with a second factor, and a user with no factor adds one right after signing in. See <a href="../authentication/#step-up-vs-login-time-mfa">Step-up vs login-time MFA</a>. Setting <code>false</code> outside dev logs a warning at boot.</td>
+</tr>
+<tr>
 <td><code>DATABASE_URL</code></td>
 <td><strong>yes</strong></td>
 <td></td>

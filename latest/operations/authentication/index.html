@@ -2840,13 +2840,28 @@
 </ol>
 <p>Operators should enrol <strong>at least two factors</strong> per privileged user, one hardware key plus one TOTP backup, so a lost YubiKey doesn't lock them out of Tier 2 ops.</p>
 <h3 id="step-up-vs-login-time-mfa">Step-up vs login-time MFA<a class="headerlink" href="#step-up-vs-login-time-mfa" title="Permanent link">&para;</a></h3>
-<p>The default posture (Slices H + I) gates <strong>only Tier-2 ops</strong> (approve / reject / reveal-wrap). Sign-in itself + Tier-1 browsing (lists, dashboards) only need a session cookie. The argument: the session cookie is the high-value loot, step-up makes "I have your cookie" insufficient at the moment of a sensitive action without paying the ergonomic cost of a modal on every page load.</p>
-<p>The alternative posture, <strong>login-time MFA on every authenticated route</strong>, is available via the Slice K opt-in knob.</p>
-<p>Set <code>api.config.mfa.requireMFAAtLogin: true</code> (renders <code>SB_REQUIRE_MFA_AT_LOGIN=true</code>) to enable. When the knob is on:</p>
+<p>There are two postures, and the default depends on <code>SB_ENV</code>:</p>
 <ul>
-<li>A fresh session with no MFA stamp returns <code>401 step_up_required</code> on every Tier-1 route (lists, dashboards, project pages).</li>
-<li>The SPA's global onError interceptor opens the step-up modal <strong>immediately after sign-in</strong> before the user reaches any value-bearing surface.</li>
-<li>A user with no factor enrolled is bounced to <code>/me/mfa</code> via the <code>412 mfa_enrollment_required</code> shape (the same response the existing 412 path uses).</li>
+<li><strong>Login-time MFA</strong> is the default for <code>SB_ENV=production</code>: every authenticated route needs a session that was verified with a second factor at least once.</li>
+<li><strong>Step-up only</strong> is the default for <code>SB_ENV=dev</code>: only Tier-2 operations (approve, reject, reveal) ask for a fresh second factor, and browsing needs only the session cookie.</li>
+</ul>
+<p>Production defaults to login-time MFA because step-up alone does not protect an account that has no second factor yet. Such an account can add its first factor using only its session (the enrollment routes have to stay open for that), and then pass step-up with it. With login-time MFA, a user with no factor adds one right after primary sign-in, before any other route answers.</p>
+<p><code>SB_REQUIRE_MFA_AT_LOGIN</code> overrides the default either way, set in the env Secret or as <code>api.config.mfa.requireMFAAtLogin: true</code> or <code>false</code> in the chart. The chart renders the variable only for an explicit <code>true</code> or <code>false</code>, and then it wins over the env Secret. Left unset, the chart renders nothing and the env Secret's value, or else the default for <code>SB_ENV</code>, applies. A chart value that isn't a boolean (a quoted <code>"false"</code>, a <code>0</code>) fails the render; in the env Secret it falls back to the default with a warning at boot. Turning it off outside dev also logs a warning at boot.</p>
+<div class="admonition warning">
+<p class="admonition-title">Upgrading a production install</p>
+<p>Before this default, login-time MFA was off unless you set it. After the upgrade:</p>
+<ul>
+<li>A user with no second factor is sent to <strong>Second factor</strong> once on the first page load, with a banner saying why. After adding an authenticator app or a security key, <strong>Continue</strong> asks for it and the console opens. An action that needs a second factor (approve, reject, reveal) offers to add one in place instead of leaving the page.</li>
+<li>A user who already has a factor is asked for it on the first page load of each new session, not only on approve, reject or reveal.</li>
+<li>Scripts that sign in with <code>curl</code> need a second factor and a step-up; see <a href="../gateway/#2-sign-in-and-step-up">Gateway, step 2</a>.</li>
+<li><strong>Check your values file.</strong> One copied from an older chart may still say <code>requireMFAAtLogin: false</code>, the default it used to write out. That line keeps the gate off after the upgrade, and the api says so at boot (<code>login-time MFA is OFF ... outside dev</code>). Delete it.</li>
+</ul>
+<p>You can opt out with <code>requireMFAAtLogin: false</code> (or <code>SB_REQUIRE_MFA_AT_LOGIN=false</code> in the env Secret), but don't outside dev: an account with no second factor is then protected by its session alone.</p>
+</div>
+<p>When login-time MFA is on:</p>
+<ul>
+<li>A fresh session with no MFA stamp gets <code>401 step_up_required</code> from every route outside the carve-outs below when the user has a factor, and <code>412 mfa_enrollment_required</code> when they have none.</li>
+<li>In the console, a <code>401</code> opens the step-up dialog right after sign-in. A <code>412</code> on a page load sends the user to <strong>Second factor</strong> once, with a banner; a <code>412</code> on an action (approve, reject, reveal, save) offers to add a factor in place, asks for it, then retries the action.</li>
 <li>Tier-2 routes still enforce the 15-min freshness window via the per-route <code>RequireFreshMFA</code>.</li>
 </ul>
 <p>Carve-outs the gate ALWAYS allows through (so it isn't self-locking):</p>
@@ -2870,12 +2885,12 @@
 </thead>
 <tbody>
 <tr>
-<td><strong>Step-up only</strong> (default)</td>
-<td>Dev clusters, single-tenant deployments, deployments where users browse infrequently and verifying on every access would be friction without benefit.</td>
+<td><strong>Login-time MFA</strong> (default for <code>env=production</code>)</td>
+<td>Every production deployment. It is the only posture in which an account with no second factor is protected.</td>
 </tr>
 <tr>
-<td><strong>Login-time MFA</strong> (<code>requireMFAAtLogin: true</code>)</td>
-<td>Production multi-tenant deployments, regulated environments (SOC2 / ISO 27001 audit), AWS-Console / GitHub-org-with-2FA-required parity.</td>
+<td><strong>Step-up only</strong> (default for <code>env=dev</code>, or <code>requireMFAAtLogin: false</code>)</td>
+<td>Laptop and dev clusters. Outside dev, only if every user already has a second factor and you accept the browsing-only exposure of a stolen session.</td>
 </tr>
 </tbody>
 </table>
