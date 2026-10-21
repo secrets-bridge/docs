@@ -15,7 +15,7 @@ Every environment variable across `api` / `agent` / `worker` /
 | `DATABASE_URL` | **yes** |  | `postgres://user:pass@host:5432/db` |
 | `DATABASE_MAX_CONNS` | no | `10` | pgxpool size |
 | `DATABASE_CONN_LIFETIME` | no | `1h` | |
-| `REDIS_URL` | **yes** |  | `redis://host:6379/0` |
+| `REDIS_URL` | **yes** |  | `redis://host:6379/0`. Run this Redis with `maxmemory-policy noeviction`: a revoke keeps the agent or Gateway out of the auth cache with a short-lived key, and an evicted key would let a cached credential back in until it expires. |
 | `REDIS_POOL_SIZE` | no | `10` | |
 | `REDIS_DIAL_TIMEOUT` | no | `5s` | |
 | `REDIS_NAMESPACE` | no | `secrets-bridge` | Key prefix |
