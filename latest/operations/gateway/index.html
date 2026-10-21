@@ -2790,6 +2790,16 @@ with the reason <code>gateway_unavailable</code> at their deadline. The pods sta
 reason in their logs. There is no credential rotation in Release 1: to replace a
 credential, revoke the Gateway, create a new one, enroll it and update the
 identity Secret.</p>
+<p>A disable, enable or revoke that answers <code>503</code> is already saved: the Gateway is
+disabled, enabled or revoked, but Redis was unreachable, so the api could not
+update its auth cache yet. It keeps trying in the background for up to two
+minutes, and the audit log has a <code>gateway.revoke.cache_unconfirmed</code>,
+<code>gateway.disable.cache_unconfirmed</code> or <code>gateway.enable.cache_unconfirmed</code> row.
+After <code>503 revoked_cache_unconfirmed</code> the Gateway may still get through for a
+moment, and after <code>503 enabled_cache_unconfirmed</code> it may still be refused. Send
+the same call again once Redis is back; repeating it is safe, and a repeated
+revoke answers <code>409 gateway_already_revoked</code> once the cache is in line. Agent
+revokes answer the same way.</p>
 <p>See <a href="../troubleshooting/#gateway">Troubleshooting</a> when something does not turn
 ready.</p>
 

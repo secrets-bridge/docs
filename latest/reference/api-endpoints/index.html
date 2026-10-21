@@ -3277,7 +3277,7 @@ enabled as a break-glass admin action.</p>
 <td><code>POST</code></td>
 <td><code>/api/v1/admin/agents/:id/revoke</code></td>
 <td><code>session + agent.revoke</code></td>
-<td>Revoke with <code>reason</code> → <code>revoked_at</code>/<code>revoked_by</code>; emits <code>agent.revoked</code> audit (<code>agent_id</code>, <code>provider_connection_id</code>, <code>reason</code>)</td>
+<td>Revoke with <code>reason</code> → <code>revoked_at</code>/<code>revoked_by</code>; emits <code>agent.revoked</code> audit (<code>agent_id</code>, <code>provider_connection_id</code>, <code>reason</code>). <code>503 revoked_cache_unconfirmed</code>: revoked, but Redis could not update the auth cache yet; the api keeps retrying and repeating the call is safe</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
@@ -3536,7 +3536,7 @@ treats as transient. The claim, lease and release bodies are limited to 4 KiB.</
 <td><code>POST</code></td>
 <td><code>/api/v1/admin/gateways/:id/revoke</code></td>
 <td><code>session + gateway.revoke</code> + fresh MFA</td>
-<td><code>{reason?}</code> → the Gateway, status <code>revoked</code>. <code>409 gateway_already_revoked</code></td>
+<td><code>{reason?}</code> → the Gateway, status <code>revoked</code>. <code>409 gateway_already_revoked</code>. <code>503 revoked_cache_unconfirmed</code>: revoked, but Redis could not update the auth cache yet; repeat the call</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
@@ -3566,7 +3566,7 @@ treats as transient. The claim, lease and release bodies are limited to 4 KiB.</
 <td><code>PUT</code></td>
 <td><code>/api/v1/admin/gateways/:id/enabled</code></td>
 <td><code>session + gateway.revoke</code> + fresh MFA</td>
-<td><code>{enabled}</code> → the Gateway. Disable refuses its calls with <code>401</code> and moves its leased tasks back to <code>queued</code>. Enable returns it to <code>active</code>, or <code>pending</code> if it never enrolled. <code>409 gateway_revoked</code></td>
+<td><code>{enabled}</code> → the Gateway. Disable refuses its calls with <code>401</code> and moves its leased tasks back to <code>queued</code>. Enable returns it to <code>active</code>, or <code>pending</code> if it never enrolled. <code>409 gateway_revoked</code>. <code>503 revoked_cache_unconfirmed</code> (disable) or <code>enabled_cache_unconfirmed</code> (enable): saved, but Redis could not update the auth cache yet; repeat the call</td>
 </tr>
 <tr>
 <td><code>GET</code></td>

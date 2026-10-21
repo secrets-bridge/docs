@@ -2315,7 +2315,7 @@
 <td><code>REDIS_URL</code></td>
 <td><strong>yes</strong></td>
 <td></td>
-<td><code>redis://host:6379/0</code></td>
+<td><code>redis://host:6379/0</code>. Run this Redis with <code>maxmemory-policy noeviction</code>: a revoke keeps the agent or Gateway out of the auth cache with a short-lived key, and an evicted key would let a cached credential back in until it expires.</td>
 </tr>
 <tr>
 <td><code>REDIS_POOL_SIZE</code></td>
