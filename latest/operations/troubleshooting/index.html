@@ -3083,6 +3083,10 @@ The interesting ones:</p>
 <td><code>worker_scheduler_lock_skipped_total{task}</code></td>
 <td>Leader-election losses (expected for N-1 of N replicas)</td>
 </tr>
+<tr>
+<td><code>redis_call_timeouts_total{site}</code></td>
+<td>api Redis calls that hit their deadline: <code>auth_cache</code> (agent and Gateway auth, revoke, 300ms) and <code>rate_limit</code> (500ms). A rise means Redis is slow before it is down: limiters start failing open, and revokes may answer <code>503 revoked_cache_unconfirmed</code></td>
+</tr>
 </tbody>
 </table>
 <p>For HTTP-side latency, log-derived metrics are the source today;
