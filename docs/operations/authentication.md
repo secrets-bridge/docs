@@ -179,11 +179,19 @@ Operators should enrol **at least two factors** per privileged user, one hardwar
 
 ### Step-up vs login-time MFA
 
-The default posture (Slices H + I) gates **only Tier-2 ops** (approve / reject / reveal-wrap). Sign-in itself + Tier-1 browsing (lists, dashboards) only need a session cookie. The argument: the session cookie is the high-value loot, step-up makes "I have your cookie" insufficient at the moment of a sensitive action without paying the ergonomic cost of a modal on every page load.
+There are two postures, and the default depends on `SB_ENV`:
 
-The alternative posture, **login-time MFA on every authenticated route**, is available via the Slice K opt-in knob.
+- **Login-time MFA** is the default for `SB_ENV=production`: every authenticated route needs a session that was verified with a second factor at least once.
+- **Step-up only** is the default for `SB_ENV=dev`: only Tier-2 operations (approve, reject, reveal) ask for a fresh second factor, and browsing needs only the session cookie.
 
-Set `api.config.mfa.requireMFAAtLogin: true` (renders `SB_REQUIRE_MFA_AT_LOGIN=true`) to enable. When the knob is on:
+Production defaults to login-time MFA because step-up alone does not protect an account that has no second factor yet. Such an account can add its first factor using only its session (the enrollment routes have to stay open for that), and then pass step-up with it. With login-time MFA, a user with no factor adds one right after primary sign-in, before any other route answers.
+
+`SB_REQUIRE_MFA_AT_LOGIN` (chart: `api.config.mfa.requireMFAAtLogin`) overrides the default either way. Leaving the chart value unset renders `true` for `env=production` and `false` for `env=dev`. Turning it off outside dev logs a warning at boot.
+
+!!! warning "Upgrading a production install"
+    Before this default, login-time MFA was off unless you set it. After the upgrade, a production user with no second factor is sent to **Second factor** right after signing in, adds an authenticator app or a security key, and confirms with it before continuing. Scripts that sign in with `curl` need a second factor and a step-up too; see [Gateway, step 2](gateway.md#2-sign-in-and-step-up).
+
+When login-time MFA is on:
 
 - A fresh session with no MFA stamp returns `401 step_up_required` on every Tier-1 route (lists, dashboards, project pages).
 - The SPA's global onError interceptor opens the step-up modal **immediately after sign-in** before the user reaches any value-bearing surface.
@@ -208,8 +216,8 @@ Pick the posture by environment, not by user:
 
 | Posture | When it fits |
 |---|---|
-| **Step-up only** (default) | Dev clusters, single-tenant deployments, deployments where users browse infrequently and verifying on every access would be friction without benefit. |
-| **Login-time MFA** (`requireMFAAtLogin: true`) | Production multi-tenant deployments, regulated environments (SOC2 / ISO 27001 audit), AWS-Console / GitHub-org-with-2FA-required parity. |
+| **Login-time MFA** (default for `env=production`) | Every production deployment. It is the only posture in which an account with no second factor is protected. |
+| **Step-up only** (default for `env=dev`, or `requireMFAAtLogin: false`) | Laptop and dev clusters. Outside dev, only if every user already has a second factor and you accept the browsing-only exposure of a stolen session. |
 
 The two postures share the same factor enrollment surface (`/me/mfa`) and the same verify endpoint (`/auth/mfa/verify`), the gate position is the only difference. Switching between them is a single env-var change + pod roll; users keep their enrolled factors.
 

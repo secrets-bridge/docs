@@ -85,8 +85,11 @@ identity and stores that identity itself. See
 [Agent onboarding](agent-onboarding.md) for the model.
 
 The UI has no enrollment screen yet, so create the token through the API.
-You need `agent.mint` (the seed `admin` role has it) and an active
-[provider connection](provider-connections.md).
+You need `agent.mint` (the seed `admin` role has it), an active
+[provider connection](provider-connections.md) and, on a production install,
+a second factor on your account: login-time MFA is on by default outside
+`SB_ENV=dev`, so add an authenticator app under **Second factor** in the
+console first ([Step-up vs login-time MFA](authentication.md#step-up-vs-login-time-mfa)).
 
 ```bash
 CP=https://secrets-bridge.example.com   # http://localhost:8080 for the local setup
@@ -101,6 +104,20 @@ IFS= read -rsp 'Admin password: ' SB_ADMIN_PASSWORD; echo
 printf '%s\n%s\n' "$SB_ADMIN_EMAIL" "$SB_ADMIN_PASSWORD" | jq -Rn '{email: input, password: input}' \
   | curl -fsS -c "$JAR" -o /dev/null -X POST "$CP/api/v1/auth/login" \
       -H 'Content-Type: application/json' --data-binary @-
+unset SB_ADMIN_PASSWORD
+
+# Step up with your TOTP factor (production: login-time MFA is on; skip
+# this block on the local SB_ENV=dev setup). Fresh for 15 minutes.
+FACTOR_ID=$(curl -fsS -b "$JAR" "$CP/api/v1/users/me/mfa/factors" \
+  | jq -r 'map(select(.kind == "totp"))[0].id')
+CHALLENGE_ID=$(curl -fsS -b "$JAR" -X POST "$CP/api/v1/auth/mfa/challenge" \
+  -H 'Content-Type: application/json' -d '{"kind":"totp"}' | jq -r .challenge_id)
+IFS= read -rsp 'TOTP code: ' SB_TOTP_CODE; echo
+printf '%s\n%s\n%s\n' "$CHALLENGE_ID" "$FACTOR_ID" "$SB_TOTP_CODE" \
+  | jq -Rn '{challenge_id: input, factor_id: input, code: input}' \
+  | curl -fsS -b "$JAR" -o /dev/null -X POST "$CP/api/v1/auth/mfa/verify" \
+      -H 'Content-Type: application/json' --data-binary @-
+unset SB_TOTP_CODE
 
 # Pick the provider connection the agent will serve.
 curl -fsS -b "$JAR" "$CP/api/v1/provider-connections" \

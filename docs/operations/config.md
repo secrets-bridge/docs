@@ -11,6 +11,7 @@ Every environment variable across `api` / `agent` / `worker` /
 | `API_SHUTDOWN_GRACE` | no | `15s` | SIGTERM grace period |
 | `LOG_LEVEL` | no | `info` | `debug` / `info` / `warn` / `error` |
 | `SB_ENV` | no | `production` | `production` or `dev`; anything else fails boot. `dev` allows the `local` KMS backend, seeds three dev users on an empty database and drops the `Secure` cookie flag. Never `dev` outside a laptop. |
+| `SB_REQUIRE_MFA_AT_LOGIN` | no | `true`, or `false` when `SB_ENV=dev` | Login-time MFA: every authenticated route needs a session verified with a second factor, and a user with no factor adds one right after signing in. See [Step-up vs login-time MFA](authentication.md#step-up-vs-login-time-mfa). Setting `false` outside dev logs a warning at boot. |
 | `DATABASE_URL` | **yes** |  | `postgres://user:pass@host:5432/db` |
 | `DATABASE_MAX_CONNS` | no | `10` | pgxpool size |
 | `DATABASE_CONN_LIFETIME` | no | `1h` | |
