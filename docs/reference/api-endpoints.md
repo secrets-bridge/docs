@@ -108,7 +108,7 @@ enabled as a break-glass admin action.
 | `GET` | `/api/v1/admin/agents` | `session + agent.list` | Rich admin list + filters (`provider_connection_id`, `status`, `cluster_name`, `provider_type`); shows `provider_connection_id` |
 | `GET` | `/api/v1/admin/agents/:id` | `session + agent.list` | Rich admin get |
 | `GET` | `/api/v1/provider-connections/:id/agents` | `session + agent.list` | Agents for a provider connection (UI Agents tab) |
-| `POST` | `/api/v1/admin/agents/:id/revoke` | `session + agent.revoke` | Revoke with `reason` → `revoked_at`/`revoked_by`; emits `agent.revoked` audit (`agent_id`, `provider_connection_id`, `reason`) |
+| `POST` | `/api/v1/admin/agents/:id/revoke` | `session + agent.revoke` | Revoke with `reason` → `revoked_at`/`revoked_by`; emits `agent.revoked` audit (`agent_id`, `provider_connection_id`, `reason`). `503 revoked_cache_unconfirmed`: revoked, but Redis could not update the auth cache yet; the api keeps retrying and repeating the call is safe |
 | `POST` | `/api/v1/agent-enrollment-tokens/:id/revoke` | `session + agent.mint` | Revoke an UNUSED enrollment token |
 
 ### Agent data plane (`X-Agent-Secret`)
@@ -184,12 +184,12 @@ Every write also needs a fresh second factor.
 | `GET` | `/api/v1/admin/gateways/:id` | `session + gateway.list` | `{gateway, replicas, connectors, bindings, enrollment_tokens}`, metadata only |
 | `POST` | `/api/v1/admin/gateways/:id/enrollment-token` | `session + gateway.mint` + fresh MFA | `{expires_in_seconds?, expected_cluster_name?}` → `201 {id, gateway_id, enrollment_token, expires_at}`. The token is returned once. Default TTL 900s, clamped to 60 to 86400. `409 gateway_not_pending` once enrolled |
 | `POST` | `/api/v1/admin/gateway-enrollment-tokens/:id/revoke` | `session + gateway.mint` + fresh MFA | Revoke an unused token. `204` |
-| `POST` | `/api/v1/admin/gateways/:id/revoke` | `session + gateway.revoke` + fresh MFA | `{reason?}` → the Gateway, status `revoked`. `409 gateway_already_revoked` |
+| `POST` | `/api/v1/admin/gateways/:id/revoke` | `session + gateway.revoke` + fresh MFA | `{reason?}` → the Gateway, status `revoked`. `409 gateway_already_revoked`. `503 revoked_cache_unconfirmed`: revoked, but Redis could not update the auth cache yet; repeat the call |
 | `POST` | `/api/v1/admin/gateways/:id/connectors/:cid/approve` | `session + gateway.bind` + fresh MFA | `:cid` is the connector's `id`. `409 connector_not_advertised` |
 | `POST` | `/api/v1/admin/gateway-bindings` | `session + gateway.bind` + fresh MFA | `{gateway_id, environment_id, project_id?, secret_id \| (provider_connection_id + secret_ref), argocd_connector_id, argocd_target_id, observation_timeout_seconds?}` → `201`. Argo CD targets only in Release 1 |
 | `GET` | `/api/v1/admin/gateway-bindings` | `session + gateway.bind` | Optional `?gateway_id=` |
 | `DELETE` | `/api/v1/admin/gateway-bindings/:id` | `session + gateway.bind` + fresh MFA | `204`. Cancels the binding's open tasks (`binding_removed`) |
-| `PUT` | `/api/v1/admin/gateways/:id/enabled` | `session + gateway.revoke` + fresh MFA | `{enabled}` → the Gateway. Disable refuses its calls with `401` and moves its leased tasks back to `queued`. Enable returns it to `active`, or `pending` if it never enrolled. `409 gateway_revoked` |
+| `PUT` | `/api/v1/admin/gateways/:id/enabled` | `session + gateway.revoke` + fresh MFA | `{enabled}` → the Gateway. Disable refuses its calls with `401` and moves its leased tasks back to `queued`. Enable returns it to `active`, or `pending` if it never enrolled. `409 gateway_revoked`. `503 revoked_cache_unconfirmed` (disable) or `enabled_cache_unconfirmed` (enable): saved, but Redis could not update the auth cache yet; repeat the call |
 | `GET` | `/api/v1/admin/gateways/:id/tasks` | `session + gateway.list` | `{items, counts}`. Optional `?state=` (`queued`, `leased`, `done`, `dead`, `cancelled`) and `?limit=` (1 to 500, default 100). Each item has `state`, `verdict`, `verdict_reason`, `attempt_count`, `failure_count`, `not_before`, `deadline_at` and ids, never secret values |
 | `GET` | `/api/v1/admin/environments/:id/observation-source` | `session + gateway.bind` | `{environment_id, observation_source}`, either `gateway` or `none`. A stored value that is not one of them reads as `none`. `404 environment_not_found` |
 | `PUT` | `/api/v1/admin/environments/:id/observation-source` | `session + gateway.bind` + fresh MFA | `{observation_source}` with `gateway` or `none` → `{environment_id, observation_source, previous_observation_source, tasks_cancelled}`. Leaving `gateway` cancels the environment's open tasks (`source_changed`). `400 source_retired` for `control_plane`, `400 invalid_observation_source` for any other value |

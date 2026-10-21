@@ -507,5 +507,16 @@ reason in their logs. There is no credential rotation in Release 1: to replace a
 credential, revoke the Gateway, create a new one, enroll it and update the
 identity Secret.
 
+A disable, enable or revoke that answers `503` is already saved: the Gateway is
+disabled, enabled or revoked, but Redis was unreachable, so the api could not
+update its auth cache yet. It keeps trying in the background for up to two
+minutes, and the audit log has a `gateway.revoke.cache_unconfirmed`,
+`gateway.disable.cache_unconfirmed` or `gateway.enable.cache_unconfirmed` row.
+After `503 revoked_cache_unconfirmed` the Gateway may still get through for a
+moment, and after `503 enabled_cache_unconfirmed` it may still be refused. Send
+the same call again once Redis is back; repeating it is safe, and a repeated
+revoke answers `409 gateway_already_revoked` once the cache is in line. Agent
+revokes answer the same way.
+
 See [Troubleshooting](troubleshooting.md#gateway) when something does not turn
 ready.
