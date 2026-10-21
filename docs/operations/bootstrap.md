@@ -38,8 +38,12 @@ The api logs both actions at INFO in its JSON log output:
 2. You'll be redirected to `/login`.
 3. Enter the email + password from the env vars (or a dev user from
    the api's first-boot log when it runs with `SB_ENV=dev`).
-4. You land on the Dashboard with the `Agents Online` KPI showing
-   `0 / 0`.
+4. With `SB_ENV=dev` you land on the Dashboard with the `Agents Online`
+   KPI showing `0 / 0`. On a production install, where login-time MFA
+   is on by default, you land on **Second factor** first: add an
+   authenticator app or a security key, then **Continue** asks for it
+   once and opens the Dashboard
+   ([Step-up vs login-time MFA](authentication.md#step-up-vs-login-time-mfa)).
 
 The api keeps you signed in with an HttpOnly session cookie, which
 the SPA's scripts can't read. Sign out from the console to end the
