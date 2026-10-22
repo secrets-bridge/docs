@@ -1,6 +1,6 @@
 ---
 title: Agent onboarding
-description: How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked, no inbound ports, no cluster-API access.
+description: "How a Secrets Bridge agent enrolls with a one-time token, gets a persistent identity once, heartbeats outbound and can be revoked. No inbound ports needed."
 ---
 
 # Agent onboarding

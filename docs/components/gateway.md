@@ -1,6 +1,7 @@
 ---
 title: Gateway
-description: "The optional, outbound-only, read-only Gateway that observes Argo CD rollout state inside your boundary and reports metadata to the control plane. Release 1 status, scope and security model."
+seo_title: "Gateway: read-only Argo CD observation - Secrets Bridge"
+description: "The optional Gateway runs in your boundary, reads Argo CD rollout state with GET-only calls and reports it as metadata. Release 1 scope and security model."
 ---
 
 # Gateway

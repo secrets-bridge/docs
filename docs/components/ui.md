@@ -1,3 +1,7 @@
+---
+description: "The Secrets Bridge console: a React and TypeScript SPA for access requests, one-time reveals, agents, audit and admin, and nothing in browser storage."
+---
+
 # UI (SPA)
 
 Repo: [`secrets-bridge/ui`](https://github.com/secrets-bridge/ui)

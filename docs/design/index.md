@@ -1,6 +1,7 @@
 ---
 title: Design system
-description: "The Secrets Bridge brand: voice, tokens, logos and assets shared by the console, this site and the brand marks."
+seo_title: "Secrets Bridge design system and brand"
+description: "The Secrets Bridge design system: brand voice, colour and type tokens, and the logos and assets shared by the console, this site and the brand marks."
 ---
 
 # Design system

@@ -1,3 +1,7 @@
+---
+description: "Copy-paste Secrets Bridge policy rules: non-prod direct reveal, prod single and multi-approver workflows, cross-team templates and scoped policy authoring."
+---
+
 # Policy templates
 
 Slice L2 moved access decisions onto `policy_rules`. Workflows now
@@ -780,8 +784,8 @@ events `platform_setting.updated` carry the actor + old/new values.
 A scoped author covering one project authors per-project rules via
 `/projects/:projectID/policy-rules`. A section head covering an entire
 team, multiple sibling projects under the same `team_id`, would
-otherwise have to author N identical rules, one per project. R-follow-up
-#3 lifts that ceiling: the third anchor `team_id` lets one rule
+otherwise have to author N identical rules, one per project.
+R-follow-up #3 lifts that ceiling: the third anchor `team_id` lets one rule
 cascade down to every descendant project of the team subtree.
 
 #### Three-anchor mental model

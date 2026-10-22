@@ -1,3 +1,7 @@
+---
+description: "The Secrets Bridge RBAC permission catalog: the seed roles, every permission string checked by auth.Require, scoped grants and how to add a permission."
+---
+
 # Permissions catalog
 
 The canonical list of permission strings used by `auth.Require(perm)`.

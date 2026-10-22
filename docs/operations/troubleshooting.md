@@ -1,3 +1,7 @@
+---
+description: "Fix common Secrets Bridge problems: login 401s, Google sign-in, failed agent jobs, stale agents, Vault permission errors, Gateway issues and audit queries."
+---
+
 # Troubleshooting
 
 ## Common failure modes

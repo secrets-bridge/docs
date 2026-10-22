@@ -1,5 +1,6 @@
 ---
 title: Components
+seo_title: "Secrets Bridge components and repositories"
 description: Nine repositories, one product. What each repo holds, what it deliberately doesn't, and the one-way dependency graph that keeps the agent infra-free.
 ---
 

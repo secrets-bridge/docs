@@ -1,6 +1,6 @@
 ---
 title: "Teams and section heads"
-description: "Model an org as an N-level team tree and grant role scopes that fan out through the subtree."
+description: "Model an organisation as an N-level team tree in Secrets Bridge and scope RBAC role grants to a team, so a section head's access covers the whole subtree."
 ---
 
 # Teams and section heads

@@ -1,3 +1,7 @@
+---
+description: "The KMS backends Secrets Bridge uses for envelope encryption: local for dev only, HashiCorp Vault Transit and AWS KMS for production, setup and rotation."
+---
+
 # KMS backends
 
 Secrets Bridge uses **envelope encryption** for every wrap and for

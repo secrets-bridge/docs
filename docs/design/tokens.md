@@ -1,6 +1,6 @@
 ---
 title: Tokens and theme
-description: "Secrets Bridge design tokens: colours for light and dark, the type scale, spacing, radii and control sizes."
+description: "Secrets Bridge design tokens: colours for the light and dark themes, the type scale, spacing, radii and control sizes used by the console and this site."
 ---
 
 # Tokens and theme

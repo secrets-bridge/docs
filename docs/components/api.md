@@ -1,3 +1,7 @@
+---
+description: "The Secrets Bridge control plane API in Go and Fiber v3: package layout, session-cookie identity, permission guards, runtime endpoints and configuration."
+---
+
 # Control Plane API (`api`)
 
 Repo: [`secrets-bridge/api`](https://github.com/secrets-bridge/api)

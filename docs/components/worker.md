@@ -1,3 +1,7 @@
+---
+description: "The Secrets Bridge worker: sweepers for expired wraps, stale agents, stuck jobs and Gateway tasks, Redis locks for multiple replicas, and webhook sinks."
+---
+
 # Worker
 
 Repo: [`secrets-bridge/worker`](https://github.com/secrets-bridge/worker)

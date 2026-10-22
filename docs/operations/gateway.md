@@ -1,6 +1,7 @@
 ---
 title: Gateway
-description: "Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, connector approval, a binding, and switching an environment to Gateway observation."
+seo_title: "Install and enroll a Gateway - Secrets Bridge"
+description: "Install a Release 1 Gateway for Argo CD observation: a read-only Argo CD account, one-time enrollment, the Helm chart, connector approval and bindings."
 ---
 
 # Gateway

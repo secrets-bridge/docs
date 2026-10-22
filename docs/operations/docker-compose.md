@@ -1,3 +1,7 @@
+---
+description: "Run Secrets Bridge on your laptop with docker compose: Postgres and Redis, the api and UI, and an agent enrolled against a HashiCorp Vault dev server."
+---
+
 # Running locally with docker compose
 
 A local loop for trying Secrets Bridge on one machine. The compose file

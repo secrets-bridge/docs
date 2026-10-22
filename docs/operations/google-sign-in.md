@@ -1,6 +1,6 @@
 ---
 title: "Sign in with Google"
-description: "Connect a Google Workspace from the console, approve the accounts it creates, and connect Google to existing accounts."
+description: "Connect a Google Workspace to Secrets Bridge from the console, approve the accounts it creates and link Google to existing accounts. Not yet through QA."
 ---
 
 # Sign in with Google

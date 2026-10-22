@@ -1,3 +1,7 @@
+---
+description: "Cross-team requests in Secrets Bridge: one team fills a value another team needs, with separation of duties, approval, a state machine and triage SQL."
+---
+
 # Cross-team requests
 
 A cross-team request is a value handoff between two teams that don't

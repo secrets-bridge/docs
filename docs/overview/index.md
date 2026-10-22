@@ -1,5 +1,6 @@
 ---
 title: Overview
+seo_title: "Secrets Bridge overview: control plane, agent, providers"
 description: How Secrets Bridge fits between developers, agents, and the actual secret providers, without ever holding raw values in the Control Plane.
 ---
 
