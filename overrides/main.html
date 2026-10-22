@@ -39,13 +39,19 @@
   {% set site_root = page.canonical_url[:(page.canonical_url | length) - (page.url | length)] if page and page.canonical_url and page.url else (page.canonical_url if page and page.canonical_url else config.site_url) %}
   {% set og_image = page.meta.image if page and page.meta and page.meta.image else site_root ~ config.extra.brand.og_image %}
 
-  {# Canonical URL — prevents duplicate-content penalties when the site
-     is mirrored or accessed through alternate hosts. #}
-  <link rel="canonical" href="{{ page_url }}" />
+  {# Material's base.html already prints <link rel="canonical"> from
+     page.canonical_url; a second one here was a duplicate. With mike's
+     `canonical_version: latest`, every version points at /latest/. #}
+
+  {# The page's Markdown source, for AI assistants and other tools that
+     read Markdown better than HTML (hooks/seo.py publishes it). #}
+  {% if page and page.meta and page.meta._md_url %}
+  <link rel="alternate" type="text/markdown" href="{{ page.meta._md_url }}" title="{{ page_title }} (Markdown)" />
+  {% endif %}
 
   {# Open Graph. Twitter falls back to these when its own tags are
      absent, so the Twitter set below is mostly belt-and-braces. #}
-  <meta property="og:type" content="website" />
+  <meta property="og:type" content="{{ 'website' if not page or page.is_homepage else 'article' }}" />
   <meta property="og:site_name" content="{{ config.extra.brand.name }}" />
   <meta property="og:title" content="{{ page_title }}" />
   <meta property="og:description" content="{{ page_description }}" />
@@ -80,44 +86,18 @@
      covers the same ground but per-page directives let us mark specific
      pages noindex in the future (e.g. drafts) without touching the
      site-wide config. #}
-  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
-
-  {# Structured data — Organization schema for the homepage so search
-     engines can build a Knowledge Panel. Other pages get a
-     TechArticle schema with the page title. #}
-  {% if page and page.is_homepage %}
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "{{ config.extra.brand.name }}",
-    "alternateName": "SecretsBridge",
-    "url": "{{ config.site_url }}",
-    "logo": "{{ og_image }}",
-    "description": "{{ config.site_description }}",
-    "sameAs": [
-      "https://github.com/secrets-bridge"
-    ]
-  }
-  </script>
+  {# The 404 page renders without a page object; keep it out of the index. #}
+  {% if page %}
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   {% else %}
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "TechArticle",
-    "headline": "{{ page_title }}",
-    "description": "{{ page_description }}",
-    "url": "{{ page_url }}",
-    "image": "{{ og_image }}",
-    "publisher": {
-      "@type": "Organization",
-      "name": "{{ config.extra.brand.name }}",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "{{ og_image }}"
-      }
-    }
-  }
-  </script>
+  <meta name="robots" content="noindex, follow" />
+  {% endif %}
+
+  {# Structured data, built by hooks/seo.py: Organization, WebSite and
+     SoftwareApplication on the home page; TechArticle and BreadcrumbList
+     on every other page; FAQPage on pages with `schema: faq`. Built in
+     Python with json.dumps, so titles with quotes can't break it. #}
+  {% if page and page.meta and page.meta._jsonld %}
+  <script type="application/ld+json">{{ page.meta._jsonld }}</script>
   {% endif %}
 {% endblock %}

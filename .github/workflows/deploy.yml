@@ -162,3 +162,23 @@ jobs:
       - name: Set default landing version
         if: github.ref == 'refs/heads/main' || steps.resolve.outputs.alias == 'latest'
         run: mike set-default --push latest
+
+      # Everything at the root of gh-pages that mike doesn't own:
+      # robots.txt (from site-root/), the sitemap index, llms.txt and
+      # llms-full.txt, the 404 page, and redirects for the URLs the site
+      # had before it was versioned. See scripts/publish_root.py.
+      - name: Publish root files
+        if: github.ref == 'refs/heads/main' || steps.resolve.outputs.alias == 'latest'
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin gh-pages
+          git worktree add --detach "$RUNNER_TEMP/gh-pages" origin/gh-pages
+          python3 scripts/publish_root.py "$RUNNER_TEMP/gh-pages" site-root latest
+          cd "$RUNNER_TEMP/gh-pages"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Root files unchanged"
+          else
+            git commit -q -m "Publish root files for latest"
+            git push origin HEAD:gh-pages
+          fi
