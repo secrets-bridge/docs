@@ -1,0 +1,67 @@
+# Secrets Bridge
+
+> Secrets Bridge adds access requests, approvals and audit to the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider.
+
+Secrets Bridge is a secrets control plane. It adds access requests, approvals, RBAC, policy, audit and agent execution around the secrets a team already keeps in AWS Secrets Manager or HashiCorp Vault. It keeps requests, approvals and audit metadata; secret values stay in the provider, and the agent runs inside the team's infrastructure and only connects out. Azure Key Vault and GCP Secret Manager are on the roadmap. It is open source and pre-1.0: see Product status for what works today.
+
+Every page below is also available as Markdown at the linked URL, and https://secrets-bridge.io/latest/llms-full.txt has all of them in one file.
+
+## Start here
+
+- [Home](https://secrets-bridge.io/latest/index.md): Secrets Bridge adds access requests, approvals, audit and agent execution around the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider.
+
+## Overview
+
+- [Overview](https://secrets-bridge.io/latest/overview/index.md): How Secrets Bridge fits between developers, agents, and the actual secret providers, without ever holding raw values in the Control Plane.
+- [Product status](https://secrets-bridge.io/latest/overview/product-status.md): What Secrets Bridge actually does today: implemented and QA-certified features, what's in progress, and what's on the roadmap. No overclaiming.
+- [Architecture](https://secrets-bridge.io/latest/overview/architecture.md)
+- [Teams and section heads](https://secrets-bridge.io/latest/overview/teams-and-section-heads.md): Model an org as an N-level team tree and grant role scopes that fan out through the subtree.
+- [Threat model & hard rules](https://secrets-bridge.io/latest/overview/threat-model.md)
+- [Glossary](https://secrets-bridge.io/latest/overview/glossary.md)
+
+## Components
+
+- [Components](https://secrets-bridge.io/latest/components/index.md): Nine repositories, one product. What each repo holds, what it deliberately doesn't, and the one-way dependency graph that keeps the agent infra-free.
+- [Control Plane API](https://secrets-bridge.io/latest/components/api.md)
+- [Agent](https://secrets-bridge.io/latest/components/agent.md)
+- [Worker](https://secrets-bridge.io/latest/components/worker.md)
+- [Controller (Kubernetes)](https://secrets-bridge.io/latest/components/controller.md)
+- [Gateway](https://secrets-bridge.io/latest/components/gateway.md): The optional, outbound-only, read-only Gateway that observes Argo CD rollout state inside your boundary and reports metadata to the control plane. Release 1 status, scope and security model.
+- [UI (SPA)](https://secrets-bridge.io/latest/components/ui.md)
+- [Core (shared library)](https://secrets-bridge.io/latest/components/core.md)
+
+## Operations
+
+- [Operations](https://secrets-bridge.io/latest/operations/index.md): Deploy, bootstrap, troubleshoot. The pre-production hardening checklist plus the audit-log queries you'll lean on day two.
+- [Running locally with docker compose](https://secrets-bridge.io/latest/operations/docker-compose.md)
+- [Bootstrap & first sign-in](https://secrets-bridge.io/latest/operations/bootstrap.md)
+- [Agent onboarding](https://secrets-bridge.io/latest/operations/agent-onboarding.md): How an agent is enrolled with a one-time token, receives a persistent identity once, heartbeats outbound, and can be revoked, no inbound ports, no cluster-API access.
+- [Authentication](https://secrets-bridge.io/latest/operations/authentication.md): Cookie-only session model, account lockout, OIDC sign-in, app-MFA enrollment + step-up, and the break-glass posture.
+- [Sign in with Google](https://secrets-bridge.io/latest/operations/google-sign-in.md): Connect a Google Workspace from the console, approve the accounts it creates, and connect Google to existing accounts.
+- [OIDC with Authentik](https://secrets-bridge.io/latest/operations/oidc-authentik.md): Step-by-step Authentik setup for Secrets Bridge, application, scopes, group claim, WebAuthn enrolment.
+- [Project environments](https://secrets-bridge.io/latest/operations/project-environments.md)
+- [Policy templates](https://secrets-bridge.io/latest/operations/policy-templates.md)
+- [Reveal sessions](https://secrets-bridge.io/latest/operations/reveal-sessions.md)
+- [Cross-team requests](https://secrets-bridge.io/latest/operations/cross-team-requests.md)
+- [Provider connections](https://secrets-bridge.io/latest/operations/provider-connections.md)
+- [Gateway](https://secrets-bridge.io/latest/operations/gateway.md): Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, connector approval, a binding, and switching an environment to Gateway observation.
+- [Gateway cutover](https://secrets-bridge.io/latest/operations/gateway-cutover.md): Upgrade an install that used the control-plane Argo CD poller to Gateway-only observation: bind a Gateway first, what migration 0049 removes, rotating the Argo CD token, cleaning up settings and egress, and why rollback does not restore the poller.
+- [Object storage](https://secrets-bridge.io/latest/operations/object-storage.md): Store media such as project and team logos in AWS S3 or an S3-compatible server. Covers IAM, encryption, bucket settings, backups and the logo migration.
+- [Verifying images and charts](https://secrets-bridge.io/latest/operations/verifying-releases.md): Check the cosign signature, SBOM and build provenance of Secrets Bridge container images and Helm charts before you deploy them.
+- [Configuration reference](https://secrets-bridge.io/latest/operations/config.md)
+- [Troubleshooting](https://secrets-bridge.io/latest/operations/troubleshooting.md)
+
+## Reference
+
+- [Reference](https://secrets-bridge.io/latest/reference/index.md): Tables and catalogues. Every HTTP endpoint, every provider, every KMS backend, every permission string used by `auth.Require(perm)`.
+- [HTTP API endpoints](https://secrets-bridge.io/latest/reference/api-endpoints.md)
+- [Providers supported](https://secrets-bridge.io/latest/reference/providers.md)
+- [KMS backends](https://secrets-bridge.io/latest/reference/kms-backends.md)
+- [Permissions catalog](https://secrets-bridge.io/latest/reference/permissions.md)
+
+## Optional
+
+- [Design system](https://secrets-bridge.io/latest/design/index.md): The Secrets Bridge brand: voice, tokens, logos and assets shared by the console, this site and the brand marks.
+- [Brand voice](https://secrets-bridge.io/latest/design/brand-voice.md): How Secrets Bridge describes itself: say what we keep, describe the mechanism, label maturity exactly.
+- [Tokens and theme](https://secrets-bridge.io/latest/design/tokens.md): Secrets Bridge design tokens: colours for light and dark, the type scale, spacing, radii and control sizes.
+- [Logos and assets](https://secrets-bridge.io/latest/design/assets.md): The Secrets Bridge Checkpoint mark, its lockups and approved colourings, the four product icons and the architecture illustration.
