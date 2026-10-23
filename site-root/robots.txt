@@ -1,0 +1,8 @@
+# secrets-bridge.io: the Secrets Bridge documentation.
+# Search engines and AI assistants are welcome to read all of it.
+# A guide for language models: https://secrets-bridge.io/llms.txt
+# Every page in Markdown, in one file: https://secrets-bridge.io/llms-full.txt
+User-agent: *
+Allow: /
+
+Sitemap: https://secrets-bridge.io/sitemap.xml
