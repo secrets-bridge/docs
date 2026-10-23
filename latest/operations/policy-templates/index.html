@@ -7,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Secrets Bridge adds access requests, approvals and audit to the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider.">
+        <meta name="description" content="Copy-paste Secrets Bridge policy rules: non-prod direct reveal, prod single and multi-approver workflows, cross-team templates and scoped policy authoring.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
@@ -88,7 +88,7 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Secrets Bridge" />
   <meta property="og:title" content="Policy templates" />
-  <meta property="og:description" content="Secrets Bridge adds access requests, approvals and audit to the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider." />
+  <meta property="og:description" content="Copy-paste Secrets Bridge policy rules: non-prod direct reveal, prod single and multi-approver workflows, cross-team templates and scoped policy authoring." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/operations/policy-templates/" />
   <meta property="og:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
@@ -99,7 +99,7 @@
   
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Policy templates" />
-  <meta name="twitter:description" content="Secrets Bridge adds access requests, approvals and audit to the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider." />
+  <meta name="twitter:description" content="Copy-paste Secrets Bridge policy rules: non-prod direct reveal, prod single and multi-approver workflows, cross-team templates and scoped policy authoring." />
   <meta name="twitter:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   
@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Policy templates","description":"Secrets Bridge adds access requests, approvals and audit to the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider.","url":"https://secrets-bridge.io/latest/operations/policy-templates/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/policy-templates/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-20T10:32:38+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Policy templates","item":"https://secrets-bridge.io/latest/operations/policy-templates/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Policy templates","description":"Copy-paste Secrets Bridge policy rules: non-prod direct reveal, prod single and multi-approver workflows, cross-team templates and scoped policy authoring.","url":"https://secrets-bridge.io/latest/operations/policy-templates/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/policy-templates/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-23T15:12:19+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Policy templates","item":"https://secrets-bridge.io/latest/operations/policy-templates/"}]}]}</script>
   
 
   </head>
@@ -517,6 +517,8 @@
       
         
       
+        
+      
     
     
     
@@ -700,6 +702,34 @@
     
   
     Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../overview/faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
   
 
     
@@ -1756,8 +1786,63 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#policy-rule-change-history-r-follow-up-5-api132" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Policy rule change history (R-follow-up #5, api#132)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observability-prometheus-counters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observability, Prometheus counters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-code-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error code reference
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hard-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hard rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2467,8 +2552,63 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#policy-rule-change-history-r-follow-up-5-api132" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Policy rule change history (R-follow-up #5, api#132)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observability-prometheus-counters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observability, Prometheus counters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-code-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error code reference
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hard-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hard rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related
+      
+    </span>
+  </a>
   
 </li>
       
@@ -3328,9 +3468,9 @@ events <code>platform_setting.updated</code> carry the actor + old/new values.</
 <p>A scoped author covering one project authors per-project rules via
 <code>/projects/:projectID/policy-rules</code>. A section head covering an entire
 team, multiple sibling projects under the same <code>team_id</code>, would
-otherwise have to author N identical rules, one per project. R-follow-up</p>
-<h1 id="3-lifts-that-ceiling-the-third-anchor-team_id-lets-one-rule">3 lifts that ceiling: the third anchor <code>team_id</code> lets one rule<a class="headerlink" href="#3-lifts-that-ceiling-the-third-anchor-team_id-lets-one-rule" title="Permanent link">&para;</a></h1>
-<p>cascade down to every descendant project of the team subtree.</p>
+otherwise have to author N identical rules, one per project.
+R-follow-up #3 lifts that ceiling: the third anchor <code>team_id</code> lets one rule
+cascade down to every descendant project of the team subtree.</p>
 <h4 id="three-anchor-mental-model">Three-anchor mental model<a class="headerlink" href="#three-anchor-mental-model" title="Permanent link">&para;</a></h4>
 <table>
 <thead>

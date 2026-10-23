@@ -7,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Tables and catalogues. Every HTTP endpoint, every provider, every KMS backend, every permission string used by `auth.Require(perm)`.">
+        <meta name="description" content="Reference pages for Secrets Bridge: every HTTP API endpoint, the supported secret providers, the KMS backends and the RBAC permission catalog.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
@@ -30,7 +30,7 @@
     
     
   
-    <title>Reference - Secrets Bridge</title>
+    <title>Secrets Bridge reference: API, providers, KMS, permissions</title>
   
 
     
@@ -81,14 +81,14 @@
 
   
   
-  <link rel="alternate" type="text/markdown" href="https://secrets-bridge.io/latest/reference/index.md" title="Reference (Markdown)">
+  <link rel="alternate" type="text/markdown" href="https://secrets-bridge.io/latest/reference/index.md" title="Secrets Bridge reference: API, providers, KMS, permissions (Markdown)">
   
 
   
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Secrets Bridge" />
-  <meta property="og:title" content="Reference" />
-  <meta property="og:description" content="Tables and catalogues. Every HTTP endpoint, every provider, every KMS backend, every permission string used by `auth.Require(perm)`." />
+  <meta property="og:title" content="Secrets Bridge reference: API, providers, KMS, permissions" />
+  <meta property="og:description" content="Reference pages for Secrets Bridge: every HTTP API endpoint, the supported secret providers, the KMS backends and the RBAC permission catalog." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/reference/" />
   <meta property="og:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
@@ -98,8 +98,8 @@
 
   
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Reference" />
-  <meta name="twitter:description" content="Tables and catalogues. Every HTTP endpoint, every provider, every KMS backend, every permission string used by `auth.Require(perm)`." />
+  <meta name="twitter:title" content="Secrets Bridge reference: API, providers, KMS, permissions" />
+  <meta name="twitter:description" content="Reference pages for Secrets Bridge: every HTTP API endpoint, the supported secret providers, the KMS backends and the RBAC permission catalog." />
   <meta name="twitter:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   
@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Reference","description":"Tables and catalogues. Every HTTP endpoint, every provider, every KMS backend, every permission string used by `auth.Require(perm)`.","url":"https://secrets-bridge.io/latest/reference/","mainEntityOfPage":"https://secrets-bridge.io/latest/reference/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-08-14T13:32:55+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Reference","item":"https://secrets-bridge.io/latest/reference/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Secrets Bridge reference: API, providers, KMS, permissions","description":"Reference pages for Secrets Bridge: every HTTP API endpoint, the supported secret providers, the KMS backends and the RBAC permission catalog.","url":"https://secrets-bridge.io/latest/reference/","mainEntityOfPage":"https://secrets-bridge.io/latest/reference/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-23T15:12:19+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Reference","item":"https://secrets-bridge.io/latest/reference/"}]}]}</script>
   
 
   </head>
@@ -517,6 +517,8 @@
       
         
       
+        
+      
     
     
     
@@ -700,6 +702,34 @@
     
   
     Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
   
 
     
@@ -2011,32 +2041,35 @@
 <h1 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h1>
 <p>Catalogues + tables. Look here when you need the exact name of an
 endpoint, a permission, a provider, or a KMS backend.</p>
-<table>
-<thead>
-<tr>
-<th>Page</th>
-<th>What</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="api-endpoints/">HTTP API endpoints</a></td>
-<td>Every route the api exposes today, the auth gate, and the response shape</td>
-</tr>
-<tr>
-<td><a href="providers/">Providers supported</a></td>
-<td>Vault / AWS SM / GCP SM / Azure Key Vault: auth + config shape per provider</td>
-</tr>
-<tr>
-<td><a href="kms-backends/">KMS backends</a></td>
-<td><code>local</code> / <code>vault-transit</code> / <code>aws-kms</code>: when to use each, env vars</td>
-</tr>
-<tr>
-<td><a href="permissions/">Permissions catalog</a></td>
-<td>The canonical list of permission strings used by <code>auth.Require(perm)</code></td>
-</tr>
-</tbody>
-</table>
+<p>These pages list what the control plane and the agent accept today: the
+routes the api serves, the secret providers the agent can reach, the KMS
+backends behind envelope encryption, and the permission strings that
+RBAC checks. The <a href="../operations/">Operations</a> pages explain how to
+use them, and the <a href="../operations/config/">Configuration reference</a> lists
+every environment variable.</p>
+<ul>
+<li><strong><a href="api-endpoints/">HTTP API endpoints</a></strong>: every route grouped by area
+  (probes, sign-in, agents, Gateways, access requests, cross-team requests,
+  reveal sessions, admin, audit, provider connections and policy rules),
+  with the auth each one needs, such as <code>public</code>, a session, a session
+  plus a permission, or an agent's or Gateway's own secret header.</li>
+<li><strong><a href="providers/">Providers supported</a></strong>: the provider types the agent
+  dispatches to. HashiCorp Vault (KV v2, token or Kubernetes auth) and AWS
+  Secrets Manager (the standard AWS SDK credential chain) ship. The
+  <code>gcp-sm</code>, <code>azure-kv</code> and <code>kubernetes</code> resolvers are placeholders, and
+  Azure Key Vault and GCP Secret Manager are on the
+  <a href="../overview/product-status/">roadmap</a>. The page also lists the
+  credential-shaped keys each resolver refuses and how a new provider is
+  added.</li>
+<li><strong><a href="kms-backends/">KMS backends</a></strong>: the envelope-encryption backends
+  selected with <code>SB_KMS_BACKEND</code>. <code>local</code> is for dev only; <code>vault-transit</code>
+  and <code>aws-kms</code> are for production. Covers their settings, setup, key
+  rotation and how to choose between them.</li>
+<li><strong><a href="permissions/">Permissions catalog</a></strong>: the permission strings that
+  <code>auth.Require(perm)</code> checks, the seed roles that carry them, which
+  permissions are meant to be narrowed by scope, and how to add a new one. The
+  api also serves the live catalog at <code>GET /api/v1/permissions</code>.</li>
+</ul>
 
 
 

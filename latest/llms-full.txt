@@ -948,6 +948,162 @@ user clicks Reveal.
 
 ---
 
+Source: https://secrets-bridge.io/latest/overview/faq/
+
+# Frequently asked questions
+
+Short answers to common questions about Secrets Bridge. Each answer links to
+the page with the full detail.
+
+## What is Secrets Bridge?
+
+Secrets Bridge is a secrets control plane. It governs who may use the secrets
+your team already keeps in AWS Secrets Manager or HashiCorp Vault, and adds
+access requests, approval workflows, RBAC, audit and agent execution around
+them. The control plane makes decisions and keeps metadata, an agent inside
+your boundary executes, and the provider holds the values. See the
+[Overview](https://secrets-bridge.io/latest/overview/) and the [Architecture](https://secrets-bridge.io/latest/overview/architecture/).
+
+## Does Secrets Bridge store secret values?
+
+No. The control plane keeps requests, approvals and audit metadata, and the
+values stay in your provider. A value in flight exists only as a
+KMS-encrypted wrap that is consumed once and has a short TTL. Values never
+appear in Redis, audit metadata, control-plane logs or browser storage, and
+request responses carry key names only. The one response that returns a
+value is the reveal itself, once, to the person who asked. See the
+[Threat model & hard rules](https://secrets-bridge.io/latest/overview/threat-model/) and
+[Product status](https://secrets-bridge.io/latest/overview/product-status/).
+
+## Does it replace HashiCorp Vault or AWS Secrets Manager?
+
+No. Your provider stays the source of truth for secret values, and Secrets
+Bridge governs access, approvals, audit and agent execution around it. The
+agent uses only the credentials configured inside its own network boundary,
+and the control plane never holds provider master credentials. See
+[What's intentionally out of scope](https://secrets-bridge.io/latest/overview/#whats-intentionally-out-of-scope).
+
+## Which secret providers does it support?
+
+HashiCorp Vault (KV v2, with token or Kubernetes auth) and AWS Secrets Manager
+(the standard AWS SDK credential chain, such as IRSA or an instance role) work
+today through the agent. Azure Key Vault and GCP Secret Manager are on the
+roadmap: their agent resolvers are placeholders, as is the Kubernetes Secret
+resolver. See [Providers supported](https://secrets-bridge.io/latest/reference/providers/) and
+[Product status](https://secrets-bridge.io/latest/overview/product-status/).
+
+## Does the agent need an inbound port?
+
+No. The agent only opens outbound connections, to the control plane and to
+its local provider, and has no Postgres, Redis or Kubernetes API access to
+Secrets. Its only listener serves `/healthz`, `/readyz` and `/metrics`; the
+`agent` Helm chart binds it on the pod IP for kubelet probes, creates no
+Service for it and denies all ingress with its default NetworkPolicy. See the
+[Agent](https://secrets-bridge.io/latest/components/agent/) page and
+[Network posture](https://secrets-bridge.io/latest/overview/threat-model/#network-posture).
+
+## How does an agent get its credentials?
+
+An admin creates a one-time enrollment token bound to one provider
+connection. The token is short-lived, stored only as a hash and returned
+once; the agent exchanges it at `POST /api/v1/agents/enroll` for a persistent
+identity that it stores and reuses on restart. An admin can revoke the agent
+at any time, and its heartbeats and job polls stop being accepted
+immediately. See [Agent onboarding](https://secrets-bridge.io/latest/operations/agent-onboarding/).
+
+## How do approvals work?
+
+When you submit a request, the policy rules are matched in priority order and
+the first match picks a workflow. The workflow sets the approval ceremony:
+the minimum number of approvers, whether a justification is required, and the
+TTLs. Approvers with `secret.approve` approve or reject from the Requests
+page, which needs a fresh second factor, and a requester can never approve
+their own request (the api answers `403 separation_of_duties_violated` and
+audits the attempt). See [Policy templates](https://secrets-bridge.io/latest/operations/policy-templates/),
+the [Glossary](https://secrets-bridge.io/latest/overview/glossary/#workflow) and
+[Bootstrap & first sign-in](https://secrets-bridge.io/latest/operations/bootstrap/#submitting-your-first-read-request).
+
+## Can a secret be revealed directly in production?
+
+No. Direct reveal needs the caller to hold `secret.reveal.direct`, a matched
+policy rule with `direct_reveal_allowed=true`, and an environment whose `kind`
+is `non_prod`. The PolicyEngine zeroes `direct_reveal_allowed` for `prod`
+environments whatever the policy says, and the refusal is audited. See
+[Project environments](https://secrets-bridge.io/latest/operations/project-environments/) and
+[Direct reveal permission](https://secrets-bridge.io/latest/operations/authentication/#direct-reveal-permission-slice-l4).
+
+## How is a secret value delivered to the person who asked for it?
+
+After approval, the agent claims the read job, fetches the value from the
+provider and posts it to the control plane as an encrypted wrap, one per key.
+When you click Reveal, the api consumes the wrap atomically and decrypts it
+with the KMS backend, so a second fetch of the same wrap gets `410 Gone`. The console shows the
+value once and clears it when the reveal closes; a
+[reveal session](https://secrets-bridge.io/latest/operations/reveal-sessions/) also ends after a TTL of 10
+to 300 seconds set by the matched policy rule. See the read flow in the
+[Architecture](https://secrets-bridge.io/latest/overview/architecture/).
+
+## What is a cross-team request?
+
+It is a value handoff between two teams that don't share access to each
+other's secrets. Team A submits the request, a Team B member with
+`secret.value.provide` fills in the values, a Team A approver (and a security
+approver when the workflow requires one) verifies, and the agent writes the
+value into Team A's provider. No user can play more than one of these roles on
+the same request. See [Cross-team requests](https://secrets-bridge.io/latest/operations/cross-team-requests/).
+
+## What is audited?
+
+Audit events record actions, IDs, statuses, reasons and timestamps, and a
+correlation ID links every event in one request's lifecycle. They never carry
+plaintext values, tokens or wrap bodies. The `audit_events` table is
+append-only: Postgres triggers reject UPDATE and DELETE. See the
+[Glossary](https://secrets-bridge.io/latest/overview/glossary/#audit_event) and
+[Append-only audit](https://secrets-bridge.io/latest/overview/threat-model/#append-only-audit).
+
+## Does it support SSO, OIDC and MFA?
+
+Yes. You can sign in through an OIDC provider set with the `SB_OIDC_*`
+variables (PKCE, group-claim to role mapping, back-channel logout), through
+Google configured from the console (merged, not yet through QA), or with a
+local password kept as break-glass. MFA uses TOTP authenticator apps or
+WebAuthn security keys: approve, reject and reveal need a fresh second
+factor, and login-time MFA is on by default outside `SB_ENV=dev`. See
+[Authentication](https://secrets-bridge.io/latest/operations/authentication/) and
+[OIDC with Authentik](https://secrets-bridge.io/latest/operations/oidc-authentik/).
+
+## How do I try it locally?
+
+Clone the `api` repo, start Postgres and Redis with
+`docker compose up -d postgres redis`, and run the api with `SB_ENV=dev` and
+the `local` KMS backend; the UI runs from the `ui` repo with `npm run dev`. On first boot
+against an empty database the api seeds three dev users and logs their
+passwords once, and the guide then enrolls an agent against a HashiCorp Vault
+dev server. The setup uses dev-only switches, so keep it on your machine and
+never load real secrets into it. See
+[Running locally with docker compose](https://secrets-bridge.io/latest/operations/docker-compose/).
+
+## How do I deploy it in production?
+
+Install the Helm charts published on GHCR: `secrets-bridge` for the api, ui,
+worker and controller, and `secrets-bridge-agent` for one agent per workload
+cluster or account. You provide Postgres and Redis on a private network, a
+real KMS backend (`vault-transit` or `aws-kms`) and an ingress with TLS. The
+chart refuses `kms.backend=local` with `env=production`, and
+[Operations](https://secrets-bridge.io/latest/operations/) has the hardening checklist to work
+through before you expose the install.
+
+## How mature is it?
+
+Secrets Bridge is open source and pre-1.0, and the first release has not been
+tagged yet. [Product status](https://secrets-bridge.io/latest/overview/product-status/) keeps what is implemented,
+what is QA-certified (such as project access, direct reveal with TTL, prod
+reveal refusal and the cross-team flow), what is in progress and what is on
+the roadmap apart. Features listed as in progress, such as the Gateway and
+Google sign-in, have not passed QA.
+
+---
+
 Source: https://secrets-bridge.io/latest/components/
 
 # Components
@@ -4401,8 +4557,8 @@ events `platform_setting.updated` carry the actor + old/new values.
 A scoped author covering one project authors per-project rules via
 `/projects/:projectID/policy-rules`. A section head covering an entire
 team, multiple sibling projects under the same `team_id`, would
-otherwise have to author N identical rules, one per project. R-follow-up
-#3 lifts that ceiling: the third anchor `team_id` lets one rule
+otherwise have to author N identical rules, one per project.
+R-follow-up #3 lifts that ceiling: the third anchor `team_id` lets one rule
 cascade down to every descendant project of the team subtree.
 
 #### Three-anchor mental model
@@ -8100,12 +8256,34 @@ Source: https://secrets-bridge.io/latest/reference/
 Catalogues + tables. Look here when you need the exact name of an
 endpoint, a permission, a provider, or a KMS backend.
 
-| Page | What |
-|---|---|
-| [HTTP API endpoints](https://secrets-bridge.io/latest/reference/api-endpoints/) | Every route the api exposes today, the auth gate, and the response shape |
-| [Providers supported](https://secrets-bridge.io/latest/reference/providers/) | Vault / AWS SM / GCP SM / Azure Key Vault: auth + config shape per provider |
-| [KMS backends](https://secrets-bridge.io/latest/reference/kms-backends/) | `local` / `vault-transit` / `aws-kms`: when to use each, env vars |
-| [Permissions catalog](https://secrets-bridge.io/latest/reference/permissions/) | The canonical list of permission strings used by `auth.Require(perm)` |
+These pages list what the control plane and the agent accept today: the
+routes the api serves, the secret providers the agent can reach, the KMS
+backends behind envelope encryption, and the permission strings that
+RBAC checks. The [Operations](https://secrets-bridge.io/latest/operations/) pages explain how to
+use them, and the [Configuration reference](https://secrets-bridge.io/latest/operations/config/) lists
+every environment variable.
+
+- **[HTTP API endpoints](https://secrets-bridge.io/latest/reference/api-endpoints/)**: every route grouped by area
+  (probes, sign-in, agents, Gateways, access requests, cross-team requests,
+  reveal sessions, admin, audit, provider connections and policy rules),
+  with the auth each one needs, such as `public`, a session, a session
+  plus a permission, or an agent's or Gateway's own secret header.
+- **[Providers supported](https://secrets-bridge.io/latest/reference/providers/)**: the provider types the agent
+  dispatches to. HashiCorp Vault (KV v2, token or Kubernetes auth) and AWS
+  Secrets Manager (the standard AWS SDK credential chain) ship. The
+  `gcp-sm`, `azure-kv` and `kubernetes` resolvers are placeholders, and
+  Azure Key Vault and GCP Secret Manager are on the
+  [roadmap](https://secrets-bridge.io/latest/overview/product-status/). The page also lists the
+  credential-shaped keys each resolver refuses and how a new provider is
+  added.
+- **[KMS backends](https://secrets-bridge.io/latest/reference/kms-backends/)**: the envelope-encryption backends
+  selected with `SB_KMS_BACKEND`. `local` is for dev only; `vault-transit`
+  and `aws-kms` are for production. Covers their settings, setup, key
+  rotation and how to choose between them.
+- **[Permissions catalog](https://secrets-bridge.io/latest/reference/permissions/)**: the permission strings that
+  `auth.Require(perm)` checks, the seed roles that carry them, which
+  permissions are meant to be narrowed by scope, and how to add a new one. The
+  api also serves the live catalog at `GET /api/v1/permissions`.
 
 ---
 

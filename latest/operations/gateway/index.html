@@ -7,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, connector approval, a binding, and switching an environment to Gateway observation.">
+        <meta name="description" content="Install a Release 1 Gateway for Argo CD observation: a read-only Argo CD account, one-time enrollment, the Helm chart, connector approval and bindings.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
@@ -30,7 +30,7 @@
     
     
   
-    <title>Gateway - Secrets Bridge</title>
+    <title>Install and enroll a Gateway - Secrets Bridge</title>
   
 
     
@@ -81,14 +81,14 @@
 
   
   
-  <link rel="alternate" type="text/markdown" href="https://secrets-bridge.io/latest/operations/gateway.md" title="Gateway (Markdown)">
+  <link rel="alternate" type="text/markdown" href="https://secrets-bridge.io/latest/operations/gateway.md" title="Install and enroll a Gateway - Secrets Bridge (Markdown)">
   
 
   
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Secrets Bridge" />
-  <meta property="og:title" content="Gateway" />
-  <meta property="og:description" content="Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, connector approval, a binding, and switching an environment to Gateway observation." />
+  <meta property="og:title" content="Install and enroll a Gateway - Secrets Bridge" />
+  <meta property="og:description" content="Install a Release 1 Gateway for Argo CD observation: a read-only Argo CD account, one-time enrollment, the Helm chart, connector approval and bindings." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/operations/gateway/" />
   <meta property="og:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
@@ -98,8 +98,8 @@
 
   
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Gateway" />
-  <meta name="twitter:description" content="Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, connector approval, a binding, and switching an environment to Gateway observation." />
+  <meta name="twitter:title" content="Install and enroll a Gateway - Secrets Bridge" />
+  <meta name="twitter:description" content="Install a Release 1 Gateway for Argo CD observation: a read-only Argo CD account, one-time enrollment, the Helm chart, connector approval and bindings." />
   <meta name="twitter:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   
@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Gateway","description":"Install and enroll a Release 1 Gateway: a read-only Argo CD account, a one-time enrollment token, the identity Secret, the Helm chart, connector approval, a binding, and switching an environment to Gateway observation.","url":"https://secrets-bridge.io/latest/operations/gateway/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/gateway/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-21T21:52:08+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Gateway","item":"https://secrets-bridge.io/latest/operations/gateway/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Install and enroll a Gateway - Secrets Bridge","description":"Install a Release 1 Gateway for Argo CD observation: a read-only Argo CD account, one-time enrollment, the Helm chart, connector approval and bindings.","url":"https://secrets-bridge.io/latest/operations/gateway/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/gateway/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-23T15:12:19+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Gateway","item":"https://secrets-bridge.io/latest/operations/gateway/"}]}]}</script>
   
 
   </head>
@@ -517,6 +517,8 @@
       
         
       
+        
+      
     
     
     
@@ -700,6 +702,34 @@
     
   
     Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../overview/faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
   
 
     
