@@ -1,0 +1,146 @@
+# Permissions catalog
+
+The canonical list of permission strings used by `auth.Require(perm)`.
+
+Source: [`api/internal/auth/permissions.go`](https://github.com/secrets-bridge/api/blob/main/internal/auth/permissions.go).
+The api also serves the live catalog at
+`GET /api/v1/permissions` (with descriptions), cached for 5
+minutes. The UI's Roles admin page hydrates from there so the
+chip picker stays in sync with what the api actually understands.
+
+## Seed roles
+
+Three roles ship as system seeds (migration 0005). Operators can
+edit their permission lists but can't delete the rows.
+
+| Role | Permissions | Notes |
+|---|---|---|
+| `admin` | `role.edit`, `user_role.edit`, `workflow.edit`, `policy.edit`, `agent.mint`, `agent.revoke`, `secret.request`, `secret.approve`, `audit.read`, `auth.sso.edit`, `gateway.mint`, `gateway.revoke`, `gateway.list`, `gateway.bind` | `auth.sso.edit` is added by migration 0043, so the bootstrap admin can connect Google from the console. The four `gateway.*` permissions are added by migration 0047 and go to no other seed role. |
+| `approver` | `secret.approve`, `audit.read` | |
+| `developer` | `secret.request`, `secret.reveal.direct`, `audit.read` | |
+| `value_provider` | `secret.value.provide` | Slice N seed, used for the [cross-team flow](../operations/cross-team-requests.md). Assignment **must** carry a `team_id` scope; the Assignments form gates global grants behind a type-to-confirm. |
+| `security_approver` | `secret.security.approve` | Slice N seed. Holder can cast the security vote on cross-team requests where the bound workflow has `requires_security_approval=true`. |
+| `provider_connection_binder` | `integration.bind` | EPIC Q seed: section-head capability for [self-service provider connection binding](../operations/provider-connections.md#scoped-bindings-integrationbind). Assignment carries a `team_id` (covers descendant project subtree) or `project_id` (one project) scope. **Not** auto-granted to `integration.edit` holders; operators grant explicitly. |
+| `policy_author` | `policy.author` | EPIC R seed (api#108): section-head capability for [scoped non-prod policy authoring](../operations/policy-templates.md#scoped-policy-authoring-policyauthor). Assignment carries `team_id` or `project_id` scope. **Not** auto-granted to `policy.edit` holders; operators grant explicitly. Scoped rules are bounded `priority < platform_reserved_priority` (default `9000`, admin-configurable per [R-follow-up #2 / api#113](../operations/policy-templates.md#adjusting-the-reserved-priority-band)) and rejected against any selector that resolves to a prod environment. R-follow-up #3 (api#114) added the team-anchored authoring surface: a `team_id`-scoped grant lets the holder author rules at `/teams/:teamID/policy-rules` that cascade down to every descendant project. |
+
+## Catalog by group
+
+### RBAC
+
+| Permission | Description |
+|---|---|
+| `role.edit` | Create / update / delete roles. |
+| `user_role.edit` | Grant / revoke role assignments to users. A **global** grant also lists, approves and declines accounts [waiting for approval](../operations/google-sign-in.md#approve-new-accounts) (`/users/pending`, `/users/:id/approve`, `/users/:id/decline`); a team-scoped grant gets 403 there. |
+
+### Workflows
+
+| Permission | Description |
+|---|---|
+| `workflow.edit` | Create / update / delete workflow definitions. R-follow-up #1 (api#112) added the `scoped_policy_authorable` flag. This permission also gates the toggle that exposes a workflow to the scoped policy author surface (`/projects/:id/policies`). Default-deny; admin curates explicitly. |
+| `policy.edit` | Create / update / delete policy rules. Global scope: affects every project's resolution. Does NOT auto-cover `policy.author` server-side (EPIC R, api#108). Operators grant scoped authoring explicitly via the `policy_author` system role. R-follow-up #2 (api#113) extended this permission to also gate the [Platform settings](api-endpoints.md#platform-settings-r-follow-up-2-api113) admin surface. R-follow-up #3 (api#114) extended the `/admin/policies` surface with team-anchored rule support; platform admins retain full lifecycle control over team rules via the admin path while the team URL family stays `policy.author`-only. `policy.edit` does NOT auto-allow on `/teams/:id/policies` or `/projects/:id/policies`; both scoped surfaces are `policy.author` only by design. R-follow-up #5 (api#132) added the admin [policy rule history](api-endpoints.md#policy-rule-change-history-r-follow-up-5-api132) endpoint at `/policies/:ruleID/history`, gated by this permission. Post-delete forensic visibility is admin-only: the admin history endpoint checks the audit chain for existence (not `policyRepo.Get`), so admins retain visibility into deleted rules. Scoped paths return 404 after delete. |
+| `policy.author` | Author scoped policy rules for non-prod environments. Two scope flavors: **project-scoped** (EPIC R, api#108) via `/projects/:projectID/policy-rules`, and **team-scoped** (R-follow-up #3, api#114) via `/teams/:teamID/policy-rules`; the latter cascades the rule down to every descendant project of the team subtree. Grants scoped to a `team_id` expand through the subtree via the existing team-aware resolver. Refuses prod env selectors, priority at or above the platform-reserved band (cap admin-configurable via R-follow-up #2 / api#113; default `9000`), and edits to platform global rules. Granted via the `policy_author` system seed role. R-follow-up #5 (api#132) added the scoped [policy rule history](api-endpoints.md#policy-rule-change-history-r-follow-up-5-api132) endpoints; `policy.author` covering the URL anchor gates the View. Scoped authors lose history visibility at delete time (the rule itself is checked, not the audit chain). |
+
+### Agents
+
+| Permission | Description |
+|---|---|
+| `agent.mint` | Create one-time agent enrollment tokens for a provider connection, and revoke unused ones. Also gates the legacy direct mint (`POST /api/v1/agents`), which stays disabled unless the dev-only `SB_ALLOW_DIRECT_AGENT_MINT` is on. |
+| `agent.revoke` | Revoke an agent. Heartbeats stop being accepted. |
+| `agent.list` | (Reserved) List agents in the projection. Today this is open to any signed-in user. |
+
+### Gateways
+
+Added with the [Gateway](../components/gateway.md) registry (migration 0047).
+
+| Permission | Description |
+|---|---|
+| `gateway.mint` | Create a Gateway record and create or revoke its one-time enrollment tokens. Every change also needs a fresh second factor. |
+| `gateway.revoke` | Revoke a Gateway, or disable and enable it. Its heartbeats, catalog uploads and task calls are refused while it is revoked or disabled. Needs a fresh second factor. |
+| `gateway.list` | List Gateways with their replicas, advertised connectors and targets, bindings, token metadata and observation tasks. Never credentials. |
+| `gateway.bind` | Approve a Gateway's advertised connectors, create or delete bindings from a secret scope to an advertised target, and read or set an environment's observation source. Does not imply `integration.bind`, and `integration.bind` does not imply it. Needs a fresh second factor for writes. |
+
+### Secrets
+
+| Permission | Description |
+|---|---|
+| `secret.request` | Submit a read or patch request. |
+| `secret.approve` | Vote on a pending request (approve or reject). |
+| `secret.reveal.direct` | (Slice L4) Eligibility for the auto-executed direct-reveal path. The matched `policy_rules` row MUST ALSO have `direct_reveal_allowed=true` AND the environment's `kind` must be `non_prod`. Without all three, the user is routed through the standard request flow. PROD direct-reveal is impossible by construction. |
+| `secret.value.provide` | (Slice N) Holder appears in the [cross-team inbox](../operations/cross-team-requests.md) for the team scoped on the grant and can fill cross-team requests targeting it. **Team-scoped**: the grant carries `team_id` in `user_roles.scope`. The SPA sidebar's Inbox entry is fail-closed on this permission. |
+| `secret.security.approve` | (Slice N) Holder can cast the security vote on cross-team requests where the bound workflow has `requires_security_approval=true`. **Global in v1**; per-project / per-environment scoping is deferred. Adding this permission to a role triggers a type-to-confirm gate in the SPA Roles editor. |
+
+### Authentication
+
+| Permission | Description |
+|---|---|
+| `auth.sso.edit` | Connect and manage sign-in providers such as [Google](../operations/google-sign-in.md), and set the install's public address and the waiting limit. **Global only**: a scoped grant gets 403. Every write, the secret replacement, Test, Turn on and Turn off also need a fresh second factor. Whoever holds it decides who can sign in, so grant it like an admin permission. |
+
+A sign-in provider's **default role** (used only when approval is off) may hold only `secret.list`, `secret.request` and `audit.read`. The api refuses a role with anything else, and refuses to widen a role that is in use as a default (`409 role_is_sso_default`).
+
+### Observability
+
+| Permission | Description |
+|---|---|
+| `audit.read` | Read the immutable audit event log. |
+
+### Integrations
+
+| Permission | Description |
+|---|---|
+| `integration.edit` | Manage the provider connection lifecycle: create, update, delete, discover now and bindings (EPIC P, api#92). Argo CD is configured on a [Gateway](../operations/gateway.md) under the `gateway.*` permissions, not here. It does **not** auto-cover `integration.bind` server-side; the SPA's capability helper unifies them in the UI but the api treats each endpoint family strictly. |
+| `integration.bind` | Bind / unbind self-service-bindable provider connections on projects + environments you cover (EPIC Q, api#99). Scoped via the existing team-aware resolver. Never auto-covered by `integration.edit`; grant explicitly via the `provider_connection_binder` system role (or any custom role carrying this permission). Refuses prod envs, disabled connections, and connections without `self_service_bindable=true`. |
+
+## Scoped permissions (today)
+
+Most permissions today gate via `auth.Require(perm)`: the user
+holds the permission or they don't. A few are intended to gate
+via `auth.RequireScoped(perm, scopeFn)` so a grant can be narrowed
+to a single project / environment / secret-ref prefix / provider:
+
+- `secret.request` (typical scope: `{project_id, environment}`)
+- `secret.approve` (typical scope: `{secret_ref_prefix, environment}`)
+- `secret.value.provide` (typical scope: `{team_id}`, required for the seed `value_provider` role)
+- `agent.mint` (typical scope: `{cluster}`)
+- `agent.revoke` (typical scope: `{cluster}`)
+
+The middleware shape is already in place; the actual scoped
+gating on each endpoint lands as part of
+[api#27](https://github.com/secrets-bridge/api/issues/27).
+
+## How the UI consumes the catalog
+
+The Roles admin page calls `GET /api/v1/permissions` on mount and
+hydrates the chip picker from the response. The catalog includes
+the group label so the chips render in the same RBAC / Workflows /
+Agents / Secrets / Authentication / Observability / Integrations groupings.
+
+If a role contains a permission string the catalog doesn't know
+about (e.g. a legacy custom permission from before
+[api#32](https://github.com/secrets-bridge/api/issues/32) shipped
+the catalog), the UI renders it in a separate **Custom / unknown**
+group at the bottom, so old roles stay editable.
+
+## How to add a permission
+
+```go
+// In api/internal/auth/permissions.go:
+
+const (
+    // ...existing
+    PermSomethingNew Permission = "something.new"
+)
+
+var Catalog = []Descriptor{
+    // ...existing
+    {PermSomethingNew, "Group Name", "What this permission gates."},
+}
+```
+
+That's it: `Catalog` is the source of truth; the `Keys()` /
+`IsKnown()` helpers + the HTTP endpoint + the drift-guard test all
+pick it up automatically.
+
+A drift-guard test asserts that **every permission string
+referenced in seed migrations is present in the Catalog**.
+Otherwise the seed roles would request unknown permissions on
+first boot.

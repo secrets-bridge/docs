@@ -1,0 +1,60 @@
+# Components
+
+The project is split into nine repositories under the
+[`secrets-bridge`](https://github.com/secrets-bridge) GitHub
+organisation. Each one has a single responsibility; the dependency
+direction is one-way and reviewable.
+
+| Repo | Language | Holds |
+|---|---|---|
+| [`core`](core.md) | Go | Provider interface + connectors, shared types. **Infra-free: no Postgres, no Redis.** |
+| [`api`](api.md) | Go (Fiber v3) | Control Plane API. Owns Postgres + Redis + the workflow/RBAC domain. |
+| [`worker`](worker.md) | Go | Background sweepers (including the Gateway observation sweepers), periodic discovery scheduler. No Argo CD client. |
+| [`agent`](agent.md) | Go | Outbound-only execution agent. **No Postgres / Redis dependency.** |
+| [`controller`](controller.md) | Go (kubebuilder) | Kubernetes CRD reconciler. Receives the v0.1.0 operator. |
+| [`gateway`](gateway.md) | Go | Optional, outbound-only, read-only observation of Argo CD rollout state. **No Postgres / Redis, no Kubernetes client in Release 1.** Release 1 in progress. |
+| [`ui`](ui.md) | React + TS + Vite | SPA dashboard. No SSR. |
+| [`charts`](https://github.com/secrets-bridge/charts) | Helm / YAML | Helm charts for the control plane, the agent and the Gateway ([production deployment](../operations/index.md#production-deployment)). |
+| `docs` | mkdocs-material | This site. |
+
+## Dependency graph
+
+```mermaid
+flowchart LR
+    core["core<br/>provider interface +<br/>shared types"]
+    api["api<br/>Postgres + Redis<br/>workflow + audit"]
+    worker["worker<br/>sweepers"]
+    agent["agent<br/>outbound only"]
+    controller["controller<br/>K8s reconciler"]
+    gateway["gateway<br/>outbound only,<br/>read-only"]
+    ui["ui<br/>React SPA"]
+    charts["charts<br/>Helm bundle"]
+
+    api -->|"imports"| core
+    worker -->|"imports"| api
+    worker -->|"imports via pkg"| core
+    agent -->|"imports"| core
+    agent -.->|"HTTPS only"| api
+    controller -->|"imports"| core
+    ui -.->|"HTTPS only"| api
+    gateway -.->|"HTTPS only"| api
+    charts -.->|"deploys"| api
+    charts -.->|"deploys"| worker
+    charts -.->|"deploys"| agent
+    charts -.->|"deploys"| controller
+    charts -.->|"deploys"| ui
+    charts -.->|"deploys"| gateway
+```
+
+The forbidden edges:
+
+- `agent` → `api/internal/storage` (would pull Postgres into the
+  workload network)
+- `agent` → `api/internal/runtime` (would pull Redis)
+- `controller` → `api/pkg/storage` (same reasoning)
+- `core` → anything that imports `database/sql` / `redis/*`
+- `gateway` → `api`, `worker`, `agent`, `controller`, any database,
+  Redis or KV driver, or `k8s.io/client-go`
+
+CI in each repo greps `go.sum` to enforce these directions; the
+build fails if a forbidden module path appears.

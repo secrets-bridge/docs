@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://secrets-bridge.io/latest/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-10-18</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/components/</loc>
@@ -10,7 +10,7 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/components/agent/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-10-16</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/components/api/</loc>
@@ -18,11 +18,11 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/components/controller/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/components/core/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/components/gateway/</loc>
@@ -38,19 +38,19 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/design/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-10-18</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/design/assets/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-10-18</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/design/brand-voice/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-10-18</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/design/tokens/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-10-18</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/</loc>
@@ -58,7 +58,7 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/agent-onboarding/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-10-16</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/authentication/</loc>
@@ -74,11 +74,11 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/cross-team-requests/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/docker-compose/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-10-20</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/gateway-cutover/</loc>
@@ -90,31 +90,31 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/google-sign-in/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-10-19</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/object-storage/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-10-19</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/oidc-authentik/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/policy-templates/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-10-20</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/project-environments/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/provider-connections/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-10-16</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/reveal-sessions/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/troubleshooting/</loc>
@@ -122,7 +122,7 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/verifying-releases/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-10-20</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/overview/</loc>
@@ -134,7 +134,7 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/overview/glossary/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-10-20</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/overview/product-status/</loc>
@@ -142,7 +142,7 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/overview/teams-and-section-heads/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/overview/threat-model/</loc>
@@ -150,7 +150,7 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/reference/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-08-14</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/reference/api-endpoints/</loc>
@@ -166,6 +166,6 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/reference/providers/</loc>
-         <lastmod>2026-10-21</lastmod>
+         <lastmod>2026-10-18</lastmod>
     </url>
 </urlset>

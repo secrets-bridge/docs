@@ -7,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap.">
+        <meta name="description" content="Secrets Bridge adds access requests, approvals and audit to the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
@@ -78,13 +78,17 @@
   
 
   
-  <link rel="canonical" href="https://secrets-bridge.io/latest/operations/project-environments/">
 
   
-  <meta property="og:type" content="website" />
+  
+  <link rel="alternate" type="text/markdown" href="https://secrets-bridge.io/latest/operations/project-environments.md" title="Project environments (Markdown)">
+  
+
+  
+  <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Secrets Bridge" />
   <meta property="og:title" content="Project environments" />
-  <meta property="og:description" content="Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap." />
+  <meta property="og:description" content="Secrets Bridge adds access requests, approvals and audit to the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/operations/project-environments/" />
   <meta property="og:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
@@ -95,7 +99,7 @@
   
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Project environments" />
-  <meta name="twitter:description" content="Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap." />
+  <meta name="twitter:description" content="Secrets Bridge adds access requests, approvals and audit to the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider." />
   <meta name="twitter:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   
@@ -108,28 +112,14 @@
   <meta name="theme-color" content="#17191E" media="(prefers-color-scheme: dark)" />
 
   
-  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  
+  
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  
 
   
   
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "TechArticle",
-    "headline": "Project environments",
-    "description": "Unified secrets control plane for approvals, RBAC, audit, and least-privilege agent execution across your secrets providers. AWS/Vault live today; Azure/GCP roadmap.",
-    "url": "https://secrets-bridge.io/latest/operations/project-environments/",
-    "image": "https://secrets-bridge.io/latest/assets/og-banner.png",
-    "publisher": {
-      "@type": "Organization",
-      "name": "Secrets Bridge",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://secrets-bridge.io/latest/assets/og-banner.png"
-      }
-    }
-  }
-  </script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Project environments","description":"Secrets Bridge adds access requests, approvals and audit to the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider.","url":"https://secrets-bridge.io/latest/operations/project-environments/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/project-environments/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-08-14T13:32:55+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Project environments","item":"https://secrets-bridge.io/latest/operations/project-environments/"}]}]}</script>
   
 
   </head>
@@ -2411,6 +2401,9 @@ ensures no orphaned bindings survive.</p>
 
 
 
+  
+  
+
 
 
 
@@ -2483,7 +2476,7 @@ ensures no orphaned bindings survive.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "navigation.tracking", "navigation.instant", "navigation.instant.progress", "toc.follow", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.action.edit", "content.action.view", "search.suggest", "search.highlight", "search.share", "announce.dismiss"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "navigation.tracking", "navigation.instant", "navigation.instant.progress", "toc.follow", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.action.edit", "content.action.view", "search.suggest", "search.highlight", "search.share", "announce.dismiss"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
