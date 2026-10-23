@@ -1,18 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Redirecting</title>
-  <noscript>
-    <meta http-equiv="refresh" content="1; url=latest/" />
-  </noscript>
+  <!-- The page / serves: mike set-default renders it with href="latest/".
+       GitHub Pages can't send a 301, so it is the next best thing:
+       a canonical link plus an immediate refresh, which search engines
+       treat as a permanent redirect, and the preview tags link
+       previews read, since their crawlers don't follow redirects.
+       Only used for /, so the absolute URLs name the site root. -->
+  <title>Secrets Bridge: access control for the secrets you keep</title>
+  <meta name="description" content="Secrets Bridge adds access requests, approvals and audit to the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider.">
+  <link rel="canonical" href="https://secrets-bridge.io/latest/">
+  <meta http-equiv="refresh" content="0; url=latest/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Secrets Bridge">
+  <meta property="og:title" content="Secrets Bridge: access control for the secrets you keep">
+  <meta property="og:description" content="Secrets Bridge adds access requests, approvals and audit to the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider.">
+  <meta property="og:url" content="https://secrets-bridge.io/">
+  <meta property="og:image" content="https://secrets-bridge.io/latest/assets/og-banner.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="latest/assets/favicon.svg" type="image/svg+xml">
   <script>
-    window.location.replace(
-      "latest/" + window.location.search + window.location.hash
-    );
+    window.location.replace("latest/" + window.location.search + window.location.hash);
   </script>
 </head>
 <body>
-  Redirecting to <a href="latest/">latest/</a>...
+  <p>Redirecting to <a href="latest/">the Secrets Bridge documentation</a>.</p>
 </body>
 </html>
