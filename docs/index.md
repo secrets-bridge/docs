@@ -2,8 +2,8 @@
 title: Secrets Bridge
 # Quoted: the value contains a `:`, which YAML would otherwise read as a
 # second mapping and drop the whole frontmatter.
-seo_title: "Secrets Bridge: access control for the secrets you already keep"
-description: "Secrets Bridge adds access requests, approvals, audit and agent execution around the secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider."
+seo_title: "Secrets Bridge: access control for secrets you already keep"
+description: "Secrets Bridge adds access requests, approvals and audit around secrets you keep in AWS Secrets Manager and HashiCorp Vault. Values stay in your provider."
 hide:
   - navigation
   - toc

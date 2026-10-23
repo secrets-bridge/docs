@@ -1,6 +1,7 @@
 ---
 title: Operations
-description: Deploy, bootstrap, troubleshoot. The pre-production hardening checklist plus the audit-log queries you'll lean on day two.
+seo_title: "Deploy and operate Secrets Bridge with Helm"
+description: "Run Secrets Bridge in production: install the Helm charts from GHCR, what you provide around them, and the hardening checklist before you expose it."
 ---
 
 # Operations

@@ -1,6 +1,6 @@
 ---
 title: Brand voice
-description: "How Secrets Bridge describes itself: say what we keep, describe the mechanism, label maturity exactly."
+description: "How Secrets Bridge describes itself: say what we keep, describe the mechanism and label maturity exactly, with examples and the words we avoid."
 ---
 
 # Brand voice

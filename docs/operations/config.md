@@ -1,3 +1,7 @@
+---
+description: "Every Secrets Bridge environment variable for the api, agent, worker, controller and Gateway, with defaults, retired settings and insecure dev switches."
+---
+
 # Configuration reference
 
 Every environment variable across `api` / `agent` / `worker` /

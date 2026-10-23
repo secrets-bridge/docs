@@ -1,6 +1,6 @@
 ---
 title: Gateway cutover
-description: "Upgrade an install that used the control-plane Argo CD poller to Gateway-only observation: bind a Gateway first, what migration 0049 removes, rotating the Argo CD token, cleaning up settings and egress, and why rollback does not restore the poller."
+description: "Move an install from the retired control-plane Argo CD poller to Gateway observation: bind Gateways first, upgrade, rotate the Argo CD token, clean up."
 ---
 
 # Gateway cutover

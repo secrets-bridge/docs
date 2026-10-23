@@ -1,3 +1,7 @@
+---
+description: "The infra-free Go library behind Secrets Bridge services: the Provider interface with its metadata and value split, Vault and AWS connectors and redaction."
+---
+
 # Core (shared library)
 
 Repo: [`secrets-bridge/core`](https://github.com/secrets-bridge/core)

@@ -1,6 +1,6 @@
 ---
 title: "Authentication"
-description: "Cookie-only session model, account lockout, OIDC sign-in, app-MFA enrollment + step-up, and the break-glass posture."
+description: "How Secrets Bridge signs users in: cookie-only sessions, account lockout, OIDC with group-to-role mapping, MFA step-up with TOTP or WebAuthn, break-glass."
 ---
 
 # Authentication

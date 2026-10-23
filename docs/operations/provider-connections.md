@@ -1,3 +1,7 @@
+---
+description: "Register HashiCorp Vault or AWS Secrets Manager as a provider connection, bind it to projects and environments, and run discovery. It holds no credentials."
+---
+
 # Provider connections
 
 A **provider connection** is the Control Plane's metadata registry for an

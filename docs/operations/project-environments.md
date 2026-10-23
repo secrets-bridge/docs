@@ -1,3 +1,7 @@
+---
+description: "Project environments in Secrets Bridge: the non_prod and prod kind that gates direct reveal, why it is separate from type, the backfill rule and the API."
+---
+
 # Project environments
 
 Slice L introduced first-class environments to the Secrets Bridge data

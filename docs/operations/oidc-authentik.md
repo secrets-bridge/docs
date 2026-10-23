@@ -1,6 +1,6 @@
 ---
 title: "OIDC with Authentik"
-description: "Step-by-step Authentik setup for Secrets Bridge, application, scopes, group claim, WebAuthn enrolment."
+description: "Set up Authentik as the OIDC provider for Secrets Bridge, step by step: the application, scopes, group claim, MFA, step-up and back-channel logout."
 ---
 
 # OIDC with Authentik

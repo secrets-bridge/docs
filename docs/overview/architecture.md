@@ -1,3 +1,7 @@
+---
+description: "Secrets Bridge architecture: control plane, outbound-only agent and providers, trust boundaries, the read, patch and discovery flows, and wire encryption."
+---
+
 # Architecture
 
 The platform splits into three loosely-coupled tiers and one

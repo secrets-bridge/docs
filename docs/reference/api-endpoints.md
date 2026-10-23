@@ -1,3 +1,7 @@
+---
+description: "Every HTTP endpoint the Secrets Bridge api exposes and its auth gate: sign-in, agents, Gateways, access requests, reveal sessions, audit and policy rules."
+---
+
 # HTTP API endpoints
 
 Every route the api exposes today. Auth column shows what's

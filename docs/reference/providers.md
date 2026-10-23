@@ -1,3 +1,7 @@
+---
+description: "Secret providers the Secrets Bridge agent supports: HashiCorp Vault KV v2 and AWS Secrets Manager, with auth and config. Azure and GCP are on the roadmap."
+---
+
 # Providers supported
 
 The agent's `ResolverByType` dispatches to one resolver per

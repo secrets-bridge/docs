@@ -1,3 +1,7 @@
+---
+description: "The hard rules Secrets Bridge never breaks, how tests, schema triggers and CI enforce each one, the attacks it defends against and the gaps still open."
+---
+
 # Threat model & hard rules
 
 These are the rules the project never breaks. They're enforced

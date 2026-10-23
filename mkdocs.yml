@@ -188,6 +188,7 @@ nav:
       - Teams and section heads: overview/teams-and-section-heads.md
       - Threat model & hard rules: overview/threat-model.md
       - Glossary: overview/glossary.md
+      - FAQ: overview/faq.md
   - Components:
       - components/index.md
       - Control Plane API: components/api.md

@@ -1,3 +1,7 @@
+---
+description: "First steps on a new Secrets Bridge install: seed the local admin, sign in, rotate its password, enroll an agent with a one-time token, run a read request."
+---
+
 # Bootstrap & first sign-in
 
 After the api starts for the first time, the platform has to be

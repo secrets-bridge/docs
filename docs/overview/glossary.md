@@ -1,3 +1,7 @@
+---
+description: "Definitions of Secrets Bridge terms used in the docs and code: access request, agent, audit event, policy rule, secret wrap, single-shot and workflow."
+---
+
 # Glossary
 
 Terms used across the docs, the code, and the BRD.

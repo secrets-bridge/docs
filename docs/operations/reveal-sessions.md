@@ -1,3 +1,7 @@
+---
+description: "How Secrets Bridge reveal sessions work: a time-limited window to view approved secret values, the policy-driven TTL, the hard rules and operator queries."
+---
+
 # Reveal sessions
 
 Slice M introduced **reveal sessions**, the time-limited bulk-reveal

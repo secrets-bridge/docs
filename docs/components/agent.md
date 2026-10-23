@@ -1,3 +1,7 @@
+---
+description: "The outbound-only Secrets Bridge agent inside your boundary: CI-enforced rules, enrollment at boot, configuration, executors and Vault and AWS resolvers."
+---
+
 # Agent
 
 Repo: [`secrets-bridge/agent`](https://github.com/secrets-bridge/agent)

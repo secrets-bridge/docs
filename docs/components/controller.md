@@ -1,3 +1,7 @@
+---
+description: "The Secrets Bridge Kubernetes controller: a SecretsSync CRD reconciler that validates provider refs and leaves sync work to the agent via the job queue."
+---
+
 # Controller
 
 Repo: [`secrets-bridge/controller`](https://github.com/secrets-bridge/controller)
