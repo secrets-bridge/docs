@@ -192,6 +192,7 @@ source for this table.
 | `SB_GATEWAY_LEASE_MARGIN` | no | `3s` | A pass stops this long before its lease expires |
 | `SB_GATEWAY_PASS_TIMEOUT` | no | `30s` | Upper bound for one pass |
 | `SB_GATEWAY_CP_UNREACHABLE_AFTER` | no | `2m` | The Gateway turns not ready when no heartbeat has been accepted for this long |
+| `SB_GATEWAY_PRIVILEGE_RECHECK_INTERVAL` | no | `5m` | How often every connector self-check and every Argo CD can-i probe runs again. A value under `1m` refuses the start. The chart does not set it |
 | `SB_LOG_LEVEL` | no | `info` | `debug`, `info`, `warn` or `error` |
 
 The Gateway ignores `HTTP_PROXY` and `HTTPS_PROXY` for every connection, so a
@@ -201,8 +202,10 @@ Each entry in the connectors file has a `name` (a DNS label the control plane
 binds to), a `kind` and `settings`. For `argocd` the settings are `base_url`,
 `token_file` (an absolute path), optional `ca_file`, `tls_server_name` and
 `timeout` (1s to 60s, default 10s), `allowed_projects` (at least one AppProject)
-and `applications` (at least one `{id, name, app_namespace?}`). Unknown fields,
-unknown kinds and duplicate names are refused at load.
+and `applications` (at least one `{id, name, app_namespace?, uid?}`). `uid` is
+the Application's `metadata.uid` as a lower-case UUID. An `id` must not start
+with `d-`, which is reserved for discovered targets. Unknown fields, unknown
+kinds and duplicate names are refused at load.
 
 ## Secret material, naming convention
 
