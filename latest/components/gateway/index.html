@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Gateway: read-only Argo CD observation - Secrets Bridge","description":"The optional Gateway runs in your boundary, reads Argo CD rollout state with GET-only calls and reports it as metadata. Release 1 scope and security model.","url":"https://secrets-bridge.io/latest/components/gateway/","mainEntityOfPage":"https://secrets-bridge.io/latest/components/gateway/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-23T15:12:19+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Components","item":"https://secrets-bridge.io/latest/components/"},{"@type":"ListItem","position":3,"name":"Gateway","item":"https://secrets-bridge.io/latest/components/gateway/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Gateway: read-only Argo CD observation - Secrets Bridge","description":"The optional Gateway runs in your boundary, reads Argo CD rollout state with GET-only calls and reports it as metadata. Release 1 scope and security model.","url":"https://secrets-bridge.io/latest/components/gateway/","mainEntityOfPage":"https://secrets-bridge.io/latest/components/gateway/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-24T14:45:35Z"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Components","item":"https://secrets-bridge.io/latest/components/"},{"@type":"ListItem","position":3,"name":"Gateway","item":"https://secrets-bridge.io/latest/components/gateway/"}]}]}</script>
   
 
   </head>
@@ -2369,8 +2369,16 @@ values or wraps, or hold provider credentials.</p>
 <ul>
 <li>The supported connector kind is <code>argocd</code>. It reads one Application by name
   with <code>GET /api/v1/applications/{name}</code> (with <code>?appNamespace=</code> when the
-  target sets one) and checks its token at boot with
-  <code>GET /api/v1/session/userinfo</code>. Nothing else.</li>
+  target sets one), checks its token at boot with
+  <code>GET /api/v1/session/userinfo</code>, and asks Argo CD's can-i API
+  (<code>GET /api/v1/account/can-i/...</code>) that its token holds no write or other
+  dangerous right. See
+  <a href="../../operations/gateway/#argo-cd-privilege-checks">Argo CD privilege checks</a>.</li>
+<li>An Application's <code>metadata.uid</code> is its identity. A deleted and recreated
+  Application under the same name gets an <code>error</code> observation with code
+  <code>target_identity_changed</code>, never the new object's state. Evidence carries a
+  scoped digest of the uid, never the uid. See
+  <a href="../../operations/gateway/#application-identity">Application identity</a>.</li>
 <li>With only <code>argocd</code> connectors, the Gateway reads no Kubernetes API. It builds
   no Kubernetes client, needs no service-account token and no RBAC, and runs
   no Kubernetes self-check.</li>
@@ -2543,11 +2551,11 @@ start, stops claiming, or stays not ready.</p>
 <tbody>
 <tr>
 <td>GET only to Argo CD</td>
-<td>Each Argo CD client is pinned to the scheme and host of its <code>base_url</code> and allows GET to two paths. Every other method, path and query key is refused before the request leaves the process. <code>resource-tree</code>, <code>managed-resources</code>, <code>manifests</code> and the application list are blocked even though Argo CD's <code>applications, get</code> permission allows them, and so is <code>?refresh=</code>, which would make Argo CD patch the Application. Redirects are refused, proxy variables are ignored, and responses are capped at 2 MiB.</td>
+<td>Each Argo CD client is pinned to the scheme and host of its <code>base_url</code> and allows GET only to exact paths: one Application by name, <code>session/userinfo</code>, the can-i question for each probe it asks, and the application list with exactly one allowed <code>projects</code> value and a fixed <code>fields</code> projection. Nothing in Release 1 calls the list. Every other method, path and query key is refused before the request leaves the process. <code>resource-tree</code>, <code>managed-resources</code>, <code>manifests</code> and the <code>exec</code>, <code>logs</code> and other stream paths are blocked even though Argo CD's <code>applications, get</code> permission allows some of them, and so is <code>?refresh=</code>, which would make Argo CD patch the Application. Redirects are refused, proxy variables are ignored, and an Application response is capped at 2 MiB.</td>
 </tr>
 <tr>
 <td>Least-privilege Argo CD account</td>
-<td>The token needs <code>applications, get</code> and nothing else. It is mounted as a file and re-read when it rotates.</td>
+<td>The token needs <code>applications, get</code> on each allowed <code>&lt;project&gt;/*</code> and nothing else. It is mounted as a file and re-read when it rotates. At boot and every 5 minutes the Gateway asks can-i, for each allowed AppProject and each static target it has read, whether the token may sync, change or delete Applications, exec, read logs, write ApplicationSets or change the AppProject. A <code>yes</code> refuses the start, or stops a running Gateway, with no override. Grants on resource actions (<code>action/...</code>) are not visible to can-i and are left to the integrator's policy review. On Argo CD 2.x, <code>server.rbac.log.enforce.enable: "true"</code> is required. See <a href="../../operations/gateway/#the-minimal-policy">the minimal policy</a>.</td>
 </tr>
 <tr>
 <td>No Secrets access, ever</td>

@@ -42,14 +42,17 @@ that isn't possible, code review is the gate.
 
 ### Gateway (Release 1, in progress)
 
-The [Gateway](../components/gateway.md) is optional and its observation path is
-not merged yet. These rules hold in the merged binary, chart and registry. The
+The [Gateway](../components/gateway.md) is optional. Release 1 is merged and
+has not passed QA. These rules hold in the merged binary, chart and control
+plane. The
 full STRIDE analysis is the
 [Gateway threat model](https://github.com/secrets-bridge/gateway/blob/main/docs/design/threat-model.md).
 
 | Rule | How it's enforced |
 |---|---|
-| The Gateway changes nothing it observes | Argo CD is read through a transport pinned to the configured origin that allows GET to two paths only; every other method, path and query key is refused before the request leaves the process. The control-plane client refuses any route outside the Gateway endpoints |
+| The Gateway changes nothing it observes | Argo CD is read through a transport pinned to the configured origin that allows GET to exact paths only: one Application by name, `session/userinfo`, the fixed can-i questions and a project-scoped application list that nothing in Release 1 calls. Every other method, path and query key is refused before the request leaves the process. The control-plane client refuses any route outside the Gateway endpoints |
+| The Gateway refuses a token that can write | At boot and every 5 minutes the Gateway asks Argo CD's can-i, project-wide and for each static target it has read, about application writes, `exec`, `logs`, ApplicationSet writes and AppProject changes. A `yes` refuses the start or stops the Gateway, and a question that cannot complete fails closed. Limits are listed below |
+| A recreated Application is not the same target | The Gateway treats `metadata.uid` as the identity and answers `target_identity_changed` when it changes. Pinning the uid in the values (`applications[].uid`) makes the check hold across restarts on every replica. Evidence carries a scoped digest, never the uid. The control-plane pin is [api#312](https://github.com/secrets-bridge/api/issues/312), not live yet |
 | The Gateway never reads Kubernetes Secrets | Release 1 has no Kubernetes access: the chart renders no Role and mounts no service-account token. The Release 2 Kubernetes connectors refuse to start if the service account can use any verb on `secrets` or a write verb on what they read, with no override |
 | The control plane cannot redirect the Gateway | A task names a connector id and a target id only. Hosts, AppProjects and Applications come from the Gateway's local configuration |
 | Gateway and agent credentials are separate | Own tables, `X-Gateway-Secret` header and `GatewayAuth` middleware. The secret is stored as a SHA-256 hash and compared in constant time |
@@ -91,6 +94,8 @@ full STRIDE analysis is the
 | Compromised host running the agent | Steal the agent credential (the identity file or `SB_AGENT_SECRET`) | **Open**: the credential is a long-lived bearer secret. Workload identity (SPIFFE / IRSA) and rotation are [agent#12](https://github.com/secrets-bridge/agent/issues/12) + [api#28](https://github.com/secrets-bridge/api/issues/28) |
 | KMS master key rotation breaks the platform | Operator can't rotate without downtime | **Open**: tested runbook is [api#31](https://github.com/secrets-bridge/api/issues/31) |
 | Customer admin who controls a Gateway | Report false Argo CD state for their own requests | **Accepted for Release 1**: evidence is customer-side attestation, and the design labels it with the Gateway that observed it. Signed evidence is [gateway#7](https://github.com/secrets-bridge/gateway/issues/7) and must ship before Gateway evidence is presented as compliance evidence |
+| Integrator who grants the Gateway's Argo CD account a resource action | Restart or change workloads through `action/...` with the Gateway's token | **Residual, integrator review**: can-i cannot see a grant on `action/*` or `action/<group>/<kind>/<name>`, only a wildcard `*` action. The [minimal policy](../operations/gateway.md#the-minimal-policy) is one `applications, get` line per allowed AppProject, and any other line is the integrator's review |
+| Argo CD 2.x with logs RBAC off | Read pod logs through `applications, get` | **Residual, integrator setting**: on 2.x logs follow `applications, get` unless `server.rbac.log.enforce.enable: "true"` is set in `argocd-cm`, and the `logs get` probe answers `no` for the minimal policy while the logs stay readable. The setting is required for a Gateway on 2.x. Argo CD 3.0 and later always enforce logs RBAC |
 | DBA with direct Postgres access | Drop the audit triggers | **Acknowledged**: the schema is a defense; database-level RBAC and audit-log shipping to a separate system are deployment-side responsibilities |
 
 Remaining findings from the 2026-09 security assessment are tracked in

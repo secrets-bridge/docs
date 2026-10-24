@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Troubleshooting","description":"Fix common Secrets Bridge problems: login 401s, Google sign-in, failed agent jobs, stale agents, Vault permission errors, Gateway issues and audit queries.","url":"https://secrets-bridge.io/latest/operations/troubleshooting/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/troubleshooting/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-23T15:12:19+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Troubleshooting","item":"https://secrets-bridge.io/latest/operations/troubleshooting/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Troubleshooting","description":"Fix common Secrets Bridge problems: login 401s, Google sign-in, failed agent jobs, stale agents, Vault permission errors, Gateway issues and audit queries.","url":"https://secrets-bridge.io/latest/operations/troubleshooting/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/troubleshooting/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-24T14:45:35Z"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Troubleshooting","item":"https://secrets-bridge.io/latest/operations/troubleshooting/"}]}]}</script>
   
 
   </head>
@@ -1995,6 +1995,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#observation-error-target_identity_changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation error target_identity_changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#gateway-gets-401-from-the-control-plane" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2537,6 +2548,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#observation-error-target_identity_changed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation error target_identity_changed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#gateway-gets-401-from-the-control-plane" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2938,12 +2960,16 @@ heartbeat and each connector's health.</p>
   refused, so storing the whole enrollment response does not work. The
   <code>jq -ce '{gateway_id, gateway_secret}'</code> step in the install pipeline keeps
   only those two fields.</li>
-<li><code>connector self-check did not pass; not ready until it does</code> with status
-  <code>unauthorized</code> or <code>unreachable</code>: the Argo CD token check
-  (<code>GET /api/v1/session/userinfo</code>) failed. Check that the token Secret holds a
-  valid token for the <code>sb-gateway</code> account, that <code>base_url</code> is right, and that
-  the connector's <code>egress</code> peer lets the pod reach Argo CD. The Gateway retries
-  before each heartbeat and turns ready once the check passes.</li>
+<li><code>refusing to start: connectors: self-check could not prove the credential
+  cannot read secrets: connector "&lt;name&gt;"; ...</code>: at boot, Argo CD could not be
+  reached, the token check (<code>GET /api/v1/session/userinfo</code>) was refused, or a
+  can-i question did not complete. The pod exits and restarts
+  (<code>CrashLoopBackOff</code>). Check that the token Secret holds a valid token for
+  the <code>sb-gateway</code> account, that <code>base_url</code> is right, and that the
+  connector's <code>egress</code> peer lets the pod reach Argo CD. Once Argo CD answers, the next restart passes; see
+  <a href="../gateway/#release-1-an-argo-cd-outage-at-boot-is-a-crash-loop">Release 1: an Argo CD outage at boot is a crash loop</a>.</li>
+<li>After boot, the same failures do not restart the pod. It stays up and not
+  ready, stops claiming, and turns ready once a recheck passes.</li>
 <li><code>connector kind is not enabled in Release 1</code>: the connectors file names
   <code>eso</code> or <code>rollout</code>. Release 1 binds <code>argocd</code> only.</li>
 <li>No heartbeat accepted within <code>SB_GATEWAY_CP_UNREACHABLE_AFTER</code> (default
@@ -2952,13 +2978,24 @@ heartbeat and each connector's health.</p>
   <code>cp.caExistingSecret</code>.</li>
 </ul>
 <h3 id="gateway-refuses-to-start-over-privileged">Gateway refuses to start: over-privileged<a class="headerlink" href="#gateway-refuses-to-start-over-privileged" title="Permanent link">&para;</a></h3>
-<p>A log line <code>refusing to start: connectors: credential is over-privileged</code> (or
-<code>self-check could not prove the credential cannot read secrets</code>) comes from the
-Kubernetes self-check. It runs only for the Release 2 <code>eso</code> and <code>rollout</code>
-connectors, which need <code>SB_GATEWAY_ENABLE_R2_CONNECTORS=true</code>; a Release 1
-Gateway built from the chart has no Kubernetes access and never runs it.</p>
-<p>The Gateway refuses to start when its service account can use any verb on
-<code>secrets</code>, or any write verb on a resource a connector reads, or when a review
+<p>A log line <code>refusing to start: connectors: credential is over-privileged:
+connector "&lt;name&gt;"; ...</code> for an <code>argocd</code> connector comes from the Argo CD
+can-i probe: Argo CD answered <code>yes</code> to one of the questions in
+<a href="../gateway/#argo-cd-privilege-checks">Argo CD privilege checks</a>. The line does
+not say which question, so compare every policy line that applies to the
+Gateway's account or role with that table. Remove the extra right from the
+Argo CD policy of the Gateway's account so that only the
+<a href="../gateway/#the-minimal-policy">minimal policy</a> is left, and check
+<code>policy.default</code> in <code>argocd-rbac-cm</code> too: <code>role:readonly</code> grants <code>logs, get</code>
+and trips this check. The pod restarts until the grant is gone. When a recheck
+finds a grant on a running Gateway, the replica turns not ready, reports
+<code>over_privileged</code> in a heartbeat and stops.</p>
+<p>For an <code>eso</code> or <code>rollout</code> connector, the same message comes from the
+Kubernetes self-check. Those Release 2 connectors need
+<code>SB_GATEWAY_ENABLE_R2_CONNECTORS=true</code>; a Release 1 Gateway built from the
+chart has no Kubernetes access and never runs it.</p>
+<p>The Kubernetes self-check refuses to start when its service account can use
+any verb on <code>secrets</code>, or any write verb on a resource a connector reads, or when a review
 call fails. There is no override. Remove the grant from the RBAC bound to the
 Gateway's service account. When a recheck finds such a grant on a running
 Gateway, it reports <code>over_privileged</code> in a heartbeat before it stops, and the
@@ -2978,6 +3015,14 @@ target. In the detail view, check the connector's <code>status</code>:</p>
 <p>A binding request that fails answers with a closed code. <code>target_not_advertised</code>
 means the <code>argocd_target_id</code> is not an application <code>id</code> in the connectors file,
 and <code>target_stale</code> means the Gateway advertised it once but no longer does.</p>
+<h3 id="observation-error-target_identity_changed">Observation error <code>target_identity_changed</code><a class="headerlink" href="#observation-error-target_identity_changed" title="Permanent link">&para;</a></h3>
+<p>The Application under the target's name is not the object the Gateway pinned:
+it was deleted and recreated, so it has a new <code>metadata.uid</code>. The Gateway
+reports nothing about the new object. If the change is expected, read the new
+uid (<code>kubectl get application -n &lt;namespace&gt; &lt;name&gt; -o jsonpath='{.metadata.uid}'</code>),
+set it as <code>applications[].uid</code> and upgrade the release. Without a <code>uid</code> in the
+values, restart the Gateway. See
+<a href="../gateway/#application-identity">Application identity</a>.</p>
 <h3 id="gateway-gets-401-from-the-control-plane">Gateway gets 401 from the control plane<a class="headerlink" href="#gateway-gets-401-from-the-control-plane" title="Permanent link">&para;</a></h3>
 <p>The log shows <code>control plane refused this gateway; claiming stopped, staying up
 and not ready until restarted</code>. The pod stays up and not ready on purpose, so it

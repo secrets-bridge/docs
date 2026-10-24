@@ -226,6 +226,17 @@ Being built now; not yet live or certified. Do not depend on these yet.
   metadata. Merged, not yet through QA:
     - the Gateway binary (Argo CD connector only, signed image) and its Helm
       chart (no RBAC, no service-account token, egress-only NetworkPolicy);
+    - the Argo CD privilege probe: at boot and every 5 minutes the Gateway
+      asks Argo CD's can-i, for each allowed AppProject and each static
+      target it has read, whether its token can write, exec, read logs, write
+      ApplicationSets or change the AppProject, and refuses to run on any
+      `yes`. An Argo CD outage at boot makes the pod crash-loop. Resource-action
+      grants are not visible to can-i and stay the integrator's policy review.
+      See [Argo CD privilege checks](https://secrets-bridge.io/latest/operations/gateway/#argo-cd-privilege-checks);
+    - Application identity: the Gateway pins each target's `metadata.uid`,
+      answers `target_identity_changed` when it changes, and sends only a
+      scoped digest of it. The control plane accepts both and checks the
+      digest's format;
     - the control-plane registry: enrollment, heartbeat, catalog, connector
       approval, bindings, disable, enable, revoke and the `gateway.*`
       permissions;
@@ -250,6 +261,14 @@ Being built now; not yet live or certified. Do not depend on these yet.
       rows as read-only history, shown on the request page as context only.
       See
       [Gateway cutover](https://secrets-bridge.io/latest/operations/gateway-cutover/).
+
+    Not merged yet: the `applications[].uid` value in the gateway chart
+    ([charts#56](https://github.com/secrets-bridge/charts/pull/56)), and the
+    control-plane identity pin
+    ([api#312](https://github.com/secrets-bridge/api/issues/312)), with which
+    the control plane will pin each static target's identity digest, suspend
+    its bindings when the digest changes, and need a platform admin to
+    re-confirm them.
 
     Argo CD `Healthy` and `Synced` are operational state, never proof that a
     secret reached a workload: a Release 1 task ends `unverified`
@@ -290,6 +309,11 @@ Being built now; not yet live or certified. Do not depend on these yet.
 - Gateway Release 2: External Secrets Operator sync and Deployment rollout
   observation (in the gateway code, off by default and not supported for
   production)
+- Gateway Argo CD discovery and AppProject-scoped bindings (ADR 0002,
+  [gateway#25](https://github.com/secrets-bridge/gateway/issues/25)): the
+  Gateway would list the Applications in its allowed AppProjects, and a
+  binding would cover a project instead of one named target. The transport
+  rule for the list read exists; discovery itself is not built
 - Signed Gateway evidence ([gateway#7](https://github.com/secrets-bridge/gateway/issues/7)),
   required before Gateway evidence is used as compliance evidence
 - Agent connection-scoped job claim
@@ -781,14 +805,17 @@ that isn't possible, code review is the gate.
 
 ### Gateway (Release 1, in progress)
 
-The [Gateway](https://secrets-bridge.io/latest/components/gateway/) is optional and its observation path is
-not merged yet. These rules hold in the merged binary, chart and registry. The
+The [Gateway](https://secrets-bridge.io/latest/components/gateway/) is optional. Release 1 is merged and
+has not passed QA. These rules hold in the merged binary, chart and control
+plane. The
 full STRIDE analysis is the
 [Gateway threat model](https://github.com/secrets-bridge/gateway/blob/main/docs/design/threat-model.md).
 
 | Rule | How it's enforced |
 |---|---|
-| The Gateway changes nothing it observes | Argo CD is read through a transport pinned to the configured origin that allows GET to two paths only; every other method, path and query key is refused before the request leaves the process. The control-plane client refuses any route outside the Gateway endpoints |
+| The Gateway changes nothing it observes | Argo CD is read through a transport pinned to the configured origin that allows GET to exact paths only: one Application by name, `session/userinfo`, the fixed can-i questions and a project-scoped application list that nothing in Release 1 calls. Every other method, path and query key is refused before the request leaves the process. The control-plane client refuses any route outside the Gateway endpoints |
+| The Gateway refuses a token that can write | At boot and every 5 minutes the Gateway asks Argo CD's can-i, project-wide and for each static target it has read, about application writes, `exec`, `logs`, ApplicationSet writes and AppProject changes. A `yes` refuses the start or stops the Gateway, and a question that cannot complete fails closed. Limits are listed below |
+| A recreated Application is not the same target | The Gateway treats `metadata.uid` as the identity and answers `target_identity_changed` when it changes. Pinning the uid in the values (`applications[].uid`) makes the check hold across restarts on every replica. Evidence carries a scoped digest, never the uid. The control-plane pin is [api#312](https://github.com/secrets-bridge/api/issues/312), not live yet |
 | The Gateway never reads Kubernetes Secrets | Release 1 has no Kubernetes access: the chart renders no Role and mounts no service-account token. The Release 2 Kubernetes connectors refuse to start if the service account can use any verb on `secrets` or a write verb on what they read, with no override |
 | The control plane cannot redirect the Gateway | A task names a connector id and a target id only. Hosts, AppProjects and Applications come from the Gateway's local configuration |
 | Gateway and agent credentials are separate | Own tables, `X-Gateway-Secret` header and `GatewayAuth` middleware. The secret is stored as a SHA-256 hash and compared in constant time |
@@ -830,6 +857,8 @@ full STRIDE analysis is the
 | Compromised host running the agent | Steal the agent credential (the identity file or `SB_AGENT_SECRET`) | **Open**: the credential is a long-lived bearer secret. Workload identity (SPIFFE / IRSA) and rotation are [agent#12](https://github.com/secrets-bridge/agent/issues/12) + [api#28](https://github.com/secrets-bridge/api/issues/28) |
 | KMS master key rotation breaks the platform | Operator can't rotate without downtime | **Open**: tested runbook is [api#31](https://github.com/secrets-bridge/api/issues/31) |
 | Customer admin who controls a Gateway | Report false Argo CD state for their own requests | **Accepted for Release 1**: evidence is customer-side attestation, and the design labels it with the Gateway that observed it. Signed evidence is [gateway#7](https://github.com/secrets-bridge/gateway/issues/7) and must ship before Gateway evidence is presented as compliance evidence |
+| Integrator who grants the Gateway's Argo CD account a resource action | Restart or change workloads through `action/...` with the Gateway's token | **Residual, integrator review**: can-i cannot see a grant on `action/*` or `action/<group>/<kind>/<name>`, only a wildcard `*` action. The [minimal policy](https://secrets-bridge.io/latest/operations/gateway/#the-minimal-policy) is one `applications, get` line per allowed AppProject, and any other line is the integrator's review |
+| Argo CD 2.x with logs RBAC off | Read pod logs through `applications, get` | **Residual, integrator setting**: on 2.x logs follow `applications, get` unless `server.rbac.log.enforce.enable: "true"` is set in `argocd-cm`, and the `logs get` probe answers `no` for the minimal policy while the logs stay readable. The setting is required for a Gateway on 2.x. Argo CD 3.0 and later always enforce logs RBAC |
 | DBA with direct Postgres access | Drop the audit triggers | **Acknowledged**: the schema is a defense; database-level RBAC and audit-log shipping to a separate system are deployment-side responsibilities |
 
 Remaining findings from the 2026-09 security assessment are tracked in
@@ -1635,8 +1664,16 @@ Release 1 is Argo CD rollout-state observation only
 
 - The supported connector kind is `argocd`. It reads one Application by name
   with `GET /api/v1/applications/{name}` (with `?appNamespace=` when the
-  target sets one) and checks its token at boot with
-  `GET /api/v1/session/userinfo`. Nothing else.
+  target sets one), checks its token at boot with
+  `GET /api/v1/session/userinfo`, and asks Argo CD's can-i API
+  (`GET /api/v1/account/can-i/...`) that its token holds no write or other
+  dangerous right. See
+  [Argo CD privilege checks](https://secrets-bridge.io/latest/operations/gateway/#argo-cd-privilege-checks).
+- An Application's `metadata.uid` is its identity. A deleted and recreated
+  Application under the same name gets an `error` observation with code
+  `target_identity_changed`, never the new object's state. Evidence carries a
+  scoped digest of the uid, never the uid. See
+  [Application identity](https://secrets-bridge.io/latest/operations/gateway/#application-identity).
 - With only `argocd` connectors, the Gateway reads no Kubernetes API. It builds
   no Kubernetes client, needs no service-account token and no RBAC, and runs
   no Kubernetes self-check.
@@ -1756,8 +1793,8 @@ start, stops claiming, or stays not ready.
 
 | Rule | How it holds |
 |---|---|
-| GET only to Argo CD | Each Argo CD client is pinned to the scheme and host of its `base_url` and allows GET to two paths. Every other method, path and query key is refused before the request leaves the process. `resource-tree`, `managed-resources`, `manifests` and the application list are blocked even though Argo CD's `applications, get` permission allows them, and so is `?refresh=`, which would make Argo CD patch the Application. Redirects are refused, proxy variables are ignored, and responses are capped at 2 MiB. |
-| Least-privilege Argo CD account | The token needs `applications, get` and nothing else. It is mounted as a file and re-read when it rotates. |
+| GET only to Argo CD | Each Argo CD client is pinned to the scheme and host of its `base_url` and allows GET only to exact paths: one Application by name, `session/userinfo`, the can-i question for each probe it asks, and the application list with exactly one allowed `projects` value and a fixed `fields` projection. Nothing in Release 1 calls the list. Every other method, path and query key is refused before the request leaves the process. `resource-tree`, `managed-resources`, `manifests` and the `exec`, `logs` and other stream paths are blocked even though Argo CD's `applications, get` permission allows some of them, and so is `?refresh=`, which would make Argo CD patch the Application. Redirects are refused, proxy variables are ignored, and an Application response is capped at 2 MiB. |
+| Least-privilege Argo CD account | The token needs `applications, get` on each allowed `<project>/*` and nothing else. It is mounted as a file and re-read when it rotates. At boot and every 5 minutes the Gateway asks can-i, for each allowed AppProject and each static target it has read, whether the token may sync, change or delete Applications, exec, read logs, write ApplicationSets or change the AppProject. A `yes` refuses the start, or stops a running Gateway, with no override. Grants on resource actions (`action/...`) are not visible to can-i and are left to the integrator's policy review. On Argo CD 2.x, `server.rbac.log.enforce.enable: "true"` is required. See [the minimal policy](https://secrets-bridge.io/latest/operations/gateway/#the-minimal-policy). |
 | No Secrets access, ever | Release 1 has no Kubernetes access at all. For the Release 2 Kubernetes connectors, a boot self-check refuses to start if the service account can use any verb on `secrets`, or any write verb on a resource a connector reads. A failed review call also refuses the boot. There is no override. The check repeats every 5 minutes and stops the Gateway if a grant appears. |
 | Writes only to the control plane | The control-plane client refuses any method or path other than the Gateway endpoints, uses no proxy and never follows redirects. Enrollment refuses any URL that is not `https`. |
 | Credential at rest | The control plane stores a SHA-256 hash of the Gateway secret and compares it in constant time. On the Gateway side the identity is a read-only file. A file that other users can read, or that its group can write, is refused at boot. |
@@ -6318,6 +6355,7 @@ sequenceDiagram
     Op->>K8s: Secret with identity.json
     Op->>K8s: helm install secrets-bridge-gateway
     GW->>Argo: GET /api/v1/session/userinfo
+    GW->>Argo: GET /api/v1/account/can-i/... (each answer must be no)
     GW->>CP: heartbeat and catalog
     Admin->>CP: approve connector, create binding
     Admin->>CP: set the environment's observation source to gateway
@@ -6350,19 +6388,72 @@ data:
   accounts.sb-gateway: apiKey
 ```
 
-Give it `applications, get` on the AppProjects the Gateway may read, and
-nothing else:
+### The minimal policy
+
+The account needs exactly one permission: `applications, get` on each
+AppProject the Gateway may read. Write one line per allowed AppProject, with
+the AppProject name in place of `<project>`, and nothing else:
 
 ```csv
-# argocd-rbac-cm, one line per allowed AppProject
+# argocd-rbac-cm, policy.csv
+p, role:sb-gateway-read, applications, get, <project>/*, allow
+g, sb-gateway, role:sb-gateway-read
+```
+
+For the examples on this page, with one allowed AppProject `tenant-a-uat`:
+
+```csv
 p, role:sb-gateway-read, applications, get, tenant-a-uat/*, allow
 g, sb-gateway, role:sb-gateway-read
 ```
 
-Do not add `sync`, `override`, `action/*`, `update`, `delete`, `exec` or `logs`,
-or anything on clusters, repositories, projects or accounts. The Gateway's
-transport already refuses every request except the two GETs it needs, but the
-token should not carry more than that either.
+`policy.default` in `argocd-rbac-cm` applies to this account too. Leave it
+unset, or point it at a role that grants nothing beyond the lines above. The
+built-in `role:readonly` includes `logs, get, */*`, so with
+`policy.default: role:readonly` the Gateway refuses to start (see
+[Argo CD privilege checks](#argo-cd-privilege-checks)).
+
+### Argo CD 2.x: turn on logs RBAC
+
+On Argo CD 2.x, set this in `argocd-cm`:
+
+```yaml
+# argocd-cm, Argo CD 2.x only
+data:
+  server.rbac.log.enforce.enable: "true"
+```
+
+Without it, Argo CD 2.x does not enforce the `logs` resource, and
+`applications, get` also lets the token read the pod logs of every
+Application it can read. Pod logs often hold secrets. The Gateway's
+`logs, get` probe cannot see this: Argo CD answers `no` to the question while
+the logs are still readable. This setting is required for a Gateway on 2.x.
+From Argo CD 3.0 logs RBAC is always enforced and the setting is removed.
+
+### Rights the account must not have
+
+Do not grant any of the following, on any object. The Gateway asks Argo CD
+about each one that has a probe and refuses to start if the answer is yes.
+
+| Resource | Actions | Why | Probed |
+|---|---|---|---|
+| `applications` | `sync`, `update`, `delete`, `create`, `override`, `action/*`, `rollback`, `invoke` | Changes the Application or what it deploys | Yes, but an `action/...` grant is not visible (see below) |
+| `exec` | `create` | A shell in the Application's pods | Yes |
+| `logs` | `get` | Pod logs often hold secrets | Yes. On 2.x the answer means something only with logs RBAC turned on |
+| `applicationsets` | `create`, `update`, `delete` | ApplicationSets create Applications | Yes |
+| `projects` | `update`, `delete` | Would let the token widen its own AppProject | Yes |
+| `clusters`, `repositories`, `accounts`, `certificates`, `gpgkeys`, `extensions` | any | Not needed | No |
+
+!!! warning "Resource-action grants are your review"
+    No can-i question can detect a grant on a resource action, such as
+    `p, role:x, applications, action/*, <project>/*, allow` or
+    `applications, action/apps/Deployment/restart`. Argo CD's can-i takes the
+    action as one segment from a fixed list, and its matcher does not match
+    the question `action` against a policy action `action/...`. The probe
+    finds such a grant only when the policy action is the wildcard `*`.
+    Your review of the Argo CD policy must check that no line grants the
+    Gateway's account or role anything beyond the minimal policy above,
+    resource actions included.
 
 Generate a token and store it in a Secret without printing it:
 
@@ -6534,6 +6625,7 @@ connectors:
       applications:
         - id: payments-api            # the target id you bind in step 7
           name: payments-api          # the Argo CD Application
+          uid: 6f1c2c1e-0000-4000-8000-0000000000a1   # optional, its metadata.uid
       egress:
         cidrs: [198.51.100.20/32]
         port: 443
@@ -6555,6 +6647,13 @@ value when the image is not pinned, `cp.endpoint` is not `https://`, the
 identity Secret is not named, a connector is incomplete, or a NetworkPolicy peer
 is missing.
 
+`uid` is optional. Set it to the Application's `metadata.uid` so that a
+deleted and recreated Application is refused on every replica, across
+restarts. See [Application identity](#application-identity) for why and how to
+read it. The chart accepts `uid` from the release that includes
+[charts#56](https://github.com/secrets-bridge/charts/pull/56); with an older
+chart, leave it out.
+
 For an Argo CD in the same cluster, use selectors instead of CIDRs, and the
 full list of values, see the
 [chart README](https://github.com/secrets-bridge/charts/blob/main/gateway/README.md).
@@ -6563,7 +6662,10 @@ full list of values, see the
 
 Wait for the pods to turn ready. Readiness runs `gateway healthcheck` inside the
 container, and it passes only after the control plane has accepted a heartbeat
-and the catalog and the Argo CD token check has passed.
+and the catalog, and the Argo CD token check and the
+[privilege checks](#argo-cd-privilege-checks) have passed. If Argo CD cannot be
+reached at boot, refuses the token, or a privilege check does not pass, the pod
+does not become ready: it exits and restarts (`CrashLoopBackOff`).
 
 ```bash
 kubectl -n tenant-a-uat rollout status deploy/secrets-bridge-gateway
@@ -6752,6 +6854,144 @@ On the Gateway's detail panel, **Recent tasks** lists the latest 25 tasks with
 their state, verdict and attempts. With `curl`,
 `GET /api/v1/admin/gateways/$GW_ID/tasks` (needs `gateway.list`) takes
 `?state=` and `?limit=` (1 to 500, default 100).
+
+## Argo CD privilege checks
+
+The Gateway does not trust the policy to be minimal. It asks Argo CD's can-i
+API whether its own token holds the rights listed in
+[Rights the account must not have](#rights-the-account-must-not-have), and
+every answer must be `no`. Each question is
+`GET /api/v1/account/can-i/<resource>/<action>/<object>`. The transport admits
+only these exact paths, built from the fixed lists below and the allowed
+AppProjects and configured Applications.
+
+| Resource | Actions | Project-wide object | Per-target object |
+|---|---|---|---|
+| `applications` | `sync`, `update`, `delete`, `create`, `override`, `action`, `rollback`, `invoke` | `<project>/*` | `<project>/<app>` |
+| `exec` | `create` | `<project>/*` | `<project>/<app>` |
+| `logs` | `get` | `<project>/*` | `<project>/<app>` |
+| `applicationsets` | `create`, `update`, `delete` | `<project>/*` | none |
+| `projects` | `update`, `delete` | `<project>` | none |
+
+When a target sets `appNamespace`, the per-target questions are also asked on
+`<project>/<app-namespace>/<app>`, because only Argo CD 3.4 and later
+normalize that object form.
+
+When they run:
+
+- **Project-wide**, for every allowed AppProject: at boot, before any
+  Application is read, and again at every recheck.
+- **Per static target**: after the first read of the target that passes the
+  uid check, before that observation is returned, and again at every recheck.
+  A grant on one Application or on a narrow glob, such as
+  `tenant-a-uat/payments-*`, does not match the project-wide object
+  `tenant-a-uat/*`, so only the per-target question finds it.
+- **Recheck**: every 5 minutes, together with the rest of the self-check.
+
+How answers are read:
+
+- **`yes`** on any question means the token is over-privileged. There is no
+  override. At boot the Gateway refuses to start and logs
+  `refusing to start: connectors: credential is over-privileged: connector
+  "<name>"; ...`. The line names the connector, not the AppProject or the
+  question. After boot, the replica marks the connector `over_privileged`, turns not ready, stops claiming,
+  reports `over_privileged` in its heartbeat, and stops at its next recheck.
+  The control plane records a `gateway.over_privileged` audit event. A
+  per-target `yes` returns no observation of the target. The pod keeps
+  restarting until you remove the grant; the next restart after that passes.
+- **HTTP 400 on `applications rollback`.** Before Argo CD 3.6, `rollback` is
+  not an RBAC action: can-i answers 400 for it, and the rollback endpoint
+  enforces `sync` instead. The Gateway asks `sync` on the same object first,
+  and accepts the 400 on `rollback` only after `sync` answered `no`. A 400 on
+  any other question fails closed.
+- **A question that cannot complete** (an error, a timeout, any answer other
+  than `yes` or `no`) fails closed. At boot the Gateway refuses to start.
+  After boot the connector stays unverified: nothing is claimed or observed
+  through it, and the replica is not ready, until a later recheck passes.
+
+Known limits, which no can-i question closes:
+
+- **Resource actions.** A grant on `action/*` or `action/<group>/<kind>/<name>`
+  is not visible, as the warning in step 1 says. Your policy review covers it.
+- **`invoke`** is enforced on the `extensions` resource, not on
+  `applications`, so `applications invoke` only catches a wildcard grant.
+- **`logs` on Argo CD 2.x.** Without `server.rbac.log.enforce.enable: "true"`,
+  logs follow `applications get` and the `logs get` question answers `no`.
+  That is why the setting is required on 2.x.
+
+Not asked yet: whether the token can read Applications outside the allowed
+AppProjects (`applications get` on `*/*`). The local allowlist still limits
+what the Gateway reads. That question is planned in
+[gateway#30](https://github.com/secrets-bridge/gateway/issues/30).
+
+### Release 1: an Argo CD outage at boot is a crash loop
+
+The Gateway refuses to start when, at boot, Argo CD cannot be reached, refuses
+the token, or a can-i question does not complete. The log line is
+`refusing to start: connectors: self-check could not prove the credential
+cannot read secrets: connector "<name>"; ...`. It names the connector, not the
+AppProject, and it does not say which of the three failed, so check Argo CD's
+reachability from the pod, the token and the can-i answers in that order. The
+process exits and Kubernetes restarts it with its usual back-off
+(`CrashLoopBackOff`). Nothing is claimed or observed while it is down.
+
+Recovery needs no change to the Gateway. Once Argo CD answers and the token
+works, the next restart passes the checks and the replica turns ready. To start
+sooner after you fix the cause, delete the pod or run
+`kubectl -n tenant-a-uat rollout restart deploy/secrets-bridge-gateway`.
+
+An outage that starts after boot does not restart the pod. The replica turns
+not ready, stops claiming, and recovers on a later recheck.
+
+## Application identity
+
+The Gateway treats an Application's `metadata.uid` as its identity. An
+Application deleted and recreated under the same name is a different object,
+and the Gateway does not report its state under the old target.
+
+- **Per process.** Without a `uid` in the values, each replica pins the uid it
+  reads first for each target and keeps it in memory. A later read that
+  returns another uid is answered with an `error` observation, code
+  `target_identity_changed`, and carries nothing from the new object. A
+  restart forgets the pin, so a replica that starts after the Application was
+  recreated pins the new object without noticing.
+- **Pinned in the values.** With `applications[].uid` set (chart) or `uid` in
+  the connectors file, every replica checks it from its first read, across
+  restarts. This is the recommended setting.
+- **No raw uid leaves your boundary.** Evidence sent to the control plane
+  carries a scoped identity digest (`identity_digest`, `d-` and 26 base32
+  characters) derived from the connector id and the uid, never the uid
+  itself.
+
+Read the uid read-only, from the namespace the Application lives in:
+
+```bash
+kubectl get application -n argocd payments-api -o jsonpath='{.metadata.uid}'
+```
+
+In the Argo CD UI, open the Application's details and read `metadata.uid` from
+its live manifest.
+
+When you recreate an Application on purpose, read the new uid, update
+`applications[].uid` and upgrade the release. The chart rolls the pods when the
+connectors file changes. Without a `uid` in the values, restart the Gateway to
+clear the per-process pin.
+
+!!! note "Control-plane identity pin: coming with api#312"
+    The control plane does not yet pin target identities. Today it checks only
+    the format of `identity_digest` and accepts `target_identity_changed` as an
+    error code. With [api#312](https://github.com/secrets-bridge/api/issues/312)
+    (and the Gateway sending each static target's digest in its catalog,
+    [gateway#30](https://github.com/secrets-bridge/gateway/issues/30)), the
+    control plane will pin the first identity digest it accepts for each
+    static target. A different digest will mark the target
+    `identity_changed`, suspend its bindings (no dispatch, no evidence
+    accepted) and be audited as `gateway.target.identity_changed`. You
+    confirm the new object locally, by setting its uid in
+    `applications[].uid` or by giving the target a new id. A platform admin
+    (global `gateway.bind`, fresh second factor) then re-confirms each
+    suspended binding, audited as `gateway.binding.identity_confirmed`. None
+    of this is live yet.
 
 ## Disable, enable or revoke a Gateway
 
@@ -8049,12 +8289,16 @@ Check the log for the first error:
   refused, so storing the whole enrollment response does not work. The
   `jq -ce '{gateway_id, gateway_secret}'` step in the install pipeline keeps
   only those two fields.
-- `connector self-check did not pass; not ready until it does` with status
-  `unauthorized` or `unreachable`: the Argo CD token check
-  (`GET /api/v1/session/userinfo`) failed. Check that the token Secret holds a
-  valid token for the `sb-gateway` account, that `base_url` is right, and that
-  the connector's `egress` peer lets the pod reach Argo CD. The Gateway retries
-  before each heartbeat and turns ready once the check passes.
+- `refusing to start: connectors: self-check could not prove the credential
+  cannot read secrets: connector "<name>"; ...`: at boot, Argo CD could not be
+  reached, the token check (`GET /api/v1/session/userinfo`) was refused, or a
+  can-i question did not complete. The pod exits and restarts
+  (`CrashLoopBackOff`). Check that the token Secret holds a valid token for
+  the `sb-gateway` account, that `base_url` is right, and that the
+  connector's `egress` peer lets the pod reach Argo CD. Once Argo CD answers, the next restart passes; see
+  [Release 1: an Argo CD outage at boot is a crash loop](https://secrets-bridge.io/latest/operations/gateway/#release-1-an-argo-cd-outage-at-boot-is-a-crash-loop).
+- After boot, the same failures do not restart the pod. It stays up and not
+  ready, stops claiming, and turns ready once a recheck passes.
 - `connector kind is not enabled in Release 1`: the connectors file names
   `eso` or `rollout`. Release 1 binds `argocd` only.
 - No heartbeat accepted within `SB_GATEWAY_CP_UNREACHABLE_AFTER` (default
@@ -8064,14 +8308,26 @@ Check the log for the first error:
 
 ### Gateway refuses to start: over-privileged
 
-A log line `refusing to start: connectors: credential is over-privileged` (or
-`self-check could not prove the credential cannot read secrets`) comes from the
-Kubernetes self-check. It runs only for the Release 2 `eso` and `rollout`
-connectors, which need `SB_GATEWAY_ENABLE_R2_CONNECTORS=true`; a Release 1
-Gateway built from the chart has no Kubernetes access and never runs it.
+A log line `refusing to start: connectors: credential is over-privileged:
+connector "<name>"; ...` for an `argocd` connector comes from the Argo CD
+can-i probe: Argo CD answered `yes` to one of the questions in
+[Argo CD privilege checks](https://secrets-bridge.io/latest/operations/gateway/#argo-cd-privilege-checks). The line does
+not say which question, so compare every policy line that applies to the
+Gateway's account or role with that table. Remove the extra right from the
+Argo CD policy of the Gateway's account so that only the
+[minimal policy](https://secrets-bridge.io/latest/operations/gateway/#the-minimal-policy) is left, and check
+`policy.default` in `argocd-rbac-cm` too: `role:readonly` grants `logs, get`
+and trips this check. The pod restarts until the grant is gone. When a recheck
+finds a grant on a running Gateway, the replica turns not ready, reports
+`over_privileged` in a heartbeat and stops.
 
-The Gateway refuses to start when its service account can use any verb on
-`secrets`, or any write verb on a resource a connector reads, or when a review
+For an `eso` or `rollout` connector, the same message comes from the
+Kubernetes self-check. Those Release 2 connectors need
+`SB_GATEWAY_ENABLE_R2_CONNECTORS=true`; a Release 1 Gateway built from the
+chart has no Kubernetes access and never runs it.
+
+The Kubernetes self-check refuses to start when its service account can use
+any verb on `secrets`, or any write verb on a resource a connector reads, or when a review
 call fails. There is no override. Remove the grant from the RBAC bound to the
 Gateway's service account. When a recheck finds such a grant on a running
 Gateway, it reports `over_privileged` in a heartbeat before it stops, and the
@@ -8093,6 +8349,16 @@ target. In the detail view, check the connector's `status`:
 A binding request that fails answers with a closed code. `target_not_advertised`
 means the `argocd_target_id` is not an application `id` in the connectors file,
 and `target_stale` means the Gateway advertised it once but no longer does.
+
+### Observation error `target_identity_changed`
+
+The Application under the target's name is not the object the Gateway pinned:
+it was deleted and recreated, so it has a new `metadata.uid`. The Gateway
+reports nothing about the new object. If the change is expected, read the new
+uid (`kubectl get application -n <namespace> <name> -o jsonpath=''`),
+set it as `applications[].uid` and upgrade the release. Without a `uid` in the
+values, restart the Gateway. See
+[Application identity](https://secrets-bridge.io/latest/operations/gateway/#application-identity).
 
 ### Gateway gets 401 from the control plane
 

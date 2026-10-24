@@ -77,6 +77,17 @@ Being built now; not yet live or certified. Do not depend on these yet.
   metadata. Merged, not yet through QA:
     - the Gateway binary (Argo CD connector only, signed image) and its Helm
       chart (no RBAC, no service-account token, egress-only NetworkPolicy);
+    - the Argo CD privilege probe: at boot and every 5 minutes the Gateway
+      asks Argo CD's can-i, for each allowed AppProject and each static
+      target it has read, whether its token can write, exec, read logs, write
+      ApplicationSets or change the AppProject, and refuses to run on any
+      `yes`. An Argo CD outage at boot makes the pod crash-loop. Resource-action
+      grants are not visible to can-i and stay the integrator's policy review.
+      See [Argo CD privilege checks](../operations/gateway.md#argo-cd-privilege-checks);
+    - Application identity: the Gateway pins each target's `metadata.uid`,
+      answers `target_identity_changed` when it changes, and sends only a
+      scoped digest of it. The control plane accepts both and checks the
+      digest's format;
     - the control-plane registry: enrollment, heartbeat, catalog, connector
       approval, bindings, disable, enable, revoke and the `gateway.*`
       permissions;
@@ -101,6 +112,14 @@ Being built now; not yet live or certified. Do not depend on these yet.
       rows as read-only history, shown on the request page as context only.
       See
       [Gateway cutover](../operations/gateway-cutover.md).
+
+    Not merged yet: the `applications[].uid` value in the gateway chart
+    ([charts#56](https://github.com/secrets-bridge/charts/pull/56)), and the
+    control-plane identity pin
+    ([api#312](https://github.com/secrets-bridge/api/issues/312)), with which
+    the control plane will pin each static target's identity digest, suspend
+    its bindings when the digest changes, and need a platform admin to
+    re-confirm them.
 
     Argo CD `Healthy` and `Synced` are operational state, never proof that a
     secret reached a workload: a Release 1 task ends `unverified`
@@ -141,6 +160,11 @@ Being built now; not yet live or certified. Do not depend on these yet.
 - Gateway Release 2: External Secrets Operator sync and Deployment rollout
   observation (in the gateway code, off by default and not supported for
   production)
+- Gateway Argo CD discovery and AppProject-scoped bindings (ADR 0002,
+  [gateway#25](https://github.com/secrets-bridge/gateway/issues/25)): the
+  Gateway would list the Applications in its allowed AppProjects, and a
+  binding would cover a project instead of one named target. The transport
+  rule for the list read exists; discovery itself is not built
 - Signed Gateway evidence ([gateway#7](https://github.com/secrets-bridge/gateway/issues/7)),
   required before Gateway evidence is used as compliance evidence
 - Agent connection-scoped job claim

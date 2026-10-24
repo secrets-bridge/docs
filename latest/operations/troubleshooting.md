@@ -209,12 +209,16 @@ Check the log for the first error:
   refused, so storing the whole enrollment response does not work. The
   `jq -ce '{gateway_id, gateway_secret}'` step in the install pipeline keeps
   only those two fields.
-- `connector self-check did not pass; not ready until it does` with status
-  `unauthorized` or `unreachable`: the Argo CD token check
-  (`GET /api/v1/session/userinfo`) failed. Check that the token Secret holds a
-  valid token for the `sb-gateway` account, that `base_url` is right, and that
-  the connector's `egress` peer lets the pod reach Argo CD. The Gateway retries
-  before each heartbeat and turns ready once the check passes.
+- `refusing to start: connectors: self-check could not prove the credential
+  cannot read secrets: connector "<name>"; ...`: at boot, Argo CD could not be
+  reached, the token check (`GET /api/v1/session/userinfo`) was refused, or a
+  can-i question did not complete. The pod exits and restarts
+  (`CrashLoopBackOff`). Check that the token Secret holds a valid token for
+  the `sb-gateway` account, that `base_url` is right, and that the
+  connector's `egress` peer lets the pod reach Argo CD. Once Argo CD answers, the next restart passes; see
+  [Release 1: an Argo CD outage at boot is a crash loop](gateway.md#release-1-an-argo-cd-outage-at-boot-is-a-crash-loop).
+- After boot, the same failures do not restart the pod. It stays up and not
+  ready, stops claiming, and turns ready once a recheck passes.
 - `connector kind is not enabled in Release 1`: the connectors file names
   `eso` or `rollout`. Release 1 binds `argocd` only.
 - No heartbeat accepted within `SB_GATEWAY_CP_UNREACHABLE_AFTER` (default
@@ -224,14 +228,26 @@ Check the log for the first error:
 
 ### Gateway refuses to start: over-privileged
 
-A log line `refusing to start: connectors: credential is over-privileged` (or
-`self-check could not prove the credential cannot read secrets`) comes from the
-Kubernetes self-check. It runs only for the Release 2 `eso` and `rollout`
-connectors, which need `SB_GATEWAY_ENABLE_R2_CONNECTORS=true`; a Release 1
-Gateway built from the chart has no Kubernetes access and never runs it.
+A log line `refusing to start: connectors: credential is over-privileged:
+connector "<name>"; ...` for an `argocd` connector comes from the Argo CD
+can-i probe: Argo CD answered `yes` to one of the questions in
+[Argo CD privilege checks](gateway.md#argo-cd-privilege-checks). The line does
+not say which question, so compare every policy line that applies to the
+Gateway's account or role with that table. Remove the extra right from the
+Argo CD policy of the Gateway's account so that only the
+[minimal policy](gateway.md#the-minimal-policy) is left, and check
+`policy.default` in `argocd-rbac-cm` too: `role:readonly` grants `logs, get`
+and trips this check. The pod restarts until the grant is gone. When a recheck
+finds a grant on a running Gateway, the replica turns not ready, reports
+`over_privileged` in a heartbeat and stops.
 
-The Gateway refuses to start when its service account can use any verb on
-`secrets`, or any write verb on a resource a connector reads, or when a review
+For an `eso` or `rollout` connector, the same message comes from the
+Kubernetes self-check. Those Release 2 connectors need
+`SB_GATEWAY_ENABLE_R2_CONNECTORS=true`; a Release 1 Gateway built from the
+chart has no Kubernetes access and never runs it.
+
+The Kubernetes self-check refuses to start when its service account can use
+any verb on `secrets`, or any write verb on a resource a connector reads, or when a review
 call fails. There is no override. Remove the grant from the RBAC bound to the
 Gateway's service account. When a recheck finds such a grant on a running
 Gateway, it reports `over_privileged` in a heartbeat before it stops, and the
@@ -253,6 +269,16 @@ target. In the detail view, check the connector's `status`:
 A binding request that fails answers with a closed code. `target_not_advertised`
 means the `argocd_target_id` is not an application `id` in the connectors file,
 and `target_stale` means the Gateway advertised it once but no longer does.
+
+### Observation error `target_identity_changed`
+
+The Application under the target's name is not the object the Gateway pinned:
+it was deleted and recreated, so it has a new `metadata.uid`. The Gateway
+reports nothing about the new object. If the change is expected, read the new
+uid (`kubectl get application -n <namespace> <name> -o jsonpath=''`),
+set it as `applications[].uid` and upgrade the release. Without a `uid` in the
+values, restart the Gateway. See
+[Application identity](gateway.md#application-identity).
 
 ### Gateway gets 401 from the control plane
 

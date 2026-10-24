@@ -87,8 +87,16 @@ Release 1 is Argo CD rollout-state observation only
 
 - The supported connector kind is `argocd`. It reads one Application by name
   with `GET /api/v1/applications/{name}` (with `?appNamespace=` when the
-  target sets one) and checks its token at boot with
-  `GET /api/v1/session/userinfo`. Nothing else.
+  target sets one), checks its token at boot with
+  `GET /api/v1/session/userinfo`, and asks Argo CD's can-i API
+  (`GET /api/v1/account/can-i/...`) that its token holds no write or other
+  dangerous right. See
+  [Argo CD privilege checks](../operations/gateway.md#argo-cd-privilege-checks).
+- An Application's `metadata.uid` is its identity. A deleted and recreated
+  Application under the same name gets an `error` observation with code
+  `target_identity_changed`, never the new object's state. Evidence carries a
+  scoped digest of the uid, never the uid. See
+  [Application identity](../operations/gateway.md#application-identity).
 - With only `argocd` connectors, the Gateway reads no Kubernetes API. It builds
   no Kubernetes client, needs no service-account token and no RBAC, and runs
   no Kubernetes self-check.
@@ -208,8 +216,8 @@ start, stops claiming, or stays not ready.
 
 | Rule | How it holds |
 |---|---|
-| GET only to Argo CD | Each Argo CD client is pinned to the scheme and host of its `base_url` and allows GET to two paths. Every other method, path and query key is refused before the request leaves the process. `resource-tree`, `managed-resources`, `manifests` and the application list are blocked even though Argo CD's `applications, get` permission allows them, and so is `?refresh=`, which would make Argo CD patch the Application. Redirects are refused, proxy variables are ignored, and responses are capped at 2 MiB. |
-| Least-privilege Argo CD account | The token needs `applications, get` and nothing else. It is mounted as a file and re-read when it rotates. |
+| GET only to Argo CD | Each Argo CD client is pinned to the scheme and host of its `base_url` and allows GET only to exact paths: one Application by name, `session/userinfo`, the can-i question for each probe it asks, and the application list with exactly one allowed `projects` value and a fixed `fields` projection. Nothing in Release 1 calls the list. Every other method, path and query key is refused before the request leaves the process. `resource-tree`, `managed-resources`, `manifests` and the `exec`, `logs` and other stream paths are blocked even though Argo CD's `applications, get` permission allows some of them, and so is `?refresh=`, which would make Argo CD patch the Application. Redirects are refused, proxy variables are ignored, and an Application response is capped at 2 MiB. |
+| Least-privilege Argo CD account | The token needs `applications, get` on each allowed `<project>/*` and nothing else. It is mounted as a file and re-read when it rotates. At boot and every 5 minutes the Gateway asks can-i, for each allowed AppProject and each static target it has read, whether the token may sync, change or delete Applications, exec, read logs, write ApplicationSets or change the AppProject. A `yes` refuses the start, or stops a running Gateway, with no override. Grants on resource actions (`action/...`) are not visible to can-i and are left to the integrator's policy review. On Argo CD 2.x, `server.rbac.log.enforce.enable: "true"` is required. See [the minimal policy](../operations/gateway.md#the-minimal-policy). |
 | No Secrets access, ever | Release 1 has no Kubernetes access at all. For the Release 2 Kubernetes connectors, a boot self-check refuses to start if the service account can use any verb on `secrets`, or any write verb on a resource a connector reads. A failed review call also refuses the boot. There is no override. The check repeats every 5 minutes and stops the Gateway if a grant appears. |
 | Writes only to the control plane | The control-plane client refuses any method or path other than the Gateway endpoints, uses no proxy and never follows redirects. Enrollment refuses any URL that is not `https`. |
 | Credential at rest | The control plane stores a SHA-256 hash of the Gateway secret and compares it in constant time. On the Gateway side the identity is a read-only file. A file that other users can read, or that its group can write, is refused at boot. |

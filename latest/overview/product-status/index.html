@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Product status","description":"What Secrets Bridge actually does today: implemented and QA-certified features, what's in progress, and what's on the roadmap. No overclaiming.","url":"https://secrets-bridge.io/latest/overview/product-status/","mainEntityOfPage":"https://secrets-bridge.io/latest/overview/product-status/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-21T00:08:34+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Overview","item":"https://secrets-bridge.io/latest/overview/"},{"@type":"ListItem","position":3,"name":"Product status","item":"https://secrets-bridge.io/latest/overview/product-status/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Product status","description":"What Secrets Bridge actually does today: implemented and QA-certified features, what's in progress, and what's on the roadmap. No overclaiming.","url":"https://secrets-bridge.io/latest/overview/product-status/","mainEntityOfPage":"https://secrets-bridge.io/latest/overview/product-status/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-24T14:45:35Z"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Overview","item":"https://secrets-bridge.io/latest/overview/"},{"@type":"ListItem","position":3,"name":"Product status","item":"https://secrets-bridge.io/latest/overview/product-status/"}]}]}</script>
   
 
   </head>
@@ -2442,6 +2442,17 @@ release / demo candidate. "PASS" means verified end-to-end, not merely merged.</
 <ul>
 <li>the Gateway binary (Argo CD connector only, signed image) and its Helm
   chart (no RBAC, no service-account token, egress-only NetworkPolicy);</li>
+<li>the Argo CD privilege probe: at boot and every 5 minutes the Gateway
+  asks Argo CD's can-i, for each allowed AppProject and each static
+  target it has read, whether its token can write, exec, read logs, write
+  ApplicationSets or change the AppProject, and refuses to run on any
+  <code>yes</code>. An Argo CD outage at boot makes the pod crash-loop. Resource-action
+  grants are not visible to can-i and stay the integrator's policy review.
+  See <a href="../../operations/gateway/#argo-cd-privilege-checks">Argo CD privilege checks</a>;</li>
+<li>Application identity: the Gateway pins each target's <code>metadata.uid</code>,
+  answers <code>target_identity_changed</code> when it changes, and sends only a
+  scoped digest of it. The control plane accepts both and checks the
+  digest's format;</li>
 <li>the control-plane registry: enrollment, heartbeat, catalog, connector
   approval, bindings, disable, enable, revoke and the <code>gateway.*</code>
   permissions;</li>
@@ -2470,6 +2481,13 @@ release / demo candidate. "PASS" means verified end-to-end, not merely merged.</
   <a href="../../operations/gateway-cutover/">Gateway cutover</a>.</p>
 </li>
 </ul>
+<p>Not merged yet: the <code>applications[].uid</code> value in the gateway chart
+(<a href="https://github.com/secrets-bridge/charts/pull/56">charts#56</a>), and the
+control-plane identity pin
+(<a href="https://github.com/secrets-bridge/api/issues/312">api#312</a>), with which
+the control plane will pin each static target's identity digest, suspend
+its bindings when the digest changes, and need a platform admin to
+re-confirm them.</p>
 <p>Argo CD <code>Healthy</code> and <code>Synced</code> are operational state, never proof that a
 secret reached a workload: a Release 1 task ends <code>unverified</code>
 (<code>context_only</code>), never <code>verified</code>, and a Gateway that is offline or late
@@ -2508,6 +2526,11 @@ leaves it <code>pending</code> and then <code>timed_out</code>, never failed. Se
 <li>Gateway Release 2: External Secrets Operator sync and Deployment rollout
   observation (in the gateway code, off by default and not supported for
   production)</li>
+<li>Gateway Argo CD discovery and AppProject-scoped bindings (ADR 0002,
+  <a href="https://github.com/secrets-bridge/gateway/issues/25">gateway#25</a>): the
+  Gateway would list the Applications in its allowed AppProjects, and a
+  binding would cover a project instead of one named target. The transport
+  rule for the list read exists; discovery itself is not built</li>
 <li>Signed Gateway evidence (<a href="https://github.com/secrets-bridge/gateway/issues/7">gateway#7</a>),
   required before Gateway evidence is used as compliance evidence</li>
 <li>Agent connection-scoped job claim</li>
