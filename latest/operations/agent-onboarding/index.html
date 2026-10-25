@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Agent onboarding","description":"Enroll a Secrets Bridge agent from your workstation, keep its X25519 key and credential in your own secret store, and deploy it stateless.","url":"https://secrets-bridge.io/latest/operations/agent-onboarding/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/agent-onboarding/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T19:48:41+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Agent onboarding","item":"https://secrets-bridge.io/latest/operations/agent-onboarding/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Agent onboarding","description":"Enroll a Secrets Bridge agent from your workstation, keep its X25519 key and credential in your own secret store, and deploy it stateless.","url":"https://secrets-bridge.io/latest/operations/agent-onboarding/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/agent-onboarding/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T21:50:42+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Agent onboarding","item":"https://secrets-bridge.io/latest/operations/agent-onboarding/"}]}]}</script>
   
 
   </head>
@@ -2522,10 +2522,28 @@ through the audited <a href="#rotate-the-wire-key">rotation</a> below.</p>
 <li>shell arguments and shell history (read the token at a silent prompt and pass
   it on stdin, as shown below);</li>
 <li>Git, including a generated Secret manifest (<code>enroll --format k8s-secret</code> is
-  for piping into <code>kubectl apply -f -</code>, never for committing);</li>
+  for piping into
+  <code>kubectl apply --server-side --field-manager=secrets-bridge-agent -f -</code>,
+  never for committing);</li>
+<li>the <code>kubectl.kubernetes.io/last-applied-configuration</code> annotation (see the
+  warning below);</li>
 <li>CI logs and job output;</li>
 <li>the browser, chat messages and tickets.</li>
 </ul>
+<div class="admonition warning">
+<p class="admonition-title">Apply the agent Secret server-side</p>
+<p>Client-side <code>kubectl apply -f -</code> stores the whole object it applies,
+including the plaintext <code>agent_secret</code> and <code>private_key</code> from
+<code>stringData</code>, in the <code>kubectl.kubernetes.io/last-applied-configuration</code>
+annotation. That copy sits outside <code>.data</code>, where tools that treat
+metadata as non-sensitive can expose it. The same happens with
+<code>kubectl create secret ... --dry-run=client -o yaml | kubectl apply -f -</code>.
+Use <code>kubectl apply --server-side</code>, which keeps no such copy, or
+<code>kubectl create secret generic --from-env-file=/dev/stdin</code>. To check a
+Secret, run
+<code>kubectl -n secrets-bridge get secret secrets-bridge-agent-identity -o jsonpath='{.metadata.annotations}'</code>:
+it must not list <code>last-applied-configuration</code>.</p>
+</div>
 <p><code>enroll</code> writes nothing secret to stderr or to logs. It may print the
 <code>agent_id</code> and the key fingerprint to stderr.</p>
 <h2 id="step-1-create-an-enrollment-token">Step 1: create an enrollment token<a class="headerlink" href="#step-1-create-an-enrollment-token" title="Permanent link">&para;</a></h2>
@@ -2569,7 +2587,7 @@ plane.</p>
 </tr>
 <tr>
 <td><code>--format json\|env\|k8s-secret</code></td>
-<td>Bundle format, <code>json</code> by default. <code>env</code> is <code>key=value</code> lines for <code>kubectl create secret generic --from-env-file</code>; <code>k8s-secret</code> is a Secret manifest for <code>kubectl apply -f -</code></td>
+<td>Bundle format, <code>json</code> by default. <code>env</code> is <code>key=value</code> lines for <code>kubectl create secret generic --from-env-file</code>; <code>k8s-secret</code> is a Secret manifest for <code>kubectl apply --server-side --field-manager=secrets-bridge-agent -f -</code> (never client-side apply)</td>
 </tr>
 <tr>
 <td><code>--secret-name</code></td>
@@ -2739,8 +2757,21 @@ briefly during a rolling update with the same identity, set
 <p><code>rotate-key</code> generates the new key locally and runs the same challenge as
 enrollment, sealed to the new key. The control plane then binds the new key,
 increments <code>public_key_version</code> and audits <code>agent.key.rotated</code> with the old
-and new fingerprints. Write to Vault or a Kubernetes Secret the same way as
-in step 3.
+and new fingerprints. Write to Vault the same way as in step 3.</p>
+<p><code>kubectl create secret</code> refuses a Secret that exists, so update a
+Kubernetes Secret in place with a server-side apply:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">'%s'</span><span class="w"> </span><span class="s2">"</span><span class="nv">$SB_ROTATION_TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>secrets-bridge-agent<span class="w"> </span>rotate-key<span class="w"> </span>--cp-endpoint<span class="w"> </span>https://secrets-bridge.example.com<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">      </span>--credentials-dir<span class="w"> </span>/path/to/current/credentials<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">      </span>--rotation-token-file<span class="w"> </span>-<span class="w"> </span>--format<span class="w"> </span>k8s-secret<span class="w"> </span>--output<span class="w"> </span>-<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>kubectl<span class="w"> </span>-n<span class="w"> </span>secrets-bridge<span class="w"> </span>apply<span class="w"> </span>--server-side<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">      </span>--field-manager<span class="o">=</span>secrets-bridge-agent<span class="w"> </span>--force-conflicts<span class="w"> </span>-f<span class="w"> </span>-
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="nb">unset</span><span class="w"> </span>SB_ROTATION_TOKEN
+</span></code></pre></div>
+<p><code>--force-conflicts</code> takes over the fields that <code>kubectl create secret</code> (or
+another field manager) set at enrollment; without it the apply stops with
+a conflict. A server-side apply over a Secret that an earlier client-side
+apply wrote also drops the old <code>last-applied-configuration</code> annotation.
 3. Restart the agent once the Kubernetes Secret has the new key: wait for ESO
    to sync it (or force a sync), then <code>kubectl rollout restart</code> the Deployment.
    With <code>reloader.enabled=true</code> (the chart default) and
