@@ -61,8 +61,12 @@ Service for it and denies all ingress with its default NetworkPolicy. See the
 
 An admin creates a one-time enrollment token bound to one provider
 connection. The token is short-lived, stored only as a hash and returned
-once; the agent exchanges it at `POST /api/v1/agents/enroll` for a persistent
-identity that it stores and reuses on restart. An admin can revoke the agent
+once. An operator runs `secrets-bridge-agent enroll` inside their boundary:
+it generates the agent's X25519 key locally, exchanges the token for
+`agent_id` and `agent_secret`, and the operator stores all three in AWS
+Secrets Manager, Vault or a Kubernetes Secret. The agent reads them from a
+read-only Secret and keeps no state of its own. The control plane stores
+only the public key and a hash of the secret. An admin can revoke the agent
 at any time, and its heartbeats and job polls stop being accepted
 immediately. See [Agent onboarding](../operations/agent-onboarding.md).
 

@@ -26,7 +26,7 @@ Everything in this section is built and running.
 | Feature | What it does |
 |---|---|
 | **Provider connections** | Manage external secret-provider connections and bind them to projects / environments. |
-| **Agent onboarding** | Secure, outbound-only agent enrollment using **one-time enrollment tokens** and a **persistent agent identity** bound to one provider connection. |
+| **Agent onboarding** | Outbound-only agent enrollment with **one-time enrollment tokens** bound to one provider connection. The enrollment at pod start with a PVC is being replaced before the first release by the operator-side flow listed under [In progress](#in-progress). |
 | **Direct reveal** | Controlled non-prod secret reveal with **MFA step-up**, **TTL**, **single-shot wraps**, and a **server-anchored countdown**. |
 | **Prod protection** | Direct reveal is **hard-blocked for prod** environments and the refusal is audited (metadata-only). |
 | **Cross-team secret request flow** | Requester submits destination keys → value provider fills values → approver verifies → agent executes the provider write. |
@@ -49,14 +49,26 @@ release / demo candidate. "PASS" means verified end-to-end, not merely merged.
 | Cross-team UI drawer submit | ✅ PASS |
 | Approver verify-panel context | ✅ PASS |
 | Plaintext-leakage sweep | ✅ PASS |
-| Agent Onboarding API | ✅ PASS / CLOSED |
+| Agent Onboarding API (earlier single-step enrollment; the two-step flow under In progress has not been through QA) | ✅ PASS / CLOSED |
 
 ## In progress
 
 Being built now; not yet live or certified. Do not depend on these yet.
 
-- **Agent enrollment rollout**: the enrollment flow and its Helm packaging are
-  built; rolling it onto a live agent is gated on a controlled rollout.
+- **Stateless agent with a customer-owned key** (first-release requirement,
+  [skills#116](https://github.com/secrets-bridge/skills/issues/116)): an
+  operator runs `secrets-bridge-agent enroll` inside their boundary, which
+  generates the X25519 wire-encryption key locally, proves possession
+  through a sealed challenge and receives `agent_id` and `agent_secret` once.
+  The bundle goes to AWS Secrets Manager, Vault or a Kubernetes Secret; the
+  agent reads it from a read-only Secret (`identity.existingSecret`, mounted
+  `0400` at `/etc/secrets-bridge/agent`) and writes nothing. The control plane
+  stores only the public key and a hash of the secret. Every agent request
+  carries its key fingerprint, there is no public-key overwrite route, and the
+  key rotates through an audited flow with a fresh second factor. The PVC and
+  enrollment at pod start are removed with no compatibility mode. Being built
+  across the api, agent, console and chart; not merged, not through QA. See
+  [Agent onboarding](../operations/agent-onboarding.md).
 - **Richer agent fleet dashboard (UI)**: the agent management API exists; the
   full fleet UI view is next.
 - **Object storage for media**: project and team logos move from Postgres to
@@ -140,7 +152,7 @@ Being built now; not yet live or certified. Do not depend on these yet.
 - Direct reveal (non-prod, MFA-gated, single-shot)
 - Cross-team request → fill → approve → execute workflow
 - Metadata-only audit trail
-- Provider-bound agent onboarding (one-time enrollment tokens)
+- Provider-bound agent onboarding (one-time enrollment tokens). The stateless, customer-key flow that replaces enrollment at pod start is in progress
 - Agent revoke / list / status
 - Non-prod reveal protection
 - Prod reveal refusal (audited)
@@ -193,7 +205,9 @@ flowchart TD
   chart binds it on the pod IP for kubelet and its NetworkPolicy denies all
   ingress.
 - The agent has **no Postgres and no Redis** dependency, and **no Kubernetes API
-  access** to read or write Secrets.
+  access** to read or write Secrets. With the in-progress stateless flow it
+  also keeps no durable state and reads its credential and key from a
+  read-only Secret.
 - The **control plane stores metadata only**, never plaintext values.
 - **Secrets remain in the provider.** Secrets Bridge governs access around them.
 - Values move only through **controlled, wrapped, single-shot** flows

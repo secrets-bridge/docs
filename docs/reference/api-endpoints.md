@@ -96,36 +96,49 @@ A waiting account may call only `GET /api/v1/users/me` (which includes
 
 ## Agents
 
-Onboarding is **self-enrollment by default**: an admin mints a one-time,
-provider-connection-bound enrollment token; the agent exchanges it for its
-persistent credential. The legacy direct mint is disabled unless explicitly
-enabled as a break-glass admin action.
+Agents onboard with a one-time, provider-connection-bound enrollment token.
+An operator runs `secrets-bridge-agent enroll` inside their boundary: it
+generates the X25519 key pair locally, submits the public key, proves
+possession through a sealed challenge and receives `agent_id` and
+`agent_secret` once. The control plane stores the public key and the SHA-256 of
+the secret, never the private key. Requests without `schema_version: "2"` are
+refused. The legacy direct mint is disabled unless explicitly enabled as a
+break-glass admin action. See [Agent onboarding](../operations/agent-onboarding.md).
 
 ### Onboarding & admin management (session auth + permission)
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
 | `POST` | `/api/v1/provider-connections/:id/agent-enrollment-token` | `session + agent.mint` | Mint a one-time, connection-bound enrollment token (returned ONCE) |
-| `POST` | `/api/v1/agents/enroll` | enrollment token | Exchange the token for a persistent `agent_token` (returned ONCE); creates a connection-bound agent |
-| `POST` | `/api/v1/agents` | `session + agent.mint` | **Legacy direct mint, disabled by default** → `403 direct_agent_mint_disabled`. Break-glass only via `SB_ALLOW_DIRECT_AGENT_MINT=true` |
+| `POST` | `/api/v1/agents/enroll/challenge` | enrollment token | `{schema_version: "2", enrollment_token, public_key, public_key_algorithm: "x25519"}`. Checks the token without spending it and validates the key (32 bytes, not all zero, not a low-order point). Returns `{challenge_id, sealed_challenge, expires_at}`; the challenge is single use and lives 120 s |
+| `POST` | `/api/v1/agents/enroll` | enrollment token | `{schema_version: "2", enrollment_token, challenge_id, challenge_response, name, cluster_name, provider_type, region}`. In one transaction: spends the token, checks the challenge, creates the agent bound to the key and the token's provider connection. **201** `{agent_id, agent_secret, public_key_fingerprint, public_key_version, heartbeat_interval_seconds, claim_interval_seconds}`, the only time the secret is returned. Errors: `401 enrollment_rejected`, `400 invalid_public_key`, `400 unsupported_schema_version`, `429` |
+| `POST` | `/api/v1/admin/agents/:id/key-rotation` | `session + agent.mint` + fresh second factor | One-time rotation token (15 minutes, stored as a hash). Audit `agent.key_rotation.requested` |
+| `POST` | `/api/v1/agents` | `session + agent.mint` | **Legacy direct mint, disabled by default** → `403 direct_agent_mint_disabled`. Break-glass only via `SB_ALLOW_DIRECT_AGENT_MINT=true`, dev and test only, and requires a validated `public_key` |
 | `GET` | `/api/v1/agents` | `session + agent.list` | Thin list. New integrations should prefer the admin/provider projections below |
 | `GET` | `/api/v1/admin/agents` | `session + agent.list` | Rich admin list + filters (`provider_connection_id`, `status`, `cluster_name`, `provider_type`); shows `provider_connection_id` |
 | `GET` | `/api/v1/admin/agents/:id` | `session + agent.list` | Rich admin get |
 | `GET` | `/api/v1/provider-connections/:id/agents` | `session + agent.list` | Agents for a provider connection (UI Agents tab) |
-| `POST` | `/api/v1/admin/agents/:id/revoke` | `session + agent.revoke` | Revoke with `reason` → `revoked_at`/`revoked_by`; emits `agent.revoked` audit (`agent_id`, `provider_connection_id`, `reason`). `503 revoked_cache_unconfirmed`: revoked, but Redis could not update the auth cache yet; the api keeps retrying and repeating the call is safe |
+| `POST` | `/api/v1/admin/agents/:id/revoke` | `session + agent.revoke` | Also invalidates open rotation tokens and challenges. Revoke with `reason` → `revoked_at`/`revoked_by`; emits `agent.revoked` audit (`agent_id`, `provider_connection_id`, `reason`). `503 revoked_cache_unconfirmed`: revoked, but Redis could not update the auth cache yet; the api keeps retrying and repeating the call is safe |
 | `POST` | `/api/v1/agent-enrollment-tokens/:id/revoke` | `session + agent.mint` | Revoke an UNUSED enrollment token |
 
-### Agent data plane (`X-Agent-Secret`)
+### Agent data plane (`X-Agent-Secret` + `X-Agent-Key-Fingerprint`)
+
+Every request under `/api/v1/agents/:id/` carries `X-Agent-Key-Fingerprint`
+(`sha256:` plus the hex SHA-256 of the public key). After the secret check, the
+control plane compares it with the bound key; a missing or different value gets
+`409 {"error":"agent_key_mismatch"}` and the audit event `agent.key.mismatch`.
+There is no route that replaces an agent's public key outside rotation.
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| `PUT` | `/api/v1/agents/:id/public-key` | agent | Self-register X25519 wire-envelope pubkey |
+| `POST` | `/api/v1/agents/:id/key-rotation/challenge` | agent + rotation token | New public key in, challenge sealed to it out |
+| `POST` | `/api/v1/agents/:id/key-rotation` | agent + rotation token | Challenge response in. Binds the new key, `public_key_version += 1`, audit `agent.key.rotated` with old and new fingerprints. `agent_secret` is unchanged |
 | `POST` | `/api/v1/agents/:id/heartbeat` | agent | Bodyless → **204** (unchanged). With an optional body (`status`/`agent_version`/`capabilities`) → **200** `{status, server_time, next_heartbeat_seconds}`. Bumps `last_seen_at`; first heartbeat flips `enrolled`→`active` |
 | `POST` | `/api/v1/agents/:id/jobs/claim` | agent | 200 with job or 204 (queue empty) |
 | `POST` | `/api/v1/agents/:id/jobs/:job_id/complete` | agent | `{status, error?}`; 204 |
 | `POST` | `/api/v1/agents/:id/dek` | agent | Issue a KMS-wrapped DEK for wire-envelope encryption |
 | `POST` | `/api/v1/agents/:id/wraps` | agent | Read flow: agent posts a fetched value |
-| `GET` | `/api/v1/agents/:id/wraps/:wrap_id` | agent | Patch flow: agent retrieves a value (single-shot) |
+| `GET` | `/api/v1/agents/:id/wraps/:wrap_id` | agent | Patch flow: agent retrieves a value (single-shot), sealed at retrieval to the current key. The response has `recipient_key_fingerprint`; the agent refuses a wrap sealed to another key |
 | `POST` | `/api/v1/agents/:id/secrets/bulk` | agent | Discovery: bulk-upsert discovered secrets |
 
 !!! note "Release notes: agent management"
