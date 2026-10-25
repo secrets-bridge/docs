@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"HTTP API endpoints","description":"Every HTTP endpoint the Secrets Bridge api exposes and its auth gate: sign-in, agents, Gateways, access requests, reveal sessions, audit and policy rules.","url":"https://secrets-bridge.io/latest/reference/api-endpoints/","mainEntityOfPage":"https://secrets-bridge.io/latest/reference/api-endpoints/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T13:47:33+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Reference","item":"https://secrets-bridge.io/latest/reference/"},{"@type":"ListItem","position":3,"name":"HTTP API endpoints","item":"https://secrets-bridge.io/latest/reference/api-endpoints/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"HTTP API endpoints","description":"Every HTTP endpoint the Secrets Bridge api exposes and its auth gate: sign-in, agents, Gateways, access requests, reveal sessions, audit and policy rules.","url":"https://secrets-bridge.io/latest/reference/api-endpoints/","mainEntityOfPage":"https://secrets-bridge.io/latest/reference/api-endpoints/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T19:48:41+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Reference","item":"https://secrets-bridge.io/latest/reference/"},{"@type":"ListItem","position":3,"name":"HTTP API endpoints","item":"https://secrets-bridge.io/latest/reference/api-endpoints/"}]}]}</script>
   
 
   </head>
@@ -2030,10 +2030,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#agent-data-plane-x-agent-secret" class="md-nav__link">
+  <a href="#agent-data-plane-x-agent-secret-x-agent-key-fingerprint" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Agent data plane (X-Agent-Secret)
+        Agent data plane (X-Agent-Secret + X-Agent-Key-Fingerprint)
       
     </span>
   </a>
@@ -2572,10 +2572,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#agent-data-plane-x-agent-secret" class="md-nav__link">
+  <a href="#agent-data-plane-x-agent-secret-x-agent-key-fingerprint" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Agent data plane (X-Agent-Secret)
+        Agent data plane (X-Agent-Secret + X-Agent-Key-Fingerprint)
       
     </span>
   </a>
@@ -3236,10 +3236,14 @@ MFA" means the route also runs <code>RequireFreshMFA</code> and answers
 <code>POST /api/v1/auth/oidc/logout</code>. Everything else answers
 <code>403 account_pending_approval</code>.</p>
 <h2 id="agents">Agents<a class="headerlink" href="#agents" title="Permanent link">&para;</a></h2>
-<p>Onboarding is <strong>self-enrollment by default</strong>: an admin mints a one-time,
-provider-connection-bound enrollment token; the agent exchanges it for its
-persistent credential. The legacy direct mint is disabled unless explicitly
-enabled as a break-glass admin action.</p>
+<p>Agents onboard with a one-time, provider-connection-bound enrollment token.
+An operator runs <code>secrets-bridge-agent enroll</code> inside their boundary: it
+generates the X25519 key pair locally, submits the public key, proves
+possession through a sealed challenge and receives <code>agent_id</code> and
+<code>agent_secret</code> once. The control plane stores the public key and the SHA-256 of
+the secret, never the private key. Requests without <code>schema_version: "2"</code> are
+refused. The legacy direct mint is disabled unless explicitly enabled as a
+break-glass admin action. See <a href="../../operations/agent-onboarding/">Agent onboarding</a>.</p>
 <h3 id="onboarding-admin-management-session-auth-permission">Onboarding &amp; admin management (session auth + permission)<a class="headerlink" href="#onboarding-admin-management-session-auth-permission" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -3259,15 +3263,27 @@ enabled as a break-glass admin action.</p>
 </tr>
 <tr>
 <td><code>POST</code></td>
+<td><code>/api/v1/agents/enroll/challenge</code></td>
+<td>enrollment token</td>
+<td><code>{schema_version: "2", enrollment_token, public_key, public_key_algorithm: "x25519"}</code>. Checks the token without spending it and validates the key (32 bytes, not all zero, not a low-order point). Returns <code>{challenge_id, sealed_challenge, expires_at}</code>; the challenge is single use and lives 120 s</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
 <td><code>/api/v1/agents/enroll</code></td>
 <td>enrollment token</td>
-<td>Exchange the token for a persistent <code>agent_token</code> (returned ONCE); creates a connection-bound agent</td>
+<td><code>{schema_version: "2", enrollment_token, challenge_id, challenge_response, name, cluster_name, provider_type, region}</code>. In one transaction: spends the token, checks the challenge, creates the agent bound to the key and the token's provider connection. <strong>201</strong> <code>{agent_id, agent_secret, public_key_fingerprint, public_key_version, heartbeat_interval_seconds, claim_interval_seconds}</code>, the only time the secret is returned. Errors: <code>401 enrollment_rejected</code>, <code>400 invalid_public_key</code>, <code>400 unsupported_schema_version</code>, <code>429</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/admin/agents/:id/key-rotation</code></td>
+<td><code>session + agent.mint</code> + fresh second factor</td>
+<td>One-time rotation token (15 minutes, stored as a hash). Audit <code>agent.key_rotation.requested</code></td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/agents</code></td>
 <td><code>session + agent.mint</code></td>
-<td><strong>Legacy direct mint, disabled by default</strong> → <code>403 direct_agent_mint_disabled</code>. Break-glass only via <code>SB_ALLOW_DIRECT_AGENT_MINT=true</code></td>
+<td><strong>Legacy direct mint, disabled by default</strong> → <code>403 direct_agent_mint_disabled</code>. Break-glass only via <code>SB_ALLOW_DIRECT_AGENT_MINT=true</code>, dev and test only, and requires a validated <code>public_key</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
@@ -3297,7 +3313,7 @@ enabled as a break-glass admin action.</p>
 <td><code>POST</code></td>
 <td><code>/api/v1/admin/agents/:id/revoke</code></td>
 <td><code>session + agent.revoke</code></td>
-<td>Revoke with <code>reason</code> → <code>revoked_at</code>/<code>revoked_by</code>; emits <code>agent.revoked</code> audit (<code>agent_id</code>, <code>provider_connection_id</code>, <code>reason</code>). <code>503 revoked_cache_unconfirmed</code>: revoked, but Redis could not update the auth cache yet; the api keeps retrying and repeating the call is safe</td>
+<td>Also invalidates open rotation tokens and challenges. Revoke with <code>reason</code> → <code>revoked_at</code>/<code>revoked_by</code>; emits <code>agent.revoked</code> audit (<code>agent_id</code>, <code>provider_connection_id</code>, <code>reason</code>). <code>503 revoked_cache_unconfirmed</code>: revoked, but Redis could not update the auth cache yet; the api keeps retrying and repeating the call is safe</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
@@ -3307,7 +3323,12 @@ enabled as a break-glass admin action.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="agent-data-plane-x-agent-secret">Agent data plane (<code>X-Agent-Secret</code>)<a class="headerlink" href="#agent-data-plane-x-agent-secret" title="Permanent link">&para;</a></h3>
+<h3 id="agent-data-plane-x-agent-secret-x-agent-key-fingerprint">Agent data plane (<code>X-Agent-Secret</code> + <code>X-Agent-Key-Fingerprint</code>)<a class="headerlink" href="#agent-data-plane-x-agent-secret-x-agent-key-fingerprint" title="Permanent link">&para;</a></h3>
+<p>Every request under <code>/api/v1/agents/:id/</code> carries <code>X-Agent-Key-Fingerprint</code>
+(<code>sha256:</code> plus the hex SHA-256 of the public key). After the secret check, the
+control plane compares it with the bound key; a missing or different value gets
+<code>409 {"error":"agent_key_mismatch"}</code> and the audit event <code>agent.key.mismatch</code>.
+There is no route that replaces an agent's public key outside rotation.</p>
 <table>
 <thead>
 <tr>
@@ -3319,10 +3340,16 @@ enabled as a break-glass admin action.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>PUT</code></td>
-<td><code>/api/v1/agents/:id/public-key</code></td>
-<td>agent</td>
-<td>Self-register X25519 wire-envelope pubkey</td>
+<td><code>POST</code></td>
+<td><code>/api/v1/agents/:id/key-rotation/challenge</code></td>
+<td>agent + rotation token</td>
+<td>New public key in, challenge sealed to it out</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/agents/:id/key-rotation</code></td>
+<td>agent + rotation token</td>
+<td>Challenge response in. Binds the new key, <code>public_key_version += 1</code>, audit <code>agent.key.rotated</code> with old and new fingerprints. <code>agent_secret</code> is unchanged</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
@@ -3358,7 +3385,7 @@ enabled as a break-glass admin action.</p>
 <td><code>GET</code></td>
 <td><code>/api/v1/agents/:id/wraps/:wrap_id</code></td>
 <td>agent</td>
-<td>Patch flow: agent retrieves a value (single-shot)</td>
+<td>Patch flow: agent retrieves a value (single-shot), sealed at retrieval to the current key. The response has <code>recipient_key_fingerprint</code>; the agent refuses a wrap sealed to another key</td>
 </tr>
 <tr>
 <td><code>POST</code></td>

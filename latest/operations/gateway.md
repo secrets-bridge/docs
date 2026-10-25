@@ -42,6 +42,14 @@ sequenceDiagram
     GW->>CP: claim task, post result
 ```
 
+!!! note "Stateless, like the agent"
+    The Gateway keeps no local state. It reads `gateway_id`, `gateway_secret`
+    and, when a connector has discovery on, the optional `snapshot_key` from
+    read-only Kubernetes Secrets, and needs no PVC. Unlike the
+    [agent](agent-onboarding.md), it has no X25519 key: it receives no sealed
+    values. Its enrollment token, credential and scopes are its own and are
+    not interchangeable with an agent's.
+
 ## Before you start
 
 - The api from `main`, with migrations `0046` to `0049` applied. Migration

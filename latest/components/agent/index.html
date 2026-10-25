@@ -7,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="The outbound-only Secrets Bridge agent inside your boundary: CI-enforced rules, enrollment at boot, configuration, executors and Vault and AWS resolvers.">
+        <meta name="description" content="The stateless, outbound-only Secrets Bridge agent: CI-enforced rules, read-only credentials, configuration, executors and Vault and AWS resolvers.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
@@ -88,7 +88,7 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Secrets Bridge" />
   <meta property="og:title" content="Agent" />
-  <meta property="og:description" content="The outbound-only Secrets Bridge agent inside your boundary: CI-enforced rules, enrollment at boot, configuration, executors and Vault and AWS resolvers." />
+  <meta property="og:description" content="The stateless, outbound-only Secrets Bridge agent: CI-enforced rules, read-only credentials, configuration, executors and Vault and AWS resolvers." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/components/agent/" />
   <meta property="og:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
@@ -99,7 +99,7 @@
   
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Agent" />
-  <meta name="twitter:description" content="The outbound-only Secrets Bridge agent inside your boundary: CI-enforced rules, enrollment at boot, configuration, executors and Vault and AWS resolvers." />
+  <meta name="twitter:description" content="The stateless, outbound-only Secrets Bridge agent: CI-enforced rules, read-only credentials, configuration, executors and Vault and AWS resolvers." />
   <meta name="twitter:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   
@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Agent","description":"The outbound-only Secrets Bridge agent inside your boundary: CI-enforced rules, enrollment at boot, configuration, executors and Vault and AWS resolvers.","url":"https://secrets-bridge.io/latest/components/agent/","mainEntityOfPage":"https://secrets-bridge.io/latest/components/agent/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-23T15:12:19+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Components","item":"https://secrets-bridge.io/latest/components/"},{"@type":"ListItem","position":3,"name":"Agent","item":"https://secrets-bridge.io/latest/components/agent/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Agent","description":"The stateless, outbound-only Secrets Bridge agent: CI-enforced rules, read-only credentials, configuration, executors and Vault and AWS resolvers.","url":"https://secrets-bridge.io/latest/components/agent/","mainEntityOfPage":"https://secrets-bridge.io/latest/components/agent/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T19:48:41+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Components","item":"https://secrets-bridge.io/latest/components/"},{"@type":"ListItem","position":3,"name":"Agent","item":"https://secrets-bridge.io/latest/components/agent/"}]}]}</script>
   
 
   </head>
@@ -2234,8 +2234,8 @@ Plane never sees them.</p>
 <td>The only listener serves <code>/healthz</code>, <code>/readyz</code> and <code>/metrics</code> on <code>SB_LOCAL_ADDR</code>. The binary defaults to <code>127.0.0.1:8090</code>. The <code>agent</code> Helm chart binds <code>0.0.0.0:8090</code> because kubelet probes come from the node, creates no Service for it, and its default NetworkPolicy denies all ingress to the pod.</td>
 </tr>
 <tr>
-<td>Identity file mode 0600</td>
-<td><code>TestSaveToFile_AtomicNoPartialOnFailure</code> asserts the perm bits</td>
+<td>Read-only credentials, no durable state</td>
+<td>The agent reads <code>agent_id</code>, <code>agent_secret</code> and <code>private_key</code> from <code>SB_AGENT_CREDENTIALS_DIR</code>, refuses a file with group write or any bit for others (<code>mode &amp; 0o037 != 0</code>), and writes no file, PVC or Kubernetes Secret</td>
 </tr>
 <tr>
 <td>TLS required to the CP</td>
@@ -2248,24 +2248,21 @@ Plane never sees them.</p>
 </tbody>
 </table>
 <h2 id="boot-sequence">Boot sequence<a class="headerlink" href="#boot-sequence" title="Permanent link">&para;</a></h2>
+<p>The agent is stateless. Its credential and its X25519 wire-encryption key are
+created before it runs, by <code>secrets-bridge-agent enroll</code> on an operator
+workstation, and reach the pod through a read-only Secret. See
+<a href="../../operations/agent-onboarding/">Agent onboarding</a>.</p>
 <pre class="mermaid"><code>sequenceDiagram
-    participant Env
+    participant Dir as Credentials dir (read-only)
     participant Agent
     participant CP
     Agent-&gt;&gt;Agent: validateEndpoint (https or fail)
-    Agent-&gt;&gt;Agent: load X25519 keypair&lt;br/&gt;(env / file / ephemeral)
-    Env-&gt;&gt;Agent: stored identity?&lt;br/&gt;(SB_IDENTITY_FILE, or SB_AGENT_ID + SB_AGENT_SECRET)
-    alt no stored identity
-        Env-&gt;&gt;Agent: SB_ENROLLMENT_TOKEN (one-time)
-        Agent-&gt;&gt;CP: POST /agents/enroll
-        CP--&gt;&gt;Agent: agent_id + agent_token (returned once)
-        Agent-&gt;&gt;Agent: write identity to SB_IDENTITY_FILE (0600)
-    end
-    Agent-&gt;&gt;CP: PUT /agents/:id/public-key&lt;br/&gt;(register wire-envelope pubkey)
-    CP--&gt;&gt;Agent: 204
+    Dir-&gt;&gt;Agent: agent_id, agent_secret, private_key
+    Note over Agent: refuse missing, malformed or too-open files&lt;br/&gt;(mode &amp; 0o037 != 0)
+    Agent-&gt;&gt;Agent: derive public key and fingerprint
     par Heartbeat loop
         loop every SB_HEARTBEAT_INTERVAL
-            Agent-&gt;&gt;CP: POST /agents/:id/heartbeat
+            Agent-&gt;&gt;CP: POST /agents/:id/heartbeat&lt;br/&gt;X-Agent-Secret + X-Agent-Key-Fingerprint
         end
     and Claim loop
         loop every SB_CLAIM_INTERVAL
@@ -2273,6 +2270,12 @@ Plane never sees them.</p>
             CP--&gt;&gt;Agent: job or 204
         end
     end</code></pre>
+<p>The agent never generates a key at runtime, never enrolls at start and never
+registers a public key: the key is bound at enrollment. When the control plane
+answers <code>409 agent_key_mismatch</code>, the loaded key is not the bound one, usually
+after a rotation the pod hasn't picked up yet. A wrap whose
+<code>recipient_key_fingerprint</code> is not the agent's own is refused before it is
+opened.</p>
 <div class="admonition note">
 <p class="admonition-title">Heartbeat response shape</p>
 <p>A <strong>bodyless</strong> heartbeat returns an empty <strong>204</strong>, the shape existing
@@ -2280,9 +2283,7 @@ agents rely on. A heartbeat with an optional JSON body
 (<code>status</code> / <code>agent_version</code> / <code>capabilities</code>) returns <strong>200</strong>
 <code>{status, server_time, next_heartbeat_seconds}</code> and records the reported
 fields; the first heartbeat also transitions an <code>enrolled</code> agent to
-<code>active</code>. Agents are onboarded via the enrollment-token flow
-(<code>POST /provider-connections/:id/agent-enrollment-token</code> →
-<code>POST /agents/enroll</code>); see the <a href="../../reference/api-endpoints/#agents">HTTP API reference</a>.</p>
+<code>active</code>. See the <a href="../../reference/api-endpoints/#agents">HTTP API reference</a>.</p>
 </div>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <table>
@@ -2302,40 +2303,16 @@ fields; the first heartbeat also transitions an <code>enrolled</code> agent to
 <td><code>https://api.secrets-bridge.example</code></td>
 </tr>
 <tr>
-<td><code>SB_ENROLLMENT_TOKEN</code></td>
-<td>first boot</td>
-<td>-</td>
-<td>One-time token from <code>POST /provider-connections/:id/agent-enrollment-token</code>; spent once at <code>POST /agents/enroll</code></td>
-</tr>
-<tr>
-<td><code>SB_ENROLLMENT_ENABLED</code></td>
+<td><code>SB_AGENT_CREDENTIALS_DIR</code></td>
 <td>no</td>
-<td><code>true</code></td>
-<td>Enroll on first boot when no identity is stored and a token is set</td>
-</tr>
-<tr>
-<td><code>SB_IDENTITY_FILE</code></td>
-<td>no</td>
-<td><code>/etc/secrets-bridge/identity.json</code></td>
-<td>Written after enrollment, read on every restart; must be writable and persistent</td>
-</tr>
-<tr>
-<td><code>SB_PROVIDER_TYPE</code></td>
-<td>no</td>
-<td><code>aws-sm</code></td>
-<td>Reported at enrollment; must match the provider connection's <code>type</code></td>
+<td><code>/etc/secrets-bridge/agent</code></td>
+<td>Read-only directory with the files <code>agent_id</code>, <code>agent_secret</code> and <code>private_key</code> (base64 of 32 bytes). Every file is required. The <code>agent</code> chart mounts <code>identity.existingSecret</code> here</td>
 </tr>
 <tr>
 <td><code>SB_CLUSTER_NAME</code></td>
 <td>yes for discovery jobs</td>
 <td>-</td>
 <td>Stamped on every discovered secret</td>
-</tr>
-<tr>
-<td><code>SB_AGENT_ID</code> / <code>SB_AGENT_SECRET</code></td>
-<td>no</td>
-<td>-</td>
-<td>Pre-provisioned credential; overrides the identity file and skips enrollment</td>
 </tr>
 <tr>
 <td><code>SB_HEARTBEAT_INTERVAL</code></td>
@@ -2368,12 +2345,6 @@ fields; the first heartbeat also transitions an <code>enrolled</code> agent to
 <td>Pin a private CA (replaces system roots)</td>
 </tr>
 <tr>
-<td><code>SB_AGENT_PRIVATE_KEY_FILE</code></td>
-<td>no</td>
-<td>ephemeral</td>
-<td>X25519 keypair persistence</td>
-</tr>
-<tr>
 <td><strong>Provider creds</strong> (per resolver)</td>
 <td>yes</td>
 <td>-</td>
@@ -2381,15 +2352,16 @@ fields; the first heartbeat also transitions an <code>enrolled</code> agent to
 </tr>
 </tbody>
 </table>
-<p>The full list, including <code>SB_AGENT_NAME</code>, <code>SB_REGION</code> and the provider
-settings, is in the <a href="../../operations/config/#agent">configuration reference</a>.</p>
+<p>There is no environment variable for the credential or the key. The full list,
+including the provider settings, is in the
+<a href="../../operations/config/#agent">configuration reference</a>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Direct mint is a dev-only break-glass</p>
-<p><code>SB_AGENT_ID</code> / <code>SB_AGENT_SECRET</code> only come from the legacy direct mint
-(<code>POST /api/v1/agents</code>), which the api refuses with
-<code>403 direct_agent_mint_disabled</code> unless <code>SB_ALLOW_DIRECT_AGENT_MINT=true</code>.
-Onboard agents with an enrollment token instead; see
-<a href="../../operations/agent-onboarding/">Agent onboarding</a>.</p>
+<p>The direct mint (<code>POST /api/v1/agents</code>) is refused with
+<code>403 direct_agent_mint_disabled</code> unless the api runs with
+<code>SB_ALLOW_DIRECT_AGENT_MINT=true</code>, and it requires a public key like
+enrollment does. Use it for dev and tests only. Onboard agents with an
+enrollment token; see <a href="../../operations/agent-onboarding/">Agent onboarding</a>.</p>
 </div>
 <h2 id="executors-that-ship-today">Executors that ship today<a class="headerlink" href="#executors-that-ship-today" title="Permanent link">&para;</a></h2>
 <table>

@@ -83,13 +83,16 @@ A disabled user's login attempts return the same generic
 
 ## Enrolling your first agent
 
-Agents onboard by **enrollment**. An admin creates a one-time token bound to
-a provider connection; the agent exchanges it once for a persistent
-identity and stores that identity itself. See
-[Agent onboarding](agent-onboarding.md) for the model.
+An admin creates a one-time token bound to a provider connection. An operator
+then runs `secrets-bridge-agent enroll` on a trusted workstation: it generates
+the agent's X25519 key locally, exchanges the token for `agent_id` and
+`agent_secret`, and prints the bundle once, to be stored in your secret store or
+a Kubernetes Secret. The agent pod only reads that Secret. See
+[Agent onboarding](agent-onboarding.md) for the model, the AWS Secrets Manager
+and Vault variants, and key custody.
 
-The UI has no enrollment screen yet, so create the token through the API.
-You need `agent.mint` (the seed `admin` role has it), an active
+Create the token in the console or through the API, as below. You need
+`agent.mint` (the seed `admin` role has it), an active
 [provider connection](provider-connections.md) and, on a production install,
 a second factor on your account: login-time MFA is on by default outside
 `SB_ENV=dev`, so add an authenticator app under **Second factor** in the
@@ -128,25 +131,30 @@ curl -fsS -b "$JAR" "$CP/api/v1/provider-connections" \
   | jq '.[] | {id, name, type, cluster_name, status}'
 CONN_ID=<provider-connection-id>
 
-# Create the one-time token and put it straight into a Kubernetes Secret
-# in the workload cluster, without printing it.
+# Create the one-time token and hand it straight to enroll on stdin, then
+# write the bundle into a Kubernetes Secret in the workload cluster. The
+# token, agent_secret and private_key are never printed, never in argv and
+# never on disk.
 kubectl create namespace secrets-bridge   # skip if it already exists
 curl -fsS -b "$JAR" -X POST "$CP/api/v1/provider-connections/$CONN_ID/agent-enrollment-token" \
   -H 'Content-Type: application/json' \
   -d '{"name":"cluster-a-agent","expected_cluster_name":"cluster-a","expected_provider_type":"vault"}' \
   | jq -j .enrollment_token \
-  | kubectl -n secrets-bridge create secret generic secrets-bridge-agent-enrollment \
-      --from-file=enrollment_token=/dev/stdin
+  | secrets-bridge-agent enroll --cp-endpoint "$CP" --token-file - \
+      --name cluster-a-agent --cluster-name cluster-a --provider-type vault \
+      --format env --output - \
+  | kubectl -n secrets-bridge create secret generic secrets-bridge-agent-identity \
+      --from-env-file=/dev/stdin
+rm -f "$JAR"
 ```
 
 All body fields are optional. `expires_in_seconds` defaults to 900 (15
 minutes) and is clamped to 60 to 86400. When `expected_cluster_name` or
-`expected_provider_type` is set, an agent that reports anything else is
-refused. The response carries the token exactly once, so don't log or
-paste the whole response. Its `install_hint` commands don't contain the
-token: they read it at a silent prompt.
+`expected_provider_type` is set, an enrollment that reports anything else is
+refused. The response carries the token exactly once, so don't log or paste
+the whole response.
 
-Then install the `agent` chart in enrollment mode (see
+Then install the `agent` chart with the Secret's name (see
 [Production deployment](index.md#production-deployment) for the chart
 source):
 
@@ -156,31 +164,27 @@ helm install secrets-bridge-agent oci://ghcr.io/secrets-bridge/charts/secrets-br
   --namespace secrets-bridge \
   --set clusterName=cluster-a \
   --set cp.endpoint=https://secrets-bridge.example.com \
-  --set enrollment.enabled=true \
-  --set enrollment.tokenSecretName=secrets-bridge-agent-enrollment \
-  --set identity.mode=file \
-  --set identity.persistence.enabled=true \
-  --set agent.providerType=vault \
+  --set image.digest=sha256:<agent-digest> \
+  --set identity.existingSecret=secrets-bridge-agent-identity \
   --set providers.vault.enabled=true \
   --set providers.vault.addr=https://vault.example.com \
   --set providers.vault.kubernetesRole=secrets-bridge-agent
 ```
 
-On first boot the agent calls `POST /api/v1/agents/enroll` with the token,
-writes `{agent_id, agent_secret}` to `SB_IDENTITY_FILE` on the persistent
-volume and starts heartbeating. Restarts reuse that file; the token is
-never spent twice. The agent shows up under
+The agent reads `agent_id`, `agent_secret` and `private_key` from the Secret,
+mounted read-only at `/etc/secrets-bridge/agent`, and starts heartbeating.
+Restarts read the same Secret. The agent shows up under
 `GET /api/v1/provider-connections/<id>/agents` and turns `active` on its
 first heartbeat.
 
-If the agent fails to enroll (expired token, wrong cluster name or provider
+If enrollment is refused (expired token, wrong cluster name or provider
 type), fix the cause and create a new token. An unused token stops working
-when it expires, so keep `expires_in_seconds` short.
+when it expires, so keep `expires_in_seconds` short. See
+[Troubleshooting: agent](troubleshooting.md#agent).
 
 !!! warning "Direct agent mint is a dev-only break-glass"
-    The **+ Mint agent** drawer on the Agents page and
-    `POST /api/v1/agents` use the legacy direct mint, which hands back a
-    long-lived `agent_secret`. The api refuses it with
+    `POST /api/v1/agents` is the legacy direct mint, which hands back a
+    long-lived `agent_secret` and also requires a public key. The api refuses it with
     `403 direct_agent_mint_disabled` unless it runs with
     `SB_ALLOW_DIRECT_AGENT_MINT=true`. Leave that switch off outside a
     local dev loop; see [Insecure switches](config.md#insecure-switches-dev-only).

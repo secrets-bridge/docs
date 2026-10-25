@@ -7,7 +7,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="How a Secrets Bridge agent enrolls with a one-time token, gets a persistent identity once, heartbeats outbound and can be revoked. No inbound ports needed.">
+        <meta name="description" content="Enroll a Secrets Bridge agent from your workstation, keep its X25519 key and credential in your own secret store, and deploy it stateless.">
       
       
         <meta name="author" content="Secrets Bridge contributors">
@@ -88,7 +88,7 @@
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Secrets Bridge" />
   <meta property="og:title" content="Agent onboarding" />
-  <meta property="og:description" content="How a Secrets Bridge agent enrolls with a one-time token, gets a persistent identity once, heartbeats outbound and can be revoked. No inbound ports needed." />
+  <meta property="og:description" content="Enroll a Secrets Bridge agent from your workstation, keep its X25519 key and credential in your own secret store, and deploy it stateless." />
   <meta property="og:url" content="https://secrets-bridge.io/latest/operations/agent-onboarding/" />
   <meta property="og:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta property="og:image:width" content="1200" />
@@ -99,7 +99,7 @@
   
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Agent onboarding" />
-  <meta name="twitter:description" content="How a Secrets Bridge agent enrolls with a one-time token, gets a persistent identity once, heartbeats outbound and can be revoked. No inbound ports needed." />
+  <meta name="twitter:description" content="Enroll a Secrets Bridge agent from your workstation, keep its X25519 key and credential in your own secret store, and deploy it stateless." />
   <meta name="twitter:image" content="https://secrets-bridge.io/latest/assets/og-banner.png" />
   <meta name="twitter:image:alt" content="Secrets Bridge: Access control for the secrets you already keep." />
   
@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Agent onboarding","description":"How a Secrets Bridge agent enrolls with a one-time token, gets a persistent identity once, heartbeats outbound and can be revoked. No inbound ports needed.","url":"https://secrets-bridge.io/latest/operations/agent-onboarding/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/agent-onboarding/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-23T15:12:19+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Agent onboarding","item":"https://secrets-bridge.io/latest/operations/agent-onboarding/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Agent onboarding","description":"Enroll a Secrets Bridge agent from your workstation, keep its X25519 key and credential in your own secret store, and deploy it stateless.","url":"https://secrets-bridge.io/latest/operations/agent-onboarding/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/agent-onboarding/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T19:48:41+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Agent onboarding","item":"https://secrets-bridge.io/latest/operations/agent-onboarding/"}]}]}</script>
   
 
   </head>
@@ -1442,10 +1442,132 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-happens-step-by-step" class="md-nav__link">
+  <a href="#key-custody" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What happens, step by step
+        Key custody
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key custody">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#where-secrets-must-never-go" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where secrets must never go
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-create-an-enrollment-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: create an enrollment token
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-enroll-from-your-workstation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: enroll from your workstation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-store-the-credential" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: store the credential
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3: store the credential">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#least-privilege-write-access-for-whoever-runs-enroll" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Least-privilege write access for whoever runs enroll
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-deploy-the-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: deploy the agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#restarts-and-reschedules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restarts and reschedules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rotate-the-wire-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rotate the wire key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#revoke-an-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Revoke an agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gateway-parity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway parity
       
     </span>
   </a>
@@ -2105,10 +2227,132 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-happens-step-by-step" class="md-nav__link">
+  <a href="#key-custody" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What happens, step by step
+        Key custody
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key custody">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#where-secrets-must-never-go" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Where secrets must never go
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-create-an-enrollment-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: create an enrollment token
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-enroll-from-your-workstation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: enroll from your workstation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-store-the-credential" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: store the credential
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3: store the credential">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#least-privilege-write-access-for-whoever-runs-enroll" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Least-privilege write access for whoever runs enroll
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-deploy-the-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: deploy the agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#restarts-and-reschedules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restarts and reschedules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rotate-the-wire-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rotate the wire key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#revoke-an-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Revoke an agent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gateway-parity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gateway parity
       
     </span>
   </a>
@@ -2160,68 +2404,392 @@
 
 
 <h1 id="agent-onboarding">Agent onboarding<a class="headerlink" href="#agent-onboarding" title="Permanent link">&para;</a></h1>
-<p>An agent runs <strong>inside your boundary</strong> (a Kubernetes cluster, a VPC, an account)
-and talks <strong>outbound only</strong> to the control plane and its local provider. Onboarding
-is <strong>self-enrollment</strong>: an admin issues a short-lived, one-time token; the agent
-exchanges it for a persistent credential exactly once.</p>
+<p>An agent runs inside your boundary (a Kubernetes cluster, a VPC, an account)
+and talks outbound only, to the control plane and to its local provider. It is
+stateless: it reads its identity from a read-only Secret and never writes a
+file, a PVC or a Kubernetes Secret.</p>
+<p>Onboarding has four steps:</p>
+<ol>
+<li>An admin creates a one-time enrollment token in the console.</li>
+<li>An operator runs <code>secrets-bridge-agent enroll</code> on a trusted workstation
+   inside your boundary. The command generates the agent's X25519 key pair
+   locally and exchanges the token for the agent credential.</li>
+<li>The operator stores the result in AWS Secrets Manager, Vault or a
+   Kubernetes Secret.</li>
+<li>The agent is deployed with the <code>agent</code> Helm chart and
+   <code>identity.existingSecret</code> pointing at that Secret.</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">First-release requirement</p>
+<p>This flow is a requirement for the first release
+(<a href="https://github.com/secrets-bridge/skills/issues/116">skills#116</a>). It
+replaces the earlier enrollment at pod start with a PVC, which is removed.
+It is in progress, not live: see <a href="../../overview/product-status/">Product status</a>.</p>
+</div>
 <h2 id="the-flow">The flow<a class="headerlink" href="#the-flow" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>sequenceDiagram
     autonumber
     participant Admin
-    participant CP as Control Plane
+    participant CP as Control plane
+    participant Op as Operator workstation
+    participant Store as Your secret store
     participant Agent
-    Admin-&gt;&gt;CP: Create one-time enrollment token&lt;br/&gt;(bound to a provider connection)
-    CP--&gt;&gt;Admin: enrollment_token (returned once, hash-only at rest)
-    Admin-&gt;&gt;Agent: deliver enrollment_token (via a Secret)
-    Agent-&gt;&gt;CP: POST /agents/enroll { enrollment_token, ... }
-    CP--&gt;&gt;Agent: agent_token (returned ONCE) + agent_id
-    Note over Agent: persist {agent_id, agent_token} safely&lt;br/&gt;(the token is spent, never reused)
-    loop heartbeat
-        Agent-&gt;&gt;CP: POST /agents/:id/heartbeat (X-Agent-Secret)
-        CP--&gt;&gt;Agent: 200 { next_heartbeat_seconds }
+    Admin-&gt;&gt;CP: Create one-time enrollment token (agent.mint)
+    CP--&gt;&gt;Admin: enrollment_token (shown once, stored as a hash)
+    Admin-&gt;&gt;Op: hand over the token out of band
+    Note over Op: enroll generates the X25519 key pair locally
+    Op-&gt;&gt;CP: POST /agents/enroll/challenge {token, public_key}
+    CP--&gt;&gt;Op: challenge sealed to the public key
+    Note over Op: opens the challenge with the private key
+    Op-&gt;&gt;CP: POST /agents/enroll {token, challenge_id, challenge_response}
+    CP--&gt;&gt;Op: agent_id, agent_secret (returned once), public_key_fingerprint
+    Op-&gt;&gt;Store: agent_id, agent_secret, private_key (stdin, never argv)
+    Store--&gt;&gt;Agent: read-only Secret at /etc/secrets-bridge/agent
+    loop heartbeat and claim
+        Agent-&gt;&gt;CP: X-Agent-Secret + X-Agent-Key-Fingerprint
+        CP--&gt;&gt;Agent: 200 / job
+    end</code></pre>
+<p>The control plane checks the enrollment token without spending it, seals a
+random challenge to the submitted public key, and only creates the agent when
+the operator returns the decrypted challenge. That proves the enrolling client
+holds the private key. The token is consumed in the same transaction that
+creates the agent, and the agent is bound to the token's provider connection.</p>
+<h2 id="key-custody">Key custody<a class="headerlink" href="#key-custody" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Material</th>
+<th>Generated by</th>
+<th>Held by</th>
+<th>The control plane keeps</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>X25519 private key (<code>private_key</code>)</td>
+<td><code>secrets-bridge-agent enroll</code>, on your workstation</td>
+<td>Your secret store and the agent pod</td>
+<td>Nothing</td>
+</tr>
+<tr>
+<td>X25519 public key</td>
+<td>Derived from the private key</td>
+<td>Sent at enrollment</td>
+<td>The public key and its fingerprint (<code>sha256:</code> plus hex)</td>
+</tr>
+<tr>
+<td>Agent credential (<code>agent_id</code>, <code>agent_secret</code>)</td>
+<td>The control plane, returned once</td>
+<td>Your secret store and the agent pod</td>
+<td><code>agent_id</code> and the SHA-256 of <code>agent_secret</code></td>
+</tr>
+<tr>
+<td>Enrollment token</td>
+<td>The control plane</td>
+<td>The admin, briefly</td>
+<td>A hash, until it is spent or expires</td>
+</tr>
+</tbody>
+</table>
+<pre class="mermaid"><code>flowchart LR
+    subgraph boundary ["Your boundary"]
+        CLI["secrets-bridge-agent enroll&lt;br/&gt;(operator workstation)"]
+        Store["AWS Secrets Manager / Vault /&lt;br/&gt;Kubernetes Secret"]
+        Pod["Agent pod&lt;br/&gt;read-only /etc/secrets-bridge/agent"]
+        CLI --&gt;|"agent_id, agent_secret, private_key&lt;br/&gt;(stdin pipe)"| Store
+        Store --&gt;|"ESO or kubectl, mounted 0400 read-only"| Pod
     end
-    Admin-&gt;&gt;CP: Revoke agent (when needed)
-    CP--&gt;&gt;Agent: subsequent heartbeats / job polls rejected</code></pre>
-<h2 id="what-happens-step-by-step">What happens, step by step<a class="headerlink" href="#what-happens-step-by-step" title="Permanent link">&para;</a></h2>
+    subgraph cp ["Control plane"]
+        DB["public key + fingerprint&lt;br/&gt;SHA-256 of agent_secret"]
+    end
+    CLI --&gt;|"public key + challenge response"| DB
+    Pod --&gt;|"X-Agent-Secret + X-Agent-Key-Fingerprint&lt;br/&gt;(outbound HTTPS)"| DB</code></pre>
+<p>The X25519 key is a wire-encryption key. The control plane seals the values it
+sends to the agent (for example, a patch value) to this key, so only the agent
+can open them. It is not a TLS client certificate and plays no part in TLS: the
+agent still verifies the control plane's certificate, and it authenticates with
+<code>agent_secret</code>. The private key never leaves your boundary, and nothing in the
+console or the API can show it.</p>
+<p>Every request the agent makes carries <code>X-Agent-Key-Fingerprint</code>. The control
+plane compares it with the key bound at enrollment, and the agent refuses a
+sealed value whose recipient fingerprint is not its own. There is no API call
+that replaces an agent's public key in normal operation; a key changes only
+through the audited <a href="#rotate-the-wire-key">rotation</a> below.</p>
+<h3 id="where-secrets-must-never-go">Where secrets must never go<a class="headerlink" href="#where-secrets-must-never-go" title="Permanent link">&para;</a></h3>
+<p>Keep the enrollment token, <code>agent_secret</code> and <code>private_key</code> out of:</p>
+<ul>
+<li>Helm values, <code>--set</code> flags and Argo CD or Flux application specs;</li>
+<li>shell arguments and shell history (read the token at a silent prompt and pass
+  it on stdin, as shown below);</li>
+<li>Git, including a generated Secret manifest (<code>enroll --format k8s-secret</code> is
+  for piping into <code>kubectl apply -f -</code>, never for committing);</li>
+<li>CI logs and job output;</li>
+<li>the browser, chat messages and tickets.</li>
+</ul>
+<p><code>enroll</code> writes nothing secret to stderr or to logs. It may print the
+<code>agent_id</code> and the key fingerprint to stderr.</p>
+<h2 id="step-1-create-an-enrollment-token">Step 1: create an enrollment token<a class="headerlink" href="#step-1-create-an-enrollment-token" title="Permanent link">&para;</a></h2>
+<p>In the console, an admin with <code>agent.mint</code> creates a one-time enrollment token
+for the provider connection the agent will serve. The token is tied to that
+connection, and optionally to an expected cluster name and provider type. It
+expires after 15 minutes by default and works once. Scripts can call
+<code>POST /api/v1/provider-connections/:id/agent-enrollment-token</code> instead; see
+<a href="../bootstrap/#enrolling-your-first-agent">Enrolling your first agent</a>.</p>
+<h2 id="step-2-enroll-from-your-workstation">Step 2: enroll from your workstation<a class="headerlink" href="#step-2-enroll-from-your-workstation" title="Permanent link">&para;</a></h2>
+<p>Run <code>secrets-bridge-agent enroll</code> (the agent binary, as a subcommand) on a
+trusted machine inside your boundary. It needs HTTPS access to the control
+plane.</p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--cp-endpoint</code></td>
+<td>The control plane URL. <code>https://</code> only, with the same TLS options as the agent runtime</td>
+</tr>
+<tr>
+<td><code>--token-file &lt;path\|-&gt;</code></td>
+<td>The enrollment token, from a file or from stdin (<code>-</code>). There is no <code>--token</code> flag</td>
+</tr>
+<tr>
+<td><code>--name</code>, <code>--provider-type</code></td>
+<td>Required. The agent's name and provider type (<code>aws-sm</code>, <code>vault</code>). The provider type must match the token's expected value when it has one</td>
+</tr>
+<tr>
+<td><code>--cluster-name</code>, <code>--region</code></td>
+<td>Reported at enrollment. The cluster name must match the token's expected value when it has one</td>
+</tr>
+<tr>
+<td><code>--output &lt;path\|-&gt;</code></td>
+<td>Where the bundle goes. A file is created with mode <code>0600</code> and refused if it exists. <code>-</code> is stdout</td>
+</tr>
+<tr>
+<td><code>--format json\|env\|k8s-secret</code></td>
+<td>Bundle format, <code>json</code> by default. <code>env</code> is <code>key=value</code> lines for <code>kubectl create secret generic --from-env-file</code>; <code>k8s-secret</code> is a Secret manifest for <code>kubectl apply -f -</code></td>
+</tr>
+<tr>
+<td><code>--secret-name</code></td>
+<td>Name of the Secret in the <code>k8s-secret</code> format. Default <code>secrets-bridge-agent-identity</code></td>
+</tr>
+</tbody>
+</table>
+<p>The bundle has <code>agent_id</code>, <code>agent_secret</code>, <code>private_key</code> and
+<code>public_key_fingerprint</code>. The agent ignores <code>public_key_fingerprint</code>, and the
+chart mounts only the other three keys, so a Secret with all four is fine. Pipe it straight into your secret store, as in step 3,
+so it never lands on disk or in the terminal. Each example reads the token at a
+silent prompt first:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">read</span><span class="w"> </span>-rsp<span class="w"> </span><span class="s1">'Enrollment token: '</span><span class="w"> </span>SB_ENROLL_TOKEN<span class="p">;</span><span class="w"> </span><span class="nb">echo</span>
+</span></code></pre></div>
+<p>and runs <code>unset SB_ENROLL_TOKEN</code> at the end. <code>printf</code> is a shell builtin, so the
+token does not show up in the process list.</p>
+<h2 id="step-3-store-the-credential">Step 3: store the credential<a class="headerlink" href="#step-3-store-the-credential" title="Permanent link">&para;</a></h2>
+<p>Pick one store. The agent only reads the Kubernetes Secret, so External Secrets
+Operator (ESO) is one way to fill that Secret, not a runtime dependency.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">AWS Secrets Manager</label><label for="__tabbed_1_2">Vault</label><label for="__tabbed_1_3">Kubernetes Secret</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Create the secret first with your infrastructure code (empty, with the tags
+and KMS key you want). Then write the bundle to it:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">'%s'</span><span class="w"> </span><span class="s2">"</span><span class="nv">$SB_ENROLL_TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>secrets-bridge-agent<span class="w"> </span>enroll<span class="w"> </span>--cp-endpoint<span class="w"> </span>https://secrets-bridge.example.com<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">      </span>--token-file<span class="w"> </span>-<span class="w"> </span>--name<span class="w"> </span>prod-eu-agent<span class="w"> </span>--cluster-name<span class="w"> </span>prod-eu<span class="w"> </span>--provider-type<span class="w"> </span>aws-sm<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">      </span>--region<span class="w"> </span>us-east-1<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span>--output<span class="w"> </span>-<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>aws<span class="w"> </span>secretsmanager<span class="w"> </span>put-secret-value<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">      </span>--secret-id<span class="w"> </span>arn:aws:secretsmanager:us-east-1:123456789012:secret:secrets-bridge/agents/prod-eu<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">      </span>--secret-string<span class="w"> </span>file:///dev/stdin
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nb">unset</span><span class="w"> </span>SB_ENROLL_TOKEN
+</span></code></pre></div>
+<p>Then sync it into the cluster with an ESO <code>ExternalSecret</code> that copies the
+<code>agent_id</code>, <code>agent_secret</code> and <code>private_key</code> properties. The chart repo has
+a tested example in
+<a href="https://github.com/secrets-bridge/charts/tree/main/agent/examples/eso-aws-secrets-manager"><code>agent/examples/eso-aws-secrets-manager</code></a>.</p>
+</div>
+<div class="tabbed-block">
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">'%s'</span><span class="w"> </span><span class="s2">"</span><span class="nv">$SB_ENROLL_TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>secrets-bridge-agent<span class="w"> </span>enroll<span class="w"> </span>--cp-endpoint<span class="w"> </span>https://secrets-bridge.example.com<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">      </span>--token-file<span class="w"> </span>-<span class="w"> </span>--name<span class="w"> </span>prod-eu-agent<span class="w"> </span>--cluster-name<span class="w"> </span>prod-eu<span class="w"> </span>--provider-type<span class="w"> </span>vault<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">      </span>--format<span class="w"> </span>json<span class="w"> </span>--output<span class="w"> </span>-<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>vault<span class="w"> </span>kv<span class="w"> </span>put<span class="w"> </span>-mount<span class="o">=</span>kv<span class="w"> </span>secrets-bridge/agents/prod-eu<span class="w"> </span>-
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="nb">unset</span><span class="w"> </span>SB_ENROLL_TOKEN
+</span></code></pre></div>
+<p><code>vault kv put &lt;path&gt; -</code> reads the JSON object from stdin. Sync it with an
+ESO <code>ExternalSecret</code>; see
+<a href="https://github.com/secrets-bridge/charts/tree/main/agent/examples/eso-vault"><code>agent/examples/eso-vault</code></a>.</p>
+</div>
+<div class="tabbed-block">
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>secrets-bridge
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">'%s'</span><span class="w"> </span><span class="s2">"</span><span class="nv">$SB_ENROLL_TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>secrets-bridge-agent<span class="w"> </span>enroll<span class="w"> </span>--cp-endpoint<span class="w"> </span>https://secrets-bridge.example.com<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">      </span>--token-file<span class="w"> </span>-<span class="w"> </span>--name<span class="w"> </span>prod-eu-agent<span class="w"> </span>--cluster-name<span class="w"> </span>prod-eu<span class="w"> </span>--provider-type<span class="w"> </span>vault<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">      </span>--format<span class="w"> </span>env<span class="w"> </span>--output<span class="w"> </span>-<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>kubectl<span class="w"> </span>-n<span class="w"> </span>secrets-bridge<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>secrets-bridge-agent-identity<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">      </span>--from-env-file<span class="o">=</span>/dev/stdin
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="nb">unset</span><span class="w"> </span>SB_ENROLL_TOKEN
+</span></code></pre></div>
+<p>The same script is in
+<a href="https://github.com/secrets-bridge/charts/tree/main/agent/examples/kubectl-secret"><code>agent/examples/kubectl-secret</code></a>.
+<code>secrets-bridge-agent-identity</code> is the documented name and the default of
+<code>--secret-name</code>. Restrict <code>get</code> on Secrets in that namespace to the people
+who run the agent.</p>
+</div>
+</div>
+</div>
+<p>If the pipe fails after the control plane answered (for example, the secret
+store refused the write), the bundle is lost and the token is spent. Revoke the
+half-created agent and start again with a new token.</p>
+<h3 id="least-privilege-write-access-for-whoever-runs-enroll">Least-privilege write access for whoever runs enroll<a class="headerlink" href="#least-privilege-write-access-for-whoever-runs-enroll" title="Permanent link">&para;</a></h3>
+<p>The person or pipeline that runs <code>enroll</code> needs to write one entry, and nothing
+else.</p>
+<p>AWS Secrets Manager, for an existing secret (the <code>-??????</code> matches the random
+suffix AWS adds to the ARN):</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">"Version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2012-10-17"</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">"Statement"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="p">{</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">      </span><span class="nt">"Sid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"WriteOneAgentCredential"</span><span class="p">,</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">      </span><span class="nt">"Effect"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Allow"</span><span class="p">,</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">      </span><span class="nt">"Action"</span><span class="p">:</span><span class="w"> </span><span class="s2">"secretsmanager:PutSecretValue"</span><span class="p">,</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">      </span><span class="nt">"Resource"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arn:aws:secretsmanager:us-east-1:123456789012:secret:secrets-bridge/agents/prod-eu-??????"</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="p">]</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>When the secret uses a customer managed KMS key, also allow
+<code>kms:GenerateDataKey</code> and <code>kms:Encrypt</code> on that key, with the condition
+<code>kms:ViaService = secretsmanager.us-east-1.amazonaws.com</code>. The writer needs no
+<code>GetSecretValue</code>. ESO reads with its own role, which needs
+<code>secretsmanager:GetSecretValue</code> on the same ARN (and <code>kms:Decrypt</code> through
+Secrets Manager), and nothing else.</p>
+<p>Vault, KV version 2 mounted at <code>kv</code>:</p>
+<div class="language-hcl highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Writer: the operator who runs enroll.</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="err">path</span><span class="w"> </span><span class="s2">"kv/data/secrets-bridge/agents/prod-eu"</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="na">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"create", "update"</span><span class="p">]</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">}</span>
+</span></code></pre></div>
+<div class="language-hcl highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Reader: the ESO role that syncs the Secret.</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="err">path</span><span class="w"> </span><span class="s2">"kv/data/secrets-bridge/agents/prod-eu"</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="na">capabilities</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">"read"</span><span class="p">]</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="step-4-deploy-the-agent">Step 4: deploy the agent<a class="headerlink" href="#step-4-deploy-the-agent" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>helm<span class="w"> </span>install<span class="w"> </span>secrets-bridge-agent<span class="w"> </span>oci://ghcr.io/secrets-bridge/charts/secrets-bridge-agent<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>--version<span class="w"> </span>&lt;chart-version&gt;<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>--namespace<span class="w"> </span>secrets-bridge<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span>--set<span class="w"> </span><span class="nv">clusterName</span><span class="o">=</span>prod-eu<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span>--set<span class="w"> </span>cp.endpoint<span class="o">=</span>https://secrets-bridge.example.com<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span>--set<span class="w"> </span>image.digest<span class="o">=</span>sha256:&lt;agent-digest&gt;<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span>--set<span class="w"> </span>identity.existingSecret<span class="o">=</span>secrets-bridge-agent-identity<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">  </span>--set<span class="w"> </span>providers.vault.enabled<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">  </span>--set<span class="w"> </span>providers.vault.addr<span class="o">=</span>https://vault.example.com<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">  </span>--set<span class="w"> </span>providers.vault.kubernetesRole<span class="o">=</span>secrets-bridge-agent
+</span></code></pre></div>
+<p><code>identity.existingSecret</code> names the Secret, never its contents, so these values
+are safe to commit. The chart:</p>
+<ul>
+<li>mounts the Secret read-only at <code>/etc/secrets-bridge/agent</code> with
+  <code>defaultMode: 0400</code>, and sets <code>SB_AGENT_CREDENTIALS_DIR</code> to that path;</li>
+<li>maps the keys <code>agent_id</code>, <code>agent_secret</code> and <code>private_key</code> to files of the
+  same name (<code>identity.keys.*</code> maps other key names);</li>
+<li>renders no PVC, no writable volume and no Role or RoleBinding;</li>
+<li>refuses the removed settings (<code>identity.mode</code>, <code>identity.persistence</code>,
+  <code>enrollment.*</code> and others) at render time, naming the key.</li>
+</ul>
+<p>Secret volume files are owned by root. The chart requires
+<code>podSecurityContext.fsGroup</code> (default <code>65532</code>), which gives them the agent's
+group, and kubelet then adds the group read bit, so the files show up in the pod
+as <code>0440 root:65532</code>. Without <code>fsGroup</code> they stay <code>0400 root:root</code> and the
+non-root agent can't read them. The agent accepts owner and group read, and
+refuses a file with group write or any permission for others
+(<code>mode &amp; 0o037 != 0</code>).</p>
+<p>At start the agent loads the three files, derives the public key and its
+fingerprint, and sends the fingerprint with every request. It fails closed: a
+missing, empty or malformed file, or a file that is too open, stops it before it
+contacts the control plane. It never generates a key and never falls back to an
+ephemeral one.</p>
+<p>To check the result, compare the fingerprint <code>enroll</code> printed with the one the
+console shows for the agent. The agent turns <code>active</code> on its first heartbeat.</p>
+<h2 id="restarts-and-reschedules">Restarts and reschedules<a class="headerlink" href="#restarts-and-reschedules" title="Permanent link">&para;</a></h2>
+<p>A restart or a move to another node reads the same Secret. The agent keeps no
+local state, so nothing is lost and no token is needed. Because two pods can run
+briefly during a rolling update with the same identity, set
+<code>strategy.type: Recreate</code> in the chart if you want no overlap.</p>
+<h2 id="rotate-the-wire-key">Rotate the wire key<a class="headerlink" href="#rotate-the-wire-key" title="Permanent link">&para;</a></h2>
+<p>Rotation replaces the X25519 key and keeps <code>agent_id</code> and <code>agent_secret</code>.</p>
 <ol>
-<li><strong>Admin creates a one-time enrollment token</strong>, bound to a specific provider
-   connection. The token is short-lived, stored <strong>hash-only</strong>, and returned
-   exactly once.</li>
-<li><strong>The agent calls <code>POST /agents/enroll</code></strong> with the token (the token travels in
-   the request body, never a header, never a log line).</li>
-<li><strong>The control plane returns a persistent <code>agent_token</code> once</strong> and creates the
-   agent, bound to that provider connection.</li>
-<li><strong>The agent stores its identity safely</strong> and, on restart, reuses it, it never
-   spends a second enrollment token.</li>
-<li><strong>The agent heartbeats</strong> using the <code>X-Agent-Secret</code> header; the control plane
-   drives the cadence.</li>
-<li><strong>An admin can revoke the agent</strong> at any time; its heartbeats and job polling
-   stop being accepted immediately.</li>
+<li>An admin requests the rotation in the console, or with
+   <code>POST /api/v1/admin/agents/:id/key-rotation</code>. This needs <code>agent.mint</code> and a
+   fresh second factor. The answer is a one-time rotation token that expires
+   after 15 minutes. The request is audited as <code>agent.key_rotation.requested</code>.</li>
+<li>
+<p>On the workstation, with the current credential available as a read-only
+   directory, run:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">'%s'</span><span class="w"> </span><span class="s2">"</span><span class="nv">$SB_ROTATION_TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>secrets-bridge-agent<span class="w"> </span>rotate-key<span class="w"> </span>--cp-endpoint<span class="w"> </span>https://secrets-bridge.example.com<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">      </span>--credentials-dir<span class="w"> </span>/path/to/current/credentials<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">      </span>--rotation-token-file<span class="w"> </span>-<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span>--output<span class="w"> </span>-<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>aws<span class="w"> </span>secretsmanager<span class="w"> </span>put-secret-value<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">      </span>--secret-id<span class="w"> </span>arn:aws:secretsmanager:us-east-1:123456789012:secret:secrets-bridge/agents/prod-eu<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">      </span>--secret-string<span class="w"> </span>file:///dev/stdin
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="nb">unset</span><span class="w"> </span>SB_ROTATION_TOKEN
+</span></code></pre></div>
+<p><code>rotate-key</code> generates the new key locally and runs the same challenge as
+enrollment, sealed to the new key. The control plane then binds the new key,
+increments <code>public_key_version</code> and audits <code>agent.key.rotated</code> with the old
+and new fingerprints. Write to Vault or a Kubernetes Secret the same way as
+in step 3.
+3. Restart the agent once the Kubernetes Secret has the new key: wait for ESO
+   to sync it (or force a sync), then <code>kubectl rollout restart</code> the Deployment.
+   With <code>reloader.enabled=true</code> (the chart default) and
+   <a href="https://github.com/stakater/Reloader">stakater/reloader</a> installed, the
+   restart happens on its own.</p>
+</li>
 </ol>
+<p>Between step 2 and the restart, the running agent still holds the old key and
+gets <code>409 agent_key_mismatch</code>. Nothing is lost: wraps are sealed when the agent
+fetches them, so queued work is sealed to the new key once the restarted agent
+picks it up.</p>
+<h2 id="revoke-an-agent">Revoke an agent<a class="headerlink" href="#revoke-an-agent" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Revoke the agent in the console (or <code>POST /api/v1/admin/agents/:id/revoke</code>
+   with a reason, needs <code>agent.revoke</code>). Its next heartbeat or claim is refused,
+   and any open rotation tokens and challenges for it stop working.</li>
+<li>Uninstall the chart or scale the Deployment to zero.</li>
+<li>Delete the Kubernetes Secret and the entry in AWS Secrets Manager or Vault.</li>
+<li>For a replacement, start again at step 1 with a new enrollment token.</li>
+</ol>
+<p>An unused enrollment token can be revoked on its own with
+<code>POST /api/v1/agent-enrollment-tokens/:id/revoke</code>.</p>
+<h2 id="gateway-parity">Gateway parity<a class="headerlink" href="#gateway-parity" title="Permanent link">&para;</a></h2>
+<p>The <a href="../gateway/">Gateway</a> runs the same way at the storage level: it is
+stateless, and it reads <code>gateway_id</code>, <code>gateway_secret</code> and, when a connector has
+discovery on, the optional <code>snapshot_key</code> from read-only Kubernetes Secrets. It
+has no X25519 key and no PVC, and it keeps its own enrollment token and scopes,
+separate from agents.</p>
 <h2 id="safety-properties">Safety properties<a class="headerlink" href="#safety-properties" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>One-time tokens</strong>, hash-only at rest, short TTL, returned once, consumed
-  once. Reuse is refused (<code>409</code>).</li>
-<li><strong>Provider-bound</strong>, an enrolled agent is tied to a single provider connection.</li>
-<li><strong>Outbound-only</strong>, no inbound ports; no Postgres / Redis / Kubernetes-API
+<li>One-time enrollment tokens: hashed at rest, short TTL, single use, bound to
+  one provider connection.</li>
+<li>Proof of possession: an agent is created only when the enrolling client opens
+  a challenge sealed to the key it submitted.</li>
+<li>The control plane stores the public key and a hash of <code>agent_secret</code>, never
+  the private key or the plaintext secret.</li>
+<li>No key substitution: a key changes only through the audited rotation flow.</li>
+<li>Outbound only: no inbound ports, and no Postgres, Redis or Kubernetes API
   dependency.</li>
-<li><strong>Metadata-only audit</strong>, enrollment, rejection, and revocation events record
-  IDs, reasons, and timestamps; never the token or the agent credential.</li>
-<li><strong>Legacy direct mint is disabled by default</strong>, the older direct
-  agent-mint endpoint is off unless explicitly enabled as a break-glass admin
-  action; enrollment is the standard path.</li>
+<li>Metadata-only audit: <code>agent.enroll.challenge</code>, <code>agent.enroll</code> (success or
+  denied, with the fingerprint and provider connection), <code>agent.key.mismatch</code>,
+  <code>agent.key_rotation.requested</code>, <code>agent.key.rotated</code> and <code>agent.revoked</code> record
+  IDs, fingerprints and reasons, never a token, secret, key or challenge.</li>
+<li>Direct mint (<code>POST /api/v1/agents</code>) is a dev and test switch, off unless
+  <code>SB_ALLOW_DIRECT_AGENT_MINT=true</code>, and it also requires a public key.</li>
 </ul>
-<div class="admonition warning">
-<p class="admonition-title">Never expose credential material</p>
-<p>Enrollment tokens and agent credentials are secrets. Deliver them through a
-Kubernetes Secret (or your secret-distribution mechanism), never as a
-plaintext value in configuration, a log line, a screenshot, or a commit.</p>
-</div>
-<p>For the exact commands (token creation, Helm install in enrollment mode), see
-<a href="../bootstrap/#enrolling-your-first-agent">Enrolling your first agent</a>; for a
-local run, see <a href="../docker-compose/#wiring-an-agent-end-to-end-vault-example">Running locally with docker compose</a>.
-See the <a href="../../components/agent/">agent component reference</a> and the
-<a href="../../reference/api-endpoints/#agents">HTTP API endpoints</a> for the exact contract.</p>
+<p>When something fails, see <a href="../troubleshooting/#agent">Troubleshooting: agent</a>.
+For the API contract, see <a href="../../reference/api-endpoints/#agents">HTTP API endpoints</a>;
+for the agent's settings, the <a href="../../components/agent/">agent component reference</a>.</p>
 
 
 

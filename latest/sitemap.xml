@@ -10,11 +10,11 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/components/agent/</loc>
-         <lastmod>2026-10-23</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/components/api/</loc>
-         <lastmod>2026-10-23</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/components/controller/</loc>
@@ -54,11 +54,11 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/</loc>
-         <lastmod>2026-10-23</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/agent-onboarding/</loc>
-         <lastmod>2026-10-23</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/authentication/</loc>
@@ -66,7 +66,7 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/bootstrap/</loc>
-         <lastmod>2026-10-23</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/config/</loc>
@@ -78,7 +78,7 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/docker-compose/</loc>
-         <lastmod>2026-10-23</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/operations/gateway-cutover/</loc>
@@ -130,11 +130,11 @@
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/overview/architecture/</loc>
-         <lastmod>2026-10-23</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/overview/faq/</loc>
-         <lastmod>2026-10-23</lastmod>
+         <lastmod>2026-10-25</lastmod>
     </url>
     <url>
          <loc>https://secrets-bridge.io/latest/overview/glossary/</loc>

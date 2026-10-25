@@ -57,8 +57,10 @@ scripts keep the session cookie in a cookie jar (`curl -c jar` to sign in,
 `-b jar` after).
 
 Agent routes under `/api/v1/agents/:id/` authenticate separately, with the
-agent's `X-Agent-Secret`. `POST /api/v1/agents/enroll` authenticates with the
-one-time enrollment token in the body.
+agent's `X-Agent-Secret`. `POST /api/v1/agents/enroll/challenge` and `POST /api/v1/agents/enroll`
+authenticate with the one-time enrollment token in the body; every agent
+request also carries `X-Agent-Key-Fingerprint`, checked against the key bound
+at enrollment.
 
 The legacy `X-User-Id` header is **ignored** unless the api runs with
 `SB_ALLOW_INSECURE_HEADER_AUTH=true`, a dev-only switch that lets anyone

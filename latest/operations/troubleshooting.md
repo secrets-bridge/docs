@@ -167,7 +167,10 @@ Two things to check:
    ```
 2. **The agent secret is correct.** A wrong secret returns 401 on
    heartbeat (generic message; the audit log records
-   `error_kind=unauthorized`).
+   `error_kind=unauthorized`). A revoked agent gets the same answer.
+3. **The key matches.** A `409 agent_key_mismatch` on every heartbeat
+   means the loaded key isn't the bound one; see
+   [Requests fail with `409 agent_key_mismatch`](#requests-fail-with-409-agent_key_mismatch).
 
 ### Vault read returns "permission denied"
 
@@ -183,6 +186,83 @@ docker exec secrets-bridge-vault-1 sh -c \
 
 If that works but the agent gets denied, the agent token has less
 scope than the dev token. Adjust the policy in Vault.
+
+## Agent
+
+Onboarding steps are in [Agent onboarding](agent-onboarding.md). Start with the
+pod log (`kubectl -n secrets-bridge logs deploy/secrets-bridge-agent`) and the
+audit log, which records why a request was refused (`error_kind`) without the
+token, secret or key.
+
+### The agent exits at start: a credential file is missing
+
+The agent reads `agent_id`, `agent_secret` and `private_key` from
+`SB_AGENT_CREDENTIALS_DIR` (`/etc/secrets-bridge/agent` in the chart) and stops
+before it contacts the control plane when one is missing, empty or malformed.
+`private_key` must be the base64 of exactly 32 bytes.
+
+- `kubectl -n secrets-bridge get secret secrets-bridge-agent` must exist in the
+  release namespace. A pod whose Secret doesn't exist stays in
+  `ContainerCreating`; `kubectl describe pod` shows the mount error.
+- The Secret must have the three keys. List the key names, not the values:
+  `kubectl -n secrets-bridge get secret secrets-bridge-agent-identity -o jsonpath='' | jq 'keys'`.
+  When your store uses other names, set `identity.keys.agentId`,
+  `identity.keys.agentSecret` and `identity.keys.privateKey`.
+- With ESO, check the `ExternalSecret` status
+  (`kubectl -n secrets-bridge get externalsecret`). A `SecretSyncedError` means
+  ESO couldn't read the store entry, usually a missing `GetSecretValue` or Vault
+  `read` grant, or a property name that doesn't match the bundle.
+
+### The agent refuses its credential files as too open
+
+The agent refuses a credential file with group write or any permission for
+others (`mode & 0o037 != 0`), checked on the file the symlink resolves to.
+Owner and group read (`0440`) is accepted.
+
+The `agent` chart mounts the Secret with `defaultMode: 0400` and requires
+`podSecurityContext.fsGroup`; kubelet shows the files as `0440 root:<fsGroup>`,
+which passes. A mount that is wider than that usually comes from a pod spec
+patched outside the chart (a different `defaultMode`, or a projected volume
+with its own mode). Without `fsGroup` the files stay `0400 root:root`, and the
+non-root agent can't read them at all: that shows up as a permission error, not
+as too open. Outside Kubernetes, `chmod 0400` (or `0600`) the files.
+
+### Requests fail with `409 agent_key_mismatch`
+
+The fingerprint of the key the agent loaded doesn't match the key bound to the
+agent on the control plane. The audit log has `agent.key.mismatch`, rate limited
+to one event per agent per minute.
+
+- After a [key rotation](agent-onboarding.md#rotate-the-wire-key) the running
+  pod still has the old key. Check that the Kubernetes Secret has the new
+  `private_key` (ESO synced it), then `kubectl rollout restart` the Deployment.
+- The Secret holds another agent's `private_key`, or the bundle from an
+  enrollment that was later replaced. Compare the `public_key_fingerprint`
+  stored with the bundle (or printed by `enroll` or `rotate-key`) with the one
+  the console shows for the agent. If they differ and no rotation is open, write the right bundle to the store, or revoke the agent and
+  enroll again.
+
+### Enrollment is refused
+
+`secrets-bridge-agent enroll` gets a generic error, and the audit log
+(`agent.enroll` with `denied`) has the reason:
+
+- `401 enrollment_rejected`: the token is wrong, expired, already used or
+  revoked, or the challenge didn't match. Tokens expire after 15 minutes by
+  default and work once. Create a new one.
+- `401 enrollment_rejected` with the right token: `--cluster-name` or
+  `--provider-type` doesn't match the token's expected values.
+- `400 invalid_public_key`: the key isn't 32 bytes of base64 for `x25519`, or
+  is a refused value (all zero or a low-order point). The CLI generates a valid
+  key, so this points at a modified client.
+- `400 unsupported_schema_version`: the CLI is older than the control plane's
+  enrollment API. Use the `secrets-bridge-agent` release that matches the
+  control plane.
+- `429`: too many attempts. Wait and retry.
+
+When `enroll` reached the control plane but the write to your secret store
+failed, the token is spent and the bundle is gone. Revoke the new agent and
+enroll again with a new token.
 
 ## Gateway
 

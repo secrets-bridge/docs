@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Install and enroll a Gateway - Secrets Bridge","description":"Install a Release 1 Gateway: the minimal Argo CD policy, enrollment, the Helm chart, the can-i privilege checks, Application identity and bindings.","url":"https://secrets-bridge.io/latest/operations/gateway/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/gateway/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T13:47:33+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Gateway","item":"https://secrets-bridge.io/latest/operations/gateway/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Install and enroll a Gateway - Secrets Bridge","description":"Install a Release 1 Gateway: the minimal Argo CD policy, enrollment, the Helm chart, the can-i privilege checks, Application identity and bindings.","url":"https://secrets-bridge.io/latest/operations/gateway/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/gateway/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T19:48:41+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Gateway","item":"https://secrets-bridge.io/latest/operations/gateway/"}]}]}</script>
   
 
   </head>
@@ -2608,6 +2608,15 @@ used the old control-plane poller, follow
     Admin-&gt;&gt;CP: approve connector, create binding
     Admin-&gt;&gt;CP: set the environment's observation source to gateway
     GW-&gt;&gt;CP: claim task, post result</code></pre>
+<div class="admonition note">
+<p class="admonition-title">Stateless, like the agent</p>
+<p>The Gateway keeps no local state. It reads <code>gateway_id</code>, <code>gateway_secret</code>
+and, when a connector has discovery on, the optional <code>snapshot_key</code> from
+read-only Kubernetes Secrets, and needs no PVC. Unlike the
+<a href="../agent-onboarding/">agent</a>, it has no X25519 key: it receives no sealed
+values. Its enrollment token, credential and scopes are its own and are
+not interchangeable with an agent's.</p>
+</div>
 <h2 id="before-you-start">Before you start<a class="headerlink" href="#before-you-start" title="Permanent link">&para;</a></h2>
 <ul>
 <li>The api from <code>main</code>, with migrations <code>0046</code> to <code>0049</code> applied. Migration

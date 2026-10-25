@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Configuration reference","description":"Every Secrets Bridge environment variable for the api, agent, worker, controller and Gateway, with defaults, retired settings and insecure dev switches.","url":"https://secrets-bridge.io/latest/operations/config/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/config/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T13:47:33+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Configuration reference","item":"https://secrets-bridge.io/latest/operations/config/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Configuration reference","description":"Every Secrets Bridge environment variable for the api, agent, worker, controller and Gateway, with defaults, retired settings and insecure dev switches.","url":"https://secrets-bridge.io/latest/operations/config/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/config/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T19:48:41+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Configuration reference","item":"https://secrets-bridge.io/latest/operations/config/"}]}]}</script>
   
 
   </head>
@@ -2531,52 +2531,16 @@ yet. See <a href="../object-storage/">Object storage</a>.</p>
 <td>SNI override for private DNS</td>
 </tr>
 <tr>
-<td><code>SB_ENROLLMENT_TOKEN</code></td>
-<td>first boot</td>
-<td></td>
-<td>One-time token from <code>POST /api/v1/provider-connections/&lt;id&gt;/agent-enrollment-token</code>. Exchanged once at <code>POST /api/v1/agents/enroll</code>, then never used again. Deliver it through a Secret.</td>
-</tr>
-<tr>
-<td><code>SB_ENROLLMENT_ENABLED</code></td>
+<td><code>SB_AGENT_CREDENTIALS_DIR</code></td>
 <td>no</td>
-<td><code>true</code></td>
-<td>Enroll on first boot when no identity is stored and a token is set</td>
-</tr>
-<tr>
-<td><code>SB_IDENTITY_FILE</code></td>
-<td>no</td>
-<td><code>/etc/secrets-bridge/identity.json</code></td>
-<td>Where the agent writes <code>{agent_id, agent_secret}</code> after enrolling (mode <code>0600</code>) and reads it on every restart. Must be writable and survive restarts.</td>
-</tr>
-<tr>
-<td><code>SB_PROVIDER_TYPE</code></td>
-<td>no</td>
-<td><code>aws-sm</code></td>
-<td>Reported at enrollment; must match the provider connection's <code>type</code></td>
-</tr>
-<tr>
-<td><code>SB_AGENT_NAME</code></td>
-<td>no</td>
-<td>hostname</td>
-<td>Reported at enrollment</td>
-</tr>
-<tr>
-<td><code>SB_REGION</code></td>
-<td>no</td>
-<td></td>
-<td>Reported at enrollment</td>
+<td><code>/etc/secrets-bridge/agent</code></td>
+<td>Read-only directory with the files <code>agent_id</code>, <code>agent_secret</code> and <code>private_key</code> (base64 of the 32-byte X25519 key), written from <code>secrets-bridge-agent enroll</code> output. Every file is required; a file with group write or any bit for others (<code>mode &amp; 0o037 != 0</code>) refuses the start. The agent never writes here. See <a href="../agent-onboarding/">Agent onboarding</a></td>
 </tr>
 <tr>
 <td><code>SB_CLUSTER_NAME</code></td>
 <td><strong>yes</strong> for discovery</td>
 <td></td>
-<td>Stamped on every discovered secret; must match the token's <code>expected_cluster_name</code> when one is set</td>
-</tr>
-<tr>
-<td><code>SB_AGENT_ID</code> / <code>SB_AGENT_SECRET</code></td>
-<td>no</td>
-<td></td>
-<td>A pre-provisioned credential. When set they take precedence over the identity file and enrollment is skipped. Only agents created by the dev-only direct mint need them.</td>
+<td>Stamped on every discovered secret. Use the <code>--cluster-name</code> given to <code>enroll</code></td>
 </tr>
 <tr>
 <td><code>SB_HEARTBEAT_INTERVAL</code></td>
@@ -2601,18 +2565,6 @@ yet. See <a href="../object-storage/">Object storage</a>.</p>
 <td>no</td>
 <td><code>127.0.0.1:8090</code></td>
 <td>Listener for <code>/healthz</code>, <code>/readyz</code>, <code>/metrics</code> only. The <code>agent</code> Helm chart sets <code>0.0.0.0:8090</code> so kubelet probes can reach it; the chart's NetworkPolicy denies all ingress to the pod.</td>
-</tr>
-<tr>
-<td><code>SB_AGENT_PRIVATE_KEY</code></td>
-<td>no</td>
-<td></td>
-<td>base64 X25519 private key (wire envelope)</td>
-</tr>
-<tr>
-<td><code>SB_AGENT_PRIVATE_KEY_FILE</code></td>
-<td>no</td>
-<td></td>
-<td>File path alternative</td>
 </tr>
 <tr>
 <td><code>SB_VAULT_ADDR</code></td>
@@ -2658,6 +2610,9 @@ yet. See <a href="../object-storage/">Object storage</a>.</p>
 </tr>
 </tbody>
 </table>
+<p>The agent reads its credential and key only from <code>SB_AGENT_CREDENTIALS_DIR</code>.
+There is no environment variable for either. Name, provider type and region are
+flags of <code>secrets-bridge-agent enroll</code>, not runtime settings.</p>
 <p><strong>AWS credentials</strong> are read from the standard AWS SDK chain
 (IRSA, instance role, <code>AWS_ACCESS_KEY_ID</code> / <code>AWS_SECRET_ACCESS_KEY</code>,
 shared profile). The agent deliberately does <strong>not</strong> add new env
@@ -3107,14 +3062,20 @@ kinds and duplicate names are refused at load.</p>
 </tr>
 <tr>
 <td>Agent identity (<code>agent_id</code> + <code>agent_secret</code>)</td>
-<td>Per-agent credential, sent as <code>X-Agent-Secret</code></td>
-<td><code>SB_IDENTITY_FILE</code> on a persistent volume (or <code>SB_AGENT_ID</code> / <code>SB_AGENT_SECRET</code>)</td>
-<td>Revoke the agent, create a new enrollment token, re-enroll with an empty identity file</td>
+<td>Per-agent credential, sent as <code>X-Agent-Secret</code>. The control plane keeps only its SHA-256</td>
+<td>Your secret store (AWS Secrets Manager, Vault) or a K8s Secret, mounted read-only into <code>SB_AGENT_CREDENTIALS_DIR</code></td>
+<td>Revoke the agent and enroll a new one with a new token</td>
 </tr>
 <tr>
-<td><code>SB_ENROLLMENT_TOKEN</code></td>
-<td>One-time enrollment token</td>
-<td>K8s Secret, read on first boot</td>
+<td>Agent wire key (<code>private_key</code>)</td>
+<td>X25519 key generated by <code>secrets-bridge-agent enroll</code>; the control plane seals values to its public key. Not a TLS client certificate</td>
+<td>Same Secret as the agent identity. Never leaves your boundary</td>
+<td><code>rotate-key</code> with a rotation token, then restart the agent. See <a href="../agent-onboarding/#rotate-the-wire-key">Rotate the wire key</a></td>
+</tr>
+<tr>
+<td>Agent enrollment token</td>
+<td>One-time token from <code>POST /api/v1/provider-connections/:id/agent-enrollment-token</code></td>
+<td>Used once from the operator's workstation, on stdin or from a file. Never stored in the cluster</td>
 <td>Single use; expires after 15 minutes by default</td>
 </tr>
 <tr>

@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Bootstrap & first sign-in","description":"First steps on a new Secrets Bridge install: seed the local admin, sign in, rotate its password, enroll an agent with a one-time token, run a read request.","url":"https://secrets-bridge.io/latest/operations/bootstrap/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/bootstrap/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-23T15:12:19+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Bootstrap & first sign-in","item":"https://secrets-bridge.io/latest/operations/bootstrap/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Bootstrap & first sign-in","description":"First steps on a new Secrets Bridge install: seed the local admin, sign in, rotate its password, enroll an agent with a one-time token, run a read request.","url":"https://secrets-bridge.io/latest/operations/bootstrap/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/bootstrap/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T19:48:41+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Bootstrap & first sign-in","item":"https://secrets-bridge.io/latest/operations/bootstrap/"}]}]}</script>
   
 
   </head>
@@ -2337,12 +2337,15 @@ its bcrypt hash are pointless:</p>
 <code>401 invalid credentials</code>; the audit log records
 <code>error_kind=user_disabled</code>.</p>
 <h2 id="enrolling-your-first-agent">Enrolling your first agent<a class="headerlink" href="#enrolling-your-first-agent" title="Permanent link">&para;</a></h2>
-<p>Agents onboard by <strong>enrollment</strong>. An admin creates a one-time token bound to
-a provider connection; the agent exchanges it once for a persistent
-identity and stores that identity itself. See
-<a href="../agent-onboarding/">Agent onboarding</a> for the model.</p>
-<p>The UI has no enrollment screen yet, so create the token through the API.
-You need <code>agent.mint</code> (the seed <code>admin</code> role has it), an active
+<p>An admin creates a one-time token bound to a provider connection. An operator
+then runs <code>secrets-bridge-agent enroll</code> on a trusted workstation: it generates
+the agent's X25519 key locally, exchanges the token for <code>agent_id</code> and
+<code>agent_secret</code>, and prints the bundle once, to be stored in your secret store or
+a Kubernetes Secret. The agent pod only reads that Secret. See
+<a href="../agent-onboarding/">Agent onboarding</a> for the model, the AWS Secrets Manager
+and Vault variants, and key custody.</p>
+<p>Create the token in the console or through the API, as below. You need
+<code>agent.mint</code> (the seed <code>admin</code> role has it), an active
 <a href="../provider-connections/">provider connection</a> and, on a production install,
 a second factor on your account: login-time MFA is on by default outside
 <code>SB_ENV=dev</code>, so add an authenticator app under <strong>Second factor</strong> in the
@@ -2379,23 +2382,28 @@ console first (<a href="../authentication/#step-up-vs-login-time-mfa">Step-up vs
 </span><span id="__span-3-30"><a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'.[] | {id, name, type, cluster_name, status}'</span>
 </span><span id="__span-3-31"><a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a><span class="nv">CONN_ID</span><span class="o">=</span>&lt;provider-connection-id&gt;
 </span><span id="__span-3-32"><a id="__codelineno-3-32" name="__codelineno-3-32" href="#__codelineno-3-32"></a>
-</span><span id="__span-3-33"><a id="__codelineno-3-33" name="__codelineno-3-33" href="#__codelineno-3-33"></a><span class="c1"># Create the one-time token and put it straight into a Kubernetes Secret</span>
-</span><span id="__span-3-34"><a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a><span class="c1"># in the workload cluster, without printing it.</span>
-</span><span id="__span-3-35"><a id="__codelineno-3-35" name="__codelineno-3-35" href="#__codelineno-3-35"></a>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>secrets-bridge<span class="w">   </span><span class="c1"># skip if it already exists</span>
-</span><span id="__span-3-36"><a id="__codelineno-3-36" name="__codelineno-3-36" href="#__codelineno-3-36"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/provider-connections/</span><span class="nv">$CONN_ID</span><span class="s2">/agent-enrollment-token"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-3-37"><a id="__codelineno-3-37" name="__codelineno-3-37" href="#__codelineno-3-37"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-3-38"><a id="__codelineno-3-38" name="__codelineno-3-38" href="#__codelineno-3-38"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"name":"cluster-a-agent","expected_cluster_name":"cluster-a","expected_provider_type":"vault"}'</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-3-39"><a id="__codelineno-3-39" name="__codelineno-3-39" href="#__codelineno-3-39"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-j<span class="w"> </span>.enrollment_token<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-3-40"><a id="__codelineno-3-40" name="__codelineno-3-40" href="#__codelineno-3-40"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>kubectl<span class="w"> </span>-n<span class="w"> </span>secrets-bridge<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>secrets-bridge-agent-enrollment<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-3-41"><a id="__codelineno-3-41" name="__codelineno-3-41" href="#__codelineno-3-41"></a><span class="w">      </span>--from-file<span class="o">=</span><span class="nv">enrollment_token</span><span class="o">=</span>/dev/stdin
+</span><span id="__span-3-33"><a id="__codelineno-3-33" name="__codelineno-3-33" href="#__codelineno-3-33"></a><span class="c1"># Create the one-time token and hand it straight to enroll on stdin, then</span>
+</span><span id="__span-3-34"><a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a><span class="c1"># write the bundle into a Kubernetes Secret in the workload cluster. The</span>
+</span><span id="__span-3-35"><a id="__codelineno-3-35" name="__codelineno-3-35" href="#__codelineno-3-35"></a><span class="c1"># token, agent_secret and private_key are never printed, never in argv and</span>
+</span><span id="__span-3-36"><a id="__codelineno-3-36" name="__codelineno-3-36" href="#__codelineno-3-36"></a><span class="c1"># never on disk.</span>
+</span><span id="__span-3-37"><a id="__codelineno-3-37" name="__codelineno-3-37" href="#__codelineno-3-37"></a>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>secrets-bridge<span class="w">   </span><span class="c1"># skip if it already exists</span>
+</span><span id="__span-3-38"><a id="__codelineno-3-38" name="__codelineno-3-38" href="#__codelineno-3-38"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/provider-connections/</span><span class="nv">$CONN_ID</span><span class="s2">/agent-enrollment-token"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-39"><a id="__codelineno-3-39" name="__codelineno-3-39" href="#__codelineno-3-39"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-40"><a id="__codelineno-3-40" name="__codelineno-3-40" href="#__codelineno-3-40"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"name":"cluster-a-agent","expected_cluster_name":"cluster-a","expected_provider_type":"vault"}'</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-41"><a id="__codelineno-3-41" name="__codelineno-3-41" href="#__codelineno-3-41"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-j<span class="w"> </span>.enrollment_token<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-42"><a id="__codelineno-3-42" name="__codelineno-3-42" href="#__codelineno-3-42"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>secrets-bridge-agent<span class="w"> </span>enroll<span class="w"> </span>--cp-endpoint<span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">"</span><span class="w"> </span>--token-file<span class="w"> </span>-<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-43"><a id="__codelineno-3-43" name="__codelineno-3-43" href="#__codelineno-3-43"></a><span class="w">      </span>--name<span class="w"> </span>cluster-a-agent<span class="w"> </span>--cluster-name<span class="w"> </span>cluster-a<span class="w"> </span>--provider-type<span class="w"> </span>vault<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-44"><a id="__codelineno-3-44" name="__codelineno-3-44" href="#__codelineno-3-44"></a><span class="w">      </span>--format<span class="w"> </span>env<span class="w"> </span>--output<span class="w"> </span>-<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-45"><a id="__codelineno-3-45" name="__codelineno-3-45" href="#__codelineno-3-45"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>kubectl<span class="w"> </span>-n<span class="w"> </span>secrets-bridge<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>generic<span class="w"> </span>secrets-bridge-agent-identity<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-46"><a id="__codelineno-3-46" name="__codelineno-3-46" href="#__codelineno-3-46"></a><span class="w">      </span>--from-env-file<span class="o">=</span>/dev/stdin
+</span><span id="__span-3-47"><a id="__codelineno-3-47" name="__codelineno-3-47" href="#__codelineno-3-47"></a>rm<span class="w"> </span>-f<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span>
 </span></code></pre></div>
 <p>All body fields are optional. <code>expires_in_seconds</code> defaults to 900 (15
 minutes) and is clamped to 60 to 86400. When <code>expected_cluster_name</code> or
-<code>expected_provider_type</code> is set, an agent that reports anything else is
-refused. The response carries the token exactly once, so don't log or
-paste the whole response. Its <code>install_hint</code> commands don't contain the
-token: they read it at a silent prompt.</p>
-<p>Then install the <code>agent</code> chart in enrollment mode (see
+<code>expected_provider_type</code> is set, an enrollment that reports anything else is
+refused. The response carries the token exactly once, so don't log or paste
+the whole response.</p>
+<p>Then install the <code>agent</code> chart with the Secret's name (see
 <a href="../#production-deployment">Production deployment</a> for the chart
 source):</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>helm<span class="w"> </span>install<span class="w"> </span>secrets-bridge-agent<span class="w"> </span>oci://ghcr.io/secrets-bridge/charts/secrets-bridge-agent<span class="w"> </span><span class="se">\</span>
@@ -2403,29 +2411,25 @@ source):</p>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span>--namespace<span class="w"> </span>secrets-bridge<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span>--set<span class="w"> </span><span class="nv">clusterName</span><span class="o">=</span>cluster-a<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span>--set<span class="w"> </span>cp.endpoint<span class="o">=</span>https://secrets-bridge.example.com<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span>--set<span class="w"> </span>enrollment.enabled<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span>--set<span class="w"> </span>enrollment.tokenSecretName<span class="o">=</span>secrets-bridge-agent-enrollment<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span>--set<span class="w"> </span>identity.mode<span class="o">=</span>file<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span>--set<span class="w"> </span>identity.persistence.enabled<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span>--set<span class="w"> </span>agent.providerType<span class="o">=</span>vault<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span>--set<span class="w"> </span>providers.vault.enabled<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">  </span>--set<span class="w"> </span>providers.vault.addr<span class="o">=</span>https://vault.example.com<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">  </span>--set<span class="w"> </span>providers.vault.kubernetesRole<span class="o">=</span>secrets-bridge-agent
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span>--set<span class="w"> </span>image.digest<span class="o">=</span>sha256:&lt;agent-digest&gt;<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span>--set<span class="w"> </span>identity.existingSecret<span class="o">=</span>secrets-bridge-agent-identity<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span>--set<span class="w"> </span>providers.vault.enabled<span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span>--set<span class="w"> </span>providers.vault.addr<span class="o">=</span>https://vault.example.com<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span>--set<span class="w"> </span>providers.vault.kubernetesRole<span class="o">=</span>secrets-bridge-agent
 </span></code></pre></div>
-<p>On first boot the agent calls <code>POST /api/v1/agents/enroll</code> with the token,
-writes <code>{agent_id, agent_secret}</code> to <code>SB_IDENTITY_FILE</code> on the persistent
-volume and starts heartbeating. Restarts reuse that file; the token is
-never spent twice. The agent shows up under
+<p>The agent reads <code>agent_id</code>, <code>agent_secret</code> and <code>private_key</code> from the Secret,
+mounted read-only at <code>/etc/secrets-bridge/agent</code>, and starts heartbeating.
+Restarts read the same Secret. The agent shows up under
 <code>GET /api/v1/provider-connections/&lt;id&gt;/agents</code> and turns <code>active</code> on its
 first heartbeat.</p>
-<p>If the agent fails to enroll (expired token, wrong cluster name or provider
+<p>If enrollment is refused (expired token, wrong cluster name or provider
 type), fix the cause and create a new token. An unused token stops working
-when it expires, so keep <code>expires_in_seconds</code> short.</p>
+when it expires, so keep <code>expires_in_seconds</code> short. See
+<a href="../troubleshooting/#agent">Troubleshooting: agent</a>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Direct agent mint is a dev-only break-glass</p>
-<p>The <strong>+ Mint agent</strong> drawer on the Agents page and
-<code>POST /api/v1/agents</code> use the legacy direct mint, which hands back a
-long-lived <code>agent_secret</code>. The api refuses it with
+<p><code>POST /api/v1/agents</code> is the legacy direct mint, which hands back a
+long-lived <code>agent_secret</code> and also requires a public key. The api refuses it with
 <code>403 direct_agent_mint_disabled</code> unless it runs with
 <code>SB_ALLOW_DIRECT_AGENT_MINT=true</code>. Leave that switch off outside a
 local dev loop; see <a href="../config/#insecure-switches-dev-only">Insecure switches</a>.</p>
