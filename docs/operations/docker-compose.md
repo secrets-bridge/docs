@@ -86,9 +86,10 @@ log. `SB_ENV=dev` is what lets the session cookie work over plain
 
 ## Wiring an agent end to end (Vault example)
 
-Agents onboard by enrollment: an admin creates a one-time token for a
-provider connection, and the agent exchanges it once for a persistent
-identity. The steps below run everything locally. See
+An admin creates a one-time token for a provider connection,
+`secrets-bridge-agent enroll` exchanges it for the agent credential and
+generates the X25519 key locally, and the agent reads both from a read-only
+directory. The steps below run everything locally. See
 [Agent onboarding](agent-onboarding.md) for the model.
 
 ```bash
@@ -122,36 +123,45 @@ CONN_ID=$(curl -fsS -b "$JAR" -X POST "$CP/api/v1/provider-connections" \
        "discover_interval_seconds":3600}' \
   | jq -r .id)
 
-# 5. Create a one-time enrollment token for that connection (15 minutes by default).
-SB_ENROLLMENT_TOKEN=$(curl -fsS -b "$JAR" -X POST "$CP/api/v1/provider-connections/$CONN_ID/agent-enrollment-token" \
+# 5. From a checkout of the agent repo: create a one-time enrollment token
+#    for that connection (15 minutes by default) and hand it to enroll on
+#    stdin. The bundle lands in a shell variable, then in three owner-only
+#    files. Dev only: in a real install it goes to your secret store.
+#    SB_INSECURE_TRANSPORT=true lets enroll and the agent use the local
+#    http:// endpoint, the same dev-only switch as the runtime.
+cd ../agent   # wherever you cloned github.com/secrets-bridge/agent
+mkdir -p -m 700 .local/credentials
+SB_BUNDLE=$(curl -fsS -b "$JAR" -X POST "$CP/api/v1/provider-connections/$CONN_ID/agent-enrollment-token" \
   -H 'Content-Type: application/json' \
   -d '{"name":"local-agent","expected_cluster_name":"local","expected_provider_type":"vault"}' \
-  | jq -j .enrollment_token)
-export SB_ENROLLMENT_TOKEN
+  | jq -j .enrollment_token \
+  | SB_INSECURE_TRANSPORT=true go run ./cmd/agent enroll --cp-endpoint "$CP" --token-file - \
+      --name local-agent --cluster-name local --provider-type vault \
+      --format json --output -)
+for k in agent_id agent_secret private_key; do
+  (umask 077 && jq -j ".$k" <<<"$SB_BUNDLE" > ".local/credentials/$k")
+done
+unset SB_BUNDLE
 
-# 6. In the same shell, from a checkout of the agent repo: enroll on first
-#    boot, then heartbeat. It runs in the background; `kill %1` stops it.
-#    SB_VAULT_KV_MOUNT has to be the connection's mount from step 4. The
-#    agent defaults to `kv`; with a mismatch it refuses discovery and
-#    points reads and patches at the wrong mount.
-cd ../agent   # wherever you cloned github.com/secrets-bridge/agent
-mkdir -p .local
+# 6. Run the agent against that directory. It runs in the background;
+#    `kill %1` stops it. SB_VAULT_KV_MOUNT has to be the connection's mount
+#    from step 4. The agent defaults to `kv`; with a mismatch it refuses
+#    discovery and points reads and patches at the wrong mount.
 SB_CP_ENDPOINT="$CP" SB_INSECURE_TRANSPORT=true \
-SB_ENROLLMENT_ENABLED=true SB_IDENTITY_FILE="$PWD/.local/identity.json" \
-SB_PROVIDER_TYPE=vault SB_CLUSTER_NAME=local \
+SB_AGENT_CREDENTIALS_DIR="$PWD/.local/credentials" SB_CLUSTER_NAME=local \
 SB_VAULT_ADDR=http://127.0.0.1:8200 SB_VAULT_TOKEN="$VAULT_DEV_TOKEN" \
 SB_VAULT_KV_MOUNT=secret \
   go run ./cmd/agent > .local/agent.log 2>&1 &
 
-# 7. After a few seconds the log shows "enrolled and persisted credential"
-#    and the agent is listed, `active`, against the connection.
+# 7. After a few seconds the agent is listed, `active`, against the connection.
 curl -fsS -b "$JAR" "$CP/api/v1/provider-connections/$CONN_ID/agents" | jq
 ```
 
-The token is spent by step 6. The agent writes its identity to
-`SB_IDENTITY_FILE` (mode `0600`) and reuses it on every restart, so a
-restart never needs a second token. To start over, revoke the agent, delete
-the identity file and create a new token.
+The token is spent by step 5. The agent only reads `.local/credentials` and
+writes nothing, so a restart reuses the same files. The files must stay
+owner-only: the agent refuses a file with group write or any bit for others.
+To start over, revoke the agent, delete `.local/credentials` and create a new
+token.
 
 ## Ports
 
@@ -176,7 +186,7 @@ still does, pull the latest `main` before you start it on a shared network.
 # including the seeded users)
 docker compose down -v
 docker rm -f sb-vault-dev   # if you started it
-rm -f .local/identity.json  # in the agent checkout
+rm -rf .local/credentials  # in the agent checkout
 ```
 
 ## What docker compose is good for, what it's not

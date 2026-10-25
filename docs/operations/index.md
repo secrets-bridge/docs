@@ -90,8 +90,11 @@ Around the charts you provide:
 - [ ] `SB_INSECURE_TRANSPORT` on the agent is **unset** (default
   is to refuse `http://`), and the chart's `cp.insecureTransport` is
   `false`
-- [ ] Agents are onboarded with one-time enrollment tokens, and their
-  identity file sits on a persistent volume that only the agent mounts
+- [ ] Agents are onboarded with one-time enrollment tokens and
+  `secrets-bridge-agent enroll`; each agent's identity Secret
+  (`agent_id`, `agent_secret`, `private_key`) lives in your secret store or a
+  Kubernetes Secret that only the agent and its operators can read, and is
+  in no Helm values, Git repository or CI log
 - [ ] TLS terminator (ingress) configured with HSTS + a real
   certificate
 - [ ] `SB_BOOTSTRAP_ADMIN_PASSWORD` is **rotated** immediately
