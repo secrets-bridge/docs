@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"HTTP API endpoints","description":"Every HTTP endpoint the Secrets Bridge api exposes and its auth gate: sign-in, agents, Gateways, access requests, reveal sessions, audit and policy rules.","url":"https://secrets-bridge.io/latest/reference/api-endpoints/","mainEntityOfPage":"https://secrets-bridge.io/latest/reference/api-endpoints/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-23T15:12:19+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Reference","item":"https://secrets-bridge.io/latest/reference/"},{"@type":"ListItem","position":3,"name":"HTTP API endpoints","item":"https://secrets-bridge.io/latest/reference/api-endpoints/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"HTTP API endpoints","description":"Every HTTP endpoint the Secrets Bridge api exposes and its auth gate: sign-in, agents, Gateways, access requests, reveal sessions, audit and policy rules.","url":"https://secrets-bridge.io/latest/reference/api-endpoints/","mainEntityOfPage":"https://secrets-bridge.io/latest/reference/api-endpoints/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T13:47:33+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Reference","item":"https://secrets-bridge.io/latest/reference/"},{"@type":"ListItem","position":3,"name":"HTTP API endpoints","item":"https://secrets-bridge.io/latest/reference/api-endpoints/"}]}]}</script>
   
 
   </head>
@@ -3412,13 +3412,13 @@ authenticated by the one-time token only; every other route needs
 <td><code>PUT</code></td>
 <td><code>/api/v1/gateways/:id/catalog</code></td>
 <td>gateway</td>
-<td>Full replace of advertised connectors and targets → <code>{accepted, targets_stale, catalog_version}</code>. Never approves or binds anything. A target no longer advertised stays, marked stale</td>
+<td>Full replace of advertised connectors and targets → <code>{accepted, targets_stale, catalog_version}</code>. Never approves or binds anything. A target no longer advertised stays, marked stale. An <code>argocd</code> target may carry <code>identity</code>, its scoped identity digest (<code>d-</code> and 26 base32 characters); on another kind, or malformed, it is <code>400 invalid_request</code>. The first digest for a target is pinned, and a different one marks the target <code>identity_changed</code> and suspends its bindings</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/gateways/:id/tasks/claim</code></td>
 <td>gateway</td>
-<td>E4. <code>{replica_id, max_tasks: 1}</code> → <code>200</code> with one task (<code>task_id</code>, <code>attempt_id</code>, <code>attempt_count</code>, <code>lease_expires_at</code>, <code>deadline_at</code>, <code>request_id</code>, <code>correlation_id</code>, <code>skew_margin_seconds</code>, <code>gateway_scope</code>, <code>connector_refs</code>, <code>expected_change</code>, <code>rollout_baseline</code>), or <code>204</code> with <code>Retry-After: 5</code> when nothing is claimable or no heartbeat has negotiated a contract version yet. Scoped to the authenticated Gateway. <code>429 inflight_limit</code> with <code>Retry-After</code> when the Gateway is at <code>max_inflight_tasks</code> or the replica already holds a task. <code>409 contract_version_unsupported</code>. 2400 a minute</td>
+<td>E4. <code>{replica_id, max_tasks: 1}</code> → <code>200</code> with one task (<code>task_id</code>, <code>attempt_id</code>, <code>attempt_count</code>, <code>lease_expires_at</code>, <code>deadline_at</code>, <code>request_id</code>, <code>correlation_id</code>, <code>skew_margin_seconds</code>, <code>gateway_scope</code>, <code>connector_refs</code>, <code>expected_change</code>, <code>rollout_baseline</code>), or <code>204</code> with <code>Retry-After: 5</code> when nothing is claimable or no heartbeat has negotiated a contract version yet. Scoped to the authenticated Gateway. Skips tasks whose target is <code>identity_changed</code>, and tasks for a connector that a replica seen in the last 10 minutes last reported, or that reported itself, <code>over_privileged</code>. <code>429 inflight_limit</code> with <code>Retry-After</code> when the Gateway is at <code>max_inflight_tasks</code> or the replica already holds a task. <code>409 contract_version_unsupported</code>. 2400 a minute</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
@@ -3504,6 +3504,16 @@ treats as transient. The claim, lease and release bodies are limited to 4 KiB.</
 <td><code>started_at</code>, <code>finished_at</code> or <code>observed_at</code> is outside the attempt, allowing for clock skew</td>
 </tr>
 <tr>
+<td><code>422</code></td>
+<td><code>target_identity_changed</code></td>
+<td>Result only: the target is <code>identity_changed</code>, so no evidence for it is accepted, an error stage included</td>
+</tr>
+<tr>
+<td><code>422</code></td>
+<td><code>identity_digest_missing</code>, <code>identity_digest_mismatch</code></td>
+<td>Result only: the target is pinned, and a stage that describes the Application carries no <code>resource.identity_digest</code>, or another one</td>
+</tr>
+<tr>
 <td><code>429</code></td>
 <td><code>inflight_limit</code></td>
 <td>Claim only: the Gateway or the replica is at its in-flight limit</td>
@@ -3538,7 +3548,7 @@ treats as transient. The claim, lease and release bodies are limited to 4 KiB.</
 <td><code>GET</code></td>
 <td><code>/api/v1/admin/gateways/:id</code></td>
 <td><code>session + gateway.list</code></td>
-<td><code>{gateway, replicas, connectors, bindings, enrollment_tokens}</code>, metadata only</td>
+<td><code>{gateway, replicas, connectors, bindings, enrollment_tokens}</code>, metadata only. Each target has <code>identity_status</code> (<code>unpinned</code>, <code>pinned</code> or <code>identity_changed</code>), and a suspended binding has <code>suspended_reason: identity_changed</code>. Never the identity digest</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
@@ -3566,14 +3576,20 @@ treats as transient. The claim, lease and release bodies are limited to 4 KiB.</
 </tr>
 <tr>
 <td><code>POST</code></td>
+<td><code>/api/v1/admin/gateways/:id/connectors/:cid/targets/:tid/confirm-identity</code></td>
+<td><code>session + gateway.bind</code> + fresh MFA</td>
+<td>No body. <code>:tid</code> is the target id. The identity the Gateway advertises now becomes the pin, and every binding on the target resumes → the connector. <code>404 connector_not_found</code> or <code>target_not_found</code>, <code>409 target_identity_not_changed</code> or <code>target_stale</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
 <td><code>/api/v1/admin/gateway-bindings</code></td>
 <td><code>session + gateway.bind</code> + fresh MFA</td>
-<td><code>{gateway_id, environment_id, project_id?, secret_id \| (provider_connection_id + secret_ref), argocd_connector_id, argocd_target_id, observation_timeout_seconds?}</code> → <code>201</code>. Argo CD targets only in Release 1</td>
+<td><code>{gateway_id, environment_id, project_id?, secret_id \| (provider_connection_id + secret_ref), argocd_connector_id, argocd_target_id, observation_timeout_seconds?}</code> → <code>201</code>. Argo CD targets only in Release 1. <code>409 target_identity_changed</code> while the target is suspended</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/admin/gateway-bindings</code></td>
-<td><code>session + gateway.bind</code></td>
+<td><code>session + gateway.list</code></td>
 <td>Optional <code>?gateway_id=</code></td>
 </tr>
 <tr>
@@ -3597,7 +3613,7 @@ treats as transient. The claim, lease and release bodies are limited to 4 KiB.</
 <tr>
 <td><code>GET</code></td>
 <td><code>/api/v1/admin/environments/:id/observation-source</code></td>
-<td><code>session + gateway.bind</code></td>
+<td><code>session + gateway.list</code></td>
 <td><code>{environment_id, observation_source}</code>, either <code>gateway</code> or <code>none</code>. A stored value that is not one of them reads as <code>none</code>. <code>404 environment_not_found</code></td>
 </tr>
 <tr>
@@ -3614,8 +3630,13 @@ treats as transient. The claim, lease and release bodies are limited to 4 KiB.</
 <code>gateway.replica_limit</code>, <code>gateway.over_privileged</code>, <code>gateway.catalog.updated</code>,
 <code>gateway.connector.missing</code>, <code>gateway.connector.approval_reset</code>,
 <code>gateway.connector.approved</code>, <code>gateway.binding.create</code>,
-<code>gateway.binding.delete</code>, <code>gateway.enable</code>, <code>gateway.disable</code> and
-<code>environment.observation_source.update</code>.</p>
+<code>gateway.binding.delete</code>, <code>gateway.target.identity_changed</code>,
+<code>gateway.target.identity_confirmed</code>, <code>gateway.enable</code>, <code>gateway.disable</code> and
+<code>environment.observation_source.update</code>. A refused (4xx) approve, bind,
+binding delete or re-confirm is also audited under its action
+(<code>gateway.connector.approved</code>, <code>gateway.binding.create</code>,
+<code>gateway.binding.delete</code>, <code>gateway.target.identity_confirmed</code>) with status
+<code>denied</code>, an <code>error_kind</code> and the UUID path ids only.</p>
 <p>Observation audit actions: <code>observation.task.created</code>,
 <code>observation.task.claimed</code>, <code>observation.task.released</code>,
 <code>observation.task.lease_expired</code>, <code>observation.evidence.accepted</code>,

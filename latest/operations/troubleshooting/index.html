@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Troubleshooting","description":"Fix common Secrets Bridge problems: login 401s, Google sign-in, failed agent jobs, stale agents, Vault permission errors, Gateway issues and audit queries.","url":"https://secrets-bridge.io/latest/operations/troubleshooting/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/troubleshooting/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-24T14:45:35Z"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Troubleshooting","item":"https://secrets-bridge.io/latest/operations/troubleshooting/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Troubleshooting","description":"Fix common Secrets Bridge problems: login 401s, Google sign-in, failed agent jobs, stale agents, Vault permission errors, Gateway issues and audit queries.","url":"https://secrets-bridge.io/latest/operations/troubleshooting/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/troubleshooting/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T13:47:33+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Troubleshooting","item":"https://secrets-bridge.io/latest/operations/troubleshooting/"}]}]}</script>
   
 
   </head>
@@ -2961,12 +2961,15 @@ heartbeat and each connector's health.</p>
   <code>jq -ce '{gateway_id, gateway_secret}'</code> step in the install pipeline keeps
   only those two fields.</li>
 <li><code>refusing to start: connectors: self-check could not prove the credential
-  cannot read secrets: connector "&lt;name&gt;"; ...</code>: at boot, Argo CD could not be
-  reached, the token check (<code>GET /api/v1/session/userinfo</code>) was refused, or a
-  can-i question did not complete. The pod exits and restarts
-  (<code>CrashLoopBackOff</code>). Check that the token Secret holds a valid token for
-  the <code>sb-gateway</code> account, that <code>base_url</code> is right, and that the
-  connector's <code>egress</code> peer lets the pod reach Argo CD. Once Argo CD answers, the next restart passes; see
+  cannot read secrets: connector "&lt;name&gt;"; failed check &lt;resource&gt; &lt;action&gt;:
+  &lt;kind&gt;; ...</code>: at boot, Argo CD could not be reached, the token check
+  (<code>GET /api/v1/session/userinfo</code>) was refused, or a can-i question did not
+  complete. The pod exits and restarts (<code>CrashLoopBackOff</code>). The named check
+  says which: <code>failed check session userinfo: unauthorized</code> points at the
+  token Secret, <code>unreachable</code>, <code>timeout</code> or <code>tls</code> at <code>base_url</code>, the
+  connector's <code>egress</code> peer or the CA, and any other check (for example
+  <code>failed check exec create: bad request</code>) at that can-i question. Once
+  Argo CD answers, the next restart passes; see
   <a href="../gateway/#release-1-an-argo-cd-outage-at-boot-is-a-crash-loop">Release 1: an Argo CD outage at boot is a crash loop</a>.</li>
 <li>After boot, the same failures do not restart the pod. It stays up and not
   ready, stops claiming, and turns ready once a recheck passes.</li>
@@ -2976,20 +2979,33 @@ heartbeat and each connector's health.</p>
   <code>2m</code>): the control plane is unreachable. Check <code>cp.endpoint</code>, the
   <code>cp.egress.cidrs</code> NetworkPolicy peer and, for a private CA,
   <code>cp.caExistingSecret</code>.</li>
+<li><code>catalog upload failed</code> with <code>http 400</code>, again on every heartbeat: the
+  control plane refused the catalog. If the api was not upgraded before the
+  Gateway, it does not know the catalog <code>identity</code> field that the Gateway
+  sends for an Argo CD target whose uid it knows. Upgrade the api; see
+  <a href="../gateway/#application-identity">Application identity</a>.</li>
+<li><code>invalid connector settings: ... applications.id: must not start with "d-"</code>:
+  a target <code>id</code> in the connectors file uses the prefix reserved for
+  discovered targets, and the Gateway refuses to start. Rename the target.</li>
 </ul>
 <h3 id="gateway-refuses-to-start-over-privileged">Gateway refuses to start: over-privileged<a class="headerlink" href="#gateway-refuses-to-start-over-privileged" title="Permanent link">&para;</a></h3>
 <p>A log line <code>refusing to start: connectors: credential is over-privileged:
-connector "&lt;name&gt;"; ...</code> for an <code>argocd</code> connector comes from the Argo CD
-can-i probe: Argo CD answered <code>yes</code> to one of the questions in
-<a href="../gateway/#argo-cd-privilege-checks">Argo CD privilege checks</a>. The line does
-not say which question, so compare every policy line that applies to the
-Gateway's account or role with that table. Remove the extra right from the
-Argo CD policy of the Gateway's account so that only the
+connector "&lt;name&gt;"; failed check &lt;resource&gt; &lt;action&gt;: can-i yes; ...</code> for an
+<code>argocd</code> connector comes from the Argo CD can-i probe: Argo CD answered <code>yes</code>
+to the question named in the line, one of those in
+<a href="../gateway/#argo-cd-privilege-checks">Argo CD privilege checks</a>. For example
+<code>failed check logs get: can-i yes</code> means the token may read pod logs. The line
+names the resource and action, not the AppProject or the object, so check
+every policy line that applies to the Gateway's account or role for that right,
+on the allowed AppProjects and on each configured Application. Remove the
+extra right from the Argo CD policy of the Gateway's account so that only the
 <a href="../gateway/#the-minimal-policy">minimal policy</a> is left, and check
 <code>policy.default</code> in <code>argocd-rbac-cm</code> too: <code>role:readonly</code> grants <code>logs, get</code>
 and trips this check. The pod restarts until the grant is gone. When a recheck
 finds a grant on a running Gateway, the replica turns not ready, reports
-<code>over_privileged</code> in a heartbeat and stops.</p>
+<code>over_privileged</code> in a heartbeat and stops. The control plane then pauses
+dispatch for that connector until the report is 10 minutes old, so after the
+fix, tasks can wait up to 10 minutes before they are claimed again.</p>
 <p>For an <code>eso</code> or <code>rollout</code> connector, the same message comes from the
 Kubernetes self-check. Those Release 2 connectors need
 <code>SB_GATEWAY_ENABLE_R2_CONNECTORS=true</code>; a Release 1 Gateway built from the
@@ -3021,8 +3037,20 @@ it was deleted and recreated, so it has a new <code>metadata.uid</code>. The Gat
 reports nothing about the new object. If the change is expected, read the new
 uid (<code>kubectl get application -n &lt;namespace&gt; &lt;name&gt; -o jsonpath='{.metadata.uid}'</code>),
 set it as <code>applications[].uid</code> and upgrade the release. Without a <code>uid</code> in the
-values, restart the Gateway. See
-<a href="../gateway/#application-identity">Application identity</a>.</p>
+values, restart the Gateway. The Gateway then advertises the new identity, so
+the control plane marks the target <code>identity_changed</code> (<code>identity_status</code> in
+the detail view) and suspends its bindings. A platform admin then re-confirms
+it with
+<code>POST /api/v1/admin/gateways/&lt;id&gt;/connectors/&lt;connector-uuid&gt;/targets/&lt;target-id&gt;/confirm-identity</code>.
+Re-confirm only after the Gateway runs with the new uid, because the
+re-confirm accepts whatever identity the Gateway advertises at that moment.
+See <a href="../gateway/#application-identity">Application identity</a>.</p>
+<p>While the target is <code>identity_changed</code>, its tasks are not dispatched, a result
+for it is refused with <code>target_identity_changed</code>, and a new binding on it gets
+<code>409 target_identity_changed</code>. A result for a pinned target that carries no
+<code>identity_digest</code>, or another one, is refused with <code>identity_digest_missing</code> or
+<code>identity_digest_mismatch</code>. Each refusal is audited as
+<code>observation.evidence.rejected</code> with that reason.</p>
 <h3 id="gateway-gets-401-from-the-control-plane">Gateway gets 401 from the control plane<a class="headerlink" href="#gateway-gets-401-from-the-control-plane" title="Permanent link">&para;</a></h3>
 <p>The log shows <code>control plane refused this gateway; claiming stopped, staying up
 and not ready until restarted</code>. The pod stays up and not ready on purpose, so it
@@ -3072,7 +3100,9 @@ audit events with the <code>correlation_id</code> of the job that executed the c
   (see <a href="../../components/gateway/#runtime-behaviour">Runtime behaviour</a>). A
   Gateway that has never had a heartbeat accepted gets <code>204</code> on every claim.</li>
 <li><strong>The connector or binding changed.</strong> A task is claimable only while its
-  binding is enabled and its connector approved.</li>
+  binding is enabled, its connector approved, its target not
+  <code>identity_changed</code>, and no replica of the Gateway seen in the last 10
+  minutes last reported the connector, or itself, <code>over_privileged</code>.</li>
 </ul>
 <p>A pending task never fails the request. At its deadline it ends <code>timed_out</code>.</p>
 <h3 id="observation-timed-out-with-gateway_unavailable">Observation timed out with <code>gateway_unavailable</code><a class="headerlink" href="#observation-timed-out-with-gateway_unavailable" title="Permanent link">&para;</a></h3>

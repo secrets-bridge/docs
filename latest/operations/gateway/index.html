@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Install and enroll a Gateway - Secrets Bridge","description":"Install a Release 1 Gateway: the minimal Argo CD policy, enrollment, the Helm chart, the can-i privilege checks, Application identity and bindings.","url":"https://secrets-bridge.io/latest/operations/gateway/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/gateway/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-24T14:45:35Z"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Gateway","item":"https://secrets-bridge.io/latest/operations/gateway/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Install and enroll a Gateway - Secrets Bridge","description":"Install a Release 1 Gateway: the minimal Argo CD policy, enrollment, the Helm chart, the can-i privilege checks, Application identity and bindings.","url":"https://secrets-bridge.io/latest/operations/gateway/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/gateway/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T13:47:33+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Gateway","item":"https://secrets-bridge.io/latest/operations/gateway/"}]}]}</script>
   
 
   </head>
@@ -1717,10 +1717,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#argo-cd-2x-turn-on-logs-rbac" class="md-nav__link">
+  <a href="#argo-cd-24-to-214-turn-on-logs-rbac" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Argo CD 2.x: turn on logs RBAC
+        Argo CD 2.4 to 2.14: turn on logs RBAC
       
     </span>
   </a>
@@ -1878,6 +1878,34 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Application identity">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#control-plane-identity-pin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Control-plane identity pin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#re-confirm-a-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Re-confirm a target
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2305,10 +2333,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#argo-cd-2x-turn-on-logs-rbac" class="md-nav__link">
+  <a href="#argo-cd-24-to-214-turn-on-logs-rbac" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Argo CD 2.x: turn on logs RBAC
+        Argo CD 2.4 to 2.14: turn on logs RBAC
       
     </span>
   </a>
@@ -2467,6 +2495,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Application identity">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#control-plane-identity-pin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Control-plane identity pin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#re-confirm-a-target" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Re-confirm a target
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2547,7 +2603,7 @@ used the old control-plane poller, follow
     Op-&gt;&gt;K8s: Secret with identity.json
     Op-&gt;&gt;K8s: helm install secrets-bridge-gateway
     GW-&gt;&gt;Argo: GET /api/v1/session/userinfo
-    GW-&gt;&gt;Argo: GET /api/v1/account/can-i/... (each answer must be no)
+    GW-&gt;&gt;Argo: GET /api/v1/account/can-i/... (each forbidden right must answer no)
     GW-&gt;&gt;CP: heartbeat and catalog
     Admin-&gt;&gt;CP: approve connector, create binding
     Admin-&gt;&gt;CP: set the environment's observation source to gateway
@@ -2591,18 +2647,21 @@ unset, or point it at a role that grants nothing beyond the lines above. The
 built-in <code>role:readonly</code> includes <code>logs, get, */*</code>, so with
 <code>policy.default: role:readonly</code> the Gateway refuses to start (see
 <a href="#argo-cd-privilege-checks">Argo CD privilege checks</a>).</p>
-<h3 id="argo-cd-2x-turn-on-logs-rbac">Argo CD 2.x: turn on logs RBAC<a class="headerlink" href="#argo-cd-2x-turn-on-logs-rbac" title="Permanent link">&para;</a></h3>
-<p>On Argo CD 2.x, set this in <code>argocd-cm</code>:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># argocd-cm, Argo CD 2.x only</span>
+<h3 id="argo-cd-24-to-214-turn-on-logs-rbac">Argo CD 2.4 to 2.14: turn on logs RBAC<a class="headerlink" href="#argo-cd-24-to-214-turn-on-logs-rbac" title="Permanent link">&para;</a></h3>
+<p>On Argo CD 2.4 to 2.14, set this in <code>argocd-cm</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># argocd-cm, Argo CD 2.4 to 2.14 only</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nt">data</span><span class="p">:</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">server.rbac.log.enforce.enable</span><span class="p">:</span><span class="w"> </span><span class="s">"true"</span>
 </span></code></pre></div>
-<p>Without it, Argo CD 2.x does not enforce the <code>logs</code> resource, and
+<p>Without it, these versions do not enforce the <code>logs</code> resource, and
 <code>applications, get</code> also lets the token read the pod logs of every
 Application it can read. Pod logs often hold secrets. The Gateway's
 <code>logs, get</code> probe cannot see this: Argo CD answers <code>no</code> to the question while
-the logs are still readable. This setting is required for a Gateway on 2.x.
-From Argo CD 3.0 logs RBAC is always enforced and the setting is removed.</p>
+the logs are still readable. This setting is required for a Gateway on 2.4 to
+2.14. Argo CD 3.0 removed the setting and always enforces logs RBAC.</p>
+<p>Argo CD before 2.4 is not supported. <code>logs</code> became an RBAC resource in 2.4.
+Before that, <code>applications, get</code> always grants the pod logs, and no setting
+restricts it.</p>
 <h3 id="rights-the-account-must-not-have">Rights the account must not have<a class="headerlink" href="#rights-the-account-must-not-have" title="Permanent link">&para;</a></h3>
 <p>Do not grant any of the following, on any object. The Gateway asks Argo CD
 about each one that has a probe and refuses to start if the answer is yes.</p>
@@ -2632,7 +2691,7 @@ about each one that has a probe and refuses to start if the answer is yes.</p>
 <td><code>logs</code></td>
 <td><code>get</code></td>
 <td>Pod logs often hold secrets</td>
-<td>Yes. On 2.x the answer means something only with logs RBAC turned on</td>
+<td>Yes. On 2.4 to 2.14 the answer means something only with logs RBAC turned on</td>
 </tr>
 <tr>
 <td><code>applicationsets</code></td>
@@ -2852,12 +2911,12 @@ Service, Ingress or volume claim. <code>helm install</code> fails with a message
 value when the image is not pinned, <code>cp.endpoint</code> is not <code>https://</code>, the
 identity Secret is not named, a connector is incomplete, or a NetworkPolicy peer
 is missing.</p>
-<p><code>uid</code> is optional. Set it to the Application's <code>metadata.uid</code> so that a
-deleted and recreated Application is refused on every replica, across
-restarts. See <a href="#application-identity">Application identity</a> for why and how to
-read it. The chart accepts <code>uid</code> from the release that includes
-<a href="https://github.com/secrets-bridge/charts/pull/56">charts#56</a>; with an older
-chart, leave it out.</p>
+<p><code>uid</code> is optional. Set it to the Application's <code>metadata.uid</code>, a lower-case
+UUID, so that a deleted and recreated Application is refused on every replica,
+across restarts. See <a href="#application-identity">Application identity</a> for why,
+how to read it, and why the control plane must be upgraded before the Gateway.</p>
+<p>A target <code>id</code> must not start with <code>d-</code>. That prefix is reserved for discovered
+targets, and the Gateway refuses to start with a static target id that uses it.</p>
 <p>For an Argo CD in the same cluster, use selectors instead of CIDRs, and the
 full list of values, see the
 <a href="https://github.com/secrets-bridge/charts/blob/main/gateway/README.md">chart README</a>.</p>
@@ -3089,35 +3148,73 @@ AppProjects and configured Applications.</p>
 <p>When a target sets <code>appNamespace</code>, the per-target questions are also asked on
 <code>&lt;project&gt;/&lt;app-namespace&gt;/&lt;app&gt;</code>, because only Argo CD 3.4 and later
 normalize that object form.</p>
+<p>One more question, the read probe, asks <code>applications get</code> on <code>*/*</code>
+(<code>GET /api/v1/account/can-i/applications/get/*/*</code>, also admitted as that exact
+path): may the token read every Application in every AppProject? Its answer is
+read differently, see below.</p>
 <p>When they run:</p>
 <ul>
-<li><strong>Project-wide</strong>, for every allowed AppProject: at boot, before any
-  Application is read, and again at every recheck.</li>
+<li><strong>Project-wide</strong>, for every allowed AppProject, then the read probe: at boot,
+  before any Application is read, and again at every recheck.</li>
+<li><strong>Startup read</strong>: once those pass at boot, the Gateway reads each configured
+  Application that has no <code>uid</code> in the values, once, with the same
+  <code>GET /api/v1/applications/&lt;name&gt;</code> an observation sends. A read that fails,
+  for example a 404 for an Application that does not exist yet, is not an
+  error: the target is read on its first task instead. There is no startup
+  read at a recheck.</li>
 <li><strong>Per static target</strong>: after the first read of the target that passes the
   uid check, before that observation is returned, and again at every recheck.
-  A grant on one Application or on a narrow glob, such as
-  <code>tenant-a-uat/payments-*</code>, does not match the project-wide object
-  <code>tenant-a-uat/*</code>, so only the per-target question finds it.</li>
-<li><strong>Recheck</strong>: every 5 minutes, together with the rest of the self-check.</li>
+  For a target without a <code>uid</code> in the values, a startup read that passes is
+  that first read, so its per-target questions are asked at boot. A grant on one
+  Application or on a narrow glob, such as <code>tenant-a-uat/payments-*</code>, does not
+  match the project-wide object <code>tenant-a-uat/*</code>, so only the per-target
+  question finds it.</li>
+<li><strong>Recheck</strong>: every <code>SB_GATEWAY_PRIVILEGE_RECHECK_INTERVAL</code> (default <code>5m</code>),
+  together with the rest of the self-check. A value under <code>1m</code> refuses the
+  start.</li>
 </ul>
 <p>How answers are read:</p>
 <ul>
-<li><strong><code>yes</code></strong> on any question means the token is over-privileged. There is no
-  override. At boot the Gateway refuses to start and logs
+<li>
+<p><strong><code>yes</code></strong> on any question in the table means the token is over-privileged.
+  There is no override. At boot the Gateway refuses to start and logs
   <code>refusing to start: connectors: credential is over-privileged: connector
-  "&lt;name&gt;"; ...</code>. The line names the connector, not the AppProject or the
-  question. After boot, the replica marks the connector <code>over_privileged</code>, turns not ready, stops claiming,
+  "&lt;name&gt;"; failed check &lt;resource&gt; &lt;action&gt;: can-i yes; ...</code>, for example
+  <code>failed check applications sync: can-i yes</code>. The line names the connector
+  and the resource and action that answered <code>yes</code>, not the AppProject or the
+  object. After boot, the replica marks the connector <code>over_privileged</code>, turns not ready, stops claiming,
   reports <code>over_privileged</code> in its heartbeat, and stops at its next recheck.
   The control plane records a <code>gateway.over_privileged</code> audit event. A
   per-target <code>yes</code> returns no observation of the target. The pod keeps
-  restarting until you remove the grant; the next restart after that passes.</li>
+  restarting until you remove the grant; the next restart after that passes.</p>
+<p>The control plane does not dispatch tasks for a connector while any
+replica of that Gateway seen in the last 10 minutes last reported the
+connector, or itself, <code>over_privileged</code>. The tasks stay queued until the
+pause lifts or their deadline passes. The reporting replica's next
+healthy heartbeat lifts the pause, but a replica that found a grant
+stops, and a restarted Gateway reports under a new replica id. The old
+report then holds the pause until it is 10 minutes old, so after you
+roll out a fixed token, dispatch can wait up to 10 minutes.</p>
+</li>
+<li>
+<p><strong><code>yes</code> on the read probe</strong> means the token can read Applications outside
+  the allowed AppProjects. It is not a refusal, because the token still only
+  reads. The connector is reported <code>degraded</code> in the heartbeat but stays
+  verified and ready, every read stays bounded by the local allowlist, and the
+  Gateway logs a warning with the connector id: <code>connector credential can read
+  outside its allowed scope (argocd: applications get on */*); reported
+  degraded, reads stay bounded by the local allowlist; narrow the token's
+  role</code>. The control plane does not pause dispatch for <code>degraded</code>. Narrow the
+  token's role, and the next full recheck reports <code>ok</code> again.</p>
+</li>
 <li><strong>HTTP 400 on <code>applications rollback</code>.</strong> Before Argo CD 3.6, <code>rollback</code> is
   not an RBAC action: can-i answers 400 for it, and the rollback endpoint
   enforces <code>sync</code> instead. The Gateway asks <code>sync</code> on the same object first,
   and accepts the 400 on <code>rollback</code> only after <code>sync</code> answered <code>no</code>. A 400 on
   any other question fails closed.</li>
 <li><strong>A question that cannot complete</strong> (an error, a timeout, any answer other
-  than <code>yes</code> or <code>no</code>) fails closed. At boot the Gateway refuses to start.
+  than <code>yes</code> or <code>no</code>), the read probe included, fails closed. At boot the
+  Gateway refuses to start (see the next section for the log line).
   After boot the connector stays unverified: nothing is claimed or observed
   through it, and the replica is not ready, until a later recheck passes.</li>
 </ul>
@@ -3127,21 +3224,38 @@ normalize that object form.</p>
   is not visible, as the warning in step 1 says. Your policy review covers it.</li>
 <li><strong><code>invoke</code></strong> is enforced on the <code>extensions</code> resource, not on
   <code>applications</code>, so <code>applications invoke</code> only catches a wildcard grant.</li>
-<li><strong><code>logs</code> on Argo CD 2.x.</strong> Without <code>server.rbac.log.enforce.enable: "true"</code>,
-  logs follow <code>applications get</code> and the <code>logs get</code> question answers <code>no</code>.
-  That is why the setting is required on 2.x.</li>
+<li><strong><code>logs</code> on Argo CD 2.4 to 2.14.</strong> Without
+  <code>server.rbac.log.enforce.enable: "true"</code>, logs follow <code>applications get</code>
+  and the <code>logs get</code> question answers <code>no</code>. That is why the setting is
+  required on those versions.</li>
+<li><strong>Reads in other AppProjects.</strong> An <code>ok</code> from the read probe does not prove
+  that the token is confined to the allowlist. Argo CD answers <code>yes</code> to <code>*/*</code>
+  only for a <code>*/*</code> or <code>*</code> grant, so a grant on one other AppProject, for
+  example <code>applications, get, tenant-b/*</code>, still answers <code>no</code>. Your policy
+  review must check that the account has no <code>applications, get</code> line beyond
+  the allowed AppProjects.</li>
 </ul>
-<p>Not asked yet: whether the token can read Applications outside the allowed
-AppProjects (<code>applications get</code> on <code>*/*</code>). The local allowlist still limits
-what the Gateway reads. That question is planned in
-<a href="https://github.com/secrets-bridge/gateway/issues/30">gateway#30</a>.</p>
 <h3 id="release-1-an-argo-cd-outage-at-boot-is-a-crash-loop">Release 1: an Argo CD outage at boot is a crash loop<a class="headerlink" href="#release-1-an-argo-cd-outage-at-boot-is-a-crash-loop" title="Permanent link">&para;</a></h3>
 <p>The Gateway refuses to start when, at boot, Argo CD cannot be reached, refuses
 the token, or a can-i question does not complete. The log line is
 <code>refusing to start: connectors: self-check could not prove the credential
-cannot read secrets: connector "&lt;name&gt;"; ...</code>. It names the connector, not the
-AppProject, and it does not say which of the three failed, so check Argo CD's
-reachability from the pod, the token and the can-i answers in that order. The
+cannot read secrets: connector "&lt;name&gt;"; failed check &lt;resource&gt; &lt;action&gt;:
+&lt;kind&gt;; ...</code>. It names the connector and the check that failed, never the
+AppProject, the Argo CD URL or the token. Read the named check like this:</p>
+<ul>
+<li><code>failed check session userinfo: &lt;kind&gt;</code>: the token check failed, so no
+  can-i question ran. <code>unauthorized</code>, <code>forbidden</code> or <code>not logged in</code> means
+  Argo CD did not accept the token, or the token file cannot be read: check
+  the token Secret. <code>unreachable</code>, <code>timeout</code> or <code>tls</code> means the pod did not get an
+  answer from Argo CD: check <code>baseURL</code>, the connector's <code>egress</code> peer and the
+  CA.</li>
+<li><code>failed check &lt;resource&gt; &lt;action&gt;: &lt;kind&gt;</code> for any other check: the token
+  works, and that can-i question did not complete, for example
+  <code>failed check exec create: bad request</code>. <code>applications get</code> is the read
+  probe.</li>
+</ul>
+<p>The kinds are <code>unreachable</code>, <code>unauthorized</code>, <code>forbidden</code>, <code>timeout</code>, <code>tls</code>,
+<code>malformed</code>, <code>bad request</code>, <code>refused locally</code>, <code>not logged in</code> and <code>error</code>. The
 process exits and Kubernetes restarts it with its usual back-off
 (<code>CrashLoopBackOff</code>). Nothing is claimed or observed while it is down.</p>
 <p>Recovery needs no change to the Gateway. Once Argo CD answers and the token
@@ -3156,45 +3270,94 @@ Application deleted and recreated under the same name is a different object,
 and the Gateway does not report its state under the old target.</p>
 <ul>
 <li><strong>Per process.</strong> Without a <code>uid</code> in the values, each replica pins the uid it
-  reads first for each target and keeps it in memory. A later read that
+  reads first for each target (the startup read, or the first task when that
+  read failed) and keeps it in memory. A later read that
   returns another uid is answered with an <code>error</code> observation, code
   <code>target_identity_changed</code>, and carries nothing from the new object. A
   restart forgets the pin, so a replica that starts after the Application was
-  recreated pins the new object without noticing.</li>
+  recreated pins the new object. The
+  <a href="#control-plane-identity-pin">control-plane pin</a> is what notices the change
+  then.</li>
 <li><strong>Pinned in the values.</strong> With <code>applications[].uid</code> set (chart) or <code>uid</code> in
   the connectors file, every replica checks it from its first read, across
-  restarts. This is the recommended setting.</li>
-<li><strong>No raw uid leaves your boundary.</strong> Evidence sent to the control plane
-  carries a scoped identity digest (<code>identity_digest</code>, <code>d-</code> and 26 base32
+  restarts, and the catalog carries the target's identity from boot. This is
+  the recommended setting.</li>
+<li><strong>No raw uid leaves your boundary.</strong> Evidence and the catalog sent to the
+  control plane carry a scoped identity digest (<code>d-</code> and 26 base32
   characters) derived from the connector id and the uid, never the uid
   itself.</li>
 </ul>
+<div class="admonition warning">
+<p class="admonition-title">Upgrade the control plane before the Gateway</p>
+<p>A Gateway sends <code>identity</code> in its catalog for each Argo CD target whose uid
+it knows: from boot for a target with a <code>uid</code> in the values, otherwise
+once the startup read or the first task has pinned the uid. An api that
+does not know the field answers <code>400</code>
+to such a catalog, so the Gateway never turns ready, and its log shows
+<code>catalog upload failed</code> with <code>http 400</code>. Upgrade the api first. The other
+order is safe: a Gateway that sends no <code>identity</code> keeps working with a
+current api, and no pin is created.</p>
+</div>
 <p>Read the uid read-only, from the namespace the Application lives in:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>application<span class="w"> </span>-n<span class="w"> </span>argocd<span class="w"> </span>payments-api<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.metadata.uid}'</span>
 </span></code></pre></div>
 <p>In the Argo CD UI, open the Application's details and read <code>metadata.uid</code> from
 its live manifest.</p>
-<p>When you recreate an Application on purpose, read the new uid, update
-<code>applications[].uid</code> and upgrade the release. The chart rolls the pods when the
-connectors file changes. Without a <code>uid</code> in the values, restart the Gateway to
-clear the per-process pin.</p>
-<div class="admonition note">
-<p class="admonition-title">Control-plane identity pin: coming with api#312</p>
-<p>The control plane does not yet pin target identities. Today it checks only
-the format of <code>identity_digest</code> and accepts <code>target_identity_changed</code> as an
-error code. With <a href="https://github.com/secrets-bridge/api/issues/312">api#312</a>
-(and the Gateway sending each static target's digest in its catalog,
-<a href="https://github.com/secrets-bridge/gateway/issues/30">gateway#30</a>), the
-control plane will pin the first identity digest it accepts for each
-static target. A different digest will mark the target
-<code>identity_changed</code>, suspend its bindings (no dispatch, no evidence
-accepted) and be audited as <code>gateway.target.identity_changed</code>. You
-confirm the new object locally, by setting its uid in
-<code>applications[].uid</code> or by giving the target a new id. A platform admin
-(global <code>gateway.bind</code>, fresh second factor) then re-confirms each
-suspended binding, audited as <code>gateway.binding.identity_confirmed</code>. None
-of this is live yet.</p>
-</div>
+<p>When you recreate an Application on purpose:</p>
+<ol>
+<li>Read the new uid, update <code>applications[].uid</code> and upgrade the release. The
+   chart rolls the pods when the connectors file changes. Without a <code>uid</code> in
+   the values, restart the Gateway instead, which clears the per-process pin.</li>
+<li>The Gateway now advertises the new identity. The control plane marks the
+   target <code>identity_changed</code> and suspends its bindings.</li>
+<li>A platform admin <a href="#re-confirm-a-target">re-confirms the target</a>. Do this
+   only after the Gateway runs with the new uid, because the re-confirm
+   accepts whatever identity the Gateway advertises at that moment.</li>
+</ol>
+<h3 id="control-plane-identity-pin">Control-plane identity pin<a class="headerlink" href="#control-plane-identity-pin" title="Permanent link">&para;</a></h3>
+<p>The control plane pins the first identity digest the Gateway's catalog
+carries for each static Argo CD target. A catalog that carries no <code>identity</code>
+for a target changes nothing. When the Gateway advertises a different digest
+for a pinned target, the control plane marks the target <code>identity_changed</code>,
+writes one <code>gateway.target.identity_changed</code> audit event, and suspends every
+binding on that target:</p>
+<ul>
+<li>its tasks are not dispatched;</li>
+<li>evidence for the target is refused with <code>422 target_identity_changed</code>;</li>
+<li>a new binding on the target gets <code>409 target_identity_changed</code>.</li>
+</ul>
+<p><code>identity_changed</code> stays until a platform admin re-confirms the target.
+Advertising the old digest again does not lift it.</p>
+<p>For a pinned target, evidence that describes the Application must carry the
+pinned <code>identity_digest</code>. Without it the result is refused with
+<code>422 identity_digest_missing</code>, and with another digest with
+<code>422 identity_digest_mismatch</code>. Each refusal is audited as
+<code>observation.evidence.rejected</code> with that reason.</p>
+<p>The admin read (<code>GET /api/v1/admin/gateways/&lt;id&gt;</code>) shows <code>identity_status</code> for
+each target (<code>unpinned</code>, <code>pinned</code> or <code>identity_changed</code>), and
+<code>suspended_reason: identity_changed</code> on each suspended binding. It never
+returns the digest.</p>
+<h3 id="re-confirm-a-target">Re-confirm a target<a class="headerlink" href="#re-confirm-a-target" title="Permanent link">&para;</a></h3>
+<p>There is no console page for this yet. With <code>curl</code>, the route needs a global
+<code>gateway.bind</code> grant and a fresh second factor (step 2), and takes no body. It
+makes the identity the Gateway advertises now the new pin and resumes every
+binding on the target:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nv">CONNECTOR_ID</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/admin/gateways/</span><span class="nv">$GW_ID</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">'.connectors[] | select(.connector_id == "argocd-main") | .id'</span><span class="k">)</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/admin/gateways/</span><span class="nv">$GW_ID</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'{targets: [.connectors[] | .targets[] | {target_id, identity_status}],</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="s1">         bindings: [.bindings[] | {id, argocd_target_id, suspended_reason}]}'</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">  </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/admin/gateways/</span><span class="nv">$GW_ID</span><span class="s2">/connectors/</span><span class="nv">$CONNECTOR_ID</span><span class="s2">/targets/payments-api/confirm-identity"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'{connector_id, targets: [.targets[] | {target_id, identity_status}]}'</span>
+</span></code></pre></div>
+<p>The answer is the connector, with the target back to <code>pinned</code>. The re-confirm
+is audited as <code>gateway.target.identity_confirmed</code>. It is refused with
+<code>404 connector_not_found</code> or <code>target_not_found</code>, <code>409 target_identity_not_changed</code>
+when the target is not <code>identity_changed</code>, and <code>409 target_stale</code> when the
+Gateway no longer advertises the target.</p>
 <h2 id="disable-enable-or-revoke-a-gateway">Disable, enable or revoke a Gateway<a class="headerlink" href="#disable-enable-or-revoke-a-gateway" title="Permanent link">&para;</a></h2>
 <p>Disabling is reversible. A disabled Gateway's calls are refused with <code>401</code>, its
 leased tasks go back to the queue, and their old attempts can no longer post a
@@ -3202,14 +3365,14 @@ result. It keeps its credential, and enabling it returns it to <code>active</cod
 <code>pending</code> if it never enrolled). In the console, open the Gateway and select
 <strong>Disable…</strong> or <strong>Enable…</strong>. With <code>curl</code> (needs <code>gateway.revoke</code> and a fresh
 second factor):</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/admin/gateways/</span><span class="nv">$GW_ID</span><span class="s2">/enabled"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">'{"enabled":false}'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'{status}'</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/admin/gateways/</span><span class="nv">$GW_ID</span><span class="s2">/enabled"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">'{"enabled":false}'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'{status}'</span>
 </span></code></pre></div>
 <p>A revoked Gateway answers <code>409 gateway_revoked</code>.</p>
 <p>Revoking is final. In the console, select <strong>Revoke…</strong>, or:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Needs gateway.revoke and a fresh second factor.</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/admin/gateways/</span><span class="nv">$GW_ID</span><span class="s2">/revoke"</span><span class="w"> </span><span class="se">\</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">'{"reason":"decommissioned"}'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'{status, revoked_at}'</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># Needs gateway.revoke and a fresh second factor.</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">"</span><span class="nv">$CP</span><span class="s2">/api/v1/admin/gateways/</span><span class="nv">$GW_ID</span><span class="s2">/revoke"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">'{"reason":"decommissioned"}'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span><span class="s1">'{status, revoked_at}'</span>
 </span></code></pre></div>
 <p><code>reason</code> is optional, a lower-case code of up to 64 characters. The next
 heartbeat, catalog upload or task call gets <code>401</code>, and leased tasks go back to

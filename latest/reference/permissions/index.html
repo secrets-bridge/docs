@@ -117,7 +117,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Permissions catalog","description":"The Secrets Bridge RBAC permission catalog: the seed roles, every permission string checked by auth.Require, scoped grants and how to add a permission.","url":"https://secrets-bridge.io/latest/reference/permissions/","mainEntityOfPage":"https://secrets-bridge.io/latest/reference/permissions/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-23T15:12:19+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Reference","item":"https://secrets-bridge.io/latest/reference/"},{"@type":"ListItem","position":3,"name":"Permissions catalog","item":"https://secrets-bridge.io/latest/reference/permissions/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Permissions catalog","description":"The Secrets Bridge RBAC permission catalog: the seed roles, every permission string checked by auth.Require, scoped grants and how to add a permission.","url":"https://secrets-bridge.io/latest/reference/permissions/","mainEntityOfPage":"https://secrets-bridge.io/latest/reference/permissions/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T13:47:33+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Reference","item":"https://secrets-bridge.io/latest/reference/"},{"@type":"ListItem","position":3,"name":"Permissions catalog","item":"https://secrets-bridge.io/latest/reference/permissions/"}]}]}</script>
   
 
   </head>
@@ -2531,11 +2531,11 @@ edit their permission lists but can't delete the rows.</p>
 </tr>
 <tr>
 <td><code>gateway.list</code></td>
-<td>List Gateways with their replicas, advertised connectors and targets, bindings, token metadata and observation tasks. Never credentials.</td>
+<td>List Gateways with their replicas, advertised connectors and targets, bindings, token metadata and observation tasks, and read an environment's observation source. Never credentials.</td>
 </tr>
 <tr>
 <td><code>gateway.bind</code></td>
-<td>Approve a Gateway's advertised connectors, create or delete bindings from a secret scope to an advertised target, and read or set an environment's observation source. Does not imply <code>integration.bind</code>, and <code>integration.bind</code> does not imply it. Needs a fresh second factor for writes.</td>
+<td>Approve a Gateway's advertised connectors, create or delete bindings from a secret scope to an advertised target, re-confirm an Argo CD target whose identity changed (which resumes its bindings), and set an environment's observation source. Does not imply <code>integration.bind</code>, and <code>integration.bind</code> does not imply it. Needs a fresh second factor for writes.</td>
 </tr>
 </tbody>
 </table>

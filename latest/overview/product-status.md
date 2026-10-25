@@ -77,17 +77,23 @@ Being built now; not yet live or certified. Do not depend on these yet.
   metadata. Merged, not yet through QA:
     - the Gateway binary (Argo CD connector only, signed image) and its Helm
       chart (no RBAC, no service-account token, egress-only NetworkPolicy);
-    - the Argo CD privilege probe: at boot and every 5 minutes the Gateway
-      asks Argo CD's can-i, for each allowed AppProject and each static
-      target it has read, whether its token can write, exec, read logs, write
-      ApplicationSets or change the AppProject, and refuses to run on any
-      `yes`. An Argo CD outage at boot makes the pod crash-loop. Resource-action
-      grants are not visible to can-i and stay the integrator's policy review.
+    - the Argo CD privilege probe: at boot and at every recheck (5 minutes
+      by default) the Gateway asks Argo CD's can-i, for each allowed
+      AppProject and each static target it has read, whether its token can
+      write, exec, read logs, write ApplicationSets or change the AppProject,
+      and refuses to run on any `yes`. A read probe (`applications get` on
+      `*/*`) reports the connector `degraded` when the token can read every
+      AppProject. An Argo CD outage at boot makes the pod crash-loop, and the
+      refusal names the failed check. Resource-action grants are not visible
+      to can-i and stay the integrator's policy review.
       See [Argo CD privilege checks](../operations/gateway.md#argo-cd-privilege-checks);
-    - Application identity: the Gateway pins each target's `metadata.uid`,
-      answers `target_identity_changed` when it changes, and sends only a
-      scoped digest of it. The control plane accepts both and checks the
-      digest's format;
+    - Application identity: the Gateway pins each target's `metadata.uid`
+      (optionally fixed in the values as `applications[].uid`), answers
+      `target_identity_changed` when it changes, and sends only a scoped
+      digest of it, in evidence and in its catalog. The control plane pins
+      the first digest for each target; a different one suspends the
+      target's bindings until a platform admin re-confirms it. See
+      [Application identity](../operations/gateway.md#application-identity);
     - the control-plane registry: enrollment, heartbeat, catalog, connector
       approval, bindings, disable, enable, revoke and the `gateway.*`
       permissions;
@@ -95,7 +101,8 @@ Being built now; not yet live or certified. Do not depend on these yet.
       whose observation source is `gateway` gets a task per binding, which the
       Gateway claims, leases and answers with metadata-only evidence that the
       control plane checks against the task's target before it computes the
-      verdict;
+      verdict. Tasks are not dispatched for a connector that a replica
+      reported `over_privileged` in the last 10 minutes;
     - the per-environment observation source (`gateway` or `none`, the
       default) and the request's evidence at
       `GET /requests/:id/observations`;
@@ -112,14 +119,6 @@ Being built now; not yet live or certified. Do not depend on these yet.
       rows as read-only history, shown on the request page as context only.
       See
       [Gateway cutover](../operations/gateway-cutover.md).
-
-    Not merged yet: the `applications[].uid` value in the gateway chart
-    ([charts#56](https://github.com/secrets-bridge/charts/pull/56)), and the
-    control-plane identity pin
-    ([api#312](https://github.com/secrets-bridge/api/issues/312)), with which
-    the control plane will pin each static target's identity digest, suspend
-    its bindings when the digest changes, and need a platform admin to
-    re-confirm them.
 
     Argo CD `Healthy` and `Synced` are operational state, never proof that a
     secret reached a workload: a Release 1 task ends `unverified`

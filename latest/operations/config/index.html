@@ -119,7 +119,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Configuration reference","description":"Every Secrets Bridge environment variable for the api, agent, worker, controller and Gateway, with defaults, retired settings and insecure dev switches.","url":"https://secrets-bridge.io/latest/operations/config/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/config/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-23T15:12:19+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Configuration reference","item":"https://secrets-bridge.io/latest/operations/config/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Configuration reference","description":"Every Secrets Bridge environment variable for the api, agent, worker, controller and Gateway, with defaults, retired settings and insecure dev switches.","url":"https://secrets-bridge.io/latest/operations/config/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/config/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T13:47:33+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Configuration reference","item":"https://secrets-bridge.io/latest/operations/config/"}]}]}</script>
   
 
   </head>
@@ -3059,6 +3059,12 @@ source for this table.</p>
 <td>The Gateway turns not ready when no heartbeat has been accepted for this long</td>
 </tr>
 <tr>
+<td><code>SB_GATEWAY_PRIVILEGE_RECHECK_INTERVAL</code></td>
+<td>no</td>
+<td><code>5m</code></td>
+<td>How often every connector self-check and every Argo CD can-i probe runs again. A value under <code>1m</code> refuses the start. The chart does not set it</td>
+</tr>
+<tr>
 <td><code>SB_LOG_LEVEL</code></td>
 <td>no</td>
 <td><code>info</code></td>
@@ -3072,8 +3078,10 @@ bearer credential never reaches a proxy.</p>
 binds to), a <code>kind</code> and <code>settings</code>. For <code>argocd</code> the settings are <code>base_url</code>,
 <code>token_file</code> (an absolute path), optional <code>ca_file</code>, <code>tls_server_name</code> and
 <code>timeout</code> (1s to 60s, default 10s), <code>allowed_projects</code> (at least one AppProject)
-and <code>applications</code> (at least one <code>{id, name, app_namespace?}</code>). Unknown fields,
-unknown kinds and duplicate names are refused at load.</p>
+and <code>applications</code> (at least one <code>{id, name, app_namespace?, uid?}</code>). <code>uid</code> is
+the Application's <code>metadata.uid</code> as a lower-case UUID. An <code>id</code> must not start
+with <code>d-</code>, which is reserved for discovered targets. Unknown fields, unknown
+kinds and duplicate names are refused at load.</p>
 <h2 id="secret-material-naming-convention">Secret material, naming convention<a class="headerlink" href="#secret-material-naming-convention" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
