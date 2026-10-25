@@ -106,9 +106,26 @@ Keep the enrollment token, `agent_secret` and `private_key` out of:
 - shell arguments and shell history (read the token at a silent prompt and pass
   it on stdin, as shown below);
 - Git, including a generated Secret manifest (`enroll --format k8s-secret` is
-  for piping into `kubectl apply -f -`, never for committing);
+  for piping into
+  `kubectl apply --server-side --field-manager=secrets-bridge-agent -f -`,
+  never for committing);
+- the `kubectl.kubernetes.io/last-applied-configuration` annotation (see the
+  warning below);
 - CI logs and job output;
 - the browser, chat messages and tickets.
+
+!!! warning "Apply the agent Secret server-side"
+    Client-side `kubectl apply -f -` stores the whole object it applies,
+    including the plaintext `agent_secret` and `private_key` from
+    `stringData`, in the `kubectl.kubernetes.io/last-applied-configuration`
+    annotation. That copy sits outside `.data`, where tools that treat
+    metadata as non-sensitive can expose it. The same happens with
+    `kubectl create secret ... --dry-run=client -o yaml | kubectl apply -f -`.
+    Use `kubectl apply --server-side`, which keeps no such copy, or
+    `kubectl create secret generic --from-env-file=/dev/stdin`. To check a
+    Secret, run
+    `kubectl -n secrets-bridge get secret secrets-bridge-agent-identity -o jsonpath='{.metadata.annotations}'`:
+    it must not list `last-applied-configuration`.
 
 `enroll` writes nothing secret to stderr or to logs. It may print the
 `agent_id` and the key fingerprint to stderr.
@@ -135,7 +152,7 @@ plane.
 | `--name`, `--provider-type` | Required. The agent's name and provider type (`aws-sm`, `vault`). The provider type must match the token's expected value when it has one |
 | `--cluster-name`, `--region` | Reported at enrollment. The cluster name must match the token's expected value when it has one |
 | `--output <path\|->` | Where the bundle goes. A file is created with mode `0600` and refused if it exists. `-` is stdout |
-| `--format json\|env\|k8s-secret` | Bundle format, `json` by default. `env` is `key=value` lines for `kubectl create secret generic --from-env-file`; `k8s-secret` is a Secret manifest for `kubectl apply -f -` |
+| `--format json\|env\|k8s-secret` | Bundle format, `json` by default. `env` is `key=value` lines for `kubectl create secret generic --from-env-file`; `k8s-secret` is a Secret manifest for `kubectl apply --server-side --field-manager=secrets-bridge-agent -f -` (never client-side apply) |
 | `--secret-name` | Name of the Secret in the `k8s-secret` format. Default `secrets-bridge-agent-identity` |
 
 The bundle has `agent_id`, `agent_secret`, `private_key` and
@@ -335,8 +352,25 @@ Rotation replaces the X25519 key and keeps `agent_id` and `agent_secret`.
     `rotate-key` generates the new key locally and runs the same challenge as
     enrollment, sealed to the new key. The control plane then binds the new key,
     increments `public_key_version` and audits `agent.key.rotated` with the old
-    and new fingerprints. Write to Vault or a Kubernetes Secret the same way as
-    in step 3.
+    and new fingerprints. Write to Vault the same way as in step 3.
+
+    `kubectl create secret` refuses a Secret that exists, so update a
+    Kubernetes Secret in place with a server-side apply:
+
+    ```bash
+    printf '%s' "$SB_ROTATION_TOKEN" \
+      | secrets-bridge-agent rotate-key --cp-endpoint https://secrets-bridge.example.com \
+          --credentials-dir /path/to/current/credentials \
+          --rotation-token-file - --format k8s-secret --output - \
+      | kubectl -n secrets-bridge apply --server-side \
+          --field-manager=secrets-bridge-agent --force-conflicts -f -
+    unset SB_ROTATION_TOKEN
+    ```
+
+    `--force-conflicts` takes over the fields that `kubectl create secret` (or
+    another field manager) set at enrollment; without it the apply stops with
+    a conflict. A server-side apply over a Secret that an earlier client-side
+    apply wrote also drops the old `last-applied-configuration` annotation.
 3. Restart the agent once the Kubernetes Secret has the new key: wait for ESO
    to sync it (or force a sync), then `kubectl rollout restart` the Deployment.
    With `reloader.enabled=true` (the chart default) and
