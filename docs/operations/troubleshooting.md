@@ -214,12 +214,15 @@ Check the log for the first error:
   `jq -ce '{gateway_id, gateway_secret}'` step in the install pipeline keeps
   only those two fields.
 - `refusing to start: connectors: self-check could not prove the credential
-  cannot read secrets: connector "<name>"; ...`: at boot, Argo CD could not be
-  reached, the token check (`GET /api/v1/session/userinfo`) was refused, or a
-  can-i question did not complete. The pod exits and restarts
-  (`CrashLoopBackOff`). Check that the token Secret holds a valid token for
-  the `sb-gateway` account, that `base_url` is right, and that the
-  connector's `egress` peer lets the pod reach Argo CD. Once Argo CD answers, the next restart passes; see
+  cannot read secrets: connector "<name>"; failed check <resource> <action>:
+  <kind>; ...`: at boot, Argo CD could not be reached, the token check
+  (`GET /api/v1/session/userinfo`) was refused, or a can-i question did not
+  complete. The pod exits and restarts (`CrashLoopBackOff`). The named check
+  says which: `failed check session userinfo: unauthorized` points at the
+  token Secret, `unreachable`, `timeout` or `tls` at `base_url`, the
+  connector's `egress` peer or the CA, and any other check (for example
+  `failed check exec create: bad request`) at that can-i question. Once
+  Argo CD answers, the next restart passes; see
   [Release 1: an Argo CD outage at boot is a crash loop](gateway.md#release-1-an-argo-cd-outage-at-boot-is-a-crash-loop).
 - After boot, the same failures do not restart the pod. It stays up and not
   ready, stops claiming, and turns ready once a recheck passes.
@@ -229,21 +232,34 @@ Check the log for the first error:
   `2m`): the control plane is unreachable. Check `cp.endpoint`, the
   `cp.egress.cidrs` NetworkPolicy peer and, for a private CA,
   `cp.caExistingSecret`.
+- `catalog upload failed` with `http 400`, again on every heartbeat: the
+  control plane refused the catalog. If the api was not upgraded before the
+  Gateway, it does not know the catalog `identity` field that the Gateway
+  sends for an Argo CD target whose uid it knows. Upgrade the api; see
+  [Application identity](gateway.md#application-identity).
+- `invalid connector settings: ... applications.id: must not start with "d-"`:
+  a target `id` in the connectors file uses the prefix reserved for
+  discovered targets, and the Gateway refuses to start. Rename the target.
 
 ### Gateway refuses to start: over-privileged
 
 A log line `refusing to start: connectors: credential is over-privileged:
-connector "<name>"; ...` for an `argocd` connector comes from the Argo CD
-can-i probe: Argo CD answered `yes` to one of the questions in
-[Argo CD privilege checks](gateway.md#argo-cd-privilege-checks). The line does
-not say which question, so compare every policy line that applies to the
-Gateway's account or role with that table. Remove the extra right from the
-Argo CD policy of the Gateway's account so that only the
+connector "<name>"; failed check <resource> <action>: can-i yes; ...` for an
+`argocd` connector comes from the Argo CD can-i probe: Argo CD answered `yes`
+to the question named in the line, one of those in
+[Argo CD privilege checks](gateway.md#argo-cd-privilege-checks). For example
+`failed check logs get: can-i yes` means the token may read pod logs. The line
+names the resource and action, not the AppProject or the object, so check
+every policy line that applies to the Gateway's account or role for that right,
+on the allowed AppProjects and on each configured Application. Remove the
+extra right from the Argo CD policy of the Gateway's account so that only the
 [minimal policy](gateway.md#the-minimal-policy) is left, and check
 `policy.default` in `argocd-rbac-cm` too: `role:readonly` grants `logs, get`
 and trips this check. The pod restarts until the grant is gone. When a recheck
 finds a grant on a running Gateway, the replica turns not ready, reports
-`over_privileged` in a heartbeat and stops.
+`over_privileged` in a heartbeat and stops. The control plane then pauses
+dispatch for that connector until the report is 10 minutes old, so after the
+fix, tasks can wait up to 10 minutes before they are claimed again.
 
 For an `eso` or `rollout` connector, the same message comes from the
 Kubernetes self-check. Those Release 2 connectors need
@@ -281,8 +297,21 @@ it was deleted and recreated, so it has a new `metadata.uid`. The Gateway
 reports nothing about the new object. If the change is expected, read the new
 uid (`kubectl get application -n <namespace> <name> -o jsonpath='{.metadata.uid}'`),
 set it as `applications[].uid` and upgrade the release. Without a `uid` in the
-values, restart the Gateway. See
-[Application identity](gateway.md#application-identity).
+values, restart the Gateway. The Gateway then advertises the new identity, so
+the control plane marks the target `identity_changed` (`identity_status` in
+the detail view) and suspends its bindings. A platform admin then re-confirms
+it with
+`POST /api/v1/admin/gateways/<id>/connectors/<connector-uuid>/targets/<target-id>/confirm-identity`.
+Re-confirm only after the Gateway runs with the new uid, because the
+re-confirm accepts whatever identity the Gateway advertises at that moment.
+See [Application identity](gateway.md#application-identity).
+
+While the target is `identity_changed`, its tasks are not dispatched, a result
+for it is refused with `target_identity_changed`, and a new binding on it gets
+`409 target_identity_changed`. A result for a pinned target that carries no
+`identity_digest`, or another one, is refused with `identity_digest_missing` or
+`identity_digest_mismatch`. Each refusal is audited as
+`observation.evidence.rejected` with that reason.
 
 ### Gateway gets 401 from the control plane
 
@@ -340,7 +369,9 @@ audit events with the `correlation_id` of the job that executed the change:
   (see [Runtime behaviour](../components/gateway.md#runtime-behaviour)). A
   Gateway that has never had a heartbeat accepted gets `204` on every claim.
 - **The connector or binding changed.** A task is claimable only while its
-  binding is enabled and its connector approved.
+  binding is enabled, its connector approved, its target not
+  `identity_changed`, and no replica of the Gateway seen in the last 10
+  minutes last reported the connector, or itself, `over_privileged`.
 
 A pending task never fails the request. At its deadline it ends `timed_out`.
 

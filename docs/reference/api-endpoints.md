@@ -151,8 +151,8 @@ authenticated by the one-time token only; every other route needs
 |---|---|---|---|
 | `POST` | `/api/v1/gateways/enroll` | enrollment token | `{enrollment_token, cluster_name?}` → `201 {gateway_id, gateway_secret, heartbeat_interval_seconds, claim_poll_seconds}`. The secret is returned once. Refused over plain `http` outside `SB_ENV=dev` (`403 https_required`). 10 a minute per IP |
 | `POST` | `/api/v1/gateways/:id/heartbeat` | gateway | `{replica_id, gateway_version, contract_versions, status, in_flight, catalog_version?, connectors?}` → `{status, server_time, next_heartbeat_seconds, claim_poll_seconds, contract_version, catalog_version}`. `429 replica_limit` past `max_replicas`. A replica that reports `over_privileged` is audited as `gateway.over_privileged` |
-| `PUT` | `/api/v1/gateways/:id/catalog` | gateway | Full replace of advertised connectors and targets → `{accepted, targets_stale, catalog_version}`. Never approves or binds anything. A target no longer advertised stays, marked stale |
-| `POST` | `/api/v1/gateways/:id/tasks/claim` | gateway | E4. `{replica_id, max_tasks: 1}` → `200` with one task (`task_id`, `attempt_id`, `attempt_count`, `lease_expires_at`, `deadline_at`, `request_id`, `correlation_id`, `skew_margin_seconds`, `gateway_scope`, `connector_refs`, `expected_change`, `rollout_baseline`), or `204` with `Retry-After: 5` when nothing is claimable or no heartbeat has negotiated a contract version yet. Scoped to the authenticated Gateway. `429 inflight_limit` with `Retry-After` when the Gateway is at `max_inflight_tasks` or the replica already holds a task. `409 contract_version_unsupported`. 2400 a minute |
+| `PUT` | `/api/v1/gateways/:id/catalog` | gateway | Full replace of advertised connectors and targets → `{accepted, targets_stale, catalog_version}`. Never approves or binds anything. A target no longer advertised stays, marked stale. An `argocd` target may carry `identity`, its scoped identity digest (`d-` and 26 base32 characters); on another kind, or malformed, it is `400 invalid_request`. The first digest for a target is pinned, and a different one marks the target `identity_changed` and suspends its bindings |
+| `POST` | `/api/v1/gateways/:id/tasks/claim` | gateway | E4. `{replica_id, max_tasks: 1}` → `200` with one task (`task_id`, `attempt_id`, `attempt_count`, `lease_expires_at`, `deadline_at`, `request_id`, `correlation_id`, `skew_margin_seconds`, `gateway_scope`, `connector_refs`, `expected_change`, `rollout_baseline`), or `204` with `Retry-After: 5` when nothing is claimable or no heartbeat has negotiated a contract version yet. Scoped to the authenticated Gateway. Skips tasks whose target is `identity_changed`, and tasks for a connector that a replica seen in the last 10 minutes last reported, or that reported itself, `over_privileged`. `429 inflight_limit` with `Retry-After` when the Gateway is at `max_inflight_tasks` or the replica already holds a task. `409 contract_version_unsupported`. 2400 a minute |
 | `POST` | `/api/v1/gateways/:id/tasks/:task_id/lease` | gateway | E5. `{replica_id, attempt_id}` → `{lease_expires_at}`. Extends the lease by 60s, capped at the deadline. 1200 a minute |
 | `POST` | `/api/v1/gateways/:id/tasks/:task_id/release` | gateway | E6. `{replica_id, attempt_id, reason}` with `reason` one of `shutdown`, `over_capacity`, `connector_unavailable` → `204`. The task goes back to the queue. Never counts as a failure. 1200 a minute |
 | `POST` | `/api/v1/gateways/:id/tasks/:task_id/result` | gateway | E7. A closed-schema evidence result (`schema_version`, `task_id`, `attempt_id`, `gateway_id`, `replica_id`, `gateway_version`, `started_at`, `finished_at`, `attempt_status`, `refusal_reason?`, `stages`, `clock`) → `{status, task_state, verdict, next}`. `status` is `accepted`, or `duplicate` for the same body sent again for the same attempt. `next` is `none` or `rescheduled`. Body limit 64 KiB. 1200 a minute |
@@ -175,6 +175,8 @@ Task route error codes:
 | `409` | `contract_version_unsupported` | None of the Gateway's contract versions is the one tasks are written in |
 | `422` | `schema_violation` | The result is outside the closed schema, names a stage the task does not expect, or fails the evidence binding |
 | `422` | `evidence_out_of_window` | `started_at`, `finished_at` or `observed_at` is outside the attempt, allowing for clock skew |
+| `422` | `target_identity_changed` | Result only: the target is `identity_changed`, so no evidence for it is accepted, an error stage included |
+| `422` | `identity_digest_missing`, `identity_digest_mismatch` | Result only: the target is pinned, and a stage that describes the Application carries no `resource.identity_digest`, or another one |
 | `429` | `inflight_limit` | Claim only: the Gateway or the replica is at its in-flight limit |
 
 ### Gateway admin routes (session auth + permission)
@@ -185,17 +187,18 @@ Every write also needs a fresh second factor.
 |---|---|---|---|
 | `POST` | `/api/v1/admin/gateways` | `session + gateway.mint` + fresh MFA | `{name, boundary, environment_id?, max_replicas?, max_inflight_tasks?}` → `201`, status `pending`. `409 gateway_name_taken` |
 | `GET` | `/api/v1/admin/gateways` | `session + gateway.list` | `{items: [...]}` with status (`pending`, `active`, `stale`, `disabled`, `revoked`), versions, last heartbeat and replica count. Never credentials |
-| `GET` | `/api/v1/admin/gateways/:id` | `session + gateway.list` | `{gateway, replicas, connectors, bindings, enrollment_tokens}`, metadata only |
+| `GET` | `/api/v1/admin/gateways/:id` | `session + gateway.list` | `{gateway, replicas, connectors, bindings, enrollment_tokens}`, metadata only. Each target has `identity_status` (`unpinned`, `pinned` or `identity_changed`), and a suspended binding has `suspended_reason: identity_changed`. Never the identity digest |
 | `POST` | `/api/v1/admin/gateways/:id/enrollment-token` | `session + gateway.mint` + fresh MFA | `{expires_in_seconds?, expected_cluster_name?}` → `201 {id, gateway_id, enrollment_token, expires_at}`. The token is returned once. Default TTL 900s, clamped to 60 to 86400. `409 gateway_not_pending` once enrolled |
 | `POST` | `/api/v1/admin/gateway-enrollment-tokens/:id/revoke` | `session + gateway.mint` + fresh MFA | Revoke an unused token. `204` |
 | `POST` | `/api/v1/admin/gateways/:id/revoke` | `session + gateway.revoke` + fresh MFA | `{reason?}` → the Gateway, status `revoked`. `409 gateway_already_revoked`. `503 revoked_cache_unconfirmed`: revoked, but Redis could not update the auth cache yet; repeat the call |
 | `POST` | `/api/v1/admin/gateways/:id/connectors/:cid/approve` | `session + gateway.bind` + fresh MFA | `:cid` is the connector's `id`. `409 connector_not_advertised` |
-| `POST` | `/api/v1/admin/gateway-bindings` | `session + gateway.bind` + fresh MFA | `{gateway_id, environment_id, project_id?, secret_id \| (provider_connection_id + secret_ref), argocd_connector_id, argocd_target_id, observation_timeout_seconds?}` → `201`. Argo CD targets only in Release 1 |
-| `GET` | `/api/v1/admin/gateway-bindings` | `session + gateway.bind` | Optional `?gateway_id=` |
+| `POST` | `/api/v1/admin/gateways/:id/connectors/:cid/targets/:tid/confirm-identity` | `session + gateway.bind` + fresh MFA | No body. `:tid` is the target id. The identity the Gateway advertises now becomes the pin, and every binding on the target resumes → the connector. `404 connector_not_found` or `target_not_found`, `409 target_identity_not_changed` or `target_stale` |
+| `POST` | `/api/v1/admin/gateway-bindings` | `session + gateway.bind` + fresh MFA | `{gateway_id, environment_id, project_id?, secret_id \| (provider_connection_id + secret_ref), argocd_connector_id, argocd_target_id, observation_timeout_seconds?}` → `201`. Argo CD targets only in Release 1. `409 target_identity_changed` while the target is suspended |
+| `GET` | `/api/v1/admin/gateway-bindings` | `session + gateway.list` | Optional `?gateway_id=` |
 | `DELETE` | `/api/v1/admin/gateway-bindings/:id` | `session + gateway.bind` + fresh MFA | `204`. Cancels the binding's open tasks (`binding_removed`) |
 | `PUT` | `/api/v1/admin/gateways/:id/enabled` | `session + gateway.revoke` + fresh MFA | `{enabled}` → the Gateway. Disable refuses its calls with `401` and moves its leased tasks back to `queued`. Enable returns it to `active`, or `pending` if it never enrolled. `409 gateway_revoked`. `503 revoked_cache_unconfirmed` (disable) or `enabled_cache_unconfirmed` (enable): saved, but Redis could not update the auth cache yet; repeat the call |
 | `GET` | `/api/v1/admin/gateways/:id/tasks` | `session + gateway.list` | `{items, counts}`. Optional `?state=` (`queued`, `leased`, `done`, `dead`, `cancelled`) and `?limit=` (1 to 500, default 100). Each item has `state`, `verdict`, `verdict_reason`, `attempt_count`, `failure_count`, `not_before`, `deadline_at` and ids, never secret values |
-| `GET` | `/api/v1/admin/environments/:id/observation-source` | `session + gateway.bind` | `{environment_id, observation_source}`, either `gateway` or `none`. A stored value that is not one of them reads as `none`. `404 environment_not_found` |
+| `GET` | `/api/v1/admin/environments/:id/observation-source` | `session + gateway.list` | `{environment_id, observation_source}`, either `gateway` or `none`. A stored value that is not one of them reads as `none`. `404 environment_not_found` |
 | `PUT` | `/api/v1/admin/environments/:id/observation-source` | `session + gateway.bind` + fresh MFA | `{observation_source}` with `gateway` or `none` → `{environment_id, observation_source, previous_observation_source, tasks_cancelled}`. Leaving `gateway` cancels the environment's open tasks (`source_changed`). `400 source_retired` for `control_plane`, `400 invalid_observation_source` for any other value |
 
 Audit actions, all with ids, enums and counts only: `gateway.create`,
@@ -204,8 +207,13 @@ Audit actions, all with ids, enums and counts only: `gateway.create`,
 `gateway.replica_limit`, `gateway.over_privileged`, `gateway.catalog.updated`,
 `gateway.connector.missing`, `gateway.connector.approval_reset`,
 `gateway.connector.approved`, `gateway.binding.create`,
-`gateway.binding.delete`, `gateway.enable`, `gateway.disable` and
-`environment.observation_source.update`.
+`gateway.binding.delete`, `gateway.target.identity_changed`,
+`gateway.target.identity_confirmed`, `gateway.enable`, `gateway.disable` and
+`environment.observation_source.update`. A refused (4xx) approve, bind,
+binding delete or re-confirm is also audited under its action
+(`gateway.connector.approved`, `gateway.binding.create`,
+`gateway.binding.delete`, `gateway.target.identity_confirmed`) with status
+`denied`, an `error_kind` and the UUID path ids only.
 
 Observation audit actions: `observation.task.created`,
 `observation.task.claimed`, `observation.task.released`,
