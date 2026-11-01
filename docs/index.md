@@ -15,6 +15,8 @@ hide:
 
 <div class="sb-hero__copy" markdown>
 
+<span class="sb-tag">Open source · pre-1.0</span>
+
 <h1 id="sb-hero-title" class="sb-display">Govern who uses your secrets.</h1>
 
 <p class="sb-lede">
@@ -30,7 +32,7 @@ stay in your provider.
 <a class="sb-textlink" href="https://github.com/secrets-bridge">Source on GitHub</a>
 </div>
 
-<p class="sb-note">Open source and pre-1.0. <a href="overview/product-status/">See what is live today</a> and what is still on the roadmap.</p>
+<p class="sb-note"><a href="overview/product-status/">See what is live today</a> and what is still on the roadmap.</p>
 
 </div>
 
@@ -55,6 +57,32 @@ stay in your provider.
 
 </section>
 
+<section class="sb-section" aria-labelledby="sb-people" markdown>
+
+<h2 id="sb-people" class="sb-section-title">Three people touch every request</h2>
+
+<p class="sb-lede sb-lede--small">Each sees what they need to do their part, and nobody sees a value they didn't ask for.</p>
+
+<div class="sb-cards">
+<div class="sb-card">
+<svg class="sb-icon" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3.5" y="4" width="11" height="16"/><path d="M10 12H20.5M17 8.5L20.5 12L17 15.5"/></g></svg>
+<h3>Developers ask</h3>
+<p>Name the secret, the exact keys and why. Once it's approved, reveal each value once with your second factor. No value travels through chat or tickets.</p>
+</div>
+<div class="sb-card">
+<svg class="sb-icon" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75"><path d="M5 3.5V20.5"/><path d="M9.5 12.5L13 16L20 8"/></g></svg>
+<h3>Approvers decide</h3>
+<p>Approve or reject with who, what, where and why in front of you. Production is marked on every screen. Approving records a decision; it never shows you the value.</p>
+</div>
+<div class="sb-card">
+<svg class="sb-icon" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3.5 11H20.5V20.5H3.5Z"/><path d="M12 16V3.5M8.5 7L12 3.5L15.5 7"/></g></svg>
+<h3>Platform teams run it</h3>
+<p>Keep Vault and AWS Secrets Manager as they are. Agents run in your clusters with their own credentials, and every step lands in an append-only audit log.</p>
+</div>
+</div>
+
+</section>
+
 <section class="sb-section sb-section--flow" aria-labelledby="sb-flow-title" markdown>
 
 <h2 id="sb-flow-title" class="sb-section-title">Where your secrets go, and where they don't</h2>
@@ -65,21 +93,20 @@ stay in your provider.
 
 </section>
 
-<section class="sb-section sb-split" aria-labelledby="sb-holds" markdown>
+<section class="sb-section" aria-labelledby="sb-holds" markdown>
 
-<div markdown>
 <h2 id="sb-holds" class="sb-section-title">What it holds to</h2>
-<p class="sb-lede sb-lede--small">These are enforced in code, not left to policy. The <a href="overview/threat-model/">threat model</a> shows how each boundary is kept.</p>
-</div>
 
-<ul class="sb-rules">
-<li><strong>No plaintext values in the control plane.</strong> Not in Postgres, Redis, logs, audit events or the browser. In transit, values are KMS-wrapped.</li>
-<li><strong>The agent only calls out.</strong> No inbound port, no database, no Kubernetes API access to Secrets.</li>
-<li><strong>Production never allows direct reveal.</strong> The refusal is enforced in code and audited.</li>
-<li><strong>Values move once.</strong> KMS-wrapped, single-use, short-lived, and opened only by the right person.</li>
-<li><strong>Audit is append-only and metadata-only.</strong> Who, what, when and why, never the value.</li>
-<li><strong>Agents are bound and revocable.</strong> One-time enrollment tokens, one provider connection per agent, revoked at once.</li>
-</ul>
+<p class="sb-lede sb-lede--small">These are enforced in code, not left to policy. The <a href="overview/threat-model/">threat model</a> shows how each boundary is kept.</p>
+
+<div class="sb-cards">
+<div class="sb-card"><span class="sb-num">01</span><h3>No plaintext values in the control plane</h3><p>Not in Postgres, Redis, logs, audit events or the browser. In transit, values are KMS-wrapped.</p></div>
+<div class="sb-card"><span class="sb-num">02</span><h3>The agent only calls out</h3><p>No inbound port, no database, no Kubernetes API access to Secrets.</p></div>
+<div class="sb-card"><span class="sb-num">03</span><h3>Production never allows direct reveal</h3><p>The refusal is enforced in code and audited.</p></div>
+<div class="sb-card"><span class="sb-num">04</span><h3>Values move once</h3><p>KMS-wrapped, single-use, short-lived, and opened only by the right person.</p></div>
+<div class="sb-card"><span class="sb-num">05</span><h3>Audit is append-only and metadata-only</h3><p>Who, what, when and why, never the value.</p></div>
+<div class="sb-card"><span class="sb-num">06</span><h3>Agents are bound and revocable</h3><p>One-time enrollment tokens, one provider connection per agent, revoked at once.</p></div>
+</div>
 
 </section>
 
@@ -117,13 +144,35 @@ stay in your provider.
 
 <section class="sb-section sb-end" aria-labelledby="sb-start" markdown>
 
+<div class="sb-start" markdown>
+
+<div markdown>
+
 <h2 id="sb-start" class="sb-section-title">Start on your laptop</h2>
 
-<p class="sb-lede sb-lede--small">The api repo's compose file starts Postgres, Redis and the control plane; the console and the agent run from their own repos. The local guide walks through the whole flow against a dev Vault.</p>
+<p class="sb-lede sb-lede--small">The api repo's compose file starts Postgres and Redis. The console and the agent run from their own repos, and the local guide walks through the whole flow against a dev Vault.</p>
 
 <div class="sb-actions" markdown>
-[Run it locally](operations/docker-compose.md){ .md-button }
+[Run it locally](operations/docker-compose.md){ .md-button .md-button--primary }
 [Operations guide](operations/index.md){ .md-button }
+</div>
+
+<p class="sb-note">Local development only. Never load real secrets into it.</p>
+
+</div>
+
+<div markdown>
+
+<p class="sb-note sb-note--label">Step 1 of the local guide</p>
+
+```bash
+git clone https://github.com/secrets-bridge/api.git
+cd api
+docker compose up -d postgres redis
+```
+
+</div>
+
 </div>
 
 </section>
