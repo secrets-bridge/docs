@@ -211,7 +211,7 @@ configured for it:
 8. **Submit** → you're navigated to the request detail page
 
 Then sign in as a second user with the `secret.approve` permission
-and approve from the Requests page's Approver queue. The requester
+and approve it on **Approvals**. The requester
 can never approve or reject their own request, whatever their role
 (admin included) or the workflow says: the api answers
 `403 separation_of_duties_violated` and audits the attempt.

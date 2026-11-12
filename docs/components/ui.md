@@ -34,6 +34,8 @@ routing: `/` → ui, `/api/v1/*` → api).
 | `/admin/gateways` | Gateways | Create, enroll, approve connectors, bind targets, disable, enable and revoke [Gateways](../operations/gateway.md) |
 | `/login` | Login | Real email + password against `POST /auth/login`, which sets the HttpOnly session cookie |
 
+Administration (`/admin`) is one entry in the sidebar, with its own navigation grouped as people and access, projects and secrets, approval rules, infrastructure, and sign-in and security. Below 1360px the sections are a select. Besides the admin pages above, it holds Accounts (`/admin/users`, including people waiting for approval), Teams (`/admin/teams`), Sign-in methods (`/admin/sign-in`), Provider connections and Platform settings. On a phone the main places are bottom tabs, picked from what the person can open, and dialogs and drawers open as sheets from the bottom.
+
 ## Hard rules baked into the SPA
 
 | Rule | Where |

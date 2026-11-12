@@ -59,13 +59,13 @@ The browser isn't signed in yet, so these events have the actor
 
 | `error_kind` | Meaning | Fix |
 |---|---|---|
-| `hd_not_allowed` | The ID token has no `hd` claim (a personal Google account) or a Workspace domain that isn't allowed | Use a Workspace account, or add its domain under Admin → Sign-in |
+| `hd_not_allowed` | The ID token has no `hd` claim (a personal Google account) or a Workspace domain that isn't allowed | Use a Workspace account, or add its domain under Administration → Sign-in methods |
 | `email_domain_not_allowed` | `hd` is allowed but the email's domain isn't | Add the email's domain too |
 | `email_unverified` | Google didn't mark the email as verified | Verify it at Google |
 | `email_has_account` | The email already belongs to an account here, which hasn't connected Google | The person signs in with their password and uses Connect Google on their profile |
 | `account_disabled` | The account was declined or disabled | A declined account can't be re-enabled from the console |
 | `provider_disabled` | Google is turned off, or `SB_OIDC_ISSUER` is Google | Turn it on, or use the env-var provider |
-| `no_public_url` | No public address is set | Set `SB_PUBLIC_URL` or save one under Admin → Sign-in |
+| `no_public_url` | No public address is set | Set `SB_PUBLIC_URL` or save one under Administration → Sign-in methods |
 | `exchange_failed` | Google refused the code exchange, usually a wrong client ID or secret | Check the client in Google Cloud Console, replace the secret, run Test |
 | `id_token_invalid`, `claims_invalid`, `nonce_mismatch`, `missing_sub` | Google's answer couldn't be verified | Check the client ID, then Test |
 | `iat_invalid` | The ID token was too old or dated in the future | Check the api server's clock |
@@ -95,7 +95,7 @@ Secrets Bridge sends exactly:
 https://secrets.example.com/api/v1/auth/sso/google/callback
 ```
 
-Copy it from **Admin → Sign-in → Google → Redirect URL**, and add it under
+Copy it from **Administration → Sign-in methods → Google → Redirect URL**, and add it under
 **Authorized redirect URIs** in Google Cloud Console. The scheme, host,
 port and path must all match. If you change the public address, update the
 redirect URI at Google too.
@@ -442,7 +442,7 @@ audit events with the `correlation_id` of the job that executed the change:
   `executed`, and a result that left the stage `not_observed` reschedules the
   task 15, 30, 60 and then 120 seconds later. Argo CD that stays
   `Progressing` or `OutOfSync` keeps the task in that loop until the deadline.
-- **The Gateway is not claiming.** Check its status in **Admin → Gateways**. A
+- **The Gateway is not claiming.** Check its status in **Administration → Gateways**. A
   `stale` Gateway has missed its heartbeats; check the pods and their route to
   the control plane. A Gateway pauses claiming while the control plane is
   unreachable, its catalog is not accepted or a connector self-check fails
