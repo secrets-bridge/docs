@@ -150,7 +150,7 @@ stay in your provider.
 
 <h2 id="sb-start" class="sb-section-title">Start on your laptop</h2>
 
-<p class="sb-lede sb-lede--small">The api repo's compose file starts Postgres and Redis. The console and the agent run from their own repos, and the local guide walks through the whole flow against a dev Vault.</p>
+<p class="sb-lede sb-lede--small">The local guide starts Postgres and Redis from the api repo's compose file, which can also run the api in a container. The console and the agent run from their own repos, and the guide walks through the whole flow against a dev Vault.</p>
 
 <div class="sb-actions" markdown>
 [Run it locally](operations/docker-compose.md){ .md-button .md-button--primary }
