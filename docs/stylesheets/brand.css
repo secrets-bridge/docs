@@ -1,65 +1,82 @@
 /*
- * Secrets Bridge brand on mkdocs-material: the console's tokens (October
- * handoff), mapped onto Material's variables, for the light and dark
- * schemes. Ultramarine is a signal (links, the current tab, the focus
- * ring, one primary button), never a large fill. Square corners, 4 px at
- * most. Panels separate with a border, not a shadow.
+ * Secrets Bridge on mkdocs-material: the console's Switchboard tokens,
+ * mapped onto Material's variables, for the light and dark schemes.
+ *
+ * Lime is a fill, never a line. --sb-accent is the colour for anything
+ * thin (links, the current tab, the focus ring): dark olive on light,
+ * where lime would disappear, and lime on dark. Filled buttons use
+ * --sb-lime with --sb-on-lime. Panels separate with a border, not a
+ * shadow.
  */
 
 [data-md-color-scheme="default"] {
-  --sb-bg: #F6F5F1;
+  --sb-bg: #F5F4EF;
   --sb-surface: #FFFFFF;
-  --sb-sunken: #EFEEE9;
-  --sb-ink: #15171C;
-  --sb-muted: #5B606B;
-  --sb-border: #DDDBD4;
-  --sb-rule: #E8E6E0;
-  --sb-edge: #7E838D;
-  --sb-accent: #3141C8;
+  --sb-raised: #FFFFFF;
+  --sb-field: #FFFFFF;
+  --sb-sunken: #EFEEE8;
+  --sb-press: #E6E5DE;
+  --sb-ink: #161614;
+  --sb-muted: #5E5C55;
+  --sb-border: #DCDAD2;
+  --sb-rule: #E8E6DF;
+  --sb-edge: #85837B;
+  --sb-accent: #4A6600;
   --sb-on-accent: #FFFFFF;
-  --sb-accent-soft: #E9EBFB;
-  --sb-accent-line: #BFC5F3;
-  --sb-ok: #1E7A46;
-  --sb-ok-bg: #E6F4EC;
-  --sb-ok-line: #A7D7BA;
-  --sb-warn: #7A5200;
-  --sb-warn-bg: #FFF3D6;
-  --sb-warn-line: #EACB86;
-  --sb-bad: #B3261E;
+  --sb-accent-soft: #F1F8D6;
+  --sb-accent-line: #B9CF6A;
+  --sb-lime: #D4F24C;
+  --sb-lime-hover: #C6E63A;
+  --sb-lime-edge: #7E9420;
+  --sb-on-lime: #161614;
+  --sb-ok: #1F6FB8;
+  --sb-ok-bg: #E7F1FB;
+  --sb-ok-line: #A9CBEC;
+  --sb-warn: #9A5A00;
+  --sb-warn-bg: #FFF2DE;
+  --sb-warn-line: #EBC58C;
+  --sb-bad: #B42318;
   --sb-bad-bg: #FDECEA;
   --sb-bad-line: #F1B8B3;
-  --sb-info: #3E4A5C;
-  --sb-info-bg: #EEF0F3;
-  --sb-info-line: #C9CED8;
+  --sb-info: #4A4943;
+  --sb-info-bg: #F0EFEA;
+  --sb-info-line: #D6D4CC;
   color-scheme: light;
 }
 
 [data-md-color-scheme="slate"] {
-  --sb-bg: #0F1013;
-  --sb-surface: #17191E;
-  --sb-sunken: #1D1F25;
-  --sb-ink: #ECECEE;
-  --sb-muted: #A2A6AF;
-  --sb-border: #2B2E36;
-  --sb-rule: #22252B;
-  --sb-edge: #686D7A;
-  --sb-accent: #9AA3FF;
-  --sb-on-accent: #0F1013;
-  --sb-accent-soft: #1D2140;
-  --sb-accent-line: #3A4285;
-  --sb-ok: #6FCF97;
-  --sb-ok-bg: #132219;
-  --sb-ok-line: #24432F;
-  --sb-warn: #F2C14E;
-  --sb-warn-bg: #2A2210;
-  --sb-warn-line: #4E4024;
-  --sb-bad: #FF8A80;
-  --sb-bad-bg: #2C1513;
-  --sb-bad-line: #4E2522;
-  --sb-info: #B7C0CF;
-  --sb-info-bg: #1B1F27;
-  --sb-info-line: #323846;
-  --md-hue: 225deg;
+  --sb-bg: #111110;
+  --sb-surface: #1A1A18;
+  --sb-raised: #232321;
+  --sb-field: #0B0B0A;
+  --sb-sunken: #1E1E1C;
+  --sb-press: #272724;
+  --sb-ink: #F4F2EA;
+  --sb-muted: #ADABA1;
+  --sb-border: #2A2A27;
+  --sb-rule: #222220;
+  --sb-edge: #76756D;
+  --sb-accent: #D4F24C;
+  --sb-on-accent: #111110;
+  --sb-accent-soft: #20260F;
+  --sb-accent-line: #4B5A1A;
+  --sb-lime: #D4F24C;
+  --sb-lime-hover: #E3F984;
+  --sb-lime-edge: transparent;
+  --sb-on-lime: #111110;
+  --sb-ok: #72BBFF;
+  --sb-ok-bg: #0F1E2C;
+  --sb-ok-line: #24476A;
+  --sb-warn: #FFAE52;
+  --sb-warn-bg: #2A1E0E;
+  --sb-warn-line: #5A3F1C;
+  --sb-bad: #FF7070;
+  --sb-bad-bg: #2C1414;
+  --sb-bad-line: #5E2828;
+  --sb-info: #CAC8BE;
+  --sb-info-bg: #1C1C1A;
+  --sb-info-line: #34342F;
+  --md-hue: 60deg;
   color-scheme: dark;
 }
 
@@ -73,10 +90,12 @@
   --md-default-fg-color--lightest: var(--sb-border);
   --md-typeset-color: var(--sb-ink);
 
-  /* Header and tabs: the surface with ink, not a coloured bar */
-  --md-primary-fg-color: var(--sb-surface);
-  --md-primary-fg-color--light: var(--sb-surface);
-  --md-primary-fg-color--dark: var(--sb-surface);
+  --sb-font-display: "Bricolage Grotesque", "Geist", system-ui, sans-serif;
+
+  /* Header and tabs: the page itself with ink, not a coloured bar */
+  --md-primary-fg-color: var(--sb-bg);
+  --md-primary-fg-color--light: var(--sb-bg);
+  --md-primary-fg-color--dark: var(--sb-bg);
   --md-primary-bg-color: var(--sb-ink);
   --md-primary-bg-color--light: var(--sb-muted);
 
@@ -87,7 +106,7 @@
   --md-typeset-a-color: var(--sb-accent);
 
   /* Code */
-  --md-code-bg-color: var(--sb-sunken);
+  --md-code-bg-color: var(--sb-field);
   --md-code-fg-color: var(--sb-ink);
   --md-code-hl-color: var(--sb-accent-soft);
   --md-code-hl-color--light: var(--sb-accent-soft);
@@ -96,8 +115,8 @@
   --md-typeset-table-color: var(--sb-border);
   --md-typeset-table-color--light: var(--sb-sunken);
   --md-typeset-mark-color: var(--sb-warn-bg);
-  --md-footer-bg-color: var(--sb-surface);
-  --md-footer-bg-color--dark: var(--sb-surface);
+  --md-footer-bg-color: var(--sb-bg);
+  --md-footer-bg-color--dark: var(--sb-bg);
   --md-footer-fg-color: var(--sb-ink);
   --md-footer-fg-color--light: var(--sb-muted);
   --md-footer-fg-color--lighter: var(--sb-edge);
@@ -135,10 +154,10 @@
   --md-admonition-fg-color: var(--sb-ink);
   --md-shadow-z1: none;
   --md-shadow-z2: none;
-  --md-shadow-z3: 0 1px 2px rgba(21, 23, 28, 0.06), 0 16px 40px rgba(21, 23, 28, 0.16);
+  --md-shadow-z3: 0 1px 2px rgba(22, 22, 20, 0.06), 0 16px 40px rgba(22, 22, 20, 0.16);
 }
 
-/* ---- Type: IBM Plex, the website scale ----------------------------- */
+/* ---- Type: Geist, with Bricolage Grotesque for titles ---------------- */
 
 .md-typeset {
   font-size: 0.8rem; /* 16 px body-docs at Material's 20 px root */
@@ -146,26 +165,28 @@
 }
 
 .md-typeset h1 {
-  font-weight: 600;
-  font-size: 1.6rem; /* 32 px: docs pages; the home page uses its own display size */
-  line-height: 1.15;
-  letter-spacing: -0.022em;
+  font-family: var(--sb-font-display);
+  font-weight: 700;
+  font-size: 1.8rem; /* 36 px: docs pages; the home page uses its own display size */
+  line-height: 1.12;
+  letter-spacing: -0.03em;
   color: var(--sb-ink);
   margin: 0 0 1rem;
 }
 
 .md-typeset h2 {
-  font-weight: 600;
-  font-size: 1.15rem; /* 23 px heading */
-  line-height: 1.3;
-  letter-spacing: -0.015em;
+  font-family: var(--sb-font-display);
+  font-weight: 700;
+  font-size: 1.3rem; /* 26 px heading */
+  line-height: 1.2;
+  letter-spacing: -0.02em;
   color: var(--sb-ink);
   margin-top: 2.4rem;
 }
 
 .md-typeset h3 {
   font-weight: 600;
-  font-size: 0.9rem; /* 18 px */
+  font-size: 0.85rem; /* 17 px */
   line-height: 1.4;
   letter-spacing: -0.01em;
   color: var(--sb-ink);
@@ -191,8 +212,18 @@
 }
 
 .md-typeset code {
-  border-radius: 3px;
+  border-radius: 5px;
   padding: 0.05em 0.3em;
+}
+
+.md-typeset :not(pre) > code {
+  background: var(--sb-raised);
+  border: 1px solid var(--sb-border);
+}
+
+.md-typeset pre > code {
+  border: 1px solid var(--sb-border);
+  border-radius: 10px;
 }
 
 /* Tabular figures where numbers line up */
@@ -212,7 +243,7 @@
 }
 
 .md-tabs {
-  background-color: var(--sb-surface);
+  background-color: var(--sb-bg);
   border-bottom: 1px solid var(--sb-border);
   color: var(--sb-muted);
 }
@@ -251,21 +282,21 @@
   pointer-events: none;
 }
 
-/* Ultramarine on light, periwinkle on dark (approved colourings).
-   Material takes one logo file, so swap it here. */
+/* Ink with a lime ring on light, lime on dark. Material takes one logo
+   file, so swap it here. */
 [data-md-color-scheme="slate"] .md-header__button.md-logo img,
 [data-md-color-scheme="slate"] .md-nav__button.md-logo img {
   content: url("../assets/logo-horizontal-dark.svg");
 }
 
 .md-search__form {
-  background-color: var(--sb-sunken);
+  background-color: var(--sb-field);
   border: 1px solid var(--sb-border);
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 .md-search__form:hover {
-  background-color: var(--sb-sunken);
+  background-color: var(--sb-field);
 }
 
 .md-search__input,
@@ -275,7 +306,7 @@
 }
 
 [data-md-toggle="search"]:checked ~ .md-header .md-search__form {
-  border-radius: 4px 4px 0 0;
+  border-radius: 8px 8px 0 0;
 }
 
 .md-nav__link--active,
@@ -293,7 +324,7 @@
 
 .md-typeset table:not([class]) {
   border: 1px solid var(--sb-border);
-  border-radius: 4px;
+  border-radius: 12px;
   box-shadow: none;
   font-size: 0.7rem;
   background: var(--sb-surface);
@@ -315,17 +346,17 @@
   box-shadow: none;
 }
 
-/* Admonitions: a border all round, a neutral title, the status colours
-   only for warnings and failures. No coloured left bars. */
+/* Admonitions read as the console's banners: note as info, warning as
+   warn, danger as error. A border all round, no coloured left bars. */
 .md-typeset .admonition,
 .md-typeset details,
 .md-typeset .admonition[class],
 .md-typeset details[class] {
-  border: 1px solid var(--sb-border);
-  border-radius: 4px;
+  border: 1px solid var(--sb-info-line);
+  border-radius: 10px;
   box-shadow: none;
   font-size: 0.75rem;
-  background: var(--sb-surface);
+  background: var(--sb-info-bg);
 }
 
 .md-typeset .admonition-title,
@@ -390,13 +421,13 @@
   background-color: var(--sb-ok) !important;
 }
 
-/* Buttons: one ultramarine primary, the rest outlined in edge */
+/* Buttons: graphite on lime for the primary, the rest outlined in edge */
 .md-typeset .md-button {
   border: 1px solid var(--sb-edge);
-  border-radius: 4px;
+  border-radius: 8px;
   color: var(--sb-ink);
-  font-weight: 500;
-  padding: 0.45em 1em;
+  font-weight: 600;
+  padding: 0.5em 1.1em;
   font-size: 0.75rem;
 }
 
@@ -408,18 +439,16 @@
 }
 
 .md-typeset .md-button--primary {
-  background-color: var(--sb-accent);
-  border-color: var(--sb-accent);
-  color: var(--sb-on-accent);
-  font-weight: 600;
+  background-color: var(--sb-lime);
+  border-color: var(--sb-lime-edge);
+  color: var(--sb-on-lime);
 }
 
 .md-typeset .md-button--primary:hover,
 .md-typeset .md-button--primary:focus {
-  background-color: var(--sb-accent);
-  border-color: var(--sb-accent);
-  color: var(--sb-on-accent);
-  filter: brightness(1.1);
+  background-color: var(--sb-lime-hover);
+  border-color: var(--sb-lime-edge);
+  color: var(--sb-on-lime);
 }
 
 /* Focus: a visible 2 px accent ring everywhere */
@@ -436,7 +465,7 @@
 }
 
 .md-footer-meta {
-  background-color: var(--sb-surface);
+  background-color: var(--sb-bg);
 }
 
 .md-footer-meta__inner,

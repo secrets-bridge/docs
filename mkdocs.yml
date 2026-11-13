@@ -29,7 +29,7 @@ theme:
   language: en
   custom_dir: overrides
   favicon: assets/favicon.svg
-  # The horizontal lockup (mark and wordmark), as the brand book asks;
+  # The horizontal lockup (mark and wordmark);
   # brand.css hides the retyped site name next to it.
   logo: assets/logo-horizontal-color.svg
   palette:
@@ -50,8 +50,8 @@ theme:
         icon: material/brightness-4
         name: Switch to light theme
   font:
-    text: IBM Plex Sans
-    code: IBM Plex Mono
+    text: Geist
+    code: Geist Mono
   icon:
     repo: fontawesome/brands/github
   features:
@@ -176,6 +176,8 @@ hooks:
   - hooks/seo.py
 
 extra_css:
+  # Titles only. The privacy plugin self-hosts it with the other fonts.
+  - https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&display=swap
   - stylesheets/brand.css
   - stylesheets/landing.css
 

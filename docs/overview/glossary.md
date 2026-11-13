@@ -29,7 +29,7 @@ reject UPDATE and DELETE.
 
 #### `correlation_id`
 The chain identifier propagated through every audit event for one
-request lifecycle. Click any `corr` chip in the UI's Audit page to
+request lifecycle. Click any `corr` chip in the console's Audit log to
 filter the whole table to that chain.
 
 #### Control Plane (CP)

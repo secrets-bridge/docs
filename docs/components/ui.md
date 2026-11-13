@@ -5,9 +5,9 @@ description: "The Secrets Bridge console: a React and TypeScript SPA for access 
 # UI (SPA)
 
 Repo: [`secrets-bridge/ui`](https://github.com/secrets-bridge/ui)
-· Stack: Vite 6 + React 18 + TypeScript 5 + Tailwind 3 +
-TanStack Query 5 + React Hook Form 7 + Zod 3 +
-react-router-dom v6
+· Stack: Vite 8 + React 19 + TypeScript + Tailwind 4 +
+TanStack Query 5 + React Hook Form + Zod 4 +
+React Router 7
 · Container: multi-stage Node build → `nginx:1.27-alpine`,
 unprivileged user 101
 
@@ -19,19 +19,22 @@ routing: `/` → ui, `/api/v1/*` → api).
 
 | Route | Page | What |
 |---|---|---|
-| `/` | Dashboard | KPI cards, pending approvals (preview), recent audit activity (preview), providers health (preview), **agents** card (real), requests-this-week chart (preview) |
-| `/requests` | Requests | My-requests filter pills (All / Pending / Approved / Rejected / Executed × patch / read) + Approver queue with inline Approve / Reject (with-reason) |
+| `/` | Overview | Counters, **Next up** with its context and action, the rest as rows, and a right rail with system health or your requests, recent activity and where you can request |
+| `/approvals` | Approvals | Requests waiting for your decision, oldest first, with the oldest in full and Approve / Reject (with reason) |
+| `/requests` | My requests | Your open and closed requests, with search and a status filter |
 | `/requests/:id` | Request detail | Timeline, Approvals, **Wraps** (single-shot Reveal modal, read flow), the **Argo CD (observed by Gateway …)** panel with Gateway evidence, a muted **Argo CD history (before the Gateway)** card with the rows the retired control-plane poller wrote before the [cutover](../operations/gateway-cutover.md), read from `GET /requests/:id/gitops` and shown by `history_status` with the label *context only* (requester only, hidden when there are none), Details, Approver actions, Cancel-own |
 | `/agents` | Agents | Revoke confirm, and a Mint drawer with a **reveal-once panel** for the agent secret. The drawer calls the legacy direct mint, which the api refuses (`403`) unless the dev-only `SB_ALLOW_DIRECT_AGENT_MINT` is on; onboard agents by [enrollment](../operations/bootstrap.md#enrolling-your-first-agent) |
-| `/secrets` | Discovered secrets | Filter strip (cluster / provider / ref prefix / status / label chips), two-pane (table + sticky details with provider_config JSON) |
-| `/audit` | Audit log | Filter strip + correlation drill-in chip on every row, sticky details with metadata JSON |
+| `/secrets` | Secrets | Filter strip (cluster / provider / ref prefix / status / label chips), with details beside the table when there's room |
+| `/audit` | Audit log | Filter panel, and a drawer with the event's metadata and a link to its whole chain |
 | `/admin/projects` | Projects | Master-detail (340px project rail + envs panel); soft-delete via archive/restore. The **Observation** column shows each environment's source (**Gateway** or **None**) to `gateway.list` holders; **Change…** appears only with `gateway.bind` |
 | `/admin/roles` | Roles | Permission chip picker hydrated from `GET /permissions` (canonical catalog) |
-| `/admin/assignments` | Assignments | User × role × scope table; scope chips with `=` separator |
+| `/admin/assignments` | Role assignments | Person × role × scope table; people are picked by name or email |
 | `/admin/workflows` | Workflows | TTL knobs, min approvers, justification required |
 | `/admin/policies` | Policies | Selector → workflow priority-ordered list |
 | `/admin/gateways` | Gateways | Create, enroll, approve connectors, bind targets, disable, enable and revoke [Gateways](../operations/gateway.md) |
 | `/login` | Login | Real email + password against `POST /auth/login`, which sets the HttpOnly session cookie |
+
+Administration (`/admin`) is one entry in the sidebar, with its own navigation grouped as people and access, projects and secrets, approval rules, infrastructure, and sign-in and security. Below 1360px the sections are a select. Besides the admin pages above, it holds Accounts (`/admin/users`, including people waiting for approval), Teams (`/admin/teams`), Sign-in methods (`/admin/sign-in`), Provider connections and Platform settings. On a phone the main places are bottom tabs, picked from what the person can open, and dialogs and drawers open as sheets from the bottom.
 
 ## Hard rules baked into the SPA
 
@@ -48,13 +51,13 @@ routing: `/` → ui, `/api/v1/*` → api).
 
 ## Design system
 
-The SPA matches the Figma file `Secrets Bridge - Brand` byte-for-byte
-on the brand pages: fonts (Inter + JetBrains Mono), colors (Navy
-900 / Dark Navy / Cyan accent), brand-gradient primary CTAs,
-`StatusPill` variants, and the reveal-once UX pattern.
+The console uses the Switchboard identity: warm graphite with a
+chartreuse accent and blue for success, Geist and Geist Mono with
+Bricolage Grotesque for titles, and status as a shape per group plus
+the exact word. Administration is one sidebar entry with its own
+navigation, and on phones the console has bottom tabs and sheets.
 
-See [Design system](../design/index.md) for the brand voice,
-tokens, and Figma file reference.
+See [Design system](../design/index.md) for the brand voice and tokens.
 
 ## Configuration
 

@@ -47,7 +47,7 @@ sequenceDiagram
     API->>API: create account, waiting for approval
     API->>UI: session cookie, redirect
     UI->>P: Waiting for approval page
-    A->>UI: Admin → Users, Approve with a role and scope
+    A->>UI: Administration → Accounts, Approve with a role and scope
     UI->>API: POST /api/v1/users/:id/approve
     P->>UI: Check again
     UI->>P: console with the granted access
@@ -84,7 +84,7 @@ two places:
 | Source | How | In the console |
 |---|---|---|
 | `SB_PUBLIC_URL` | Set it in the api's environment, for example in the chart's `secrets.existingSecret`. The worker reads the same Secret. | Shown read-only, with "Set by SB_PUBLIC_URL on this install" |
-| The console | **Admin → Sign-in → Public address**. The field is prefilled from the address you are using. | Editable |
+| The console | **Administration → Sign-in methods → Public address**. The field is prefilled from the address you are using. | Editable |
 
 When `SB_PUBLIC_URL` is set it always wins, and `PUT /sso/settings` refuses
 to change the address (`409 public_url_from_env`).
@@ -104,7 +104,7 @@ accounts that can wait for approval at once. It defaults to 50 and accepts
 
 ### 2. Create the OAuth client in Google Cloud Console
 
-With the address saved, **Admin → Sign-in → Google → Set up Google** shows
+With the address saved, **Administration → Sign-in methods → Google → Set up Google** shows
 the redirect URL to copy. It is always the public address plus
 `/api/v1/auth/sso/google/callback`:
 
@@ -150,7 +150,7 @@ with **Replace…** to set a new one. Replacing it is its own call,
 ### 4. Test, then turn it on
 
 **Test** sends you through Google with your own account and back to
-**Admin → Sign-in**. It runs every check a real sign-in runs, creates
+**Administration → Sign-in methods**. It runs every check a real sign-in runs, creates
 nothing, issues no session, and works while Google is still off. The result
 shows as "Google sign-in works." or as the reason it didn't pass, and only
 the admin who ran it sees that reason.
@@ -211,9 +211,11 @@ its group mapping is skipped, so it gets no role from IdP groups either.
 
 Admins who can approve see:
 
-- a count on **Users** in the sidebar;
+- a count on **Administration** in the sidebar and on **Accounts** in its
+  navigation, and a banner on every Administration section until
+  Accounts is open;
 - a banner on **Overview** with a link while anyone is waiting;
-- the **Waiting for approval** list on **Admin → Users**, longest wait
+- the **Waiting for approval** list on **Administration → Accounts**, longest wait
   first;
 - optionally, a [webhook message from the worker](#notify-admins-from-the-worker).
 
@@ -239,7 +241,7 @@ can't sign in again.
 ### The waiting limit
 
 At most 50 accounts can wait at once by default; change the limit on
-**Admin → Sign-in → Public address**. Past it, new Google sign-ins are
+**Administration → Sign-in methods → Public address**. Past it, new Google sign-ins are
 refused with the same generic page until you approve or decline some.
 Declined accounts don't count. Refusals at the limit are audited as
 `user.pending_refused`, aggregated per 10-minute window: the first refusal
@@ -252,7 +254,7 @@ append-only audit log.
 With **Let them in right away**, a new account starts active. You can pick
 a **Role for new people**, granted globally when the account is created.
 Without one, the account starts with no role, and an admin grants one on
-the Users page.
+**Administration → Accounts**.
 
 The default role must be non-privileged: every permission it holds must be
 in `secret.list`, `secret.request` and `audit.read` (`audit.read` only
@@ -311,7 +313,7 @@ the console's count and banner still work.
 | `SB_WORKER_WEBHOOK_URL` | (unset) | Where to post. Required for this message. |
 | `SB_WORKER_WEBHOOK_SLACK_FORMAT` | `false` | `true` posts `{"text": ...}` for a Slack incoming webhook. |
 | `SB_WORKER_USERS_PENDING_INTERVAL` | `1m` | How often it runs, and so the most often admins hear about new accounts. At least `30s`, or the worker refuses to start. |
-| `SB_PUBLIC_URL` | (unset) | Used for the link to Admin → Users. Unset, the address saved in the console is used. |
+| `SB_PUBLIC_URL` | (unset) | Used for the link to Administration → Accounts (`/admin/users`). Unset, the address saved in the console is used. |
 
 Each run posts **at most one message**. It covers the accounts that started
 waiting since the last message: up to 10 by email, oldest first, then "and
@@ -348,7 +350,7 @@ be turned on.
 **Password sign-in and the break-glass admin are never turned off by these
 settings.** No sign-in setting disables `POST /auth/login`, and decline
 only touches waiting accounts. If Google is misconfigured or down, sign in
-with the bootstrap admin's password and fix it under Admin → Sign-in.
+with the bootstrap admin's password and fix it under Administration → Sign-in methods.
 
 ## Audit events
 
