@@ -6,7 +6,7 @@ Gateway in the control plane, enroll it once from your workstation, install the
 chart, approve its connector, bind an Argo CD Application to a secret, and
 switch the environment's observation source to the Gateway.
 
-Each control-plane step can be done in the console (Admin → Gateways) or with
+Each control-plane step can be done in the console (Administration → Gateways) or with
 `curl`. Enrollment always runs from a shell, because the credential goes
 straight into a Kubernetes Secret.
 
@@ -199,7 +199,7 @@ dialog on the first write that needs it.
 
 In the console:
 
-1. Open **Admin → Gateways** (needs `gateway.list`) and select
+1. Open **Administration → Gateways** (needs `gateway.list`) and select
    **Create gateway**.
 2. Fill in **Name**, **Boundary** and, if you want, **Environment
    (optional)**, **Max replicas** and **Max tasks in flight**. Select
@@ -369,7 +369,7 @@ kubectl -n tenant-a-uat logs deploy/secrets-bridge-gateway
 
 In the log, look for `identity loaded` and `connectors bound`.
 
-Then check the control plane. In the console, **Admin → Gateways** shows the
+Then check the control plane. In the console, **Administration → Gateways** shows the
 status, replicas and last heartbeat in UTC. Select the Gateway's name to see its
 replicas and **Advertised connectors**. With `curl`,
 `GET /api/v1/admin/gateways` needs `gateway.list` and no step-up:
@@ -396,7 +396,7 @@ and does not affect readiness.
 Advertising a connector approves nothing. An admin with `gateway.bind` approves
 it and binds a target.
 
-In the console, open the Gateway from **Admin → Gateways**:
+In the console, open the Gateway from **Administration → Gateways**:
 
 1. Under **Advertised connectors**, select **Approve…** next to
    `argocd-main`, then **Approve connector**. Approving grants the Gateway
@@ -461,7 +461,7 @@ observer to fall back to. Switching away from `gateway` cancels the
 environment's open Gateway tasks with the reason `source_changed`. The requests
 themselves are not affected.
 
-In the console, open **Admin → Projects**, select the project, and find the
+In the console, open **Administration → Projects**, select the project, and find the
 environment on the **Environments** tab. The **Observation** column shows the
 current source, **Gateway** or **None**, to anyone with `gateway.list`. With
 `gateway.bind`, select **Change…**, choose **Gateway** in the

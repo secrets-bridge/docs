@@ -51,10 +51,12 @@
         
         
         
-        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.804a7bde.css">
-        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
+        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.86e47105.css">
+        <style>:root{--md-text-font:"Geist";--md-code-font:"Geist Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css2.62918e6d.css">
     
       <link rel="stylesheet" href="../../stylesheets/brand.css">
     
@@ -119,7 +121,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Tokens and theme","description":"Secrets Bridge design tokens: colours for the light and dark themes, the type scale, spacing, radii and control sizes used by the console and this site.","url":"https://secrets-bridge.io/latest/design/tokens/","mainEntityOfPage":"https://secrets-bridge.io/latest/design/tokens/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-23T15:12:19+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Design system","item":"https://secrets-bridge.io/latest/design/"},{"@type":"ListItem","position":3,"name":"Tokens and theme","item":"https://secrets-bridge.io/latest/design/tokens/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Tokens and theme","description":"Secrets Bridge design tokens: colours for the light and dark themes, the type scale, spacing, radii and control sizes used by the console and this site.","url":"https://secrets-bridge.io/latest/design/tokens/","mainEntityOfPage":"https://secrets-bridge.io/latest/design/tokens/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-11-13T16:55:28+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Design system","item":"https://secrets-bridge.io/latest/design/"},{"@type":"ListItem","position":3,"name":"Tokens and theme","item":"https://secrets-bridge.io/latest/design/tokens/"}]}]}</script>
   
 
   </head>
@@ -163,7 +165,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Secrets Bridge" class="md-header__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="156" height="24">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -447,7 +449,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="Secrets Bridge" class="md-nav__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="156" height="24">
 
     </a>
     Secrets Bridge
@@ -2210,7 +2212,7 @@
 <li><strong>This site:</strong> <code>docs/stylesheets/brand.css</code> maps them onto mkdocs-material's variables for its light and dark schemes.</li>
 </ul>
 <h2 id="colour">Colour<a class="headerlink" href="#colour" title="Permanent link">&para;</a></h2>
-<p>Build every screen from <code>bg</code>, <code>surface</code>, <code>ink</code>, <code>muted</code>, <code>border</code> and <code>rule</code>: roughly 70% <code>bg</code>, 13% <code>surface</code>, 10% <code>ink</code>, 5% <code>muted</code> and <code>rule</code>, and about 2% <code>accent</code>.</p>
+<p>Build every screen from <code>bg</code>, <code>surface</code>, <code>ink</code>, <code>muted</code>, <code>border</code> and <code>rule</code>, with <code>accent</code> kept to about 2%.</p>
 <table>
 <thead>
 <tr>
@@ -2223,181 +2225,222 @@
 <tbody>
 <tr>
 <td><code>bg</code></td>
-<td><code>#F6F5F1</code></td>
-<td><code>#0F1013</code></td>
-<td>Paper. Page background behind everything; about 70% of a screen.</td>
+<td><code>#F5F4EF</code></td>
+<td><code>#111110</code></td>
+<td>Page background behind everything; about 70% of a screen.</td>
+</tr>
+<tr>
+<td><code>side</code></td>
+<td><code>#EDECE6</code></td>
+<td><code>#0D0D0C</code></td>
+<td>The console sidebar and the phone bars.</td>
 </tr>
 <tr>
 <td><code>surface</code></td>
 <td><code>#FFFFFF</code></td>
-<td><code>#17191E</code></td>
-<td>Panels, tables, dialogs, drawers and inputs sitting on bg.</td>
+<td><code>#1A1A18</code></td>
+<td>Panels and tables sitting on bg.</td>
 </tr>
 <tr>
-<td><code>sunken</code></td>
-<td><code>#EFEEE9</code></td>
-<td><code>#1D1F25</code></td>
-<td>Row hover, current nav item, read-only boxes, key chips.</td>
+<td><code>raised</code></td>
+<td><code>#FFFFFF</code></td>
+<td><code>#232321</code></td>
+<td>Dialogs, drawers, the current nav item and key chips.</td>
+</tr>
+<tr>
+<td><code>field</code></td>
+<td><code>#FFFFFF</code></td>
+<td><code>#0B0B0A</code></td>
+<td>Inputs, code and revealed values.</td>
+</tr>
+<tr>
+<td><code>hover</code></td>
+<td><code>#EFEEE8</code></td>
+<td><code>#1E1E1C</code></td>
+<td>Row and control hover.</td>
+</tr>
+<tr>
+<td><code>press</code></td>
+<td><code>#E6E5DE</code></td>
+<td><code>#272724</code></td>
+<td>A control while it is pressed.</td>
 </tr>
 <tr>
 <td><code>ink</code></td>
-<td><code>#15171C</code></td>
-<td><code>#ECECEE</code></td>
-<td>Primary text and the production environment tag. 16.4:1 on bg (light), 16.1:1 (dark).</td>
+<td><code>#161614</code></td>
+<td><code>#F4F2EA</code></td>
+<td>Primary text and the production environment tag. 16.45:1 on bg (light), 16.86:1 (dark).</td>
 </tr>
 <tr>
 <td><code>muted</code></td>
-<td><code>#5B606B</code></td>
-<td><code>#A2A6AF</code></td>
-<td>Secondary text: subtitles, table headers, times, hints. 5.8:1 on bg (light), 7.8:1 (dark); passes 4.5:1 on surface and sunken too.</td>
+<td><code>#5E5C55</code></td>
+<td><code>#ADABA1</code></td>
+<td>Secondary text: subtitles, table headers, times, hints. 6.08:1 on bg (light), 8.20:1 (dark).</td>
 </tr>
 <tr>
 <td><code>border</code></td>
-<td><code>#DDDBD4</code></td>
-<td><code>#2B2E36</code></td>
+<td><code>#DCDAD2</code></td>
+<td><code>#2A2A27</code></td>
 <td>Outer edges of panels, tables and dividers between sections. Decorative only: never the only edge of a control.</td>
 </tr>
 <tr>
 <td><code>rule</code></td>
-<td><code>#E8E6E0</code></td>
-<td><code>#22252B</code></td>
+<td><code>#E8E6DF</code></td>
+<td><code>#222220</code></td>
 <td>Hairlines between rows inside a table, list or log.</td>
 </tr>
 <tr>
 <td><code>edge</code></td>
-<td><code>#7E838D</code></td>
-<td><code>#686D7A</code></td>
-<td>Control borders (inputs, secondary buttons), dashed empty states, hollow status squares. At least 3.3:1 on bg, surface and sunken in light; 3.2:1 in dark.</td>
+<td><code>#85837B</code></td>
+<td><code>#76756D</code></td>
+<td>Control borders (inputs, secondary buttons), dashed empty states, hollow status shapes. At least 3:1 on bg and surface in both themes.</td>
 </tr>
 <tr>
 <td><code>accent</code></td>
-<td><code>#3141C8</code></td>
-<td><code>#9AA3FF</code></td>
-<td>Ultramarine. The brand mark, links, the one primary button per view, current-tab underline, focus ring, reveal progress. About 2% of a screen. 7.1:1 on bg (light), 8.2:1 (dark).</td>
+<td><code>#D4F24C</code></td>
+<td><code>#D4F24C</code></td>
+<td>Lime. A fill only: the one primary button per view, counts, reveal fills. Graphite on lime is 14.33:1 (light), 14.94:1 (dark).</td>
+</tr>
+<tr>
+<td><code>accent-ink</code></td>
+<td><code>#4A6600</code></td>
+<td><code>#D4F24C</code></td>
+<td>Everything thin in the accent: links, the current tab, focus ring, radios, reveal progress. 5.97:1 on bg (light), 14.94:1 (dark).</td>
+</tr>
+<tr>
+<td><code>accent-edge</code></td>
+<td><code>#7E9420</code></td>
+<td><code>transparent</code></td>
+<td>The outline of a lime button on light.</td>
 </tr>
 <tr>
 <td><code>on-accent</code></td>
-<td><code>#FFFFFF</code></td>
-<td><code>#0F1013</code></td>
-<td>Text and icons on accent fills (primary button, nav count). 7.7:1 (light), 8.2:1 (dark).</td>
+<td><code>#161614</code></td>
+<td><code>#111110</code></td>
+<td>Text and icons on lime.</td>
 </tr>
 <tr>
 <td><code>accent-soft</code></td>
-<td><code>#E9EBFB</code></td>
-<td><code>#1D2140</code></td>
-<td>Control-plane zone in diagrams and the avatar background. Never a status.</td>
+<td><code>#F1F8D6</code></td>
+<td><code>#20260F</code></td>
+<td>The control-plane zone in diagrams, reveal-ready panels and checked options. Never a status.</td>
 </tr>
 <tr>
 <td><code>accent-line</code></td>
-<td><code>#BFC5F3</code></td>
-<td><code>#3A4285</code></td>
+<td><code>#B9CF6A</code></td>
+<td><code>#4B5A1A</code></td>
 <td>Border for accent-soft areas.</td>
 </tr>
 <tr>
 <td><code>ok</code></td>
-<td><code>#1E7A46</code></td>
-<td><code>#6FCF97</code></td>
-<td>Success: approved, executed, reveal ready, copied. Text on ok-bg, bg and surface (4.7:1 or more); always with a word. ok and bad differ by hue more than lightness, so never rely on the colour of a status square alone.</td>
+<td><code>#1F6FB8</code></td>
+<td><code>#72BBFF</code></td>
+<td>Success, in blue: approved, executed, copied. Text on ok-bg, bg and surface; always with a word.</td>
 </tr>
 <tr>
 <td><code>ok-bg</code></td>
-<td><code>#E6F4EC</code></td>
-<td><code>#132219</code></td>
+<td><code>#E7F1FB</code></td>
+<td><code>#0F1E2C</code></td>
 <td>Success fill behind ok text.</td>
 </tr>
 <tr>
 <td><code>ok-line</code></td>
-<td><code>#A7D7BA</code></td>
-<td><code>#24432F</code></td>
+<td><code>#A9CBEC</code></td>
+<td><code>#24476A</code></td>
 <td>Border around ok-bg.</td>
 </tr>
 <tr>
 <td><code>warn</code></td>
-<td><code>#7A5200</code></td>
-<td><code>#F2C14E</code></td>
+<td><code>#9A5A00</code></td>
+<td><code>#FFAE52</code></td>
 <td>Waiting: pending, pending_values, pending_verification. Text on warn-bg, bg and surface.</td>
 </tr>
 <tr>
 <td><code>warn-bg</code></td>
-<td><code>#FFF3D6</code></td>
-<td><code>#2A2210</code></td>
+<td><code>#FFF2DE</code></td>
+<td><code>#2A1E0E</code></td>
 <td>Waiting fill behind warn text.</td>
 </tr>
 <tr>
 <td><code>warn-line</code></td>
-<td><code>#EACB86</code></td>
-<td><code>#4E4024</code></td>
+<td><code>#EBC58C</code></td>
+<td><code>#5A3F1C</code></td>
 <td>Border around warn-bg.</td>
 </tr>
 <tr>
 <td><code>bad</code></td>
-<td><code>#B3261E</code></td>
-<td><code>#FF8A80</code></td>
+<td><code>#B42318</code></td>
+<td><code>#FF7070</code></td>
 <td>Failure: rejected, refused, failed, validation errors. Text on bad-bg, bg and surface; always with a word.</td>
 </tr>
 <tr>
 <td><code>bad-bg</code></td>
 <td><code>#FDECEA</code></td>
-<td><code>#2C1513</code></td>
+<td><code>#2C1414</code></td>
 <td>Failure fill behind bad text; hover on danger buttons.</td>
 </tr>
 <tr>
 <td><code>bad-line</code></td>
 <td><code>#F1B8B3</code></td>
-<td><code>#4E2522</code></td>
-<td>Border of danger buttons and error banners.</td>
+<td><code>#5E2828</code></td>
+<td>Border of error banners.</td>
 </tr>
 <tr>
 <td><code>info</code></td>
-<td><code>#3E4A5C</code></td>
-<td><code>#B7C0CF</code></td>
+<td><code>#4A4943</code></td>
+<td><code>#CAC8BE</code></td>
 <td>Neutral information labels. Text on info-bg.</td>
 </tr>
 <tr>
 <td><code>info-bg</code></td>
-<td><code>#EEF0F3</code></td>
-<td><code>#1B1F27</code></td>
+<td><code>#F0EFEA</code></td>
+<td><code>#1C1C1A</code></td>
 <td>Neutral information fill.</td>
 </tr>
 <tr>
 <td><code>info-line</code></td>
-<td><code>#C9CED8</code></td>
-<td><code>#323846</code></td>
+<td><code>#D6D4CC</code></td>
+<td><code>#34342F</code></td>
 <td>Border around info-bg.</td>
 </tr>
 <tr>
 <td><code>scrim</code></td>
-<td><code>rgba(21,23,28,0.36)</code></td>
-<td><code>rgba(0,0,0,0.6)</code></td>
+<td><code>rgba(22,22,20,0.36)</code></td>
+<td><code>rgba(0,0,0,0.62)</code></td>
 <td>Overlay behind dialogs and drawers.</td>
 </tr>
 </tbody>
 </table>
-<p><code>accent</code> is a signal: the mark, links, one primary button per view, the current tab, the focus ring, reveal progress. It is never a large fill, a status, or emphasis in running text. <code>edge</code> is for what you operate (input and secondary-button borders); <code>border</code> and <code>rule</code> only separate.</p>
+<p>Lime is a fill, never a line. On the light background it is about 1.2:1, so anything thin uses <code>accent-ink</code>, and a filled control keeps lime with an <code>accent-edge</code> border. In the console, ESLint refuses <code>text-accent</code> and its relatives. <code>edge</code> is for what you operate (input and secondary-button borders); <code>border</code> and <code>rule</code> only separate.</p>
 <h2 id="status">Status<a class="headerlink" href="#status" title="Permanent link">&para;</a></h2>
-<p>Show the exact API status as a word after a small square:</p>
+<p>Show the exact API status as a word after a shape. Each group has its own shape, so a status never rests on colour alone:</p>
 <table>
 <thead>
 <tr>
 <th>Status</th>
-<th>Square</th>
+<th>Shape</th>
 <th>Token</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>pending, pending_values, pending_verification</td>
-<td>hollow</td>
+<td>half</td>
 <td><code>warn</code></td>
 </tr>
 <tr>
-<td>approved, executed</td>
+<td>approved (the agent is working)</td>
+<td>split</td>
+<td><code>ok</code></td>
+</tr>
+<tr>
+<td>executed</td>
 <td>solid</td>
 <td><code>ok</code></td>
 </tr>
 <tr>
 <td>rejected, refused, failed</td>
-<td>solid</td>
+<td>diamond</td>
 <td><code>bad</code></td>
 </tr>
 <tr>
@@ -2409,7 +2452,7 @@
 </table>
 <p>A reveal condition (ready, consumed, expired) shows separately from the status, in <code>ok</code> or <code>muted</code> text. <code>executed</code> alone never means a reveal is available.</p>
 <h2 id="type">Type<a class="headerlink" href="#type" title="Permanent link">&para;</a></h2>
-<p>IBM Plex Sans and IBM Plex Mono (SIL Open Font License 1.1), weights 400, 500 and 600, self-hosted. Emphasis is weight, never italics or colour. Sentence case everywhere, including buttons and navigation.</p>
+<p>Geist and Geist Mono for the interface, with Bricolage Grotesque for titles and counts only (all SIL Open Font License 1.1), self-hosted. Emphasis is weight, never italics or colour. Sentence case everywhere, including buttons and navigation.</p>
 <table>
 <thead>
 <tr>
@@ -2424,35 +2467,28 @@
 <tr>
 <td>Website</td>
 <td><code>display</code></td>
-<td>64 / 66</td>
-<td>600</td>
-<td>The home page hero only</td>
-</tr>
-<tr>
-<td>Website</td>
-<td><code>page-title</code></td>
-<td>42 / 47</td>
-<td>600</td>
-<td>Page h1</td>
+<td>64 / 64</td>
+<td>700</td>
+<td>The home page hero only, in Bricolage Grotesque</td>
 </tr>
 <tr>
 <td>Website</td>
 <td><code>section</code></td>
-<td>38 / 43</td>
-<td>600</td>
-<td>Home page sections</td>
+<td>40 / 44</td>
+<td>700</td>
+<td>Home page sections, in Bricolage Grotesque</td>
 </tr>
 <tr>
 <td>Website</td>
 <td><code>heading</code></td>
-<td>23 / 30</td>
-<td>600</td>
-<td>Headings in docs pages</td>
+<td>26 / 31</td>
+<td>700</td>
+<td>Headings in docs pages, in Bricolage Grotesque</td>
 </tr>
 <tr>
 <td>Website</td>
 <td><code>lede</code></td>
-<td>18 / 29</td>
+<td>17 / 27</td>
 <td>400</td>
 <td>The paragraph under a title</td>
 </tr>
@@ -2466,56 +2502,63 @@
 <tr>
 <td>Console</td>
 <td><code>console-title</code></td>
-<td>20 / 24</td>
-<td>600</td>
-<td>Page h1 in the console</td>
+<td>30 / 34</td>
+<td>700</td>
+<td>Page h1 in the console, in Bricolage Grotesque</td>
 </tr>
 <tr>
 <td>Console</td>
 <td><code>dialog-title</code></td>
-<td>17 / 22</td>
-<td>600</td>
-<td>Dialog and drawer titles</td>
+<td>20 / 25</td>
+<td>700</td>
+<td>Dialog and drawer titles, in Bricolage Grotesque</td>
+</tr>
+<tr>
+<td>Console</td>
+<td><code>count</code></td>
+<td>28 / 30</td>
+<td>700</td>
+<td>Counters, in Bricolage Grotesque</td>
 </tr>
 <tr>
 <td>Console</td>
 <td><code>block-heading</code></td>
-<td>13.5 / 20</td>
+<td>15 / 22</td>
 <td>600</td>
 <td>Above tables and panels</td>
 </tr>
 <tr>
 <td>Console</td>
 <td><code>body</code></td>
-<td>13.5 / 20</td>
+<td>14.5 / 22</td>
 <td>400</td>
 <td>Prose in the console</td>
 </tr>
 <tr>
 <td>Console</td>
 <td><code>ui</code></td>
-<td>13 / 18</td>
+<td>14 / 20</td>
 <td>500</td>
 <td>Controls</td>
 </tr>
 <tr>
 <td>Console</td>
 <td><code>caption</code></td>
-<td>12.5 / 18</td>
+<td>13.5 / 20</td>
 <td>400</td>
 <td>Hints</td>
 </tr>
 <tr>
 <td>Console</td>
 <td><code>label</code></td>
-<td>12 / 16</td>
+<td>12.5 / 16</td>
 <td>500</td>
 <td>Table headers</td>
 </tr>
 <tr>
 <td>Mono</td>
 <td><code>mono</code>, <code>mono-small</code></td>
-<td>13, 12</td>
+<td>12.5, 11.5</td>
 <td>400</td>
 <td>Refs, key names, paths, times, IDs</td>
 </tr>
@@ -2536,11 +2579,23 @@
 </tr>
 <tr>
 <td><code>radius-sm</code></td>
-<td>3 px (tags)</td>
+<td>6 px (tags)</td>
 </tr>
 <tr>
 <td><code>radius-md</code></td>
-<td>4 px, the largest radius</td>
+<td>8 px (controls)</td>
+</tr>
+<tr>
+<td><code>radius-lg</code></td>
+<td>10 px (banners and wells)</td>
+</tr>
+<tr>
+<td><code>radius-xl</code></td>
+<td>12 px (panels)</td>
+</tr>
+<tr>
+<td><code>radius-2xl</code></td>
+<td>14 px (dialogs)</td>
 </tr>
 <tr>
 <td><code>radius-round</code></td>
@@ -2548,11 +2603,11 @@
 </tr>
 <tr>
 <td><code>control-md</code> / <code>control-sm</code> / <code>control-touch</code></td>
-<td>32 px default, 28 px in tables, 44 px on phones</td>
+<td>38 px default, 32 px in tables, 44 px on phones</td>
 </tr>
 <tr>
 <td><code>sidebar</code> / <code>rail</code></td>
-<td>216 px console sidebar, 260 px overview side column</td>
+<td>240 px console sidebar, 320 px right rail</td>
 </tr>
 </tbody>
 </table>
@@ -2560,7 +2615,7 @@
 <h2 id="accessibility">Accessibility<a class="headerlink" href="#accessibility" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Text at least 4.5:1, and controls, focus rings and status squares at least 3:1, against their background in both themes. The usage notes above give the ratios.</li>
-<li>Focus ring: 2 px solid <code>accent</code>, 2 px offset, on every interactive element.</li>
+<li>Focus ring: 2 px solid <code>accent-ink</code>, 2 px offset, on every interactive element.</li>
 <li>Respect <code>prefers-reduced-motion</code>. Nothing in the product needs animation.</li>
 </ul>
 

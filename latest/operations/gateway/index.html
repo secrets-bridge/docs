@@ -51,10 +51,12 @@
         
         
         
-        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.804a7bde.css">
-        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
+        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.86e47105.css">
+        <style>:root{--md-text-font:"Geist";--md-code-font:"Geist Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css2.62918e6d.css">
     
       <link rel="stylesheet" href="../../stylesheets/brand.css">
     
@@ -119,7 +121,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Install and enroll a Gateway - Secrets Bridge","description":"Install a Release 1 Gateway: the minimal Argo CD policy, enrollment, the Helm chart, the can-i privilege checks, Application identity and bindings.","url":"https://secrets-bridge.io/latest/operations/gateway/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/gateway/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T19:48:41+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Gateway","item":"https://secrets-bridge.io/latest/operations/gateway/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Install and enroll a Gateway - Secrets Bridge","description":"Install a Release 1 Gateway: the minimal Argo CD policy, enrollment, the Helm chart, the can-i privilege checks, Application identity and bindings.","url":"https://secrets-bridge.io/latest/operations/gateway/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/gateway/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-11-13T16:55:28+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Gateway","item":"https://secrets-bridge.io/latest/operations/gateway/"}]}]}</script>
   
 
   </head>
@@ -163,7 +165,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Secrets Bridge" class="md-header__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="156" height="24">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -447,7 +449,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="Secrets Bridge" class="md-nav__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="156" height="24">
 
     </a>
     Secrets Bridge
@@ -2575,7 +2577,7 @@ observes Argo CD only. You create a read-only Argo CD account, create the
 Gateway in the control plane, enroll it once from your workstation, install the
 chart, approve its connector, bind an Argo CD Application to a secret, and
 switch the environment's observation source to the Gateway.</p>
-<p>Each control-plane step can be done in the console (Admin → Gateways) or with
+<p>Each control-plane step can be done in the console (Administration → Gateways) or with
 <code>curl</code>. Enrollment always runs from a shell, because the credential goes
 straight into a Kubernetes Secret.</p>
 <div class="admonition warning">
@@ -2775,7 +2777,7 @@ dialog on the first write that needs it.</p>
 <h2 id="3-create-the-gateway-and-mint-an-enrollment-token">3. Create the Gateway and mint an enrollment token<a class="headerlink" href="#3-create-the-gateway-and-mint-an-enrollment-token" title="Permanent link">&para;</a></h2>
 <p>In the console:</p>
 <ol>
-<li>Open <strong>Admin → Gateways</strong> (needs <code>gateway.list</code>) and select
+<li>Open <strong>Administration → Gateways</strong> (needs <code>gateway.list</code>) and select
    <strong>Create gateway</strong>.</li>
 <li>Fill in <strong>Name</strong>, <strong>Boundary</strong> and, if you want, <strong>Environment
    (optional)</strong>, <strong>Max replicas</strong> and <strong>Max tasks in flight</strong>. Select
@@ -2942,7 +2944,7 @@ does not become ready: it exits and restarts (<code>CrashLoopBackOff</code>).</p
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>kubectl<span class="w"> </span>-n<span class="w"> </span>tenant-a-uat<span class="w"> </span>logs<span class="w"> </span>deploy/secrets-bridge-gateway
 </span></code></pre></div>
 <p>In the log, look for <code>identity loaded</code> and <code>connectors bound</code>.</p>
-<p>Then check the control plane. In the console, <strong>Admin → Gateways</strong> shows the
+<p>Then check the control plane. In the console, <strong>Administration → Gateways</strong> shows the
 status, replicas and last heartbeat in UTC. Select the Gateway's name to see its
 replicas and <strong>Advertised connectors</strong>. With <code>curl</code>,
 <code>GET /api/v1/admin/gateways</code> needs <code>gateway.list</code> and no step-up:</p>
@@ -2962,7 +2964,7 @@ and does not affect readiness.</p>
 <h2 id="7-approve-the-connector-and-bind-a-target">7. Approve the connector and bind a target<a class="headerlink" href="#7-approve-the-connector-and-bind-a-target" title="Permanent link">&para;</a></h2>
 <p>Advertising a connector approves nothing. An admin with <code>gateway.bind</code> approves
 it and binds a target.</p>
-<p>In the console, open the Gateway from <strong>Admin → Gateways</strong>:</p>
+<p>In the console, open the Gateway from <strong>Administration → Gateways</strong>:</p>
 <ol>
 <li>Under <strong>Advertised connectors</strong>, select <strong>Approve…</strong> next to
    <code>argocd-main</code>, then <strong>Approve connector</strong>. Approving grants the Gateway
@@ -3029,7 +3031,7 @@ and only an environment set to <code>gateway</code> gets Gateway tasks:</p>
 observer to fall back to. Switching away from <code>gateway</code> cancels the
 environment's open Gateway tasks with the reason <code>source_changed</code>. The requests
 themselves are not affected.</p>
-<p>In the console, open <strong>Admin → Projects</strong>, select the project, and find the
+<p>In the console, open <strong>Administration → Projects</strong>, select the project, and find the
 environment on the <strong>Environments</strong> tab. The <strong>Observation</strong> column shows the
 current source, <strong>Gateway</strong> or <strong>None</strong>, to anyone with <code>gateway.list</code>. With
 <code>gateway.bind</code>, select <strong>Change…</strong>, choose <strong>Gateway</strong> in the

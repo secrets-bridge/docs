@@ -120,7 +120,7 @@ Being built now; not yet live or certified. Do not depend on these yet.
       `GET /requests/:id/observations`;
     - the worker sweepers for leases, deadlines, stale Gateways and old
       replica rows (`SB_WORKER_GATEWAY_SWEEPERS_ENABLED`);
-    - the console: Admin → Gateways, the Observation column on a project's
+    - the console: Administration → Gateways, the Observation column on a project's
       environments, and the Argo CD panel on the request page.
 
     - the cutover ([gateway#13](https://github.com/secrets-bridge/gateway/issues/13)):

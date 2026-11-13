@@ -1,3 +1,5 @@
+Open source · pre-1.0
+
 # Govern who uses your secrets.
 
 Secrets Bridge adds access requests, approvals, audit and agent execution
@@ -9,7 +11,7 @@ stay in your provider.
 [Read the architecture](overview/architecture.md)
 Source on GitHub
 
-Open source and pre-1.0. See what is live today and what is still on the roadmap.
+See what is live today and what is still on the roadmap.
 
 ## We keep
 
@@ -24,19 +26,34 @@ Open source and pre-1.0. See what is live today and what is still on the roadmap
 
 The agent runs inside your infrastructure and only calls out, so you open no inbound port.
 
+## Three people touch every request
+
+Each sees what they need to do their part, and nobody sees a value they didn't ask for.
+
+<rect x="3.5" y="4" width="11" height="16"/>
+### Developers ask
+Name the secret, the exact keys and why. Once it's approved, reveal each value once with your second factor. No value travels through chat or tickets.
+
+### Approvers decide
+Approve or reject with who, what, where and why in front of you. Production is marked on every screen. Approving records a decision; it never shows you the value.
+
+### Platform teams run it
+Keep Vault and AWS Secrets Manager as they are. Agents run in your clusters with their own credentials, and every step lands in an append-only audit log.
+
 ## Where your secrets go, and where they don't
 
 Values stay in your provider until an approved request needs them. Then they travel once, sealed, and only to the person who asked. Pick a step to follow it.
 
 ## What it holds to
+
 These are enforced in code, not left to policy. The threat model shows how each boundary is kept.
 
-- No plaintext values in the control plane. Not in Postgres, Redis, logs, audit events or the browser. In transit, values are KMS-wrapped.
-- The agent only calls out. No inbound port, no database, no Kubernetes API access to Secrets.
-- Production never allows direct reveal. The refusal is enforced in code and audited.
-- Values move once. KMS-wrapped, single-use, short-lived, and opened only by the right person.
-- Audit is append-only and metadata-only. Who, what, when and why, never the value.
-- Agents are bound and revocable. One-time enrollment tokens, one provider connection per agent, revoked at once.
+01### No plaintext values in the control planeNot in Postgres, Redis, logs, audit events or the browser. In transit, values are KMS-wrapped.
+02### The agent only calls outNo inbound port, no database, no Kubernetes API access to Secrets.
+03### Production never allows direct revealThe refusal is enforced in code and audited.
+04### Values move onceKMS-wrapped, single-use, short-lived, and opened only by the right person.
+05### Audit is append-only and metadata-onlyWho, what, when and why, never the value.
+06### Agents are bound and revocableOne-time enrollment tokens, one provider connection per agent, revoked at once.
 
 ## What works today
 
@@ -62,7 +79,17 @@ Full product status, with what is QA-certified and what is in progress.
 
 ## Start on your laptop
 
-The api repo's compose file starts Postgres, Redis and the control plane; the console and the agent run from their own repos. The local guide walks through the whole flow against a dev Vault.
+The local guide starts Postgres and Redis from the api repo's compose file, which can also run the api in a container. The console and the agent run from their own repos, and the guide walks through the whole flow against a dev Vault.
 
 [Run it locally](operations/docker-compose.md)
 [Operations guide](operations/index.md)
+
+Local development only. Never load real secrets into it.
+
+Step 1 of the local guide
+
+```bash
+git clone https://github.com/secrets-bridge/api.git
+cd api
+docker compose up -d postgres redis
+```

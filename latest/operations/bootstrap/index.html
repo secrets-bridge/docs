@@ -51,10 +51,12 @@
         
         
         
-        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.804a7bde.css">
-        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
+        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.86e47105.css">
+        <style>:root{--md-text-font:"Geist";--md-code-font:"Geist Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css2.62918e6d.css">
     
       <link rel="stylesheet" href="../../stylesheets/brand.css">
     
@@ -119,7 +121,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Bootstrap & first sign-in","description":"First steps on a new Secrets Bridge install: seed the local admin, sign in, rotate its password, enroll an agent with a one-time token, run a read request.","url":"https://secrets-bridge.io/latest/operations/bootstrap/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/bootstrap/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T19:48:41+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Bootstrap & first sign-in","item":"https://secrets-bridge.io/latest/operations/bootstrap/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Bootstrap & first sign-in","description":"First steps on a new Secrets Bridge install: seed the local admin, sign in, rotate its password, enroll an agent with a one-time token, run a read request.","url":"https://secrets-bridge.io/latest/operations/bootstrap/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/bootstrap/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-11-13T16:55:28+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Bootstrap & first sign-in","item":"https://secrets-bridge.io/latest/operations/bootstrap/"}]}]}</script>
   
 
   </head>
@@ -163,7 +165,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Secrets Bridge" class="md-header__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="156" height="24">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -447,7 +449,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="Secrets Bridge" class="md-nav__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="156" height="24">
 
     </a>
     Secrets Bridge
@@ -2304,11 +2306,10 @@ the bootstrap env vars are set:</p>
 <li>You'll be redirected to <code>/login</code>.</li>
 <li>Enter the email + password from the env vars (or a dev user from
    the api's first-boot log when it runs with <code>SB_ENV=dev</code>).</li>
-<li>With <code>SB_ENV=dev</code> you land on the Dashboard with the <code>Agents Online</code>
-   KPI showing <code>0 / 0</code>. On a production install, where login-time MFA
+<li>With <code>SB_ENV=dev</code> you land on the Overview. On a production install, where login-time MFA
    is on by default, you land on <strong>Second factor</strong> first: add an
    authenticator app or a security key, then <strong>Continue</strong> asks for it
-   once and opens the Dashboard
+   once and opens the Overview
    (<a href="../authentication/#step-up-vs-login-time-mfa">Step-up vs login-time MFA</a>).</li>
 </ol>
 <p>The api keeps you signed in with an HttpOnly session cookie, which
@@ -2452,7 +2453,7 @@ configured for it:</p>
 <li><strong>Submit</strong> → you're navigated to the request detail page</li>
 </ol>
 <p>Then sign in as a second user with the <code>secret.approve</code> permission
-and approve from the Requests page's Approver queue. The requester
+and approve it on <strong>Approvals</strong>. The requester
 can never approve or reject their own request, whatever their role
 (admin included) or the workflow says: the api answers
 <code>403 separation_of_duties_violated</code> and audits the attempt.</p>

@@ -51,10 +51,12 @@
         
         
         
-        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.804a7bde.css">
-        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
+        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.86e47105.css">
+        <style>:root{--md-text-font:"Geist";--md-code-font:"Geist Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css2.62918e6d.css">
     
       <link rel="stylesheet" href="../../stylesheets/brand.css">
     
@@ -119,7 +121,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"UI (SPA)","description":"The Secrets Bridge console: a React and TypeScript SPA for access requests, one-time reveals, agents, audit and admin, and nothing in browser storage.","url":"https://secrets-bridge.io/latest/components/ui/","mainEntityOfPage":"https://secrets-bridge.io/latest/components/ui/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-23T15:12:19+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Components","item":"https://secrets-bridge.io/latest/components/"},{"@type":"ListItem","position":3,"name":"UI (SPA)","item":"https://secrets-bridge.io/latest/components/ui/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"UI (SPA)","description":"The Secrets Bridge console: a React and TypeScript SPA for access requests, one-time reveals, agents, audit and admin, and nothing in browser storage.","url":"https://secrets-bridge.io/latest/components/ui/","mainEntityOfPage":"https://secrets-bridge.io/latest/components/ui/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-11-13T16:55:28+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Components","item":"https://secrets-bridge.io/latest/components/"},{"@type":"ListItem","position":3,"name":"UI (SPA)","item":"https://secrets-bridge.io/latest/components/ui/"}]}]}</script>
   
 
   </head>
@@ -163,7 +165,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Secrets Bridge" class="md-header__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="156" height="24">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -447,7 +449,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="Secrets Bridge" class="md-nav__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="156" height="24">
 
     </a>
     Secrets Bridge
@@ -2183,9 +2185,9 @@
 
 <h1 id="ui-spa">UI (SPA)<a class="headerlink" href="#ui-spa" title="Permanent link">&para;</a></h1>
 <p>Repo: <a href="https://github.com/secrets-bridge/ui"><code>secrets-bridge/ui</code></a>
-· Stack: Vite 6 + React 18 + TypeScript 5 + Tailwind 3 +
-TanStack Query 5 + React Hook Form 7 + Zod 3 +
-react-router-dom v6
+· Stack: Vite 8 + React 19 + TypeScript + Tailwind 4 +
+TanStack Query 5 + React Hook Form + Zod 4 +
+React Router 7
 · Container: multi-stage Node build → <code>nginx:1.27-alpine</code>,
 unprivileged user 101</p>
 <p>The operator-facing surface. A single-page application served as
@@ -2203,13 +2205,18 @@ routing: <code>/</code> → ui, <code>/api/v1/*</code> → api).</p>
 <tbody>
 <tr>
 <td><code>/</code></td>
-<td>Dashboard</td>
-<td>KPI cards, pending approvals (preview), recent audit activity (preview), providers health (preview), <strong>agents</strong> card (real), requests-this-week chart (preview)</td>
+<td>Overview</td>
+<td>Counters, <strong>Next up</strong> with its context and action, the rest as rows, and a right rail with system health or your requests, recent activity and where you can request</td>
+</tr>
+<tr>
+<td><code>/approvals</code></td>
+<td>Approvals</td>
+<td>Requests waiting for your decision, oldest first, with the oldest in full and Approve / Reject (with reason)</td>
 </tr>
 <tr>
 <td><code>/requests</code></td>
-<td>Requests</td>
-<td>My-requests filter pills (All / Pending / Approved / Rejected / Executed × patch / read) + Approver queue with inline Approve / Reject (with-reason)</td>
+<td>My requests</td>
+<td>Your open and closed requests, with search and a status filter</td>
 </tr>
 <tr>
 <td><code>/requests/:id</code></td>
@@ -2223,13 +2230,13 @@ routing: <code>/</code> → ui, <code>/api/v1/*</code> → api).</p>
 </tr>
 <tr>
 <td><code>/secrets</code></td>
-<td>Discovered secrets</td>
-<td>Filter strip (cluster / provider / ref prefix / status / label chips), two-pane (table + sticky details with provider_config JSON)</td>
+<td>Secrets</td>
+<td>Filter strip (cluster / provider / ref prefix / status / label chips), with details beside the table when there's room</td>
 </tr>
 <tr>
 <td><code>/audit</code></td>
 <td>Audit log</td>
-<td>Filter strip + correlation drill-in chip on every row, sticky details with metadata JSON</td>
+<td>Filter panel, and a drawer with the event's metadata and a link to its whole chain</td>
 </tr>
 <tr>
 <td><code>/admin/projects</code></td>
@@ -2243,8 +2250,8 @@ routing: <code>/</code> → ui, <code>/api/v1/*</code> → api).</p>
 </tr>
 <tr>
 <td><code>/admin/assignments</code></td>
-<td>Assignments</td>
-<td>User × role × scope table; scope chips with <code>=</code> separator</td>
+<td>Role assignments</td>
+<td>Person × role × scope table; people are picked by name or email</td>
 </tr>
 <tr>
 <td><code>/admin/workflows</code></td>
@@ -2268,6 +2275,7 @@ routing: <code>/</code> → ui, <code>/api/v1/*</code> → api).</p>
 </tr>
 </tbody>
 </table>
+<p>Administration (<code>/admin</code>) is one entry in the sidebar, with its own navigation grouped as people and access, projects and secrets, approval rules, infrastructure, and sign-in and security. Below 1360px the sections are a select. Besides the admin pages above, it holds Accounts (<code>/admin/users</code>, including people waiting for approval), Teams (<code>/admin/teams</code>), Sign-in methods (<code>/admin/sign-in</code>), Provider connections and Platform settings. On a phone the main places are bottom tabs, picked from what the person can open, and dialogs and drawers open as sheets from the bottom.</p>
 <h2 id="hard-rules-baked-into-the-spa">Hard rules baked into the SPA<a class="headerlink" href="#hard-rules-baked-into-the-spa" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -2312,12 +2320,12 @@ routing: <code>/</code> → ui, <code>/api/v1/*</code> → api).</p>
 </tbody>
 </table>
 <h2 id="design-system">Design system<a class="headerlink" href="#design-system" title="Permanent link">&para;</a></h2>
-<p>The SPA matches the Figma file <code>Secrets Bridge - Brand</code> byte-for-byte
-on the brand pages: fonts (Inter + JetBrains Mono), colors (Navy
-900 / Dark Navy / Cyan accent), brand-gradient primary CTAs,
-<code>StatusPill</code> variants, and the reveal-once UX pattern.</p>
-<p>See <a href="../../design/">Design system</a> for the brand voice,
-tokens, and Figma file reference.</p>
+<p>The console uses the Switchboard identity: warm graphite with a
+chartreuse accent and blue for success, Geist and Geist Mono with
+Bricolage Grotesque for titles, and status as a shape per group plus
+the exact word. Administration is one sidebar entry with its own
+navigation, and on phones the console has bottom tabs and sheets.</p>
+<p>See <a href="../../design/">Design system</a> for the brand voice and tokens.</p>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <p>The SPA is configured at <strong>build time</strong>, not runtime:</p>
 <table>

@@ -38,11 +38,10 @@ The api logs both actions at INFO in its JSON log output:
 2. You'll be redirected to `/login`.
 3. Enter the email + password from the env vars (or a dev user from
    the api's first-boot log when it runs with `SB_ENV=dev`).
-4. With `SB_ENV=dev` you land on the Dashboard with the `Agents Online`
-   KPI showing `0 / 0`. On a production install, where login-time MFA
+4. With `SB_ENV=dev` you land on the Overview. On a production install, where login-time MFA
    is on by default, you land on **Second factor** first: add an
    authenticator app or a security key, then **Continue** asks for it
-   once and opens the Dashboard
+   once and opens the Overview
    ([Step-up vs login-time MFA](authentication.md#step-up-vs-login-time-mfa)).
 
 The api keeps you signed in with an HttpOnly session cookie, which
@@ -208,7 +207,7 @@ configured for it:
 8. **Submit** → you're navigated to the request detail page
 
 Then sign in as a second user with the `secret.approve` permission
-and approve from the Requests page's Approver queue. The requester
+and approve it on **Approvals**. The requester
 can never approve or reject their own request, whatever their role
 (admin included) or the workflow says: the api answers
 `403 separation_of_duties_violated` and audits the attempt.

@@ -186,7 +186,7 @@ curl -fsS -b "$JAR" "$CP/api/v1/audit-events?actor=system:migration&action=envir
 
 7. **Use the console as it is now.** Admin → Integrations and its Argo CD
    endpoint and app-mapping pages are gone. Argo CD is configured on the
-   Gateway (Admin → Gateways). On a project's **Environments** tab, the
+   Gateway (Administration → Gateways). On a project's **Environments** tab, the
    **Observation** dialog offers **Gateway** and **None**; an environment with
    no stored source shows **None**.
 

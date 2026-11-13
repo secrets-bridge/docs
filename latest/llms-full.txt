@@ -10,6 +10,8 @@ Every page below is also available as Markdown at the linked URL, and https://se
 
 Source: https://secrets-bridge.io/latest/
 
+Open source · pre-1.0
+
 # Govern who uses your secrets.
 
 Secrets Bridge adds access requests, approvals, audit and agent execution
@@ -21,7 +23,7 @@ stay in your provider.
 [Read the architecture](https://secrets-bridge.io/latest/overview/architecture/)
 Source on GitHub
 
-Open source and pre-1.0. See what is live today and what is still on the roadmap.
+See what is live today and what is still on the roadmap.
 
 ## We keep
 
@@ -36,19 +38,34 @@ Open source and pre-1.0. See what is live today and what is still on the roadmap
 
 The agent runs inside your infrastructure and only calls out, so you open no inbound port.
 
+## Three people touch every request
+
+Each sees what they need to do their part, and nobody sees a value they didn't ask for.
+
+<rect x="3.5" y="4" width="11" height="16"/>
+### Developers ask
+Name the secret, the exact keys and why. Once it's approved, reveal each value once with your second factor. No value travels through chat or tickets.
+
+### Approvers decide
+Approve or reject with who, what, where and why in front of you. Production is marked on every screen. Approving records a decision; it never shows you the value.
+
+### Platform teams run it
+Keep Vault and AWS Secrets Manager as they are. Agents run in your clusters with their own credentials, and every step lands in an append-only audit log.
+
 ## Where your secrets go, and where they don't
 
 Values stay in your provider until an approved request needs them. Then they travel once, sealed, and only to the person who asked. Pick a step to follow it.
 
 ## What it holds to
+
 These are enforced in code, not left to policy. The threat model shows how each boundary is kept.
 
-- No plaintext values in the control plane. Not in Postgres, Redis, logs, audit events or the browser. In transit, values are KMS-wrapped.
-- The agent only calls out. No inbound port, no database, no Kubernetes API access to Secrets.
-- Production never allows direct reveal. The refusal is enforced in code and audited.
-- Values move once. KMS-wrapped, single-use, short-lived, and opened only by the right person.
-- Audit is append-only and metadata-only. Who, what, when and why, never the value.
-- Agents are bound and revocable. One-time enrollment tokens, one provider connection per agent, revoked at once.
+01### No plaintext values in the control planeNot in Postgres, Redis, logs, audit events or the browser. In transit, values are KMS-wrapped.
+02### The agent only calls outNo inbound port, no database, no Kubernetes API access to Secrets.
+03### Production never allows direct revealThe refusal is enforced in code and audited.
+04### Values move onceKMS-wrapped, single-use, short-lived, and opened only by the right person.
+05### Audit is append-only and metadata-onlyWho, what, when and why, never the value.
+06### Agents are bound and revocableOne-time enrollment tokens, one provider connection per agent, revoked at once.
 
 ## What works today
 
@@ -74,10 +91,20 @@ Full product status, with what is QA-certified and what is in progress.
 
 ## Start on your laptop
 
-The api repo's compose file starts Postgres, Redis and the control plane; the console and the agent run from their own repos. The local guide walks through the whole flow against a dev Vault.
+The local guide starts Postgres and Redis from the api repo's compose file, which can also run the api in a container. The console and the agent run from their own repos, and the guide walks through the whole flow against a dev Vault.
 
 [Run it locally](https://secrets-bridge.io/latest/operations/docker-compose/)
 [Operations guide](https://secrets-bridge.io/latest/operations/)
+
+Local development only. Never load real secrets into it.
+
+Step 1 of the local guide
+
+```bash
+git clone https://github.com/secrets-bridge/api.git
+cd api
+docker compose up -d postgres redis
+```
 
 ---
 
@@ -269,7 +296,7 @@ Being built now; not yet live or certified. Do not depend on these yet.
       `GET /requests/:id/observations`;
     - the worker sweepers for leases, deadlines, stale Gateways and old
       replica rows (`SB_WORKER_GATEWAY_SWEEPERS_ENABLED`);
-    - the console: Admin → Gateways, the Observation column on a project's
+    - the console: Administration → Gateways, the Observation column on a project's
       environments, and the Argo CD panel on the request page.
 
     - the cutover ([gateway#13](https://github.com/secrets-bridge/gateway/issues/13)):
@@ -927,7 +954,7 @@ reject UPDATE and DELETE.
 
 #### `correlation_id`
 The chain identifier propagated through every audit event for one
-request lifecycle. Click any `corr` chip in the UI's Audit page to
+request lifecycle. Click any `corr` chip in the console's Audit log to
 filter the whole table to that chain.
 
 #### Control Plane (CP)
@@ -1859,9 +1886,9 @@ Source: https://secrets-bridge.io/latest/components/ui/
 # UI (SPA)
 
 Repo: [`secrets-bridge/ui`](https://github.com/secrets-bridge/ui)
-· Stack: Vite 6 + React 18 + TypeScript 5 + Tailwind 3 +
-TanStack Query 5 + React Hook Form 7 + Zod 3 +
-react-router-dom v6
+· Stack: Vite 8 + React 19 + TypeScript + Tailwind 4 +
+TanStack Query 5 + React Hook Form + Zod 4 +
+React Router 7
 · Container: multi-stage Node build → `nginx:1.27-alpine`,
 unprivileged user 101
 
@@ -1873,19 +1900,22 @@ routing: `/` → ui, `/api/v1/*` → api).
 
 | Route | Page | What |
 |---|---|---|
-| `/` | Dashboard | KPI cards, pending approvals (preview), recent audit activity (preview), providers health (preview), **agents** card (real), requests-this-week chart (preview) |
-| `/requests` | Requests | My-requests filter pills (All / Pending / Approved / Rejected / Executed × patch / read) + Approver queue with inline Approve / Reject (with-reason) |
+| `/` | Overview | Counters, **Next up** with its context and action, the rest as rows, and a right rail with system health or your requests, recent activity and where you can request |
+| `/approvals` | Approvals | Requests waiting for your decision, oldest first, with the oldest in full and Approve / Reject (with reason) |
+| `/requests` | My requests | Your open and closed requests, with search and a status filter |
 | `/requests/:id` | Request detail | Timeline, Approvals, **Wraps** (single-shot Reveal modal, read flow), the **Argo CD (observed by Gateway …)** panel with Gateway evidence, a muted **Argo CD history (before the Gateway)** card with the rows the retired control-plane poller wrote before the [cutover](https://secrets-bridge.io/latest/operations/gateway-cutover/), read from `GET /requests/:id/gitops` and shown by `history_status` with the label *context only* (requester only, hidden when there are none), Details, Approver actions, Cancel-own |
 | `/agents` | Agents | Revoke confirm, and a Mint drawer with a **reveal-once panel** for the agent secret. The drawer calls the legacy direct mint, which the api refuses (`403`) unless the dev-only `SB_ALLOW_DIRECT_AGENT_MINT` is on; onboard agents by [enrollment](https://secrets-bridge.io/latest/operations/bootstrap/#enrolling-your-first-agent) |
-| `/secrets` | Discovered secrets | Filter strip (cluster / provider / ref prefix / status / label chips), two-pane (table + sticky details with provider_config JSON) |
-| `/audit` | Audit log | Filter strip + correlation drill-in chip on every row, sticky details with metadata JSON |
+| `/secrets` | Secrets | Filter strip (cluster / provider / ref prefix / status / label chips), with details beside the table when there's room |
+| `/audit` | Audit log | Filter panel, and a drawer with the event's metadata and a link to its whole chain |
 | `/admin/projects` | Projects | Master-detail (340px project rail + envs panel); soft-delete via archive/restore. The **Observation** column shows each environment's source (**Gateway** or **None**) to `gateway.list` holders; **Change…** appears only with `gateway.bind` |
 | `/admin/roles` | Roles | Permission chip picker hydrated from `GET /permissions` (canonical catalog) |
-| `/admin/assignments` | Assignments | User × role × scope table; scope chips with `=` separator |
+| `/admin/assignments` | Role assignments | Person × role × scope table; people are picked by name or email |
 | `/admin/workflows` | Workflows | TTL knobs, min approvers, justification required |
 | `/admin/policies` | Policies | Selector → workflow priority-ordered list |
 | `/admin/gateways` | Gateways | Create, enroll, approve connectors, bind targets, disable, enable and revoke [Gateways](https://secrets-bridge.io/latest/operations/gateway/) |
 | `/login` | Login | Real email + password against `POST /auth/login`, which sets the HttpOnly session cookie |
+
+Administration (`/admin`) is one entry in the sidebar, with its own navigation grouped as people and access, projects and secrets, approval rules, infrastructure, and sign-in and security. Below 1360px the sections are a select. Besides the admin pages above, it holds Accounts (`/admin/users`, including people waiting for approval), Teams (`/admin/teams`), Sign-in methods (`/admin/sign-in`), Provider connections and Platform settings. On a phone the main places are bottom tabs, picked from what the person can open, and dialogs and drawers open as sheets from the bottom.
 
 ## Hard rules baked into the SPA
 
@@ -1902,13 +1932,13 @@ routing: `/` → ui, `/api/v1/*` → api).
 
 ## Design system
 
-The SPA matches the Figma file `Secrets Bridge - Brand` byte-for-byte
-on the brand pages: fonts (Inter + JetBrains Mono), colors (Navy
-900 / Dark Navy / Cyan accent), brand-gradient primary CTAs,
-`StatusPill` variants, and the reveal-once UX pattern.
+The console uses the Switchboard identity: warm graphite with a
+chartreuse accent and blue for success, Geist and Geist Mono with
+Bricolage Grotesque for titles, and status as a shape per group plus
+the exact word. Administration is one sidebar entry with its own
+navigation, and on phones the console has bottom tabs and sheets.
 
-See [Design system](https://secrets-bridge.io/latest/design/) for the brand voice,
-tokens, and Figma file reference.
+See [Design system](https://secrets-bridge.io/latest/design/) for the brand voice and tokens.
 
 ## Configuration
 
@@ -1977,7 +2007,7 @@ Source: https://secrets-bridge.io/latest/design/
 
 # Design system
 
-One system covers the console, this site and the brand marks. It aims for an operations tool written by the engineers who answer for it: plain, exact and quiet, with one ultramarine accent and nothing decorative.
+One system covers the console, this site and the brand marks. It aims for an operations tool written by the engineers who answer for it: plain, exact and quiet, with warm graphite, one chartreuse accent and nothing decorative.
 
 Read these before you write copy, build a page or make an image:
 
@@ -1990,11 +2020,11 @@ Read these before you write copy, build a page or make an image:
 | Question | Answer |
 |---|---|
 | Name | **Secrets Bridge**, two words, everywhere. In logos it comes from the lockup files; never retype it. |
-| Fonts | IBM Plex Sans for what people read, IBM Plex Mono for what machines read (refs, key names, paths, times, code). Weights 400, 500 and 600. |
-| Accent | Ultramarine `#3141C8` on light, periwinkle `#9AA3FF` on dark. A signal only: links, one primary button per view, the current tab, the focus ring. |
+| Fonts | Geist for what people read, Geist Mono for what machines read (refs, key names, paths, times, code), and Bricolage Grotesque for titles and counts. |
+| Accent | Lime `#D4F24C`, as a fill only: one primary button per view, counts. Anything thin uses `accent-ink`, `#4A6600` on light and lime on dark. |
 | Surfaces | Paper `bg`, white `surface`, `ink` text. Panels separate with a border, not a shadow. |
-| Corners | Square. 4 px is the largest radius. Only avatars are round. |
-| Status | A small square and the exact status word. Colour never carries a status alone. |
+| Corners | 6 px tags, 8 px controls, 12 px panels, 14 px dialogs. Only avatars are round. |
+| Status | A shape for its group and the exact status word. Blue means success. Colour never carries a status alone. |
 | Secret values | Never shown outside the reveal panel: no values, lengths, hashes or previews. |
 
 ## Where it lives
@@ -2078,89 +2108,99 @@ The console, this site and the brand assets use one set of tokens with light and
 
 ## Colour
 
-Build every screen from `bg`, `surface`, `ink`, `muted`, `border` and `rule`: roughly 70% `bg`, 13% `surface`, 10% `ink`, 5% `muted` and `rule`, and about 2% `accent`.
+Build every screen from `bg`, `surface`, `ink`, `muted`, `border` and `rule`, with `accent` kept to about 2%.
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `bg` | `#F6F5F1` | `#0F1013` | Paper. Page background behind everything; about 70% of a screen. |
-| `surface` | `#FFFFFF` | `#17191E` | Panels, tables, dialogs, drawers and inputs sitting on bg. |
-| `sunken` | `#EFEEE9` | `#1D1F25` | Row hover, current nav item, read-only boxes, key chips. |
-| `ink` | `#15171C` | `#ECECEE` | Primary text and the production environment tag. 16.4:1 on bg (light), 16.1:1 (dark). |
-| `muted` | `#5B606B` | `#A2A6AF` | Secondary text: subtitles, table headers, times, hints. 5.8:1 on bg (light), 7.8:1 (dark); passes 4.5:1 on surface and sunken too. |
-| `border` | `#DDDBD4` | `#2B2E36` | Outer edges of panels, tables and dividers between sections. Decorative only: never the only edge of a control. |
-| `rule` | `#E8E6E0` | `#22252B` | Hairlines between rows inside a table, list or log. |
-| `edge` | `#7E838D` | `#686D7A` | Control borders (inputs, secondary buttons), dashed empty states, hollow status squares. At least 3.3:1 on bg, surface and sunken in light; 3.2:1 in dark. |
-| `accent` | `#3141C8` | `#9AA3FF` | Ultramarine. The brand mark, links, the one primary button per view, current-tab underline, focus ring, reveal progress. About 2% of a screen. 7.1:1 on bg (light), 8.2:1 (dark). |
-| `on-accent` | `#FFFFFF` | `#0F1013` | Text and icons on accent fills (primary button, nav count). 7.7:1 (light), 8.2:1 (dark). |
-| `accent-soft` | `#E9EBFB` | `#1D2140` | Control-plane zone in diagrams and the avatar background. Never a status. |
-| `accent-line` | `#BFC5F3` | `#3A4285` | Border for accent-soft areas. |
-| `ok` | `#1E7A46` | `#6FCF97` | Success: approved, executed, reveal ready, copied. Text on ok-bg, bg and surface (4.7:1 or more); always with a word. ok and bad differ by hue more than lightness, so never rely on the colour of a status square alone. |
-| `ok-bg` | `#E6F4EC` | `#132219` | Success fill behind ok text. |
-| `ok-line` | `#A7D7BA` | `#24432F` | Border around ok-bg. |
-| `warn` | `#7A5200` | `#F2C14E` | Waiting: pending, pending_values, pending_verification. Text on warn-bg, bg and surface. |
-| `warn-bg` | `#FFF3D6` | `#2A2210` | Waiting fill behind warn text. |
-| `warn-line` | `#EACB86` | `#4E4024` | Border around warn-bg. |
-| `bad` | `#B3261E` | `#FF8A80` | Failure: rejected, refused, failed, validation errors. Text on bad-bg, bg and surface; always with a word. |
-| `bad-bg` | `#FDECEA` | `#2C1513` | Failure fill behind bad text; hover on danger buttons. |
-| `bad-line` | `#F1B8B3` | `#4E2522` | Border of danger buttons and error banners. |
-| `info` | `#3E4A5C` | `#B7C0CF` | Neutral information labels. Text on info-bg. |
-| `info-bg` | `#EEF0F3` | `#1B1F27` | Neutral information fill. |
-| `info-line` | `#C9CED8` | `#323846` | Border around info-bg. |
-| `scrim` | `rgba(21,23,28,0.36)` | `rgba(0,0,0,0.6)` | Overlay behind dialogs and drawers. |
+| `bg` | `#F5F4EF` | `#111110` | Page background behind everything; about 70% of a screen. |
+| `side` | `#EDECE6` | `#0D0D0C` | The console sidebar and the phone bars. |
+| `surface` | `#FFFFFF` | `#1A1A18` | Panels and tables sitting on bg. |
+| `raised` | `#FFFFFF` | `#232321` | Dialogs, drawers, the current nav item and key chips. |
+| `field` | `#FFFFFF` | `#0B0B0A` | Inputs, code and revealed values. |
+| `hover` | `#EFEEE8` | `#1E1E1C` | Row and control hover. |
+| `press` | `#E6E5DE` | `#272724` | A control while it is pressed. |
+| `ink` | `#161614` | `#F4F2EA` | Primary text and the production environment tag. 16.45:1 on bg (light), 16.86:1 (dark). |
+| `muted` | `#5E5C55` | `#ADABA1` | Secondary text: subtitles, table headers, times, hints. 6.08:1 on bg (light), 8.20:1 (dark). |
+| `border` | `#DCDAD2` | `#2A2A27` | Outer edges of panels, tables and dividers between sections. Decorative only: never the only edge of a control. |
+| `rule` | `#E8E6DF` | `#222220` | Hairlines between rows inside a table, list or log. |
+| `edge` | `#85837B` | `#76756D` | Control borders (inputs, secondary buttons), dashed empty states, hollow status shapes. At least 3:1 on bg and surface in both themes. |
+| `accent` | `#D4F24C` | `#D4F24C` | Lime. A fill only: the one primary button per view, counts, reveal fills. Graphite on lime is 14.33:1 (light), 14.94:1 (dark). |
+| `accent-ink` | `#4A6600` | `#D4F24C` | Everything thin in the accent: links, the current tab, focus ring, radios, reveal progress. 5.97:1 on bg (light), 14.94:1 (dark). |
+| `accent-edge` | `#7E9420` | `transparent` | The outline of a lime button on light. |
+| `on-accent` | `#161614` | `#111110` | Text and icons on lime. |
+| `accent-soft` | `#F1F8D6` | `#20260F` | The control-plane zone in diagrams, reveal-ready panels and checked options. Never a status. |
+| `accent-line` | `#B9CF6A` | `#4B5A1A` | Border for accent-soft areas. |
+| `ok` | `#1F6FB8` | `#72BBFF` | Success, in blue: approved, executed, copied. Text on ok-bg, bg and surface; always with a word. |
+| `ok-bg` | `#E7F1FB` | `#0F1E2C` | Success fill behind ok text. |
+| `ok-line` | `#A9CBEC` | `#24476A` | Border around ok-bg. |
+| `warn` | `#9A5A00` | `#FFAE52` | Waiting: pending, pending_values, pending_verification. Text on warn-bg, bg and surface. |
+| `warn-bg` | `#FFF2DE` | `#2A1E0E` | Waiting fill behind warn text. |
+| `warn-line` | `#EBC58C` | `#5A3F1C` | Border around warn-bg. |
+| `bad` | `#B42318` | `#FF7070` | Failure: rejected, refused, failed, validation errors. Text on bad-bg, bg and surface; always with a word. |
+| `bad-bg` | `#FDECEA` | `#2C1414` | Failure fill behind bad text; hover on danger buttons. |
+| `bad-line` | `#F1B8B3` | `#5E2828` | Border of error banners. |
+| `info` | `#4A4943` | `#CAC8BE` | Neutral information labels. Text on info-bg. |
+| `info-bg` | `#F0EFEA` | `#1C1C1A` | Neutral information fill. |
+| `info-line` | `#D6D4CC` | `#34342F` | Border around info-bg. |
+| `scrim` | `rgba(22,22,20,0.36)` | `rgba(0,0,0,0.62)` | Overlay behind dialogs and drawers. |
 
-`accent` is a signal: the mark, links, one primary button per view, the current tab, the focus ring, reveal progress. It is never a large fill, a status, or emphasis in running text. `edge` is for what you operate (input and secondary-button borders); `border` and `rule` only separate.
+Lime is a fill, never a line. On the light background it is about 1.2:1, so anything thin uses `accent-ink`, and a filled control keeps lime with an `accent-edge` border. In the console, ESLint refuses `text-accent` and its relatives. `edge` is for what you operate (input and secondary-button borders); `border` and `rule` only separate.
 
 ## Status
 
-Show the exact API status as a word after a small square:
+Show the exact API status as a word after a shape. Each group has its own shape, so a status never rests on colour alone:
 
-| Status | Square | Token |
+| Status | Shape | Token |
 |---|---|---|
-| pending, pending_values, pending_verification | hollow | `warn` |
-| approved, executed | solid | `ok` |
-| rejected, refused, failed | solid | `bad` |
+| pending, pending_values, pending_verification | half | `warn` |
+| approved (the agent is working) | split | `ok` |
+| executed | solid | `ok` |
+| rejected, refused, failed | diamond | `bad` |
 | cancelled, expired | hollow | `edge` |
 
 A reveal condition (ready, consumed, expired) shows separately from the status, in `ok` or `muted` text. `executed` alone never means a reveal is available.
 
 ## Type
 
-IBM Plex Sans and IBM Plex Mono (SIL Open Font License 1.1), weights 400, 500 and 600, self-hosted. Emphasis is weight, never italics or colour. Sentence case everywhere, including buttons and navigation.
+Geist and Geist Mono for the interface, with Bricolage Grotesque for titles and counts only (all SIL Open Font License 1.1), self-hosted. Emphasis is weight, never italics or colour. Sentence case everywhere, including buttons and navigation.
 
 | Group | Style | Size / line | Weight | Use |
 |---|---|---|---|---|
-| Website | `display` | 64 / 66 | 600 | The home page hero only |
-| Website | `page-title` | 42 / 47 | 600 | Page h1 |
-| Website | `section` | 38 / 43 | 600 | Home page sections |
-| Website | `heading` | 23 / 30 | 600 | Headings in docs pages |
-| Website | `lede` | 18 / 29 | 400 | The paragraph under a title |
+| Website | `display` | 64 / 64 | 700 | The home page hero only, in Bricolage Grotesque |
+| Website | `section` | 40 / 44 | 700 | Home page sections, in Bricolage Grotesque |
+| Website | `heading` | 26 / 31 | 700 | Headings in docs pages, in Bricolage Grotesque |
+| Website | `lede` | 17 / 27 | 400 | The paragraph under a title |
 | Website | `body-docs` | 16 / 27 | 400 | Docs body text |
-| Console | `console-title` | 20 / 24 | 600 | Page h1 in the console |
-| Console | `dialog-title` | 17 / 22 | 600 | Dialog and drawer titles |
-| Console | `block-heading` | 13.5 / 20 | 600 | Above tables and panels |
-| Console | `body` | 13.5 / 20 | 400 | Prose in the console |
-| Console | `ui` | 13 / 18 | 500 | Controls |
-| Console | `caption` | 12.5 / 18 | 400 | Hints |
-| Console | `label` | 12 / 16 | 500 | Table headers |
-| Mono | `mono`, `mono-small` | 13, 12 | 400 | Refs, key names, paths, times, IDs |
+| Console | `console-title` | 30 / 34 | 700 | Page h1 in the console, in Bricolage Grotesque |
+| Console | `dialog-title` | 20 / 25 | 700 | Dialog and drawer titles, in Bricolage Grotesque |
+| Console | `count` | 28 / 30 | 700 | Counters, in Bricolage Grotesque |
+| Console | `block-heading` | 15 / 22 | 600 | Above tables and panels |
+| Console | `body` | 14.5 / 22 | 400 | Prose in the console |
+| Console | `ui` | 14 / 20 | 500 | Controls |
+| Console | `caption` | 13.5 / 20 | 400 | Hints |
+| Console | `label` | 12.5 / 16 | 500 | Table headers |
+| Mono | `mono`, `mono-small` | 12.5, 11.5 | 400 | Refs, key names, paths, times, IDs |
 
 ## Space, shape and size
 
 | Token | Value |
 |---|---|
 | `space-1` to `space-8` | 4, 8, 12, 16, 20, 24, 28, 32 px |
-| `radius-sm` | 3 px (tags) |
-| `radius-md` | 4 px, the largest radius |
+| `radius-sm` | 6 px (tags) |
+| `radius-md` | 8 px (controls) |
+| `radius-lg` | 10 px (banners and wells) |
+| `radius-xl` | 12 px (panels) |
+| `radius-2xl` | 14 px (dialogs) |
 | `radius-round` | 50%, avatars only |
-| `control-md` / `control-sm` / `control-touch` | 32 px default, 28 px in tables, 44 px on phones |
-| `sidebar` / `rail` | 216 px console sidebar, 260 px overview side column |
+| `control-md` / `control-sm` / `control-touch` | 38 px default, 32 px in tables, 44 px on phones |
+| `sidebar` / `rail` | 240 px console sidebar, 320 px right rail |
 
 Panels separate with a `border` line, never a shadow. The `overlay` shadow is only for dialogs, drawers and toasts.
 
 ## Accessibility
 
 - Text at least 4.5:1, and controls, focus rings and status squares at least 3:1, against their background in both themes. The usage notes above give the ratios.
-- Focus ring: 2 px solid `accent`, 2 px offset, on every interactive element.
+- Focus ring: 2 px solid `accent-ink`, 2 px offset, on every interactive element.
 - Respect `prefers-reduced-motion`. Nothing in the product needs animation.
 
 ---
@@ -2174,7 +2214,7 @@ Source: https://secrets-bridge.io/latest/design/assets/
 Two squares joined by a route that turns once at a ring. Use the files below; never redraw the mark or retype the wordmark.
 
 - Use the **horizontal lockup** (mark and wordmark) by default, the **mark alone** in square spaces, and the **favicon** form below 20 px.
-- **Approved colourings:** ultramarine on `bg` or `surface`; periwinkle (`accent` dark) with light ink on dark; white on ultramarine; black; white.
+- **Approved colourings:** lime on dark; ink with a lime ring on light; black; white. Never lime alone on a light background.
 - **Clear space** is 3/8 of the mark height on every side.
 - Trademark clearance has not been checked.
 
@@ -2206,7 +2246,7 @@ Right angles and 45° only; no curves except the checkpoint ring. No padlocks, s
 The architecture illustration ([light](https://secrets-bridge.io/latest/assets/architecture-light.svg), [dark](https://secrets-bridge.io/latest/assets/architecture-dark.svg)) follows the diagram rules:
 
 - Arrows point away from the side that opens the connection; solid opens, dashed returns.
-- The control plane has an `accent-soft` fill with an `accent` edge. Customer infrastructure has a dashed `edge` outline.
+- The control plane has an `accent-soft` fill with an `accent-ink` edge. Customer infrastructure has a dashed `edge` outline.
 - Providers connect only to the agent. Never draw a line from a provider to a browser or the console. Name providers in text; don't draw their logos.
 
 Documentation diagrams use Mermaid, not screenshots.
@@ -2573,11 +2613,10 @@ The api logs both actions at INFO in its JSON log output:
 2. You'll be redirected to `/login`.
 3. Enter the email + password from the env vars (or a dev user from
    the api's first-boot log when it runs with `SB_ENV=dev`).
-4. With `SB_ENV=dev` you land on the Dashboard with the `Agents Online`
-   KPI showing `0 / 0`. On a production install, where login-time MFA
+4. With `SB_ENV=dev` you land on the Overview. On a production install, where login-time MFA
    is on by default, you land on **Second factor** first: add an
    authenticator app or a security key, then **Continue** asks for it
-   once and opens the Dashboard
+   once and opens the Overview
    ([Step-up vs login-time MFA](https://secrets-bridge.io/latest/operations/authentication/#step-up-vs-login-time-mfa)).
 
 The api keeps you signed in with an HttpOnly session cookie, which
@@ -2743,7 +2782,7 @@ configured for it:
 8. **Submit** → you're navigated to the request detail page
 
 Then sign in as a second user with the `secret.approve` permission
-and approve from the Requests page's Approver queue. The requester
+and approve it on **Approvals**. The requester
 can never approve or reject their own request, whatever their role
 (admin included) or the workflow says: the api answers
 `403 separation_of_duties_violated` and audits the attempt.
@@ -3293,7 +3332,7 @@ If you ever find yourself "cleaning up" this filter, **stop**. It is the securit
 
 ## Google sign-in from the console
 
-Separate from the env-var provider above, an admin with `auth.sso.edit` can connect a Google Workspace under **Admin → Sign-in**, with no restart. Its accounts are bound by Google's issuer and subject rather than by email, the ID token's `hd` claim must be in the allowed Workspace domains, and new accounts wait for an admin's approval by default. Existing accounts connect Google from their profile after a fresh second factor. Both providers can be configured at once; the login page shows a button for each.
+Separate from the env-var provider above, an admin with `auth.sso.edit` can connect a Google Workspace under **Administration → Sign-in methods**, with no restart. Its accounts are bound by Google's issuer and subject rather than by email, the ID token's `hd` claim must be in the allowed Workspace domains, and new accounts wait for an admin's approval by default. Existing accounts connect Google from their profile after a fresh second factor. Both providers can be configured at once; the login page shows a button for each.
 
 See [Sign in with Google](https://secrets-bridge.io/latest/operations/google-sign-in/) for setup, approvals and the audit events.
 
@@ -3321,7 +3360,7 @@ Both kinds follow the same two-step shape (Stripe / GitHub / AWS Console model):
 
 A wrong TOTP code or a failed WebAuthn attestation **burns the challenge**, the user restarts from step 1. This blocks an attacker from brute-forcing the 6-digit space against a single secret.
 
-The SPA exposes the enrollment surfaces at `/me/mfa`. A user with zero factors sees an accent-coloured "Add MFA factor →" nudge in the sidebar; an enrolled user sees a quieter "Security" link.
+The SPA exposes the enrollment surfaces at `/me/mfa`. A user with no factor sees "Add a second factor. Approving and revealing need one." at the foot of the sidebar; an enrolled user sees a quieter "Second factor on" link.
 
 ### Step-up ceremony
 
@@ -3550,7 +3589,7 @@ sequenceDiagram
     API->>API: create account, waiting for approval
     API->>UI: session cookie, redirect
     UI->>P: Waiting for approval page
-    A->>UI: Admin → Users, Approve with a role and scope
+    A->>UI: Administration → Accounts, Approve with a role and scope
     UI->>API: POST /api/v1/users/:id/approve
     P->>UI: Check again
     UI->>P: console with the granted access
@@ -3587,7 +3626,7 @@ two places:
 | Source | How | In the console |
 |---|---|---|
 | `SB_PUBLIC_URL` | Set it in the api's environment, for example in the chart's `secrets.existingSecret`. The worker reads the same Secret. | Shown read-only, with "Set by SB_PUBLIC_URL on this install" |
-| The console | **Admin → Sign-in → Public address**. The field is prefilled from the address you are using. | Editable |
+| The console | **Administration → Sign-in methods → Public address**. The field is prefilled from the address you are using. | Editable |
 
 When `SB_PUBLIC_URL` is set it always wins, and `PUT /sso/settings` refuses
 to change the address (`409 public_url_from_env`).
@@ -3607,7 +3646,7 @@ accounts that can wait for approval at once. It defaults to 50 and accepts
 
 ### 2. Create the OAuth client in Google Cloud Console
 
-With the address saved, **Admin → Sign-in → Google → Set up Google** shows
+With the address saved, **Administration → Sign-in methods → Google → Set up Google** shows
 the redirect URL to copy. It is always the public address plus
 `/api/v1/auth/sso/google/callback`:
 
@@ -3653,7 +3692,7 @@ with **Replace…** to set a new one. Replacing it is its own call,
 ### 4. Test, then turn it on
 
 **Test** sends you through Google with your own account and back to
-**Admin → Sign-in**. It runs every check a real sign-in runs, creates
+**Administration → Sign-in methods**. It runs every check a real sign-in runs, creates
 nothing, issues no session, and works while Google is still off. The result
 shows as "Google sign-in works." or as the reason it didn't pass, and only
 the admin who ran it sees that reason.
@@ -3714,9 +3753,11 @@ its group mapping is skipped, so it gets no role from IdP groups either.
 
 Admins who can approve see:
 
-- a count on **Users** in the sidebar;
+- a count on **Administration** in the sidebar and on **Accounts** in its
+  navigation, and a banner on every Administration section until
+  Accounts is open;
 - a banner on **Overview** with a link while anyone is waiting;
-- the **Waiting for approval** list on **Admin → Users**, longest wait
+- the **Waiting for approval** list on **Administration → Accounts**, longest wait
   first;
 - optionally, a [webhook message from the worker](#notify-admins-from-the-worker).
 
@@ -3742,7 +3783,7 @@ can't sign in again.
 ### The waiting limit
 
 At most 50 accounts can wait at once by default; change the limit on
-**Admin → Sign-in → Public address**. Past it, new Google sign-ins are
+**Administration → Sign-in methods → Public address**. Past it, new Google sign-ins are
 refused with the same generic page until you approve or decline some.
 Declined accounts don't count. Refusals at the limit are audited as
 `user.pending_refused`, aggregated per 10-minute window: the first refusal
@@ -3755,7 +3796,7 @@ append-only audit log.
 With **Let them in right away**, a new account starts active. You can pick
 a **Role for new people**, granted globally when the account is created.
 Without one, the account starts with no role, and an admin grants one on
-the Users page.
+**Administration → Accounts**.
 
 The default role must be non-privileged: every permission it holds must be
 in `secret.list`, `secret.request` and `audit.read` (`audit.read` only
@@ -3814,7 +3855,7 @@ the console's count and banner still work.
 | `SB_WORKER_WEBHOOK_URL` | (unset) | Where to post. Required for this message. |
 | `SB_WORKER_WEBHOOK_SLACK_FORMAT` | `false` | `true` posts `{"text": ...}` for a Slack incoming webhook. |
 | `SB_WORKER_USERS_PENDING_INTERVAL` | `1m` | How often it runs, and so the most often admins hear about new accounts. At least `30s`, or the worker refuses to start. |
-| `SB_PUBLIC_URL` | (unset) | Used for the link to Admin → Users. Unset, the address saved in the console is used. |
+| `SB_PUBLIC_URL` | (unset) | Used for the link to Administration → Accounts (`/admin/users`). Unset, the address saved in the console is used. |
 
 Each run posts **at most one message**. It covers the accounts that started
 waiting since the last message: up to 10 by email, oldest first, then "and
@@ -3851,7 +3892,7 @@ be turned on.
 **Password sign-in and the break-glass admin are never turned off by these
 settings.** No sign-in setting disables `POST /auth/login`, and decline
 only touches waiting accounts. If Google is misconfigured or down, sign in
-with the bootstrap admin's password and fix it under Admin → Sign-in.
+with the bootstrap admin's password and fix it under Administration → Sign-in methods.
 
 ## Audit events
 
@@ -6719,7 +6760,7 @@ Gateway in the control plane, enroll it once from your workstation, install the
 chart, approve its connector, bind an Argo CD Application to a secret, and
 switch the environment's observation source to the Gateway.
 
-Each control-plane step can be done in the console (Admin → Gateways) or with
+Each control-plane step can be done in the console (Administration → Gateways) or with
 `curl`. Enrollment always runs from a shell, because the credential goes
 straight into a Kubernetes Secret.
 
@@ -6912,7 +6953,7 @@ dialog on the first write that needs it.
 
 In the console:
 
-1. Open **Admin → Gateways** (needs `gateway.list`) and select
+1. Open **Administration → Gateways** (needs `gateway.list`) and select
    **Create gateway**.
 2. Fill in **Name**, **Boundary** and, if you want, **Environment
    (optional)**, **Max replicas** and **Max tasks in flight**. Select
@@ -7082,7 +7123,7 @@ kubectl -n tenant-a-uat logs deploy/secrets-bridge-gateway
 
 In the log, look for `identity loaded` and `connectors bound`.
 
-Then check the control plane. In the console, **Admin → Gateways** shows the
+Then check the control plane. In the console, **Administration → Gateways** shows the
 status, replicas and last heartbeat in UTC. Select the Gateway's name to see its
 replicas and **Advertised connectors**. With `curl`,
 `GET /api/v1/admin/gateways` needs `gateway.list` and no step-up:
@@ -7109,7 +7150,7 @@ and does not affect readiness.
 Advertising a connector approves nothing. An admin with `gateway.bind` approves
 it and binds a target.
 
-In the console, open the Gateway from **Admin → Gateways**:
+In the console, open the Gateway from **Administration → Gateways**:
 
 1. Under **Advertised connectors**, select **Approve…** next to
    `argocd-main`, then **Approve connector**. Approving grants the Gateway
@@ -7174,7 +7215,7 @@ observer to fall back to. Switching away from `gateway` cancels the
 environment's open Gateway tasks with the reason `source_changed`. The requests
 themselves are not affected.
 
-In the console, open **Admin → Projects**, select the project, and find the
+In the console, open **Administration → Projects**, select the project, and find the
 environment on the **Environments** tab. The **Observation** column shows the
 current source, **Gateway** or **None**, to anyone with `gateway.list`. With
 `gateway.bind`, select **Change…**, choose **Gateway** in the
@@ -7747,7 +7788,7 @@ curl -fsS -b "$JAR" "$CP/api/v1/audit-events?actor=system:migration&action=envir
 
 7. **Use the console as it is now.** Admin → Integrations and its Argo CD
    endpoint and app-mapping pages are gone. Argo CD is configured on the
-   Gateway (Admin → Gateways). On a project's **Environments** tab, the
+   Gateway (Administration → Gateways). On a project's **Environments** tab, the
    **Observation** dialog offers **Gateway** and **None**; an environment with
    no stored source shows **None**.
 
@@ -8376,7 +8417,7 @@ Every environment variable across `api` / `agent` / `worker` /
 | `SB_BOOTSTRAP_ADMIN_EMAIL` | recommended on first boot |  | See [Bootstrap](https://secrets-bridge.io/latest/operations/bootstrap/) |
 | `SB_BOOTSTRAP_ADMIN_PASSWORD` | recommended on first boot |  | |
 | `SB_BOOTSTRAP_ADMIN_USER_ID` | optional |  | Opaque user_id for pre-OIDC role assignment |
-| `SB_PUBLIC_URL` | no |  | The install's public address, for example `https://secrets.example.com`. Sign-in redirect URIs are built from it, never from request headers. When set, the console shows it read-only; unset, an admin saves it under Admin → Sign-in. Must be `https`, with no user info, query or fragment; plain `http` only for `localhost` or a loopback address with `SB_ENV=dev`. An invalid value stops the api at boot. See [Sign in with Google](https://secrets-bridge.io/latest/operations/google-sign-in/#1-set-the-public-address) |
+| `SB_PUBLIC_URL` | no |  | The install's public address, for example `https://secrets.example.com`. Sign-in redirect URIs are built from it, never from request headers. When set, the console shows it read-only; unset, an admin saves it under Administration → Sign-in methods. Must be `https`, with no user info, query or fragment; plain `http` only for `localhost` or a loopback address with `SB_ENV=dev`. An invalid value stops the api at boot. See [Sign in with Google](https://secrets-bridge.io/latest/operations/google-sign-in/#1-set-the-public-address) |
 | `SB_OBJECTSTORE_BUCKET` | no |  | Bucket for media (logos). Unset, with no other `SB_OBJECTSTORE_*` set, turns object storage off. See [Object storage](https://secrets-bridge.io/latest/operations/object-storage/) |
 | `SB_OBJECTSTORE_REGION` | yes with a bucket |  | Bucket region |
 | `SB_OBJECTSTORE_ENDPOINT` | no |  | `http://` or `https://` endpoint override for S3-compatible servers such as MinIO, or a VPC endpoint (`https://s3.example.com`). Unset for AWS S3. |
@@ -8651,13 +8692,13 @@ The browser isn't signed in yet, so these events have the actor
 
 | `error_kind` | Meaning | Fix |
 |---|---|---|
-| `hd_not_allowed` | The ID token has no `hd` claim (a personal Google account) or a Workspace domain that isn't allowed | Use a Workspace account, or add its domain under Admin → Sign-in |
+| `hd_not_allowed` | The ID token has no `hd` claim (a personal Google account) or a Workspace domain that isn't allowed | Use a Workspace account, or add its domain under Administration → Sign-in methods |
 | `email_domain_not_allowed` | `hd` is allowed but the email's domain isn't | Add the email's domain too |
 | `email_unverified` | Google didn't mark the email as verified | Verify it at Google |
 | `email_has_account` | The email already belongs to an account here, which hasn't connected Google | The person signs in with their password and uses Connect Google on their profile |
 | `account_disabled` | The account was declined or disabled | A declined account can't be re-enabled from the console |
 | `provider_disabled` | Google is turned off, or `SB_OIDC_ISSUER` is Google | Turn it on, or use the env-var provider |
-| `no_public_url` | No public address is set | Set `SB_PUBLIC_URL` or save one under Admin → Sign-in |
+| `no_public_url` | No public address is set | Set `SB_PUBLIC_URL` or save one under Administration → Sign-in methods |
 | `exchange_failed` | Google refused the code exchange, usually a wrong client ID or secret | Check the client in Google Cloud Console, replace the secret, run Test |
 | `id_token_invalid`, `claims_invalid`, `nonce_mismatch`, `missing_sub` | Google's answer couldn't be verified | Check the client ID, then Test |
 | `iat_invalid` | The ID token was too old or dated in the future | Check the api server's clock |
@@ -8687,7 +8728,7 @@ Secrets Bridge sends exactly:
 https://secrets.example.com/api/v1/auth/sso/google/callback
 ```
 
-Copy it from **Admin → Sign-in → Google → Redirect URL**, and add it under
+Copy it from **Administration → Sign-in methods → Google → Redirect URL**, and add it under
 **Authorized redirect URIs** in Google Cloud Console. The scheme, host,
 port and path must all match. If you change the public address, update the
 redirect URI at Google too.
@@ -9034,7 +9075,7 @@ audit events with the `correlation_id` of the job that executed the change:
   `executed`, and a result that left the stage `not_observed` reschedules the
   task 15, 30, 60 and then 120 seconds later. Argo CD that stays
   `Progressing` or `OutOfSync` keeps the task in that loop until the deadline.
-- **The Gateway is not claiming.** Check its status in **Admin → Gateways**. A
+- **The Gateway is not claiming.** Check its status in **Administration → Gateways**. A
   `stale` Gateway has missed its heartbeats; check the pods and their route to
   the control plane. A Gateway pauses claiming while the control plane is
   unreachable, its catalog is not accepted or a connector self-check fails

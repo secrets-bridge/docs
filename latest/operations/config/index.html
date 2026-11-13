@@ -51,10 +51,12 @@
         
         
         
-        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.804a7bde.css">
-        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
+        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.86e47105.css">
+        <style>:root{--md-text-font:"Geist";--md-code-font:"Geist Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css2.62918e6d.css">
     
       <link rel="stylesheet" href="../../stylesheets/brand.css">
     
@@ -119,7 +121,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Configuration reference","description":"Every Secrets Bridge environment variable for the api, agent, worker, controller and Gateway, with defaults, retired settings and insecure dev switches.","url":"https://secrets-bridge.io/latest/operations/config/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/config/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T19:48:41+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Configuration reference","item":"https://secrets-bridge.io/latest/operations/config/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Configuration reference","description":"Every Secrets Bridge environment variable for the api, agent, worker, controller and Gateway, with defaults, retired settings and insecure dev switches.","url":"https://secrets-bridge.io/latest/operations/config/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/config/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-11-13T16:55:28+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Configuration reference","item":"https://secrets-bridge.io/latest/operations/config/"}]}]}</script>
   
 
   </head>
@@ -163,7 +165,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Secrets Bridge" class="md-header__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="156" height="24">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -447,7 +449,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="Secrets Bridge" class="md-nav__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="156" height="24">
 
     </a>
     Secrets Bridge
@@ -2431,7 +2433,7 @@
 <td><code>SB_PUBLIC_URL</code></td>
 <td>no</td>
 <td></td>
-<td>The install's public address, for example <code>https://secrets.example.com</code>. Sign-in redirect URIs are built from it, never from request headers. When set, the console shows it read-only; unset, an admin saves it under Admin → Sign-in. Must be <code>https</code>, with no user info, query or fragment; plain <code>http</code> only for <code>localhost</code> or a loopback address with <code>SB_ENV=dev</code>. An invalid value stops the api at boot. See <a href="../google-sign-in/#1-set-the-public-address">Sign in with Google</a></td>
+<td>The install's public address, for example <code>https://secrets.example.com</code>. Sign-in redirect URIs are built from it, never from request headers. When set, the console shows it read-only; unset, an admin saves it under Administration → Sign-in methods. Must be <code>https</code>, with no user info, query or fragment; plain <code>http</code> only for <code>localhost</code> or a loopback address with <code>SB_ENV=dev</code>. An invalid value stops the api at boot. See <a href="../google-sign-in/#1-set-the-public-address">Sign in with Google</a></td>
 </tr>
 <tr>
 <td><code>SB_OBJECTSTORE_BUCKET</code></td>

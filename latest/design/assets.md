@@ -5,7 +5,7 @@
 Two squares joined by a route that turns once at a ring. Use the files below; never redraw the mark or retype the wordmark.
 
 - Use the **horizontal lockup** (mark and wordmark) by default, the **mark alone** in square spaces, and the **favicon** form below 20 px.
-- **Approved colourings:** ultramarine on `bg` or `surface`; periwinkle (`accent` dark) with light ink on dark; white on ultramarine; black; white.
+- **Approved colourings:** lime on dark; ink with a lime ring on light; black; white. Never lime alone on a light background.
 - **Clear space** is 3/8 of the mark height on every side.
 - Trademark clearance has not been checked.
 
@@ -37,7 +37,7 @@ Right angles and 45° only; no curves except the checkpoint ring. No padlocks, s
 The architecture illustration ([light](../assets/architecture-light.svg), [dark](../assets/architecture-dark.svg)) follows the diagram rules:
 
 - Arrows point away from the side that opens the connection; solid opens, dashed returns.
-- The control plane has an `accent-soft` fill with an `accent` edge. Customer infrastructure has a dashed `edge` outline.
+- The control plane has an `accent-soft` fill with an `accent-ink` edge. Customer infrastructure has a dashed `edge` outline.
 - Providers connect only to the agent. Never draw a line from a provider to a browser or the console. Name providers in text; don't draw their logos.
 
 Documentation diagrams use Mermaid, not screenshots.

@@ -51,10 +51,12 @@
         
         
         
-        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.804a7bde.css">
-        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
+        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.86e47105.css">
+        <style>:root{--md-text-font:"Geist";--md-code-font:"Geist Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css2.62918e6d.css">
     
       <link rel="stylesheet" href="../../stylesheets/brand.css">
     
@@ -119,7 +121,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Troubleshooting","description":"Fix common Secrets Bridge problems: login 401s, Google sign-in, failed agent jobs, stale agents, Vault permission errors, Gateway issues and audit queries.","url":"https://secrets-bridge.io/latest/operations/troubleshooting/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/troubleshooting/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T19:48:41+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Troubleshooting","item":"https://secrets-bridge.io/latest/operations/troubleshooting/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Troubleshooting","description":"Fix common Secrets Bridge problems: login 401s, Google sign-in, failed agent jobs, stale agents, Vault permission errors, Gateway issues and audit queries.","url":"https://secrets-bridge.io/latest/operations/troubleshooting/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/troubleshooting/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-11-13T16:55:28+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Troubleshooting","item":"https://secrets-bridge.io/latest/operations/troubleshooting/"}]}]}</script>
   
 
   </head>
@@ -163,7 +165,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Secrets Bridge" class="md-header__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="156" height="24">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -447,7 +449,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="Secrets Bridge" class="md-nav__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="156" height="24">
 
     </a>
     Secrets Bridge
@@ -2912,7 +2914,7 @@ the reason in the audit log:</p>
 <tr>
 <td><code>hd_not_allowed</code></td>
 <td>The ID token has no <code>hd</code> claim (a personal Google account) or a Workspace domain that isn't allowed</td>
-<td>Use a Workspace account, or add its domain under Admin → Sign-in</td>
+<td>Use a Workspace account, or add its domain under Administration → Sign-in methods</td>
 </tr>
 <tr>
 <td><code>email_domain_not_allowed</code></td>
@@ -2942,7 +2944,7 @@ the reason in the audit log:</p>
 <tr>
 <td><code>no_public_url</code></td>
 <td>No public address is set</td>
-<td>Set <code>SB_PUBLIC_URL</code> or save one under Admin → Sign-in</td>
+<td>Set <code>SB_PUBLIC_URL</code> or save one under Administration → Sign-in methods</td>
 </tr>
 <tr>
 <td><code>exchange_failed</code></td>
@@ -2989,7 +2991,7 @@ audited. The redirect URI registered on the OAuth client must match the one
 Secrets Bridge sends exactly:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>https://secrets.example.com/api/v1/auth/sso/google/callback
 </span></code></pre></div>
-<p>Copy it from <strong>Admin → Sign-in → Google → Redirect URL</strong>, and add it under
+<p>Copy it from <strong>Administration → Sign-in methods → Google → Redirect URL</strong>, and add it under
 <strong>Authorized redirect URIs</strong> in Google Cloud Console. The scheme, host,
 port and path must all match. If you change the public address, update the
 redirect URI at Google too.</p>
@@ -3286,7 +3288,7 @@ audit events with the <code>correlation_id</code> of the job that executed the c
   <code>executed</code>, and a result that left the stage <code>not_observed</code> reschedules the
   task 15, 30, 60 and then 120 seconds later. Argo CD that stays
   <code>Progressing</code> or <code>OutOfSync</code> keeps the task in that loop until the deadline.</li>
-<li><strong>The Gateway is not claiming.</strong> Check its status in <strong>Admin → Gateways</strong>. A
+<li><strong>The Gateway is not claiming.</strong> Check its status in <strong>Administration → Gateways</strong>. A
   <code>stale</code> Gateway has missed its heartbeats; check the pods and their route to
   the control plane. A Gateway pauses claiming while the control plane is
   unreachable, its catalog is not accepted or a connector self-check fails

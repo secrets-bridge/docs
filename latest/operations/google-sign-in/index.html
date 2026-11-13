@@ -51,10 +51,12 @@
         
         
         
-        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.804a7bde.css">
-        <style>:root{--md-text-font:"IBM Plex Sans";--md-code-font:"IBM Plex Mono"}</style>
+        <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css.86e47105.css">
+        <style>:root{--md-text-font:"Geist";--md-code-font:"Geist Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="../../assets/external/fonts.googleapis.com/css2.62918e6d.css">
     
       <link rel="stylesheet" href="../../stylesheets/brand.css">
     
@@ -119,7 +121,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Sign in with Google","description":"Connect a Google Workspace to Secrets Bridge from the console, approve the accounts it creates and link Google to existing accounts. Not yet through QA.","url":"https://secrets-bridge.io/latest/operations/google-sign-in/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/google-sign-in/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-23T15:12:19+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Sign in with Google","item":"https://secrets-bridge.io/latest/operations/google-sign-in/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"Sign in with Google","description":"Connect a Google Workspace to Secrets Bridge from the console, approve the accounts it creates and link Google to existing accounts. Not yet through QA.","url":"https://secrets-bridge.io/latest/operations/google-sign-in/","mainEntityOfPage":"https://secrets-bridge.io/latest/operations/google-sign-in/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-11-13T16:55:28+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Operations","item":"https://secrets-bridge.io/latest/operations/"},{"@type":"ListItem","position":3,"name":"Sign in with Google","item":"https://secrets-bridge.io/latest/operations/google-sign-in/"}]}]}</script>
   
 
   </head>
@@ -163,7 +165,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Secrets Bridge" class="md-header__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="156" height="24">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -447,7 +449,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="../.." title="Secrets Bridge" class="md-nav__button md-logo" aria-label="Secrets Bridge" data-md-component="logo">
       
-  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="175" height="24">
+  <img src="../../assets/logo-horizontal-color.svg" alt="Secrets Bridge" width="156" height="24">
 
     </a>
     Secrets Bridge
@@ -2509,7 +2511,7 @@ not passed a QA cycle. See <a href="../../overview/product-status/">Product stat
     API-&gt;&gt;API: create account, waiting for approval
     API-&gt;&gt;UI: session cookie, redirect
     UI-&gt;&gt;P: Waiting for approval page
-    A-&gt;&gt;UI: Admin → Users, Approve with a role and scope
+    A-&gt;&gt;UI: Administration → Accounts, Approve with a role and scope
     UI-&gt;&gt;API: POST /api/v1/users/:id/approve
     P-&gt;&gt;UI: Check again
     UI-&gt;&gt;P: console with the granted access</code></pre>
@@ -2552,7 +2554,7 @@ two places:</p>
 </tr>
 <tr>
 <td>The console</td>
-<td><strong>Admin → Sign-in → Public address</strong>. The field is prefilled from the address you are using.</td>
+<td><strong>Administration → Sign-in methods → Public address</strong>. The field is prefilled from the address you are using.</td>
 <td>Editable</td>
 </tr>
 </tbody>
@@ -2570,7 +2572,7 @@ the login page doesn't offer Google.</p>
 accounts that can wait for approval at once. It defaults to 50 and accepts
 1 to 10,000. See <a href="#the-waiting-limit">The waiting limit</a>.</p>
 <h3 id="2-create-the-oauth-client-in-google-cloud-console">2. Create the OAuth client in Google Cloud Console<a class="headerlink" href="#2-create-the-oauth-client-in-google-cloud-console" title="Permanent link">&para;</a></h3>
-<p>With the address saved, <strong>Admin → Sign-in → Google → Set up Google</strong> shows
+<p>With the address saved, <strong>Administration → Sign-in methods → Google → Set up Google</strong> shows
 the redirect URL to copy. It is always the public address plus
 <code>/api/v1/auth/sso/google/callback</code>:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>https://secrets.example.com/api/v1/auth/sso/google/callback
@@ -2629,7 +2631,7 @@ with <strong>Replace…</strong> to set a new one. Replacing it is its own call,
 <code>PUT /sso/providers/:id</code> refuses a <code>client_secret</code> field with <code>400</code>.</p>
 <h3 id="4-test-then-turn-it-on">4. Test, then turn it on<a class="headerlink" href="#4-test-then-turn-it-on" title="Permanent link">&para;</a></h3>
 <p><strong>Test</strong> sends you through Google with your own account and back to
-<strong>Admin → Sign-in</strong>. It runs every check a real sign-in runs, creates
+<strong>Administration → Sign-in methods</strong>. It runs every check a real sign-in runs, creates
 nothing, issues no session, and works while Google is still off. The result
 shows as "Google sign-in works." or as the reason it didn't pass, and only
 the admin who ran it sees that reason.</p>
@@ -2681,9 +2683,11 @@ is enforced at session validation and at sign-in. If a waiting account signs in 
 its group mapping is skipped, so it gets no role from IdP groups either.</p>
 <p>Admins who can approve see:</p>
 <ul>
-<li>a count on <strong>Users</strong> in the sidebar;</li>
+<li>a count on <strong>Administration</strong> in the sidebar and on <strong>Accounts</strong> in its
+  navigation, and a banner on every Administration section until
+  Accounts is open;</li>
 <li>a banner on <strong>Overview</strong> with a link while anyone is waiting;</li>
-<li>the <strong>Waiting for approval</strong> list on <strong>Admin → Users</strong>, longest wait
+<li>the <strong>Waiting for approval</strong> list on <strong>Administration → Accounts</strong>, longest wait
   first;</li>
 <li>optionally, a <a href="#notify-admins-from-the-worker">webhook message from the worker</a>.</li>
 </ul>
@@ -2705,7 +2709,7 @@ can't be approved or re-enabled from the console, and that Google account
 can't sign in again.</p>
 <h3 id="the-waiting-limit">The waiting limit<a class="headerlink" href="#the-waiting-limit" title="Permanent link">&para;</a></h3>
 <p>At most 50 accounts can wait at once by default; change the limit on
-<strong>Admin → Sign-in → Public address</strong>. Past it, new Google sign-ins are
+<strong>Administration → Sign-in methods → Public address</strong>. Past it, new Google sign-ins are
 refused with the same generic page until you approve or decline some.
 Declined accounts don't count. Refusals at the limit are audited as
 <code>user.pending_refused</code>, aggregated per 10-minute window: the first refusal
@@ -2716,7 +2720,7 @@ append-only audit log.</p>
 <p>With <strong>Let them in right away</strong>, a new account starts active. You can pick
 a <strong>Role for new people</strong>, granted globally when the account is created.
 Without one, the account starts with no role, and an admin grants one on
-the Users page.</p>
+<strong>Administration → Accounts</strong>.</p>
 <p>The default role must be non-privileged: every permission it holds must be
 in <code>secret.list</code>, <code>secret.request</code> and <code>audit.read</code> (<code>audit.read</code> only
 shows a user their own events). The api refuses anything else with
@@ -2789,7 +2793,7 @@ the console's count and banner still work.</p>
 <tr>
 <td><code>SB_PUBLIC_URL</code></td>
 <td>(unset)</td>
-<td>Used for the link to Admin → Users. Unset, the address saved in the console is used.</td>
+<td>Used for the link to Administration → Accounts (<code>/admin/users</code>). Unset, the address saved in the console is used.</td>
 </tr>
 </tbody>
 </table>
@@ -2821,7 +2825,7 @@ be turned on.</p>
 <p><strong>Password sign-in and the break-glass admin are never turned off by these
 settings.</strong> No sign-in setting disables <code>POST /auth/login</code>, and decline
 only touches waiting accounts. If Google is misconfigured or down, sign in
-with the bootstrap admin's password and fix it under Admin → Sign-in.</p>
+with the bootstrap admin's password and fix it under Administration → Sign-in methods.</p>
 <h2 id="audit-events">Audit events<a class="headerlink" href="#audit-events" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

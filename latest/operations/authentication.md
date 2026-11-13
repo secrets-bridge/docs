@@ -107,7 +107,7 @@ If you ever find yourself "cleaning up" this filter, **stop**. It is the securit
 
 ## Google sign-in from the console
 
-Separate from the env-var provider above, an admin with `auth.sso.edit` can connect a Google Workspace under **Admin → Sign-in**, with no restart. Its accounts are bound by Google's issuer and subject rather than by email, the ID token's `hd` claim must be in the allowed Workspace domains, and new accounts wait for an admin's approval by default. Existing accounts connect Google from their profile after a fresh second factor. Both providers can be configured at once; the login page shows a button for each.
+Separate from the env-var provider above, an admin with `auth.sso.edit` can connect a Google Workspace under **Administration → Sign-in methods**, with no restart. Its accounts are bound by Google's issuer and subject rather than by email, the ID token's `hd` claim must be in the allowed Workspace domains, and new accounts wait for an admin's approval by default. Existing accounts connect Google from their profile after a fresh second factor. Both providers can be configured at once; the login page shows a button for each.
 
 See [Sign in with Google](google-sign-in.md) for setup, approvals and the audit events.
 
@@ -135,7 +135,7 @@ Both kinds follow the same two-step shape (Stripe / GitHub / AWS Console model):
 
 A wrong TOTP code or a failed WebAuthn attestation **burns the challenge**, the user restarts from step 1. This blocks an attacker from brute-forcing the 6-digit space against a single secret.
 
-The SPA exposes the enrollment surfaces at `/me/mfa`. A user with zero factors sees an accent-coloured "Add MFA factor →" nudge in the sidebar; an enrolled user sees a quieter "Security" link.
+The SPA exposes the enrollment surfaces at `/me/mfa`. A user with no factor sees "Add a second factor. Approving and revealing need one." at the foot of the sidebar; an enrolled user sees a quieter "Second factor on" link.
 
 ### Step-up ceremony
 

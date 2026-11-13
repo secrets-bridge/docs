@@ -1,6 +1,6 @@
 # Design system
 
-One system covers the console, this site and the brand marks. It aims for an operations tool written by the engineers who answer for it: plain, exact and quiet, with one ultramarine accent and nothing decorative.
+One system covers the console, this site and the brand marks. It aims for an operations tool written by the engineers who answer for it: plain, exact and quiet, with warm graphite, one chartreuse accent and nothing decorative.
 
 Read these before you write copy, build a page or make an image:
 
@@ -13,11 +13,11 @@ Read these before you write copy, build a page or make an image:
 | Question | Answer |
 |---|---|
 | Name | **Secrets Bridge**, two words, everywhere. In logos it comes from the lockup files; never retype it. |
-| Fonts | IBM Plex Sans for what people read, IBM Plex Mono for what machines read (refs, key names, paths, times, code). Weights 400, 500 and 600. |
-| Accent | Ultramarine `#3141C8` on light, periwinkle `#9AA3FF` on dark. A signal only: links, one primary button per view, the current tab, the focus ring. |
+| Fonts | Geist for what people read, Geist Mono for what machines read (refs, key names, paths, times, code), and Bricolage Grotesque for titles and counts. |
+| Accent | Lime `#D4F24C`, as a fill only: one primary button per view, counts. Anything thin uses `accent-ink`, `#4A6600` on light and lime on dark. |
 | Surfaces | Paper `bg`, white `surface`, `ink` text. Panels separate with a border, not a shadow. |
-| Corners | Square. 4 px is the largest radius. Only avatars are round. |
-| Status | A small square and the exact status word. Colour never carries a status alone. |
+| Corners | 6 px tags, 8 px controls, 12 px panels, 14 px dialogs. Only avatars are round. |
+| Status | A shape for its group and the exact status word. Blue means success. Colour never carries a status alone. |
 | Secret values | Never shown outside the reveal panel: no values, lengths, hashes or previews. |
 
 ## Where it lives
