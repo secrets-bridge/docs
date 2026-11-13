@@ -12,9 +12,32 @@ required to call it.
 | `public` | No auth, open route (probes, login) |
 | `session` | A signed-in session: the `sb_session` cookie from `/auth/login` or a sign-in callback. There are no bearer tokens; scripts keep the cookie in a jar (`curl -c jar`, then `-b jar`) |
 | `session + perm` | A session + the named permission via `auth.Require(perm)` |
+| `+ fresh MFA` | The session's second factor must be newer than 15 minutes. A stale session gets `401 step_up_required`, and an account with no factor gets `412 mfa_enrollment_required`. The permission check runs first, so a caller without the permission gets `403` and no prompt. See [Stepping up from a script](#stepping-up-from-a-script) |
 | `agent` | An agent's `X-Agent-Secret` header (validated by `AgentAuth` middleware) |
 | `gateway` | A Gateway's `X-Gateway-Secret` header (validated by `GatewayAuth` middleware) |
 | `user_id` | A `?user_id=<uuid>` query param matching the request's requester (stop-gap until OIDC) |
+
+### Stepping up from a script
+
+Role, assignment, workflow, policy and team writes need a fresh second
+factor, so a script signs in, then steps up with a TOTP code before it
+writes. The stamp lasts 15 minutes on that session.
+
+```bash
+API=https://secrets.example.com/api/v1
+JAR=$(mktemp)
+curl -fsS -c "$JAR" -H 'Content-Type: application/json' \
+  -d '{"email":"admin@example.com","password":"<password>"}' "$API/auth/login" >/dev/null
+
+FACTOR=$(curl -fsS -b "$JAR" "$API/users/me/mfa/factors" | jq -r '.[] | select(.kind=="totp") | .id')
+CHALLENGE=$(curl -fsS -b "$JAR" -H 'Content-Type: application/json' \
+  -d '{"kind":"totp"}' "$API/auth/mfa/challenge" | jq -r .challenge_id)
+curl -fsS -b "$JAR" -H 'Content-Type: application/json' \
+  -d "{\"challenge_id\":\"$CHALLENGE\",\"factor_id\":\"$FACTOR\",\"code\":\"<6-digit code>\"}" \
+  "$API/auth/mfa/verify"   # 204: this session is fresh for 15 minutes
+```
+
+A wrong code burns the challenge; ask for a new one.
 
 ## Probes
 
@@ -86,7 +109,7 @@ Every route needs a **global** `user_role.edit`.
 | Method | Path | Auth | Notes |
 |---|---|---|---|
 | `GET` | `/api/v1/users/pending` | `session + user_role.edit` | Waiting accounts, oldest first, at most 100, with `total` for the count |
-| `POST` | `/api/v1/users/:id/approve` | `session + user_role.edit` | `{role_id, scope}`. Grants the role and clears the waiting flag in one transaction. `scope` uses the `POST /user-roles` rules; a malformed one gets `400`. `409 user_not_pending` for an account that isn't waiting |
+| `POST` | `/api/v1/users/:id/approve` | `session + user_role.edit` + fresh MFA | `{role_id, scope}`. Grants the role and clears the waiting flag in one transaction. `scope` uses the `POST /user-roles` rules; a malformed one gets `400`. `409 user_not_pending` for an account that isn't waiting |
 | `POST` | `/api/v1/users/:id/decline` | `session + user_role.edit` | Disables a waiting account. `409 user_not_pending` for any other account |
 
 A waiting account may call only `GET /api/v1/users/me` (which includes
@@ -303,30 +326,35 @@ guide.
 
 | Method | Path | Auth |
 |---|---|---|
-| `POST` | `/api/v1/roles` | `session + role.edit` |
+| `POST` | `/api/v1/roles` | `session + role.edit` + fresh MFA |
 | `GET` | `/api/v1/roles` | session |
 | `GET` | `/api/v1/roles/:id` | session |
-| `PUT` | `/api/v1/roles/:id/permissions` | `session + role.edit` | `409 role_is_sso_default` when the role is a sign-in provider's default role and the change would add a privileged permission |
-| `DELETE` | `/api/v1/roles/:id` | `session + role.edit` |
-| `POST` | `/api/v1/user-roles` | `session + user_role.edit` |
+| `PUT` | `/api/v1/roles/:id/permissions` | `session + role.edit` + fresh MFA | `409 role_is_sso_default` when the role is a sign-in provider's default role and the change would add a privileged permission |
+| `DELETE` | `/api/v1/roles/:id` | `session + role.edit` + fresh MFA |
+| `POST` | `/api/v1/user-roles` | `session + user_role.edit` + fresh MFA |
 | `GET` | `/api/v1/user-roles` | session |
-| `DELETE` | `/api/v1/user-roles/:id` | `session + user_role.edit` |
+| `DELETE` | `/api/v1/user-roles/:id` | `session + user_role.edit` + fresh MFA |
 | `GET` | `/api/v1/users/:userID/roles` | session |
-| `POST` | `/api/v1/workflows` | `session + workflow.edit` |
+| `POST` | `/api/v1/workflows` | `session + workflow.edit` + fresh MFA |
 | `GET` | `/api/v1/workflows` | session |
 | `GET` | `/api/v1/workflows/scoped-policy-authorable` | `session + policy.author` at any scope | R-follow-up #1 (api#112). Returns workflows where `enabled=true AND scoped_policy_authorable=true`. Auth uses the new `auth.RequireAny` middleware, which admits any non-empty scope match because `policy.author` is always scoped. Mounted BEFORE the dynamic `:id` route per the route-ordering correction. |
 | `GET` | `/api/v1/workflows/:id` | session |
-| `PUT` | `/api/v1/workflows/:id` | `session + workflow.edit` | R-follow-up #1 added `scoped_policy_authorable` to the body shape. Field is `*bool` with COALESCE-preserve semantic: omit the field to keep the existing value (the handler does a Get-then-merge); send `true`/`false` to flip. Critical for rolling-deploy safety with older admin clients that don't yet know about the field. |
-| `DELETE` | `/api/v1/workflows/:id` | `session + workflow.edit` |
-| `POST` | `/api/v1/policies` | `session + policy.edit` |
+| `PUT` | `/api/v1/workflows/:id` | `session + workflow.edit` + fresh MFA | R-follow-up #1 added `scoped_policy_authorable` to the body shape. Field is `*bool` with COALESCE-preserve semantic: omit the field to keep the existing value (the handler does a Get-then-merge); send `true`/`false` to flip. Critical for rolling-deploy safety with older admin clients that don't yet know about the field. |
+| `DELETE` | `/api/v1/workflows/:id` | `session + workflow.edit` + fresh MFA |
+| `POST` | `/api/v1/policies` | `session + policy.edit` + fresh MFA |
 | `GET` | `/api/v1/policies` | session |
 | `GET` | `/api/v1/policies/:id` | session |
-| `PUT` | `/api/v1/policies/:id` | `session + policy.edit` |
-| `DELETE` | `/api/v1/policies/:id` | `session + policy.edit` |
+| `PUT` | `/api/v1/policies/:id` | `session + policy.edit` + fresh MFA |
+| `DELETE` | `/api/v1/policies/:id` | `session + policy.edit` + fresh MFA |
 | `POST` | `/api/v1/projects` | session |
 | `GET` | `/api/v1/projects` | session |
 | `GET` | `/api/v1/projects/:id` | session |
 | `PUT` | `/api/v1/projects/:id/status` | session |
+| `PUT` | `/api/v1/projects/:id/team` | `session + team.edit` + fresh MFA | `{team_id}`. `403 self_scope_expansion_not_allowed` when the new team is, or is under, a team where the caller holds a role limited to that team for a permission they don't hold globally; another admin has to make the move. The refusal is audited as denied |
+| `POST` | `/api/v1/teams` | `session + team.edit` + fresh MFA | A new team is empty, so creating one under any parent is allowed |
+| `GET` | `/api/v1/teams` | session |
+| `PUT` | `/api/v1/teams/:id` | `session + team.edit` + fresh MFA | A new `parent_team_id` follows the same rule as `PUT /projects/:id/team` (`403 self_scope_expansion_not_allowed`) |
+| `DELETE` | `/api/v1/teams/:id` | `session + team.edit` | `409` while the team has sub-teams |
 | `GET` | `/api/v1/projects/:id/environments` | session |
 | `POST` | `/api/v1/environments` | session |
 | `GET` | `/api/v1/environments` | session |
@@ -423,11 +451,11 @@ keep using them.
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| `POST` | `/api/v1/projects/:projectID/policy-rules` | `session + policy.author` scoped to projectID | Author a scoped rule. Body: `{name, selector, priority, workflow_id, enabled}`. Selector MUST carry `environment_kind="non_prod"` OR `environment_id`; the api runs the locked 6-gate chain (coverage → priority<9000 → selector.project_id consistency → env constraint → workflow exists → INSERT). 8 stable codes listed below. |
+| `POST` | `/api/v1/projects/:projectID/policy-rules` | `session + policy.author` scoped to projectID + fresh MFA | Author a scoped rule. Body: `{name, selector, priority, workflow_id, enabled}`. Selector MUST carry `environment_kind="non_prod"` OR `environment_id`; the api runs the locked 6-gate chain (coverage → priority<9000 → selector.project_id consistency → env constraint → workflow exists → INSERT). 8 stable codes listed below. |
 | `GET` | `/api/v1/projects/:projectID/policy-rules` | `session` | List scoped rules + inherited platform rules. **§4 correction 1 sanitization**: inherited platform rows carry `selector_keys` ONLY; the `selector` field is OMITTED server-side. Scoped rows carry the full selector. Route-pinned not perm-pinned; admins acting via this URL also get the sanitized view. |
 | `GET` | `/api/v1/projects/:projectID/policy-rules/:ruleID` | `session` | Single rule with the same sanitization rules as the list. Inherited platform row → sanitized projection. Scoped row whose `project_id` doesn't match URL projectID → 404 `policy_not_found` (§4 mismatch protection). |
-| `PUT` | `/api/v1/projects/:projectID/policy-rules/:ruleID` | `session + policy.author` scoped to projectID | Update scoped rule. All body fields optional (omitted = preserve). **§3 Q9 lock**: explicit empty `{}` selector REJECTED with `policy_scope_too_broad.reason=selector_empty`. **§4 lock**: URL projectID mismatch returns `policy_not_found`, NEVER `out_of_scope_policy`. |
-| `DELETE` | `/api/v1/projects/:projectID/policy-rules/:ruleID` | `session + policy.author` scoped to projectID | 204 on success. URL projectID mismatch returns 404 `policy_not_found`. Platform NULL rule returns 403 `platform_policy_not_editable`. |
+| `PUT` | `/api/v1/projects/:projectID/policy-rules/:ruleID` | `session + policy.author` scoped to projectID + fresh MFA | Update scoped rule. All body fields optional (omitted = preserve). **§3 Q9 lock**: explicit empty `{}` selector REJECTED with `policy_scope_too_broad.reason=selector_empty`. **§4 lock**: URL projectID mismatch returns `policy_not_found`, NEVER `out_of_scope_policy`. |
+| `DELETE` | `/api/v1/projects/:projectID/policy-rules/:ruleID` | `session + policy.author` scoped to projectID + fresh MFA | 204 on success. URL projectID mismatch returns 404 `policy_not_found`. Platform NULL rule returns 403 `platform_policy_not_editable`. |
 
 **Stable error codes** (EPIC R):
 
@@ -479,11 +507,11 @@ posture R-follow-up #2 established for URL-key-wins).
 
 | Method | Path | Auth | Notes |
 |---|---|---|---|
-| `POST` | `/api/v1/teams/:teamID/policy-rules` | `session + policy.author` scoped to teamID | Author a team-scoped rule. Body: `{name, selector, priority, workflow_id, enabled}`. §1 C1 strict: selector MUST carry `environment_kind="non_prod"` and MUST NOT carry `project_id`, `environment_id`, or `team_id`. The 6-gate chain (coverage → team exists+active → priority < live cap → selector consistency → workflow authorable → INSERT) runs server-side. Live `priority_cap` echoed in the envelope. |
+| `POST` | `/api/v1/teams/:teamID/policy-rules` | `session + policy.author` scoped to teamID + fresh MFA | Author a team-scoped rule. Body: `{name, selector, priority, workflow_id, enabled}`. §1 C1 strict: selector MUST carry `environment_kind="non_prod"` and MUST NOT carry `project_id`, `environment_id`, or `team_id`. The 6-gate chain (coverage → team exists+active → priority < live cap → selector consistency → workflow authorable → INSERT) runs server-side. Live `priority_cap` echoed in the envelope. |
 | `GET` | `/api/v1/teams/:teamID/policy-rules` | `session + policy.author` scoped to teamID | List team-own rules + inherited ancestor-team rules + inherited platform rules. Inherited rows carry `selector_keys` only (sanitized). Response envelope carries `priority_cap`. |
 | `GET` | `/api/v1/teams/:teamID/policy-rules/:ruleID` | `session + policy.author` scoped to teamID | Single rule with the same sanitization rules as the list. Mismatched anchor (project rule via team URL OR rule under a different team) returns 404 `policy_not_found` per §4 mismatch protection. |
-| `PUT` | `/api/v1/teams/:teamID/policy-rules/:ruleID` | `session + policy.author` scoped to teamID | Update team-scoped rule. R-follow-up #2 §3 critical pin preserved: priority revalidates against the LIVE cap on EVERY call (not only when priority is changing). §4 mismatch returns `policy_not_found`. Anchor is immutable post-create. |
-| `DELETE` | `/api/v1/teams/:teamID/policy-rules/:ruleID` | `session + policy.author` scoped to teamID | 204 on success. URL teamID mismatch returns 404 `policy_not_found`. Platform NULL rule returns 403 `platform_policy_not_editable`. |
+| `PUT` | `/api/v1/teams/:teamID/policy-rules/:ruleID` | `session + policy.author` scoped to teamID + fresh MFA | Update team-scoped rule. R-follow-up #2 §3 critical pin preserved: priority revalidates against the LIVE cap on EVERY call (not only when priority is changing). §4 mismatch returns `policy_not_found`. Anchor is immutable post-create. |
+| `DELETE` | `/api/v1/teams/:teamID/policy-rules/:ruleID` | `session + policy.author` scoped to teamID + fresh MFA | 204 on success. URL teamID mismatch returns 404 `policy_not_found`. Platform NULL rule returns 403 `platform_policy_not_editable`. |
 
 **Response envelope shape** (all GET / PUT / POST):
 
@@ -776,7 +804,7 @@ a 5-minute TTL backstop for missed messages.
 |---|---|---|---|
 | `GET` | `/api/v1/platform-settings` | `session + policy.edit` | List all whitelisted rows. Non-whitelisted rows in the table (shouldn't exist in v1) are filtered out service-side. |
 | `GET` | `/api/v1/platform-settings/:key` | `session + policy.edit` | One row. Unknown / non-whitelisted key → 404 `unknown_platform_setting`. |
-| `PUT` | `/api/v1/platform-settings/:key` | `session + policy.edit` | Update. Body: `{value: <json>}`. URL `:key` wins over any `key` in the body (defense against URL/body confusion). Transactional: BEGIN → SELECT FOR UPDATE → validate → UPDATE → INSERT audit → COMMIT → pub/sub publish AFTER commit. |
+| `PUT` | `/api/v1/platform-settings/:key` | `session + policy.edit` + fresh MFA | Update. Body: `{value: <json>}`. URL `:key` wins over any `key` in the body (defense against URL/body confusion). Transactional: BEGIN → SELECT FOR UPDATE → validate → UPDATE → INSERT audit → COMMIT → pub/sub publish AFTER commit. |
 
 **Response shape** (`PlatformSetting`):
 

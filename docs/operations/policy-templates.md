@@ -412,16 +412,22 @@ VALUES (
 );
 ```
 
-Assign it scoped to a project or team:
+Assign it scoped to a project or team. Role writes need a session with
+a fresh second factor; sign in and step up first, as in
+[Stepping up from a script](../reference/api-endpoints.md#stepping-up-from-a-script):
 
 ```bash
 # Per-project, section head covers exactly one project
 curl -X POST /api/v1/user-roles \
-  -d '{"user_id":"alice","role_id":"<policy_author>","scope":{"project_id":"<billing-prod>"}}'
+  -b "$JAR" \
+  -H 'Content-Type: application/json' \
+  -d '{"user_id":"<alice-user-id>","role_id":"<policy_author>","scope":{"project_id":"<billing-prod>"}}'
 
 # Per-team, section head covers the entire descendant team subtree
 curl -X POST /api/v1/user-roles \
-  -d '{"user_id":"alice","role_id":"<policy_author>","scope":{"team_id":"<billing-team>"}}'
+  -b "$JAR" \
+  -H 'Content-Type: application/json' \
+  -d '{"user_id":"<alice-user-id>","role_id":"<policy_author>","scope":{"team_id":"<billing-team>"}}'
 ```
 
 The team-aware resolver walks `team_id` → descendant subtree →
@@ -566,7 +572,7 @@ canary for someone probing without coverage.
 curl /api/v1/users/<user_id>/roles
 
 # Revoke
-curl -X DELETE /api/v1/user-roles/<assignment_id>
+curl -X DELETE -b "$JAR" /api/v1/user-roles/<assignment_id>   # needs a fresh second factor too
 ```
 
 The rules they authored stay in `policy_rules`, they're still owned
@@ -617,7 +623,8 @@ invalidated on every workflow mutation.
 # Get the workflow id
 gh api .../api/v1/workflows | jq '.[] | select(.name=="standard") | .id'
 
-# Flip the flag, Get-then-merge in the api preserves all other fields
+# Flip the flag, Get-then-merge in the api preserves all other fields.
+# Workflow writes need a session with a fresh second factor.
 curl -X PUT /api/v1/workflows/<id> \
   -b "$JAR" \
   -H 'Content-Type: application/json' \
@@ -716,6 +723,7 @@ catches dropped notifications.
 #### Editing through the API
 
 ```bash
+# Needs a session with a fresh second factor.
 curl -X PUT /api/v1/platform-settings/platform_reserved_priority \
   -b "$JAR" \
   -H 'Content-Type: application/json' \
