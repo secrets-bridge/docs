@@ -113,7 +113,7 @@ See [Sign in with Google](google-sign-in.md) for setup, approvals and the audit 
 
 ## MFA + step-up (Slices H + I, current model)
 
-Tier 2 operations (approve / reject / reveal-wrap; future: rotate, role-edit, provider-edit) require a session whose `last_mfa_at` is within the step-up TTL.
+Tier 2 operations require a session whose `last_mfa_at` is within the step-up TTL (15 minutes): approve, reject and reveal, and the admin writes that change who can do what (roles, role assignments, account approval, workflows, policies, policy rules, the platform setting, teams and project moves), as well as sign-in settings and Gateway administration. The [endpoint reference](../reference/api-endpoints.md) marks each one `+ fresh MFA`.
 
 **The Control Plane owns MFA enrollment + step-up directly.** Identity stays with the IdP; MFA is an app-level concern. This is an architectural inversion of the original Slice D design (described as the legacy path further down). Every user enrolls one or more factors in the SPA at `/me/mfa`; step-up runs through the api's `/auth/mfa/{challenge,verify}` endpoints. Local-admin and OIDC users follow the same enrollment surface and the same step-up flow.
 

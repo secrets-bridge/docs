@@ -121,7 +121,7 @@
 
   
   
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"HTTP API endpoints","description":"Every HTTP endpoint the Secrets Bridge api exposes and its auth gate: sign-in, agents, Gateways, access requests, reveal sessions, audit and policy rules.","url":"https://secrets-bridge.io/latest/reference/api-endpoints/","mainEntityOfPage":"https://secrets-bridge.io/latest/reference/api-endpoints/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-10-25T19:48:41+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Reference","item":"https://secrets-bridge.io/latest/reference/"},{"@type":"ListItem","position":3,"name":"HTTP API endpoints","item":"https://secrets-bridge.io/latest/reference/api-endpoints/"}]}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"HTTP API endpoints","description":"Every HTTP endpoint the Secrets Bridge api exposes and its auth gate: sign-in, agents, Gateways, access requests, reveal sessions, audit and policy rules.","url":"https://secrets-bridge.io/latest/reference/api-endpoints/","mainEntityOfPage":"https://secrets-bridge.io/latest/reference/api-endpoints/","image":"https://secrets-bridge.io/latest/assets/og-banner.png","inLanguage":"en","isPartOf":{"@type":"WebSite","@id":"https://secrets-bridge.io/#website","name":"Secrets Bridge","url":"https://secrets-bridge.io/"},"author":{"@type":"Organization","name":"Secrets Bridge contributors","url":"https://github.com/secrets-bridge"},"publisher":{"@type":"Organization","@id":"https://secrets-bridge.io/#organization","name":"Secrets Bridge","url":"https://secrets-bridge.io/","logo":{"@type":"ImageObject","url":"https://secrets-bridge.io/latest/assets/apple-touch-icon.png","width":180,"height":180},"sameAs":["https://github.com/secrets-bridge"]},"dateModified":"2026-11-14T14:50:08+03:00"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Secrets Bridge","item":"https://secrets-bridge.io/latest/"},{"@type":"ListItem","position":2,"name":"Reference","item":"https://secrets-bridge.io/latest/reference/"},{"@type":"ListItem","position":3,"name":"HTTP API endpoints","item":"https://secrets-bridge.io/latest/reference/api-endpoints/"}]}]}</script>
   
 
   </head>
@@ -1937,6 +1937,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#stepping-up-from-a-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stepping up from a script
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#probes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2479,6 +2490,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#stepping-up-from-a-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stepping up from a script
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#probes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2951,6 +2973,10 @@ required to call it.</p>
 <td>A session + the named permission via <code>auth.Require(perm)</code></td>
 </tr>
 <tr>
+<td><code>+ fresh MFA</code></td>
+<td>The session's second factor must be newer than 15 minutes. A stale session gets <code>401 step_up_required</code>, and an account with no factor gets <code>412 mfa_enrollment_required</code>. The permission check runs first, so a caller without the permission gets <code>403</code> and no prompt. See <a href="#stepping-up-from-a-script">Stepping up from a script</a></td>
+</tr>
+<tr>
 <td><code>agent</code></td>
 <td>An agent's <code>X-Agent-Secret</code> header (validated by <code>AgentAuth</code> middleware)</td>
 </tr>
@@ -2964,6 +2990,23 @@ required to call it.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="stepping-up-from-a-script">Stepping up from a script<a class="headerlink" href="#stepping-up-from-a-script" title="Permanent link">&para;</a></h3>
+<p>Role, assignment, workflow, policy and team writes need a fresh second
+factor, so a script signs in, then steps up with a TOTP code before it
+writes. The stamp lasts 15 minutes on that session.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">API</span><span class="o">=</span>https://secrets.example.com/api/v1
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">JAR</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="k">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-c<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"email":"admin@example.com","password":"&lt;password&gt;"}'</span><span class="w"> </span><span class="s2">"</span><span class="nv">$API</span><span class="s2">/auth/login"</span><span class="w"> </span>&gt;/dev/null
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nv">FACTOR</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$API</span><span class="s2">/users/me/mfa/factors"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">'.[] | select(.kind=="totp") | .id'</span><span class="k">)</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nv">CHALLENGE</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"kind":"totp"}'</span><span class="w"> </span><span class="s2">"</span><span class="nv">$API</span><span class="s2">/auth/mfa/challenge"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-r<span class="w"> </span>.challenge_id<span class="k">)</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>curl<span class="w"> </span>-fsS<span class="w"> </span>-b<span class="w"> </span><span class="s2">"</span><span class="nv">$JAR</span><span class="s2">"</span><span class="w"> </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span>-d<span class="w"> </span><span class="s2">"{\"challenge_id\":\"</span><span class="nv">$CHALLENGE</span><span class="s2">\",\"factor_id\":\"</span><span class="nv">$FACTOR</span><span class="s2">\",\"code\":\"&lt;6-digit code&gt;\"}"</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="s2">"</span><span class="nv">$API</span><span class="s2">/auth/mfa/verify"</span><span class="w">   </span><span class="c1"># 204: this session is fresh for 15 minutes</span>
+</span></code></pre></div>
+<p>A wrong code burns the challenge; ask for a new one.</p>
 <h2 id="probes">Probes<a class="headerlink" href="#probes" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -3222,7 +3265,7 @@ MFA" means the route also runs <code>RequireFreshMFA</code> and answers
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/users/:id/approve</code></td>
-<td><code>session + user_role.edit</code></td>
+<td><code>session + user_role.edit</code> + fresh MFA</td>
 <td><code>{role_id, scope}</code>. Grants the role and clears the waiting flag in one transaction. <code>scope</code> uses the <code>POST /user-roles</code> rules; a malformed one gets <code>400</code>. <code>409 user_not_pending</code> for an account that isn't waiting</td>
 </tr>
 <tr>
@@ -3901,7 +3944,7 @@ guide.</p>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/roles</code></td>
-<td><code>session + role.edit</code></td>
+<td><code>session + role.edit</code> + fresh MFA</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
@@ -3916,17 +3959,17 @@ guide.</p>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/roles/:id/permissions</code></td>
-<td><code>session + role.edit</code></td>
+<td><code>session + role.edit</code> + fresh MFA</td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/roles/:id</code></td>
-<td><code>session + role.edit</code></td>
+<td><code>session + role.edit</code> + fresh MFA</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/user-roles</code></td>
-<td><code>session + user_role.edit</code></td>
+<td><code>session + user_role.edit</code> + fresh MFA</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
@@ -3936,7 +3979,7 @@ guide.</p>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/user-roles/:id</code></td>
-<td><code>session + user_role.edit</code></td>
+<td><code>session + user_role.edit</code> + fresh MFA</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
@@ -3946,7 +3989,7 @@ guide.</p>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/workflows</code></td>
-<td><code>session + workflow.edit</code></td>
+<td><code>session + workflow.edit</code> + fresh MFA</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
@@ -3966,17 +4009,17 @@ guide.</p>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/workflows/:id</code></td>
-<td><code>session + workflow.edit</code></td>
+<td><code>session + workflow.edit</code> + fresh MFA</td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/workflows/:id</code></td>
-<td><code>session + workflow.edit</code></td>
+<td><code>session + workflow.edit</code> + fresh MFA</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/policies</code></td>
-<td><code>session + policy.edit</code></td>
+<td><code>session + policy.edit</code> + fresh MFA</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
@@ -3991,12 +4034,12 @@ guide.</p>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/policies/:id</code></td>
-<td><code>session + policy.edit</code></td>
+<td><code>session + policy.edit</code> + fresh MFA</td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/policies/:id</code></td>
-<td><code>session + policy.edit</code></td>
+<td><code>session + policy.edit</code> + fresh MFA</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
@@ -4017,6 +4060,31 @@ guide.</p>
 <td><code>PUT</code></td>
 <td><code>/api/v1/projects/:id/status</code></td>
 <td>session</td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/api/v1/projects/:id/team</code></td>
+<td><code>session + team.edit</code> + fresh MFA</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/teams</code></td>
+<td><code>session + team.edit</code> + fresh MFA</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/teams</code></td>
+<td>session</td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/api/v1/teams/:id</code></td>
+<td><code>session + team.edit</code> + fresh MFA</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/teams/:id</code></td>
+<td><code>session + team.edit</code></td>
 </tr>
 <tr>
 <td><code>GET</code></td>
@@ -4243,9 +4311,9 @@ project-ownership work, not platform registry administration. The
 </tbody>
 </table>
 <p><strong>Prometheus counters</strong> (EPIC Q):</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>provider_connection_bindings_created_total{permission_used, env_kind}
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>provider_connection_bindings_deleted_total{permission_used, env_kind}
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>provider_connection_bindings_denied_total{reason}
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>provider_connection_bindings_created_total{permission_used, env_kind}
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>provider_connection_bindings_deleted_total{permission_used, env_kind}
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>provider_connection_bindings_denied_total{reason}
 </span></code></pre></div>
 <p><code>reason</code> is a fixed low-cardinality set; the counters NEVER carry
 <code>actor_id</code>, <code>project_id</code>, <code>connection_id</code>, or <code>environment_id</code> as
@@ -4274,7 +4342,7 @@ keep using them.</p>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/projects/:projectID/policy-rules</code></td>
-<td><code>session + policy.author</code> scoped to projectID</td>
+<td><code>session + policy.author</code> scoped to projectID + fresh MFA</td>
 <td>Author a scoped rule. Body: <code>{name, selector, priority, workflow_id, enabled}</code>. Selector MUST carry <code>environment_kind="non_prod"</code> OR <code>environment_id</code>; the api runs the locked 6-gate chain (coverage → priority&lt;9000 → selector.project_id consistency → env constraint → workflow exists → INSERT). 8 stable codes listed below.</td>
 </tr>
 <tr>
@@ -4292,13 +4360,13 @@ keep using them.</p>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/projects/:projectID/policy-rules/:ruleID</code></td>
-<td><code>session + policy.author</code> scoped to projectID</td>
+<td><code>session + policy.author</code> scoped to projectID + fresh MFA</td>
 <td>Update scoped rule. All body fields optional (omitted = preserve). <strong>§3 Q9 lock</strong>: explicit empty <code>{}</code> selector REJECTED with <code>policy_scope_too_broad.reason=selector_empty</code>. <strong>§4 lock</strong>: URL projectID mismatch returns <code>policy_not_found</code>, NEVER <code>out_of_scope_policy</code>.</td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/projects/:projectID/policy-rules/:ruleID</code></td>
-<td><code>session + policy.author</code> scoped to projectID</td>
+<td><code>session + policy.author</code> scoped to projectID + fresh MFA</td>
 <td>204 on success. URL projectID mismatch returns 404 <code>policy_not_found</code>. Platform NULL rule returns 403 <code>platform_policy_not_editable</code>.</td>
 </tr>
 </tbody>
@@ -4361,10 +4429,10 @@ keep using them.</p>
 </tbody>
 </table>
 <p><strong>Prometheus counters</strong> (EPIC R):</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>policy_rules_created_total{permission_used, scope}
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>policy_rules_updated_total{permission_used, scope}
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>policy_rules_deleted_total{permission_used, scope}
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>policy_rules_denied_total{reason}
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>policy_rules_created_total{permission_used, scope}
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>policy_rules_updated_total{permission_used, scope}
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>policy_rules_deleted_total{permission_used, scope}
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>policy_rules_denied_total{reason}
 </span></code></pre></div>
 <p><code>reason</code> is a fixed low-cardinality 9-element set (<code>workflow_not_authorable</code>
 added by R-follow-up #1, api#112); the counters NEVER carry
@@ -4399,7 +4467,7 @@ posture R-follow-up #2 established for URL-key-wins).</p>
 <tr>
 <td><code>POST</code></td>
 <td><code>/api/v1/teams/:teamID/policy-rules</code></td>
-<td><code>session + policy.author</code> scoped to teamID</td>
+<td><code>session + policy.author</code> scoped to teamID + fresh MFA</td>
 <td>Author a team-scoped rule. Body: <code>{name, selector, priority, workflow_id, enabled}</code>. §1 C1 strict: selector MUST carry <code>environment_kind="non_prod"</code> and MUST NOT carry <code>project_id</code>, <code>environment_id</code>, or <code>team_id</code>. The 6-gate chain (coverage → team exists+active → priority &lt; live cap → selector consistency → workflow authorable → INSERT) runs server-side. Live <code>priority_cap</code> echoed in the envelope.</td>
 </tr>
 <tr>
@@ -4417,38 +4485,38 @@ posture R-follow-up #2 established for URL-key-wins).</p>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/teams/:teamID/policy-rules/:ruleID</code></td>
-<td><code>session + policy.author</code> scoped to teamID</td>
+<td><code>session + policy.author</code> scoped to teamID + fresh MFA</td>
 <td>Update team-scoped rule. R-follow-up #2 §3 critical pin preserved: priority revalidates against the LIVE cap on EVERY call (not only when priority is changing). §4 mismatch returns <code>policy_not_found</code>. Anchor is immutable post-create.</td>
 </tr>
 <tr>
 <td><code>DELETE</code></td>
 <td><code>/api/v1/teams/:teamID/policy-rules/:ruleID</code></td>
-<td><code>session + policy.author</code> scoped to teamID</td>
+<td><code>session + policy.author</code> scoped to teamID + fresh MFA</td>
 <td>204 on success. URL teamID mismatch returns 404 <code>policy_not_found</code>. Platform NULL rule returns 403 <code>platform_policy_not_editable</code>.</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Response envelope shape</strong> (all GET / PUT / POST):</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">"rule"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="p">,</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="p">,</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="nt">"team_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="p">,</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="nt">"team_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="p">,</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="nt">"workflow_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="p">,</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="nt">"workflow_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="p">,</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="nt">"is_platform_inherited"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="nt">"is_ancestor_inherited"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="nt">"selector_keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"environment_kind"</span><span class="p">,</span><span class="w"> </span><span class="s2">"secret_ref_prefix"</span><span class="p">],</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="nt">"selector"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"environment_kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"non_prod"</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="nt">"priority"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="nt">"enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">    </span><span class="nt">"is_system"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="p">,</span>
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">    </span><span class="nt">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span>
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">  </span><span class="nt">"priority_cap"</span><span class="p">:</span><span class="w"> </span><span class="mi">9000</span>
-</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">"rule"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="p">,</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="p">,</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="nt">"team_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="p">,</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="nt">"team_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="p">,</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span><span class="nt">"workflow_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="p">,</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="nt">"workflow_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="p">,</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="nt">"is_platform_inherited"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="nt">"is_ancestor_inherited"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="nt">"selector_keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"environment_kind"</span><span class="p">,</span><span class="w"> </span><span class="s2">"secret_ref_prefix"</span><span class="p">],</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span><span class="nt">"selector"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"environment_kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"non_prod"</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="nt">"priority"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">    </span><span class="nt">"enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">    </span><span class="nt">"is_system"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">    </span><span class="nt">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span><span class="p">,</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="w">    </span><span class="nt">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"..."</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="w">  </span><span class="nt">"priority_cap"</span><span class="p">:</span><span class="w"> </span><span class="mi">9000</span>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>For inherited rows (<code>is_platform_inherited = true</code> OR
 <code>is_ancestor_inherited = true</code>), the <code>selector</code> field is OMITTED
@@ -4518,10 +4586,10 @@ api's <code>EffectiveTeamAccess(actor, policy.author)</code> helper: every team
 the actor's grants cover, subtree-expanded.</p>
 <p>Permission: session only. Exposes ONLY the caller's own coverage; not
 enumerable across other users.</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">"global"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">"team_ids"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span><span class="w"> </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="p">]</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">"global"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">"team_ids"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span><span class="w"> </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="p">]</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>SPA reads this to drive sidebar visibility + <code>canAuthorTeamPolicy</code>
 without walking the team tree client-side.</p>
@@ -4590,13 +4658,13 @@ wire response carries <code>selector_keys</code> (set-based, sorted) and
 <li><code>limit=&lt;int&gt;</code>: default 50; cap 500 (<code>storage.MaxPolicyHistoryLimit</code>). Server-side cap defends against operator typos.</li>
 </ul>
 <p><strong>Response envelope shape</strong> (200):</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">"rule_id"</span><span class="p">:</span><span class="w">  </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">"scope"</span><span class="p">:</span><span class="w">    </span><span class="s2">"platform"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"project"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"team"</span><span class="p">,</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">"entries"</span><span class="p">:</span><span class="w">  </span><span class="p">[</span><span class="err">&lt;His</span><span class="kc">t</span><span class="err">oryE</span><span class="kc">ntr</span><span class="err">y&gt;</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="p">],</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nt">"has_more"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="nt">"limit"</span><span class="p">:</span><span class="w">    </span><span class="mi">50</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">"rule_id"</span><span class="p">:</span><span class="w">  </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">"scope"</span><span class="p">:</span><span class="w">    </span><span class="s2">"platform"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"project"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"team"</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">"entries"</span><span class="p">:</span><span class="w">  </span><span class="p">[</span><span class="err">&lt;His</span><span class="kc">t</span><span class="err">oryE</span><span class="kc">ntr</span><span class="err">y&gt;</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="p">],</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nt">"has_more"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nt">"limit"</span><span class="p">:</span><span class="w">    </span><span class="mi">50</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">}</span>
 </span></code></pre></div>
 <p><code>scope</code> reflects the rule's anchor (not the URL family). For the
 admin endpoint with a deleted rule, scope is derived from the most
@@ -4606,32 +4674,32 @@ legacy events with no scope key.</p>
 SPA grows <code>limit</code> per "Load more" click (50 → 100 → 200 …) per
 OQ3-A; cursor pagination is deferred.</p>
 <p><strong><code>HistoryEntry</code> shape</strong>:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">"event_id"</span><span class="p">:</span><span class="w">             </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">"occurred_at"</span><span class="p">:</span><span class="w">          </span><span class="s2">"&lt;rfc3339&gt;"</span><span class="p">,</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">"actor"</span><span class="p">:</span><span class="w">                </span><span class="s2">"user:&lt;uuid&gt;"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"agent:&lt;uuid&gt;"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"system:&lt;kind&gt;"</span><span class="p">,</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nt">"actor_display"</span><span class="p">:</span><span class="w">        </span><span class="s2">"&lt;resolved name&gt;"</span><span class="p">,</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nt">"correlation_id"</span><span class="p">:</span><span class="w">       </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="nt">"action"</span><span class="p">:</span><span class="w">               </span><span class="s2">"policy.create"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"policy.update"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"policy.delete"</span><span class="p">,</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="nt">"actor_permission_used"</span><span class="p">:</span><span class="w"> </span><span class="s2">"policy.author"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"policy.edit"</span><span class="p">,</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="nt">"scope"</span><span class="p">:</span><span class="w">                </span><span class="s2">"platform"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"project"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"team"</span><span class="p">,</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="nt">"changes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"priority"</span><span class="p">,</span><span class="w">      </span><span class="nt">"before"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">  </span><span class="nt">"after"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="w"> </span><span class="p">},</span>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span><span class="w">          </span><span class="nt">"before"</span><span class="p">:</span><span class="w"> </span><span class="s2">"old"</span><span class="p">,</span><span class="w"> </span><span class="nt">"after"</span><span class="p">:</span><span class="w"> </span><span class="s2">"new"</span><span class="w"> </span><span class="p">},</span>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"enabled"</span><span class="p">,</span><span class="w">       </span><span class="nt">"before"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">  </span><span class="nt">"after"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">},</span>
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"workflow_id"</span><span class="p">,</span><span class="w">   </span><span class="nt">"before"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span><span class="w"> </span><span class="nt">"after"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span>
-</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="w">      </span><span class="nt">"before_workflow_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"approval-v1"</span><span class="p">,</span><span class="w"> </span><span class="nt">"after_workflow_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"approval-v2"</span><span class="w"> </span><span class="p">},</span>
-</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"selector_keys"</span><span class="p">,</span><span class="w"> </span><span class="nt">"before"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"environment_kind"</span><span class="p">],</span><span class="w"> </span><span class="nt">"after"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"environment_kind"</span><span class="p">,</span><span class="w"> </span><span class="s2">"secret_ref_prefix"</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
-</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">  </span><span class="p">],</span>
-</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="w">  </span><span class="nt">"snapshot_after"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w">          </span><span class="s2">"..."</span><span class="p">,</span>
-</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="w">    </span><span class="nt">"enabled"</span><span class="p">:</span><span class="w">       </span><span class="kc">true</span><span class="p">,</span>
-</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="w">    </span><span class="nt">"priority"</span><span class="p">:</span><span class="w">      </span><span class="mi">100</span><span class="p">,</span>
-</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="w">    </span><span class="nt">"workflow_id"</span><span class="p">:</span><span class="w">   </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span>
-</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="w">    </span><span class="nt">"workflow_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"approval-v1"</span><span class="p">,</span>
-</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="w">    </span><span class="nt">"selector_keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"..."</span><span class="p">]</span>
-</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">"event_id"</span><span class="p">:</span><span class="w">             </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">"occurred_at"</span><span class="p">:</span><span class="w">          </span><span class="s2">"&lt;rfc3339&gt;"</span><span class="p">,</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nt">"actor"</span><span class="p">:</span><span class="w">                </span><span class="s2">"user:&lt;uuid&gt;"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"agent:&lt;uuid&gt;"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"system:&lt;kind&gt;"</span><span class="p">,</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="nt">"actor_display"</span><span class="p">:</span><span class="w">        </span><span class="s2">"&lt;resolved name&gt;"</span><span class="p">,</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="nt">"correlation_id"</span><span class="p">:</span><span class="w">       </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="nt">"action"</span><span class="p">:</span><span class="w">               </span><span class="s2">"policy.create"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"policy.update"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"policy.delete"</span><span class="p">,</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="nt">"actor_permission_used"</span><span class="p">:</span><span class="w"> </span><span class="s2">"policy.author"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"policy.edit"</span><span class="p">,</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span><span class="nt">"scope"</span><span class="p">:</span><span class="w">                </span><span class="s2">"platform"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"project"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"team"</span><span class="p">,</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span><span class="nt">"changes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"priority"</span><span class="p">,</span><span class="w">      </span><span class="nt">"before"</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w">  </span><span class="nt">"after"</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span><span class="w">          </span><span class="nt">"before"</span><span class="p">:</span><span class="w"> </span><span class="s2">"old"</span><span class="p">,</span><span class="w"> </span><span class="nt">"after"</span><span class="p">:</span><span class="w"> </span><span class="s2">"new"</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"enabled"</span><span class="p">,</span><span class="w">       </span><span class="nt">"before"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">  </span><span class="nt">"after"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"workflow_id"</span><span class="p">,</span><span class="w">   </span><span class="nt">"before"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span><span class="w"> </span><span class="nt">"after"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">      </span><span class="nt">"before_workflow_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"approval-v1"</span><span class="p">,</span><span class="w"> </span><span class="nt">"after_workflow_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"approval-v2"</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"selector_keys"</span><span class="p">,</span><span class="w"> </span><span class="nt">"before"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"environment_kind"</span><span class="p">],</span><span class="w"> </span><span class="nt">"after"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"environment_kind"</span><span class="p">,</span><span class="w"> </span><span class="s2">"secret_ref_prefix"</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">  </span><span class="p">],</span>
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">  </span><span class="nt">"snapshot_after"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w">          </span><span class="s2">"..."</span><span class="p">,</span>
+</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">    </span><span class="nt">"enabled"</span><span class="p">:</span><span class="w">       </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="w">    </span><span class="nt">"priority"</span><span class="p">:</span><span class="w">      </span><span class="mi">100</span><span class="p">,</span>
+</span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="w">    </span><span class="nt">"workflow_id"</span><span class="p">:</span><span class="w">   </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span>
+</span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="w">    </span><span class="nt">"workflow_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"approval-v1"</span><span class="p">,</span>
+</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="w">    </span><span class="nt">"selector_keys"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"..."</span><span class="p">]</span>
+</span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-6-26"><a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="p">}</span>
 </span></code></pre></div>
 <ul>
 <li><code>action</code> is always the <strong>normalized</strong> name. Legacy events from
@@ -4657,7 +4725,7 @@ NO <code>policy.denied_anchor_mismatch</code> audit event; that would defeat
 the very enumeration protection it claims to enhance. Slice 1c §4
 OQ4-1 lock.</p>
 <h3 id="counter">Counter<a class="headerlink" href="#counter" title="Permanent link">&para;</a></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>policy_rule_history_views_total{scope}
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>policy_rule_history_views_total{scope}
 </span></code></pre></div>
 <p>LOW-CARDINALITY LOCK preserved: <code>scope ∈ {platform, project, team}</code>,
 3 values total. NEVER carries <code>actor_id</code>, <code>rule_id</code>, <code>project_id</code>,
@@ -4665,16 +4733,16 @@ or <code>team_id</code> labels. Per-rule reads live in the audit log via
 <code>audit.read.policy_history</code> (see below).</p>
 <h3 id="audit-emit-on-read">Audit emit on read<a class="headerlink" href="#audit-emit-on-read" title="Permanent link">&para;</a></h3>
 <p>Every successful history list emits one audit event:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">{</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">"action"</span><span class="p">:</span><span class="w">   </span><span class="s2">"audit.read.policy_history"</span><span class="p">,</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">"actor"</span><span class="p">:</span><span class="w">    </span><span class="s2">"&lt;actor&gt;"</span><span class="p">,</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nt">"resource"</span><span class="p">:</span><span class="w"> </span><span class="s2">"policy_rule:&lt;rule-uuid&gt;"</span><span class="p">,</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="nt">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="nt">"policy_rule_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="nt">"scope"</span><span class="p">:</span><span class="w">          </span><span class="s2">"platform"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"project"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"team"</span><span class="p">,</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="nt">"entry_count"</span><span class="p">:</span><span class="w">    </span><span class="err">&lt;i</span><span class="kc">nt</span><span class="err">&gt;</span>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">"action"</span><span class="p">:</span><span class="w">   </span><span class="s2">"audit.read.policy_history"</span><span class="p">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">"actor"</span><span class="p">:</span><span class="w">    </span><span class="s2">"&lt;actor&gt;"</span><span class="p">,</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">"resource"</span><span class="p">:</span><span class="w"> </span><span class="s2">"policy_rule:&lt;rule-uuid&gt;"</span><span class="p">,</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="nt">"policy_rule_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;uuid&gt;"</span><span class="p">,</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="nt">"scope"</span><span class="p">:</span><span class="w">          </span><span class="s2">"platform"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"project"</span><span class="w"> </span><span class="err">|</span><span class="w"> </span><span class="s2">"team"</span><span class="p">,</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="nt">"entry_count"</span><span class="p">:</span><span class="w">    </span><span class="err">&lt;i</span><span class="kc">nt</span><span class="err">&gt;</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Provides forensic traceability for "who read whose history": a
 post-incident query for <code>action='audit.read.policy_history'</code>
@@ -4734,18 +4802,18 @@ a 5-minute TTL backstop for missed messages.</p>
 <tr>
 <td><code>PUT</code></td>
 <td><code>/api/v1/platform-settings/:key</code></td>
-<td><code>session + policy.edit</code></td>
+<td><code>session + policy.edit</code> + fresh MFA</td>
 <td>Update. Body: <code>{value: &lt;json&gt;}</code>. URL <code>:key</code> wins over any <code>key</code> in the body (defense against URL/body confusion). Transactional: BEGIN → SELECT FOR UPDATE → validate → UPDATE → INSERT audit → COMMIT → pub/sub publish AFTER commit.</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Response shape</strong> (<code>PlatformSetting</code>):</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"platform_reserved_priority"</span><span class="p">,</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="mi">9000</span><span class="p">,</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-06-08T12:34:56.789Z"</span><span class="p">,</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">"updated_by"</span><span class="p">:</span><span class="w"> </span><span class="s2">"alice"</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">{</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"platform_reserved_priority"</span><span class="p">,</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="mi">9000</span><span class="p">,</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nt">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-06-08T12:34:56.789Z"</span><span class="p">,</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="nt">"updated_by"</span><span class="p">:</span><span class="w"> </span><span class="s2">"alice"</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">}</span>
 </span></code></pre></div>
 <p><code>value</code> is generic JSON. Callers narrow per-key. For
 <code>platform_reserved_priority</code> it's an integer between <code>100</code> and
@@ -4782,8 +4850,8 @@ a 5-minute TTL backstop for missed messages.</p>
 </tbody>
 </table>
 <p><strong>Prometheus counters</strong> (R-follow-up #2):</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>platform_setting_updates_total{key, result}
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>platform_setting_cache_reloads_total{key, trigger}
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>platform_setting_updates_total{key, result}
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>platform_setting_cache_reloads_total{key, trigger}
 </span></code></pre></div>
 <ul>
 <li><code>key</code> is the whitelisted key string (low-cardinality, v1 has one).</li>
