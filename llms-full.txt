@@ -3866,7 +3866,7 @@ N more", the total still waiting when older ones are left, and a link to
 [info] 2 new accounts are waiting for approval
 • sara@example.com
 • omar@example.com
-Approve or decline them in Admin → Users: https://secrets.example.com/admin/users
+Approve or decline them in Administration → Accounts: https://secrets.example.com/admin/users
 ```
 
 The message carries **emails only**, never display names, because a display
